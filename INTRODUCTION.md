@@ -87,8 +87,10 @@ AI 会自动：
 1. 打开`dev_docs/rules/combined/AI_RULES.md`
 2. 删除文件开头的「使用说明」部分
 3. 复制剩余内容到 IDE 的 rule 配置
-   - Cursor: `.cursorrules`
+   - Cursor: `.cursorrules` (直接复制内容即可,无需转换)
    - Windsurf: Custom Rules
+
+**说明**: AI_RULES.md 生成的内容就是 IDE 的.cursorrules 文件格式,可以直接复制使用。
 
 **配置后效果**: AI 每次交互自动遵守项目规范，无需重复提醒！
 
@@ -239,6 +241,17 @@ A: 可以！框架有完整的分批执行和进度跟踪机制。
 
 **Q: 支持我的小众框架吗？**  
 A: AI 会自动识别和记录，即使框架不在预设列表中。
+
+**Q: 为什么选择 Markdown 而不是 JSON/YAML?**  
+A: Markdown 具有三大优势:
+
+- 便于开发者直接阅读和理解
+- 便于人工审核和修改
+- AI 解析友好,语义清晰,支持代码示例和格式化
+- 版本控制友好(可读的 diff)
+
+**Q: 生成的文档與其他工具的关系?**  
+A: 本框架作为独立文档体系使用,不与 Swagger/TypeDoc 等 API 文档工具整合。各工具解决不同层面的问题,可以并行使用。
 
 ---
 
