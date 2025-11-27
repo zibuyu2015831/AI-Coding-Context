@@ -1,0 +1,181 @@
+# AI Rules - [项目名称]
+
+> **用途**: 项目级AI规则，在IDE中配置后每次AI交互都会自动应用  
+> **生成时间**: YYYY-MM-DD  
+> **最后更新**: YYYY-MM-DD  
+> **对应文档**: `dev_docs/AI_Coding_Context.md`
+
+---
+
+## 📚 文档体系入口
+
+**主文档**: `dev_docs/AI_Coding_Context.md`  
+开始任何工作前，请先阅读此文档了解项目全貌。
+
+---
+
+## 🎯 核心规范（必须遵守）
+
+### 1. [技术栈]规范
+
+- **语言**: [主要编程语言+版本]
+- **框架**: [主要框架+版本]
+- **包管理**: [npm/pip/maven等]
+
+### 2. API调用规范
+
+- [具体规范，例如: 使用`src/api/`下的封装，禁止直接使用axios]
+- 详见 → `dev_docs/api_layer.md`
+
+### 3. 状态管理规范
+
+- [具体规范，例如: 使用Pinia，store命名`use[Name]Store`]
+- 详见 → `dev_docs/state_management.md`
+
+### 4. 组件/模块开发规范
+
+- [具体规范，例如: Composition API + TypeScript]
+- 详见 → `dev_docs/component_guide.md`
+
+### 5. 错误处理规范
+
+- [具体规范，例如: 统一使用`useErrorHandler`]
+- 详见 → `dev_docs/error_handling.md`
+
+### 6. 命名规范
+
+- **文件**: [kebab-case/snake_case/camelCase]
+- **组件/类**: [PascalCase/camelCase]
+- **函数/方法**: [camelCase/snake_case]
+- **常量**: [UPPER_SNAKE_CASE]
+
+---
+
+## 🚦 文档阅读触发器
+
+**根据任务类型，自动阅读对应文档**:
+
+| 任务类型     | 阅读文档                              | 时机               |
+| ------------ | ------------------------------------- | ------------------ |
+| API调用相关  | `dev_docs/api_layer.md`               | 编写API调用前      |
+| 状态管理相关 | `dev_docs/state_management.md`        | 使用store前        |
+| 组件开发相关 | `dev_docs/component_guide.md`         | 创建组件前         |
+| 路由配置相关 | `dev_docs/routing_guide.md`           | 修改路由前         |
+| 样式编写相关 | `dev_docs/styling_guide.md`           | 编写样式前         |
+| 表单处理相关 | `dev_docs/form_validation.md`         | 处理表单前         |
+| 遇到复杂问题 | `dev_docs/knowledge/troubleshooting/` | 问题无法快速解决时 |
+| 性能优化相关 | `dev_docs/knowledge/performance/`     | 优化性能时         |
+
+---
+
+## 🔄 工作流程规范
+
+### 新功能开发
+
+1. **先创建方案**: `dev_docs/plans/features/YYYY-MM-DD_功能描述.md`
+2. **等待用户审核** - 方案通过后再开始编码
+3. **按规范实施** - 参考对应的子文档
+4. **完成后沉淀** - 提取关键要点到`dev_docs/knowledge/`
+
+### Bug修复
+
+1. **先创建方案**: `dev_docs/plans/bugfixes/YYYY-MM-DD_bug描述.md`（复杂bug）
+2. **分析根因** - 检查`dev_docs/knowledge/troubleshooting/`
+3. **按规范修复** - 遵守项目规范
+4. **记录经验** - 难题沉淀到knowledge/
+
+### 代码修改
+
+1. **识别影响范围** - 确定涉及哪些模块
+2. **阅读相关文档** - 根据触发器阅读对应文档
+3. **遵守规范修改** - 保持一致性
+4. **更新文档**（如有必要） - 保持文档与代码同步
+
+---
+
+## ⚠️ 禁止事项
+
+1. ❌ **不要臆测规范** - 不确定时先阅读文档或询问用户
+2. ❌ **不要跳过方案** - 重要功能/修复必须先写方案
+3. ❌ **不要直接修改核心配置** - 配置变更需要用户确认
+4. ❌ **不要引入新依赖未讨论** - 新依赖需要评估和确认
+5. ❌ **不要忽略错误处理** - 所有API调用都要处理错误
+6. ❌ **不要使用占位符** - 代码示例必须完整可用
+
+---
+
+## 💡 最佳实践
+
+1. ✅ **优先查阅knowledge/** - 类似问题可能已有解决方案
+2. ✅ **保持代码一致性** - 遵循现有代码风格
+3. ✅ **完善的错误提示** - 用户友好的错误信息
+4. ✅ **注释关键逻辑** - 复杂逻辑必须注释
+5. ✅ **及时更新文档** - 规范变更时同步更新
+
+---
+
+## 🔧 特殊场景处理
+
+### 多租户/多品牌（如适用）
+
+- [特殊处理规则]
+- 详见 → `dev_docs/[相关文档]`
+
+### 实时通讯（如适用）
+
+- [WebSocket/SSE等规则]
+- 详见 → `dev_docs/[相关文档]`
+
+### 国际化（如适用）
+
+- [i18n规则]
+- 详见 → `dev_docs/[相关文档]`
+
+---
+
+## 📅 Rule更新触发条件
+
+**何时需要更新此Rule文件**:
+
+1. 技术栈升级（框架、语言版本变更）
+2. 核心规范调整（API调用方式、状态管理方案变更）
+3. 新增重要子文档
+4. 命名规范变更
+5. 开发流程调整
+
+**更新流程**:
+
+1. AI生成更新后的rule到`dev_docs/AI_RULES.md`
+2. 提醒用户手动更新IDE的rule配置
+3. 记录更新日期
+
+---
+
+## 🎓 使用说明
+
+### 如何在IDE中配置
+
+**Cursor**:
+
+1. 将此文件内容复制到项目根目录的`.cursorrules`文件
+2. 重启Cursor或重新加载项目
+
+**Windsurf**:
+
+1. 在项目设置中找到"Custom Rules"
+2. 粘贴此文件内容
+3. 保存配置
+
+**VS Code + GitHub Copilot**:
+
+1. 在`.vscode/settings.json`中配置
+2. 或使用workspace settings
+
+**其他IDE**:
+
+- 参考IDE文档配置项目级AI规则
+- 本质是让AI在每次交互时都读取这些规则
+
+---
+
+**最后更新**: YYYY-MM-DD
