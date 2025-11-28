@@ -2,8 +2,8 @@
 
 > **AI 专用入口文档**  
 > **用途**: AI 读取此文件即可理解整个框架，自主决策生成流程  
-> **版本**: v2.1  
-> **最后更新**: 2025-11-27
+> **版本**: v2.3  
+> **最后更新**: 2025-11-28
 >
 > ---
 >
@@ -12,7 +12,12 @@
 > - ✅ **对用户**: 这是您唯一需要关心的入口文档，将此文档发送给 AI 即可
 > - ✅ **对 AI**: 本文档包含所有决策逻辑，其他文档是内部参考文件，按需读取
 > - ✅ **其他文档**: 仅在 AI 自主决策时内部使用，用户无需阅读
-> - ⚠️ **补充规范**: 必须同时阅读 [`AI_ENTRY_POINT_SUPPLEMENT.md`](./AI_ENTRY_POINT_SUPPLEMENT.md) 了解完整规范
+>
+> **📚 必读核心规范** (优先阅读):
+>
+> 1. [语言规范](./core/language_rules.md) - 确定文档生成语言
+> 2. [安全规范](./core/security_rules.md) - 敏感信息脱敏
+> 3. [项目类型规范](./core/project_types.md) - 项目类型识别与处理
 
 ---
 
@@ -21,9 +26,10 @@
 ### 设计理念
 
 1. **方案优先** - 先生成分析方案，人工审核后再执行
-2. **问题发现** - 分析时记录问题和疑问，不臆测
-3. **分层文档** - 主文档（索引）→ 子文档（详细）→ 知识库（经验）
-4. **进度可控** - 大型项目分批执行，系统化完成
+2. **基于代码** - 一切分析以实际代码为依据，禁止臆测
+3. **问题发现** - 分析时记录问题和疑问，不确定时标注
+4. **分层文档** - 主文档（索引）→ 子文档（详细）→ 知识库（经验）
+5. **进度可控** - 大型项目分批执行，系统化完成
 
 ### 框架能力
 
@@ -44,14 +50,37 @@
 | `AI_ENTRY_POINT.md` | AI 入口（本文档） | **首次使用必读** |
 | `INTRODUCTION.md`   | 人类入门指南      | 无需读取         |
 
+### 核心规范 (`core/`) **[v2.2 新增]**
+
+| 文件                      | 用途               | AI 何时读取            |
+| ------------------------- | ------------------ | ---------------------- |
+| `core/language_rules.md`  | 文档语言确认       | **开始前必读**         |
+| `core/security_rules.md`  | 敏感信息脱敏规范   | **生成文档时必读**     |
+| `core/project_types.md`   | 项目类型识别与处理 | **决策子文档清单必读** |
+| `core/update_triggers.md` | 文档更新触发机制   | 生成完成后阅读         |
+
+### 流程文档 (`workflows/`) **[v2.2 新增]**
+
+| 文件                                       | 用途              | AI 何时读取                     |
+| ------------------------------------------ | ----------------- | ------------------------------- |
+| `workflows/detection_workflow.md`          | 项目检测详细流程  | 执行步骤 0-1 时参考             |
+| `workflows/decision_workflow.md`           | 策略决策详细流程  | 执行步骤 2-3 时参考             |
+| `workflows/generation_workflow.md`         | 文档生成详细流程  | 执行步骤 4-6 时参考             |
+| `workflows/progress_tracking.md`           | 进度记录机制      | 了解进度管理时参考              |
+| `workflows/incremental_update_workflow.md` | 增量更新流程      | 执行增量更新时参考 (v2.3)       |
+| `workflows/monorepo_workflow.md`           | Monorepo 处理流程 | **Monorepo 项目必读** (v2.3)    |
+| `workflows/document_health_check.md`       | 文档健康度检查    | **检测到现有文档时必读** (v2.3) |
+
 ### 指导文档 (`guides/`)
 
-| 文件                            | 用途         | AI 何时读取                 |
-| ------------------------------- | ------------ | --------------------------- |
-| `guides/quick_start.md`         | 快速开始     | 需要了解使用流程时          |
-| `guides/project_types.md`       | 项目类型适配 | **决策子文档清单时必读**    |
-| `guides/language_support.md`    | 多语言分析   | **分析非 JS/TS 项目时必读** |
-| `guides/generation_workflow.md` | 详细生成流程 | 需要详细步骤时              |
+| 文件                                 | 用途              | AI 何时读取                 |
+| ------------------------------------ | ----------------- | --------------------------- |
+| `guides/quick_start.md`              | 快速开始          | 需要了解使用流程时          |
+| `guides/project_types.md`            | 项目类型适配      | **决策子文档清单时必读**    |
+| `guides/language_support.md`         | 多语言分析        | **分析非 JS/TS 项目时必读** |
+| `guides/generation_workflow.md`      | 详细生成流程      | 需要详细步骤时              |
+| `guides/ai_rules_maintenance.md`     | AI Rules 维护指南 | **生成完成后阅读** (v2.3)   |
+| `guides/configuration_management.md` | 配置管理最佳实践  | 了解配置方案时参考 (v2.3)   |
 
 ### 模板文档 (`templates/`)
 
@@ -70,189 +99,162 @@
 
 ### 参考文档 (`reference/`)
 
-**跨平台检测命令**:
+| 文件                            | 用途         | AI 何时参考    |
+| ------------------------------- | ------------ | -------------- |
+| `reference/design_decisions.md` | 设计决策说明 | 了解设计理由时 |
+| `reference/framework_spec.md`   | 文档体系规范 | 生成任意文档时 |
+
+---
+
+## 🔀 智能工作流分流 (v2.3)
+
+### 首次使用自动检测
+
+AI 读取本文档后，应**首先执行以下检测**，根据项目状态选择合适的工作流：
+
+**步骤-1: 检测现有文档体系**
 
 ```bash
-# Linux/Mac检测
-which cloc && echo "✅ cloc可用" || echo "❌ cloc未安装"
-which tokei && echo "✅ tokei可用" || echo "❌ tokei未安装"
-which fd && echo "✅ fd可用" || echo "❌ fd未安装"
-
-# Windows PowerShell检测
-where.exe cloc
-where.exe tokei
-where.exe fd
-
-# 如果都未安装，使用基础命令验证
-# Windows
-powershell -Command "Get-Command Get-ChildItem"
-# Linux/Mac
-which find
+# 检测dev_docs目录是否存在
+if [ -d "dev_docs" ]; then
+    # 检测主文档是否存在
+    if [ -f "dev_docs/AI_Coding_Context.md" ]; then
+        echo "✅ 检测到现有文档体系"
+        # → 进入场景4: 文档健康度检查
+    else
+        echo "⚠️ dev_docs存在但文档不完整"
+        # → 询问用户：修复还是重新生成
+    fi
+else
+    echo "📝 未检测到文档体系"
+    # → 进入首次生成流程（步骤0-6）
+fi
 ```
 
-#### 0.2 工具选择策略
+**跨平台命令**:
 
-**优先级排序**:
+```bash
+# Linux/Mac
+test -f dev_docs/AI_Coding_Context.md && echo "文档存在" || echo "文档不存在"
 
-1. **tokei** (推荐) ⭐⭐⭐
-   - 优点: 最快，自动排除.gitignore，跨平台
-   - 安装: `cargo install tokei` 或 [下载预编译版](https://github.com/XAMPPRocky/tokei/releases)
-2. **cloc** (通用) ⭐⭐
+# Windows PowerShell
+Test-Path dev_docs/AI_Coding_Context.md
+```
 
-   - 优点: 功能全面，准确
-   - 缺点: 需手动配置排除规则
-   - 安装:
-     ```bash
-     # Mac
-     brew install cloc
-     # Ubuntu
-     sudo apt install cloc
-     # Windows
-     choco install cloc
-     ```
+---
 
-3. **fd** (快速查找) ⭐⭐
+### 分流决策逻辑
 
-   - 优点: 比 find 更快，自动排除.gitignore
-   - 用途: 配合 wc 统计文件数
-   - 安装: `cargo install fd-find` 或包管理器
+| 检测结果                   | AI 行为    | 进入流程         |
+| -------------------------- | ---------- | ---------------- |
+| dev_docs/不存在            | 首次生成   | 步骤 0-6（下方） |
+| dev_docs/存在 + 主文档存在 | 健康度检查 | 场景 4（下方）   |
+| dev_docs/存在但文档不完整  | 询问用户   | 修复 or 重新生成 |
 
-4. **基础命令** (降级方案) ⭐
-   - Windows: `Get-ChildItem` (PowerShell)
-   - Linux/Mac: `find` + `wc`
-   - 缺点: 速度慢，需手动排除
+---
 
-#### 0.3 自动选择逻辑
+### 分流输出示例
+
+#### 情况 1: 检测到现有文档
 
 ```markdown
-AI 自动选择流程:
+✅ 检测到现有文档体系！
 
-1. 优先使用 tokei（如果可用）
-2. 其次使用 cloc（如果可用）
-3. 再次使用 fd + wc（如果可用）
-4. 最后降级到基础命令
+📁 发现的文档:
+
+- dev_docs/AI_Coding_Context.md ✅
+- dev_docs/\_analysis/generation_plan.md ✅
+- dev_docs/\_analysis/generation_progress.md ✅
+
+📅 文档元数据:
+
+- 生成日期: 2025-09-15
+- 距今: 74 天
+- 文档版本: v1.0
+
+💡 建议操作:
+A. 执行文档健康度检查（推荐）- 评估是否需要更新
+B. 直接进行增量更新 - 如果确定代码有变更
+C. 重新生成文档 - 如果需要完全重建
+
+请选择: A / B / C
 ```
 
-**⚠️ 如果所有工具都不可用**:
+#### 情况 2: 未检测到文档
 
-- 记录到疑问事项
-- 建议用户手动提供项目信息
-- 或提供工具安装指南
+```markdown
+📝 未检测到文档体系
+
+将执行首次生成流程:
+
+- 步骤 0: 环境预检
+- 步骤 1: 项目检测
+- 步骤 2-6: 生成执行
+
+继续执行...
+```
+
+#### 情况 3: 文档不完整
+
+```markdown
+⚠️ 检测到 dev_docs/目录，但文档不完整
+
+发现的文件:
+
+- dev_docs/\_analysis/generation_plan.md ✅
+- dev_docs/AI_Coding_Context.md ❌ 缺失
+
+💡 可能原因:
+
+- 上次生成未完成
+- 文档被误删除
+- 目录结构不正确
+
+建议操作:
+A. 修复文档（尝试恢复或补全）
+B. 重新生成文档（推荐）
+
+请选择: A / B
+```
+
+---
+
+## 🚀 文档生成流程
+
+### 步骤 0: 环境预检（自动）
+
+**检测统计工具可用性**：
+
+推荐工具优先级：`tokei` → `cloc` → `fd` → 基础命令
+
+**详细操作**: 参见 [检测流程](./workflows/detection_workflow.md#环境预检)
 
 ---
 
 ### 步骤 1: 项目检测（自动）
 
-#### 1.1 准备排除规则
+**检测内容**：
 
-**⚠️ 重要**: 统计前必须排除依赖目录，否则会严重影响项目规模判断！
+1. 编程语言（通过文件扩展名）
+2. 项目规模（代码行数、文件数）
+3. 项目类型（通过依赖文件和目录结构）
 
-**优先使用.gitignore 规则**:
+**关键原则**：
 
-```bash
-# 检查项目是否有.gitignore文件
-if [ -f ".gitignore" ]; then
-    echo "✅ 检测到.gitignore，将应用其排除规则"
-fi
-```
+- ⚠️ **必须排除依赖目录**（如 node_modules、vendor、.venv 等）
+- ✅ **优先使用 .gitignore 规则**
+- ✅ **使用跨平台命令**（支持 Windows/Linux/Mac）
 
-**通用排除目录**（无论是否有.gitignore 都要排除）:
+**详细操作**: 参见 [检测流程](./workflows/detection_workflow.md#项目检测)
 
-- Node.js: `node_modules/`, `dist/`, `build/`, `.next/`, `.nuxt/`
-- Python: `.venv/`, `venv/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`
-- Java: `target/`, `build/`, `.gradle/`
-- Go: `vendor/`
-- Rust: `target/`
-- PHP: `vendor/`
-- Ruby: `vendor/`
-- C++: `build/`, `cmake-build-*/`
-- 通用: `.git/`, `.idea/`, `.vscode/`, `.DS_Store`
-
----
-
-#### 1.2 检测编程语言
-
-**跨平台命令**:
-
-```bash
-# 方案1: 使用fd（推荐，跨平台）
-fd -e py | wc -l    # Python
-fd -e js -e ts | wc -l  # JavaScript/TypeScript
-fd -e java | wc -l  # Java
-fd -e go | wc -l    # Go
-
-# 方案2: Linux/Mac - 使用find
-find . -name "*.py" -not -path "*/.*" -not -path "*/.venv/*" -not -path "*/venv/*" | wc -l
-
-# 方案3: Windows PowerShell
-(Get-ChildItem -Recurse -Filter "*.py" -Exclude node_modules,venv,.venv | Measure-Object).Count
-(Get-ChildItem -Recurse -Include *.js,*.ts -Exclude node_modules,dist | Measure-Object).Count
-(Get-ChildItem -Recurse -Filter "*.java" -Exclude target,build | Measure-Object).Count
-```
-
----
-
-#### 1.3 统计项目规模
-
-**方案 1: 使用 tokei**（推荐，最快，跨平台）:
-
-```bash
-tokei
-# tokei自动排除.gitignore中的文件
-# 跨平台支持：Windows/Linux/Mac
-```
-
-**方案 2: 使用 cloc**:
-
-```bash
-# 跨平台命令（Windows/Linux/Mac）
-cloc . --exclude-dir=node_modules,dist,vendor,.venv,venv,build,target
-```
-
-**方案 3: 基础命令**（降级方案）:
-
-```bash
-# Linux/Mac
-find . -name "*.py" -o -name "*.js" -o -name "*.ts" | xargs wc -l
-
-# Windows PowerShell
-Get-ChildItem -Recurse -Include *.py,*.js,*.ts -Exclude node_modules,dist |
-  Get-Content | Measure-Object -Line
-```
-
----
-
-#### 1.4 检测项目类型特征
-
-**跨平台命令**:
-
-```bash
-# Linux/Mac
-ls package.json 2>/dev/null && echo "检测到Node.js项目"
-ls requirements.txt pyproject.toml 2>/dev/null && echo "检测到Python项目"
-ls pom.xml build.gradle 2>/dev/null && echo "检测到Java项目"
-ls go.mod 2>/dev/null && echo "检测到Go项目"
-
-# Windows PowerShell
-Test-Path package.json
-Test-Path requirements.txt
-Test-Path pom.xml
-Test-Path go.mod
-```
-
----
-
-#### 1.5 填写检测结果
+**检测结果示例**：
 
 ```markdown
-- 主要语言: [Python/Java/JavaScript/...]
-- 项目类型: [前端/后端/全栈/...]
-- 项目规模: [小型/中型/大型/超大型]
-- 统计范围:
-  - 总文件数: [X 个] （不包括依赖）
-  - 总代码行: [X 行] （不包括依赖）
-  - 排除目录: [列出实际排除的目录]
-  - 是否应用.gitignore: [是/否]
+- 主要语言: Python
+- 项目类型: 后端 API
+- 项目规模: 中型（150 个文件，12K 行代码）
+- 统计工具: tokei
+- 已排除依赖: .venv/, **pycache**/
 ```
 
 **⚠️ 再次强调**: 所有统计数据必须明确**排除依赖目录**！
@@ -309,123 +311,34 @@ Test-Path go.mod
 
 **目的**: 基于项目复杂度特征，智能调整策略级别
 
-**检测复杂度因素**:
+**复杂度因素**:
 
-**1. Monorepo 检测 (+1 级)**
+| 因素       | 影响  | 识别特征                    |
+| ---------- | ----- | --------------------------- |
+| Monorepo   | +1 级 | workspace 配置、多包目录    |
+| 微服务架构 | +1 级 | Docker Compose、多服务      |
+| 混合语言   | +0.5  | ≥3 种编程语言               |
+| 多租户架构 | +0.5  | tenant 相关代码、多品牌配置 |
 
-特征识别:
+**详细检测方法**: 参见 [决策流程](./workflows/decision_workflow.md#复杂度检测)
 
-- 存在 `pnpm-workspace.yaml` 或 `lerna.json`
-- package.json 中有 `workspaces` 字段
-- 存在 `packages/` 或 `apps/` 目录结构
+**计算公式**:
 
-检测命令（跨平台）:
-
-```bash
-# Linux/Mac
-test -f pnpm-workspace.yaml && echo "✅ Monorepo"
-grep -q "workspaces" package.json 2>/dev/null && echo "✅ Workspaces"
-
-# Windows PowerShell
-Test-Path pnpm-workspace.yaml
-Select-String -Path package.json -Pattern "workspaces" -Quiet
 ```
-
-**2. 微服务架构检测 (+1 级)**
-
-特征识别:
-
-- Docker Compose 配置多个服务
-- 多个独立服务目录
-- Kubernetes 配置文件
-
-检测命令（跨平台）:
-
-```bash
-# Linux/Mac
-test -f docker-compose.yml && grep -c "services:" docker-compose.yml
-find . -name "Dockerfile" | wc -l
-
-# Windows PowerShell
-Test-Path docker-compose.yml
-(Get-ChildItem -Recurse -Filter "Dockerfile").Count
-```
-
-**3. 混合语言检测 (+0.5 级)**
-
-检测逻辑:
-
-```markdown
-语言数 ≥ 3 种 → +0.5 级
-
-示例: 同时检测到:
-
-- package.json (Node.js)
-- requirements.txt (Python)
-- go.mod (Go)
-  → 混合语言项目
-```
-
-**4. 多租户架构检测 (+0.5 级)**
-
-特征识别:
-
-- 代码中有 `tenant` / `multi-tenant` 关键词
-- 配置多品牌/多租户目录
-
-检测命令:
-
-```bash
-# 搜索关键词（仅示例，不强制执行）
-grep -r "tenant" src/ --include="*.ts" --include="*.js" | wc -l
-```
-
-**复杂度调整计算**:
-
-```markdown
-最终策略 = 基础策略 + 复杂度因子
+最终策略级别 = 基础级别 + 复杂度因子之和
 
 级别对应:
-
 - 小型 (0 级)
 - 中型 (1 级)
 - 大型 (2 级)
 - 超大型 (3 级)
-
-示例 1: 中型项目 + Monorepo
-
-- 基础: 中型 (1 级)
-- 调整: +1 级 (Monorepo)
-- 最终: 2 级 = 大型项目策略
-
-示例 2: 小型项目 + Monorepo + 微服务
-
-- 基础: 小型 (0 级)
-- 调整: +1+1 = +2 级
-- 最终: 2 级 = 大型项目策略
-
-示例 3: 中型 + 混合语言 + 多租户
-
-- 基础: 中型 (1 级)
-- 调整: +0.5+0.5 = +1 级
-- 最终: 2 级 = 大型项目策略
 ```
 
-**调整后输出示例**:
+**示例**:
 
 ```markdown
-📊 项目分析结果:
-
-基础规模: 中型（150 个文件，12K 行代码）
-
-复杂度因素检测:
-✅ Monorepo 结构检测 → pnpm-workspace.yaml (+1 级)
-✅ 微服务架构检测 → 4 个 Dockerfile (+1 级)
-❌ 混合语言检测 → 仅 1 种语言
-❌ 多租户架构检测 → 未检测到
-
-复杂度调整: +2 级
-最终策略: 大型项目策略（分 5-8 批执行）
+中型项目 (1 级) + Monorepo (+1) + 混合语言 (+0.5)
+= 2.5 级 → 大型项目策略
 ```
 
 ---
@@ -512,71 +425,23 @@ grep -r "tenant" src/ --include="*.ts" --include="*.js" | wc -l
 
 ## 📊 进度记录机制（必需）
 
-### 为什么需要进度记录？（v2.1 增强说明）
+⚠️ **无论项目规模大小，都必须使用进度记录！**
 
-**价值 1: 会话中断恢复** ⭐⭐⭐
+### 为什么需要？
 
-- ⚠️ AI 会话可能随时中断（网络问题、超时、手动刷新等）
-- ✅ 记录进度后，可从上次位置继续，避免重复劳动
+| 价值                | 说明                                 |
+| ------------------- | ------------------------------------ |
+| 会话中断恢复 ⭐⭐⭐ | AI 会话可能随时中断,记录进度避免重复 |
+| 便于用户审核 ⭐⭐⭐ | 随时了解当前进度,预估剩余工作量      |
+| 质量保证 ⭐⭐       | 强制按顺序完成,避免遗漏              |
+| 协作友好 ⭐         | 多人协作或交接工作时快速了解进度     |
 
-**价值 2: 便于用户审核** ⭐⭐⭐
+### 如何记录？
 
-- ✅ 用户可随时查看 generation_progress.md 了解当前进度
-- ✅ 清晰知道已完成哪些文档、正在生成哪些
-- ✅ 预估剩余工作量和完成时间
-
-**价值 3: 质量保证** ⭐⭐
-
-- ✅ 强制 AI 按顺序完成，避免遗漏
-- ✅ 每个文档都有明确的状态标记
-- ✅ 便于发现和修复生成过程中的问题
-
-**价值 4: 协作友好** ⭐
-
-- ✅ 多人可通过进度文件了解生成状态
-- ✅ 接手他人工作时快速了解进度
-
-**因此**: ⚠️ **无论项目规模大小，都必须使用进度记录！**
-
-### 进度记录方式
-
-**无论项目规模**，在生成过程中必须创建:  
-`dev_docs/_analysis/generation_progress.md`
-
+**固定路径**: `dev_docs/_analysis/generation_progress.md`  
 **使用模板**: `templates/PROGRESS_TEMPLATE.md`
 
-### AI 生成时的行为
-
-1. **开始生成前**:
-
-   ```markdown
-   ✅ 创建进度记录: dev_docs/\_analysis/generation_progress.md
-   ```
-
-2. **每完成一个文档后**:
-
-   ```markdown
-   ✅ 更新进度记录: 标记 XX 文档为已完成
-   ```
-
-3. **所有文档生成完毕**:
-
-   ```markdown
-   ✅ 更新进度记录: 当前状态 = 已完成
-   ✅ 生成完成报告
-   ```
-
-4. **如果会话中断，用户恢复时**:
-
-   ```markdown
-   用户: "继续生成文档"
-   AI:
-
-   1. 读取 dev_docs/\_analysis/generation_progress.md
-   2. 识别未完成的部分
-   3. 输出: "检测到进度记录，上次完成到 XX，现在从 YY 继续"
-   4. 继续生成未完成的部分
-   ```
+**详细说明**: 参见 [进度记录机制](./workflows/progress_tracking.md)
 
 ---
 
@@ -831,6 +696,18 @@ packages/
 理由: 技术栈差异大，分开生成更合适
 ```
 
+**策略 2 详细执行步骤**: 参见 [Monorepo 工作流](./workflows/monorepo_workflow.md)
+
+**要点概述**:
+
+1. 检测子项目清单（跨平台命令）
+2. 用户确认生成范围（全部/部分/自定义）
+3. 逐个子项目执行完整生成流程
+4. 生成根目录 README 索引文档
+5. 完成汇总和使用提示
+
+**详细操作流程**: 请查阅 [workflows/monorepo_workflow.md](./workflows/monorepo_workflow.md)
+
 **⚠️ 询问用户**:
 
 ```markdown
@@ -841,11 +718,28 @@ packages/
 3. packages/shared (TypeScript 工具库)
 
 请选择文档生成策略：
-A. 生成全局文档（推荐，适合技术栈统一）
-B. 为每个子项目生成独立文档
-C. 仅为特定子项目生成（请指定）
 
-请回复 A / B / C-[项目名]
+A. 生成全局文档（推荐，适合技术栈统一）
+
+- 一个主文档包含所有子项目
+- 共享知识库
+- 适合: 所有子项目使用相同技术栈
+
+B. 为每个子项目生成独立文档
+
+- 每个子项目有完整的 dev_docs/
+- 独立的 AI_Coding_Context.md
+- 根目录生成索引 README
+- 适合: 技术栈差异大
+
+C. 仅为特定子项目生成（部分生成）
+
+- 手动选择需要生成的子项目
+- 可多选，例如: C-web,api (生成 web 和 api)
+- 根目录生成包含选中项目的 README
+- 适合: 只关注部分子项目
+
+请回复 A / B / C-[项目名,项目名] (例如: C-web,api)
 ```
 
 ### 场景 3: 未识别框架
@@ -857,7 +751,39 @@ C. 仅为特定子项目生成（请指定）
 2. 询问用户项目类型
 3. 不要臆测，记录到疑问事项
 
-### 场景 4: 遗留代码项目
+### 场景 4: 文档健康度检查 (v2.3)
+
+**触发条件**:
+
+- 检测到现有`dev_docs/`文档体系
+- 距上次文档生成已有一段时间
+- 用户不确定文档是否仍然准确
+
+**检查模式**: 参见 [文档健康度检查流程](./workflows/document_health_check.md)
+
+**三种检查模式**:
+
+| 模式                | 时长       | Token 消耗  | 适用场景               |
+| ------------------- | ---------- | ----------- | ---------------------- |
+| 模式 1: 快速扫描 ⚡ | 1 分钟     | ~50 tokens  | 快速评估               |
+| 模式 2: 标准检查 ⭐ | 3-5 分钟   | ~250 tokens | 常规评估（推荐）       |
+| 模式 3: 深度分析 🔍 | 10-15 分钟 | ~900 tokens | 长期未更新或重大变更后 |
+
+> 注意：上方表格“Token 消耗”列中的数据，仅作为量级参考，并非实际 tokens 消耗。
+
+**默认行为**:
+
+1. 自动执行快速扫描（无需询问用户）
+2. 输出评估卡片
+3. 给出选项让用户选择（A/B/C/D/E）
+
+**健康度评分**: 百分制，分 5 级（优秀/良好/一般/较差/极差）
+
+**降级策略**: Git diff → 文件时间对比（双向）→ 用户提供 → 仅时间
+
+**详细说明**: [workflows/document_health_check.md](./workflows/document_health_check.md)
+
+### 场景 5: 遗留代码项目
 
 **检测**: 代码年代久远或技术栈过时  
 **处理**:
@@ -903,167 +829,27 @@ C. 仅为特定子项目生成（请指定）
 
 ---
 
-## � 故障处理指南
+## 🛠️ 故障处理指南
 
-### 场景 1: 项目检测失败
+### 降级决策原则
 
-**症状**: 统计命令返回错误或无法执行
+**设计理念**: AI 自主处理故障,能继续则继续,结束时汇总提醒用户
 
-**可能原因**:
+**故障分类**:
 
-- 操作系统差异（Windows/Mac/Linux 命令不同）
-- 工具未安装（cloc、tokei、fd 等）
-- 权限问题
+| 类型   | 处理方式     | 示例                        |
+| ------ | ------------ | --------------------------- |
+| 非致命 | 降级继续     | 统计工具不可用 → 用基础命令 |
+| 可降级 | 使用替代方案 | tokei→cloc→fd→find          |
+| 致命   | 暂停询问用户 | 无法访问项目目录            |
 
-**解决方案**:
-
-1. **Windows 用户**:
-
-   ```powershell
-   # 使用PowerShell替代命令
-   (Get-ChildItem -Recurse -Filter "*.py" | Measure-Object).Count
-   ```
-
-2. **工具未安装**:
-
-   - 询问用户是否安装了统计工具
-   - 如没有，提供安装指南或使用基础命令
-   - 最后手段：请用户手动提供项目信息
-
-3. **输出到疑问事项**:
-   ```markdown
-   🔵 疑问: 无法执行统计命令，已请用户手动确认项目规模
-   ```
-
----
-
-### 场景 2: 无法识别项目类型
-
-**症状**: 没有找到典型的依赖文件（package.json、requirements.txt 等）
-
-**解决方案**:
-
-1. 列出发现的文件类型:
-
-   ```markdown
-   检测到以下文件类型:
-
-   - .py 文件: 50 个
-   - .sh 文件: 10 个
-   - .md 文件: 5 个
-   ```
-
-2. 询问用户项目类型:
-
-   ```markdown
-   🔵 疑问: 无法自动识别项目类型，请确认：
-
-   - 这是什么类型的项目？（脚本/CLI 工具/库/其他）
-   - 主要用途是什么？
-   ```
-
-3. **禁止臆测**: 不要假设项目类型，必须等待用户确认
-
----
-
-### 场景 3: 统计数据异常
-
-**症状**: 文件数远超预期（例如小项目显示几千个文件）
-
-**可能原因**: 统计包含了依赖目录（node_modules、vendor 等）
-
-**解决方案**:
-
-1. 检查是否正确排除依赖目录
-2. 使用更严格的排除规则:
-   ```bash
-   cloc . --exclude-dir=node_modules,dist,vendor,.venv,venv,build,target,.git
-   ```
-3. 向用户确认:
-   ```markdown
-   🔵 疑问: 检测到[X]个文件，这个数字是否合理？
-   如果不合理，可能包含了依赖目录。
-   ```
-
----
-
-### 场景 4: 混合项目类型
-
-**症状**: 发现多种项目类型特征（如同时有 package.json 和 requirements.txt）
-
-**解决方案**:  
-⚠️ **不支持混合项目类型**
-
-**输出**:
-
-```markdown
-❌ 检测到混合项目类型:
-
-- 前端项目特征: package.json
-- 后端项目特征: requirements.txt
-
-🛑 **框架限制**: 此框架仅支持单一项目类型。
-
-💡 **建议**:
-如果这是 Monorepo 或前后端混合项目，建议：
-
-1. 在各自子目录单独使用此框架
-2. 或选择主要部分（前端/后端）生成文档
-
-请确认您希望为哪部分生成文档？
-```
-
-**暂停执行，等待用户确认**
-
----
-
-### 场景 5: AI 会话中断
-
-**症状**: 生成过程中会话断开、超时、或需要重启
-
-**解决方案**:  
-✅ **依赖进度记录机制**（见上文"进度记录机制"）
-
-**恢复步骤**:
-
-1. 检查是否存在 `dev_docs/_analysis/generation_progress.md`
-2. 如果存在:
-
-   ```markdown
-   ✅ 检测到进度记录
-   上次生成进度:
-
-   - 已完成: XX、YY、ZZ
-   - 未完成: AA、BB
-
-   现在从 AA 继续生成，是否确认？
-   ```
-
-3. 如果不存在:
-   ```markdown
-   ⚠️ 未检测到进度记录
-   建议重新开始生成流程，以确保完整性
-   ```
-
----
+**详细降级机制**: 参见 AI_ENTRY_POINT.md 第 420-540 行（故障降级决策机制）
 
 ### 处理原则
 
 1. ✅ **永远不要臆测** - 不确定的内容记录到疑问事项
 2. ✅ **提供验证命令** - 让用户可以自行验证
 3. ✅ **优雅降级** - 工具不可用时提供替代方案
-4. ✅ **明确限制** - 不支持的场景要清晰告知
-5. ✅ **记录问题** - 所有异常都记录到方案的"风险点"章节
-
----
-
-## �📌 重要提醒
-
-### 禁止事项
-
-1. ❌ **不要跳过方案生成** - 即使是小项目
-2. ❌ **不要臆测架构特点** - 必须有代码依据
-3. ❌ **不要虚构代码示例** - 必须来自实际文件
 4. ❌ **不要跳过问题报告** - 必须记录发现的问题
 5. ❌ **不要未经审核就生成** - 必须等待用户确认
 

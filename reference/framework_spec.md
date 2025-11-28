@@ -1,12 +1,12 @@
-# AI辅助开发文档体系规范
+# AI 辅助开发文档体系规范
 
 > **版本**: v2.0 ✨ 已更新  
 > **创建日期**: 2025-11-27  
-> 本规范定义了一套**通用的AI辅助开发文档体系**，通过结构化文档帮助AI快速理解项目、保持开发规范、沉淀团队知识。
+> 本规范定义了一套**通用的 AI 辅助开发文档体系**，通过结构化文档帮助 AI 快速理解项目、保持开发规范、沉淀团队知识。
 
 ### 核心理念
 
-1. **单一入口** - 一个主文档作为AI的快速上下文入口
+1. **单一入口** - 一个主文档作为 AI 的快速上下文入口
 2. **分层架构** - 主文档（索引+速查）→ 子文档（详细）→ 知识库（经验）
 3. **方案驱动** - 强制规划先行，提升开发质量
 4. **知识沉淀** - 持续积累项目经验，避免重复踩坑
@@ -139,8 +139,8 @@ plans/
 ├── README.md # 方案索引与使用规范
 ├── features/ # 功能开发方案
 │ └── YYYY-MM-DD\_功能描述.md
-└── bugfixes/ # Bug修复方案
-└── YYYY-MM-DD_bug描述.md
+└── bugfixes/ # Bug 修复方案
+└── YYYY-MM-DD_bug 描述.md
 
 ````
 
@@ -197,7 +197,7 @@ plans/
 
 ### 🔵 进行中 (In Progress)
 
-- [2025-11-26\_修复登录bug](./bugfixes/2025-11-26_login-bug.md)
+- [2025-11-26\_修复登录 bug](./bugfixes/2025-11-26_login-bug.md)
 
 ### ✅ 已完成 (Completed)
 
@@ -257,8 +257,8 @@ knowledge/
 
 ### 关键要点
 
-- 要点1: 为什么这样做
-- 要点2: 注意事项
+- 要点 1: 为什么这样做
+- 要点 2: 注意事项
 
 ## ⚠️ 注意事项
 
@@ -311,7 +311,7 @@ knowledge/
 ```
 
 - 状态管理方案
-- API调用模式
+- API 调用模式
 - 路由设计
 - 特殊架构（多租户、微前端等）
 
@@ -320,7 +320,7 @@ knowledge/
 3. **提取核心代码模式**
 ```
 
-- API调用示例
+- API 调用示例
 - 组件开发模板
 - 状态管理用法
 - 常用工具函数
@@ -460,24 +460,24 @@ knowledge/
 
 ```bash
 # 1. 克隆此规范到新项目
-cp -r _documentation_framework new_project/
+cp -r ai_documentation_framework new_project/
 
 # 2. 让AI分析项目生成文档
-"请按照 _documentation_framework/AI_DOCS_GENERATION_GUIDE.md
+"请按照 ai_documentation_framework/AI_DOCS_GENERATION_GUIDE.md
 分析当前项目并生成完整文档体系"
 
 # 3. 人工审核和优化
-# 4. 删除 _documentation_framework（可选）
+# 4. 删除 ai_documentation_framework（可选）
 ````
 
-### 场景2: 已有项目补充文档
+### 场景 2: 已有项目补充文档
 
 ```bash
 # 1. 添加规范到项目
-cp -r _documentation_framework existing_project/
+cp -r ai_documentation_framework existing_project/
 
 # 2. 让AI审查现有文档
-"参考 _documentation_framework 规范，审查并优化现有文档"
+"参考 ai_documentation_framework 规范，审查并优化现有文档"
 
 # 3. 补充缺失的文档和目录
 ```
@@ -489,9 +489,9 @@ cp -r _documentation_framework existing_project/
 这套文档体系规范的核心价值：
 
 1. **标准化** - 统一的结构和格式，易于复制
-2. **AI友好** - 结构化文档，AI易于理解和生成
+2. **AI 友好** - 结构化文档，AI 易于理解和生成
 3. **可扩展** - 根据项目类型灵活调整
 4. **易维护** - 清晰的维护规范和触发器
 5. **知识积累** - 持续沉淀团队经验
 
-**让每个项目都拥有高质量的AI辅助开发文档！** 🚀
+**让每个项目都拥有高质量的 AI 辅助开发文档！** 🚀
