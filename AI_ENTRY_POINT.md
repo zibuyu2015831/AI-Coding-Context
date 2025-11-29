@@ -1,4 +1,4 @@
-# AI Documentation Framework - Entry Point
+# AI Coding Context - Entry Point
 
 > **AI 专用入口文档**  
 > **用途**: AI 读取此文件即可理解整个框架，自主决策生成流程  

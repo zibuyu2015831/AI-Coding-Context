@@ -464,7 +464,7 @@ E. 保持现有文档
 ---
 
 **报告生成时间**: YYYY-MM-DD HH:MM:SS
-**报告生成工具**: AI Documentation Framework v2.3
+**报告生成工具**: AI Coding Context v2.3
 **检查模式**: 深度分析
 ```
 

@@ -1,7 +1,9 @@
-# AI 辅助开发文档体系框架 - 使用指南
+# AI Coding Context - 使用指南
 
-> **面向人类开发者的完整介绍**  
-> 如果你是 AI，请阅读 `AI_ENTRY_POINT.md`
+> **AI 编程上下文框架** (AI Coding Context Framework)  
+> **简称**: AI Coding Context / ACC  
+> **宣传语**: 让 AI 深度理解你的项目  
+> **面向人类开发者的完整介绍** | 如果你是 AI，请阅读 `AI_ENTRY_POINT.md`
 
 ---
 
@@ -165,7 +167,6 @@ ai_documentation_framework/
 | `guides/*.md`                 | 详细指导和参考            | AI/人类按需查阅 |
 | `templates/*.md`              | 生成模板                  | AI 在生成时使用 |
 | `reference/framework_spec.md` | 完整规范                  | 深入了解时查阅  |
-
 
 ---
 

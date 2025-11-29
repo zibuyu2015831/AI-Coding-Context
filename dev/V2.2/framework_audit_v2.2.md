@@ -1,4 +1,4 @@
-# AI Documentation Framework v2.2 全面审核报告
+# AI Coding Context v2.2 全面审核报告
 
 > **审核日期**: 2025-11-27  
 > **审核版本**: v2.2  

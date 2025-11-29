@@ -16,7 +16,7 @@
 
 ### 框架名称
 
-**AI 辅助编程文档生成框架** (AI Documentation Framework)
+**AI 辅助编程文档生成框架** (AI Coding Context)
 
 ### ## 💡 使用建议
 

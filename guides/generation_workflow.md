@@ -603,7 +603,7 @@ README.md 包含：
 
    ```bash
    git add dev_docs/
-   git commit -m "docs: 添加AI辅助开发文档体系"
+   git commit -m "docs: 添加AI编程上下文文档"
    ```
 
 2. **团队分享**

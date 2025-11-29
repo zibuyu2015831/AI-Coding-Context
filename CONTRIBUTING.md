@@ -2,13 +2,13 @@
 
 > **版本**: v2.3  
 > **创建日期**: 2025-11-28  
-> **用途**: 指导如何为 AI Documentation Framework 贡献新功能或扩展
+> **用途**: 指导如何为 AI Coding Context 贡献新功能或扩展
 
 ---
 
 ## 📋 概述
 
-AI Documentation Framework 是一个模块化的文档生成框架。本指南说明如何扩展框架以支持：
+AI Coding Context 是一个模块化的文档生成框架。本指南说明如何扩展框架以支持：
 
 - 新的编程语言
 - 新的项目类型
