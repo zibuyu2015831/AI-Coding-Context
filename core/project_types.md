@@ -281,8 +281,6 @@ const result = feature({ option: value });
 | 2.x  | >=14    | >=4.5      |
 | 1.x  | >=12    | >=4.0      |
 
-````
-
 ---
 
 ## 🎲 全栈项目

@@ -78,7 +78,6 @@
 | `guides/quick_start.md`              | 快速开始          | 需要了解使用流程时          |
 | `guides/project_types.md`            | 项目类型适配      | **决策子文档清单时必读**    |
 | `guides/language_support.md`         | 多语言分析        | **分析非 JS/TS 项目时必读** |
-| `guides/generation_workflow.md`      | 详细生成流程      | 需要详细步骤时              |
 | `guides/ai_rules_maintenance.md`     | AI Rules 维护指南 | **生成完成后阅读** (v2.3)   |
 | `guides/configuration_management.md` | 配置管理最佳实践  | 了解配置方案时参考 (v2.3)   |
 
