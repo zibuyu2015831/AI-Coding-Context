@@ -109,54 +109,78 @@ AI 会自动：
 
 ## 📂 框架文件结构
 
+### 用户使用（生成项目文档）
+
 ```
 ai_documentation_framework/
 ├── AI_ENTRY_POINT.md          # 🤖 AI入口（AI读这个）
 ├── INTRODUCTION.md             # 👤 人类指南（你在读这个）
-├── CONTRIBUTING.md             # 🤝 框架扩展指南 (v2.3新增)
 │
-├── core/                       # 🔧 核心规范 (v2.2新增)
+├── core/                       # 🔧 核心规范
 │   ├── language_rules.md       # 文档语言确认规范
 │   ├── security_rules.md       # 敏感信息脱敏规范
 │   ├── project_types.md        # 项目类型识别与处理
 │   └── update_triggers.md      # 文档更新触发机制
 │
-├── workflows/                  # 📋 流程文档 (v2.2新增)
+├── workflows/                  # 📋 流程文档
 │   ├── detection_workflow.md   # 项目检测详细流程
 │   ├── decision_workflow.md    # 策略决策详细流程
 │   ├── generation_workflow.md  # 文档生成详细流程
 │   ├── progress_tracking.md    # 进度记录机制
-│   ├── incremental_update_workflow.md # 增量更新流程 (v2.3新增)
-│   ├── monorepo_workflow.md    # Monorepo处理流程 (v2.3新增)
-│   └── document_health_check.md # 文档健康度检查 (v2.3新增)
+│   ├── incremental_update_workflow.md # 增量更新流程
+│   ├── monorepo_workflow.md    # Monorepo处理流程
+│   └── document_health_check.md # 文档健康度检查
 │
 ├── guides/                     # 📚 详细指导
 │   ├── quick_start.md          # 快速开始
 │   ├── project_types.md        # 项目类型适配（11种）
 │   ├── language_support.md     # 语言支持（9种语言）
-│   ├── generation_workflow.md  # 详细生成流程
-│   ├── ai_rules_maintenance.md # AI Rules维护指南 (v2.3新增)
-│   └── configuration_management.md # 配置管理最佳实践 (v2.3新增)
+│   ├── documentation_maintenance.md # 文档维护指南
+│   ├── ai_rules_maintenance.md # AI Rules维护指南
+│   └── configuration_management.md # 配置管理最佳实践
 │
-├── templates/                  # 📋 文档模板
-│   ├── GENERATION_PLAN_TEMPLATE.md
-│   ├── PROJECT_ANALYSIS_REPORT_TEMPLATE.md
-│   ├── PROGRESS_TEMPLATE.md
-│   ├── HEALTH_CHECK_REPORT_TEMPLATE.md # 健康度报告模板 (v2.3新增)
-│   ├── AI_RULES_TEMPLATE.md    # ⭐ Rule总模板
-│   ├── RULE_TEMPLATE.md        # ⭐ 独立Rule模板
-│   ├── PLAN_TEMPLATE.md
-│   ├── rules/                  # ⭐ Rule示例
-│   │   ├── core/               # 核心规范示例
-│   │   ├── triggers/           # 触发器示例
-│   │   └── AI_RULES_STANDARD_TEMPLATE.md
-│   ├── rules_README_TEMPLATE.md
-│   └── ...
+└── templates/                  # 📋 文档模板
+    ├── GENERATION_PLAN_TEMPLATE.md
+    ├── PROJECT_ANALYSIS_REPORT_TEMPLATE.md
+    ├── AI_RULES_TEMPLATE.md    # Rule总模板
+    └── ... (其他模板)
+```
+
+### 框架开发和维护
+
+```
+ai_documentation_framework/
+├── CONTRIBUTING.md             # 🤝 框架扩展指南
+│
+├── dev/                        # 🔧 版本规划和开发文档
+│   ├── FRAMEWORK_CONTEXT.md    # 框架全局上下文
+│   ├── VERSION_HISTORY.md      # 详细版本历史
+│   └── V3.0/                   # V3.0版本规划
+│       ├── README.md
+│       ├── PROGRESS.md
+│       ├── pending/            # 待讨论的优化点
+│       └── confirmed/          # 已确认的优化点
+│
+├── quality/                    # ⭐ 质量保证体系（框架开发者工具）
+│   ├── README.md               # 质量保证体系索引
+│   ├── AUDIT_WORKFLOW.md       # 文档审查工作流
+│   ├── HOW_TO_GENERATE_CONTEXTS.md # 批量生成审查上下文指南
+│   ├── standards/              # 质量标准
+│   │   ├── COMMON_STANDARDS.md # 通用质量标准（5大维度）
+│   │   ├── QUALITY_CHECKLIST.md # 快速检查清单
+│   │   └── BY_DOCUMENT_TYPE.md # 按文档类型的专项标准
+│   ├── contexts/               # 审查上下文（每个框架文档一个）
+│   │   └── _template.md        # 审查上下文模板
+│   ├── reports/                # 审查报告归档
+│   └── tools/                  # 审查辅助工具
 │
 └── reference/                  # 📖 参考规范
     ├── framework_spec.md       # 框架详细规范
-    └── design_decisions.md     # 设计决策说明 (v2.2新增)
+    └── design_decisions.md     # 设计决策说明
 ```
+
+> **说明**: `quality/` 目录是供框架开发者使用的质量保证工具，普通用户无需关心。  
+> 如果你对框架的设计和原理感兴趣，可以阅读 `quality/README.md` 了解详情。
 
 🎯 简要文档职责表
 
