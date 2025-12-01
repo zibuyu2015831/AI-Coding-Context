@@ -1,11 +1,11 @@
-# 001 - AI 互审机制 (工作流编排器)
+# 013 - AI 互审机制 (工作流编排器)
 
 **优先级**: P0  
 **状态**: 🟡 待讨论  
 **预估工作量**: 1 周  
 **来源**: 《AI 编程的现状.md》方法 1 + 《AI_PROGRAMMING_ANALYSIS.md》  
-**依赖**: 013 (AI 角色库) - 需要 `plan_reviewer` 角色  
-**实施顺序**: 在 013 完成后实施
+**依赖**: 001 (AI 角色库) - 需要 `plan_reviewer` 角色  
+**实施顺序**: 在 001 完成后实施
 
 ---
 
@@ -17,10 +17,10 @@
 
 **职责划分**:
 
-- **本优化点 (001)**: 工作流编排 + 复杂度评估 + 分级审查机制
-- **013 (AI 角色库)**: 提供 `plan_reviewer` 角色的具体实现
+- **本优化点 (013)**: 工作流编排 + 复杂度评估 + 分级审查机制
+- **001 (AI 角色库)**: 提供 `plan_reviewer` 角色的具体实现
 
-**依赖关系**: 必须在 013 完成后实施
+**依赖关系**: 必须在 001 完成后实施
 
 ### 原文观点
 
@@ -181,7 +181,7 @@ AI 评估结果:
 └── 包含: 技术方案 + 实施步骤 + 影响评估 + 复杂度评估
 ```
 
-#### 4. AI 互审阶段（依赖 013 的 plan_reviewer 角色）
+#### 4. AI 互审阶段（依赖 001 的 plan_reviewer 角色）
 
 **快速模式** (跳过审查):
 
@@ -192,7 +192,7 @@ AI 评估结果:
 **标准审查** (1 轮):
 
 ```markdown
-**AI 审查者** (来自 013/runtime/plan_reviewer.md)
+**AI 审查者** (来自 001/runtime/plan_reviewer.md)
 └── 输入: 生成的方案 + 框架规范
 └── 审查清单:
 ├── 是否符合 AI 编码禁忌？
@@ -208,7 +208,7 @@ AI 评估结果:
 **深度审查** (2 轮):
 
 ```markdown
-**第 1 轮审查** (来自 013/runtime/plan_reviewer.md)
+**第 1 轮审查** (来自 001/runtime/plan_reviewer.md)
 └── 基础审查清单 (同标准审查)
 └── 输出: 第 1 轮审查报告
 
@@ -270,7 +270,7 @@ class MutualReviewCoordinator:
     """AI互审工作流编排器"""
 
     def __init__(self, agent_library):
-        self.agent_library = agent_library  # 依赖013的AI角色库
+        self.agent_library = agent_library  # 依赖001的AI角色库
         self.plan_reviewer = agent_library.get_agent('plan_reviewer')
 
     def process_request(self, user_request, project_context):
@@ -340,7 +340,7 @@ class MutualReviewCoordinator:
         review_reports = []
 
         for round_num in range(1, max_rounds + 1):
-            # 调用013的plan_reviewer角色
+            # 调用001的plan_reviewer角色
             review_report = self.plan_reviewer.review(
                 plan=plan,
                 previous_reports=review_reports,
@@ -373,12 +373,12 @@ class MutualReviewCoordinator:
             return self.review_mode(user_request, project_context, mode)
 ```
 
-#### 与 013 的集成
+#### 与 001 的集成
 
 ```markdown
 **依赖关系**:
 
-1. 从 013/runtime/plan_reviewer.md 加载审查角色
+1. 从 001/runtime/plan_reviewer.md 加载审查角色
 2. 使用标准化的审查清单和输出格式
 3. 复用角色库的质量保证机制
 
