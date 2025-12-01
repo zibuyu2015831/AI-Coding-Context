@@ -143,8 +143,6 @@ CREATE INDEX idx_users_age ON users(age);
 
 查询复杂度从 O(N) 降为 O(logN)，响应时间预计从 2s 降至 50ms。
 
-```
-
 ---
 
 ## 🔗 协作角色

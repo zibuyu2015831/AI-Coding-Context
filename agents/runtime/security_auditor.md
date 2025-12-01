@@ -8,12 +8,13 @@ ID: runtime.security_auditor
 版本: v1.0
 创建: 2025-11-29
 更新: 2025-11-29
-来源: other_project/ai-coding-prompt-java-main/rules/安全检查 prompt.md
+来源: 框架内置
 改造状态: 已通用化
 语言支持: 通用
 标签: [安全, 审计, 漏洞扫描, 风险评估]
 依赖: []
 被依赖: []
+可编辑性: locked
 
 <!-- AGENT_META_END -->
 
@@ -142,7 +143,7 @@ pstmt.setString(2, pass);
 ```
 ````
 
-```
+
 
 ---
 
@@ -204,4 +205,3 @@ pstmt.setString(2, pass);
 
 **模板版本**: v1.0
 **最后更新**: 2025-11-29
-```

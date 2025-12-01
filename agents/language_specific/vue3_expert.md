@@ -8,12 +8,13 @@ ID: language_specific.vue3_expert
 版本: v1.0
 创建: 2025-11-29
 更新: 2025-11-29
-来源: other_project/ai-coding-prompt-java-main/前端/前端组件开发 prompt.md
+来源: 框架内置
 改造状态: 已通用化
 语言支持: Vue 3, TypeScript, SCSS
 标签: [Vue 3, Composition API, 组件开发, Ant Design Vue]
 依赖: [language_specific.base.frontend_engineer]
 被依赖: []
+可编辑性: customizable
 
 <!-- AGENT_META_END -->
 

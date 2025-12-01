@@ -8,12 +8,13 @@ ID: language_specific.vue3_state_manager
 版本: v1.0
 创建: 2025-11-29
 更新: 2025-11-29
-来源: other_project/ai-coding-prompt-java-main/前端/前端状态管理 prompt.md
+来源: 框架内置
 改造状态: 已通用化
 语言支持: Vue 3, TypeScript, Pinia
 标签: [Pinia, 状态管理, Store 设计, 数据流]
 依赖: [language_specific.vue3_expert]
 被依赖: []
+可编辑性: customizable
 
 <!-- AGENT_META_END -->
 
