@@ -115,7 +115,7 @@ ID: runtime.performance_optimizer
 
 ### 示例文档
 
-**详细示例**: [`performance_optimizer_examples.md`](../examples/performance_optimizer_examples.md) (待创建)
+**详细示例**: [`performance_optimizer_examples.md`](../examples/performance_optimizer_examples.md)
 
 ### 快速示例
 
@@ -188,9 +188,9 @@ CREATE INDEX idx_users_age ON users(age);
 
 ### 调用方式
 
-**IDE集成**: 复制内容到 AI IDE agent 配置。
+**IDE 集成**: 复制内容到 AI IDE agent 配置。
 
-**框架Rules**: 识别到性能相关关键词或慢查询日志时提示。
+**框架 Rules**: 识别到性能相关关键词或慢查询日志时提示。
 
 **自然语言**: "优化这段代码的性能" 或 "@角色:性能优化专家 分析慢查询"
 
@@ -204,4 +204,7 @@ CREATE INDEX idx_users_age ON users(age);
 
 **模板版本**: v1.0
 **最后更新**: 2025-11-29
+
+```
+
 ```

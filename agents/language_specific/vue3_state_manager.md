@@ -110,7 +110,7 @@ ID: language_specific.vue3_state_manager
 
 ### 示例文档
 
-**详细示例**: [`vue3_state_manager_examples.md`](../../examples/vue3_state_manager_examples.md) (待创建)
+**详细示例**: [`vue3_state_manager_examples.md`](../../examples/vue3_state_manager_examples.md)
 
 ### 快速示例
 

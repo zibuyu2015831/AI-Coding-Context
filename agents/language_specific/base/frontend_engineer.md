@@ -104,7 +104,7 @@ ID: language_specific.base.frontend_engineer
 
 ### 示例文档
 
-**详细示例**: [`frontend_engineer_examples.md`](../../examples/frontend_engineer_examples.md) (待创建)
+**详细示例**: [`frontend_engineer_examples.md`](../../examples/frontend_engineer_examples.md)
 
 ### 快速示例
 

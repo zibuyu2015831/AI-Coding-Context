@@ -114,7 +114,7 @@ ID: runtime.code_reviewer
 
 ### 示例文档
 
-**详细示例**: [`code_reviewer_examples.md`](../examples/code_reviewer_examples.md) (待创建)
+**详细示例**: [`code_reviewer_examples.md`](../examples/code_reviewer_examples.md)
 
 ### 快速示例
 

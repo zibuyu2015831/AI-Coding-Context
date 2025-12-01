@@ -118,7 +118,7 @@ ID: development.api_designer
 
 ### 示例文档
 
-**详细示例**: [`api_designer_examples.md`](../examples/api_designer_examples.md) (待创建)
+**详细示例**: [`api_designer_examples.md`](../examples/api_designer_examples.md)
 
 ### 快速示例
 
@@ -184,7 +184,7 @@ paths:
 
 ### 下游角色
 
-- **language_specific.frontend_engineer** (待创建) - 根据 API 文档开发前端
+- **language_specific.frontend_engineer** - 根据 API 文档开发前端
 - **test_engineer** ([runtime/test_engineer.md](../runtime/test_engineer.md)) - 根据 API 文档编写接口测试
 
 ---

@@ -110,7 +110,7 @@ ID: language_specific.vue3_expert
 
 ### 示例文档
 
-**详细示例**: [`vue3_expert_examples.md`](../../examples/vue3_expert_examples.md) (待创建)
+**详细示例**: [`vue3_expert_examples.md`](../../examples/vue3_expert_examples.md)
 
 ### 快速示例
 

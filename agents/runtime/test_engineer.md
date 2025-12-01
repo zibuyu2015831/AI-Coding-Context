@@ -117,7 +117,7 @@ ID: runtime.test_engineer
 
 ### 示例文档
 
-**详细示例**: [`test_engineer_examples.md`](../examples/test_engineer_examples.md) (待创建)
+**详细示例**: [`test_engineer_examples.md`](../examples/test_engineer_examples.md)
 
 ### 快速示例
 

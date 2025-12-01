@@ -126,7 +126,7 @@ ID: development.architecture_analyst
 
 ### 示例文档
 
-**详细示例**: [`architecture_analyst_examples.md`](../examples/architecture_analyst_examples.md) (待创建)
+**详细示例**: [`architecture_analyst_examples.md`](../examples/architecture_analyst_examples.md)
 
 ### 快速示例
 

@@ -118,7 +118,7 @@ ID: runtime.plan_reviewer
 
 ### 示例文档
 
-**详细示例**: [`plan_reviewer_examples.md`](../examples/plan_reviewer_examples.md) (待创建)
+**详细示例**: [`plan_reviewer_examples.md`](../examples/plan_reviewer_examples.md)
 
 ### 快速示例
 

@@ -114,7 +114,7 @@ ID: runtime.security_auditor
 
 ### 示例文档
 
-**详细示例**: [`security_auditor_examples.md`](../examples/security_auditor_examples.md) (待创建)
+**详细示例**: [`security_auditor_examples.md`](../examples/security_auditor_examples.md)
 
 ### 快速示例
 
@@ -142,8 +142,6 @@ pstmt.setString(1, name);
 pstmt.setString(2, pass);
 ```
 ````
-
-
 
 ---
 
@@ -189,9 +187,9 @@ pstmt.setString(2, pass);
 
 ### 调用方式
 
-**IDE集成**: 复制内容到 AI IDE agent 配置。
+**IDE 集成**: 复制内容到 AI IDE agent 配置。
 
-**框架Rules**: 识别到敏感操作（如 SQL 拼接、文件上传）时提示。
+**框架 Rules**: 识别到敏感操作（如 SQL 拼接、文件上传）时提示。
 
 **自然语言**: "审计这段代码的安全性" 或 "@角色:安全审计员 检查权限配置"
 
