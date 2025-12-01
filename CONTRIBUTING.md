@@ -32,6 +32,7 @@ AI Coding Context 是一个模块化的文档生成框架。本指南说明如�
 ai_documentation_framework/
 ├── core/           # 核心规范（添加新规范）
 ├── workflows/      # 流程文档（添加新流程）
+├── tools/          # 实用工具（添加新脚本）
 ├── guides/         # 指导文档（添加新指南）
 ├── templates/      # 文档模板（添加新模板）
 └── reference/      # 参考规范（记录设计决策）
@@ -552,6 +553,35 @@ cp ../../templates/microservices_architecture_TEMPLATE.md \
 - [ ] 已添加到`AI_ENTRY_POINT.md`模板索引
 - [ ] 在相应项目类型中引用
 - [ ] 已测试模板实用性
+
+- [ ] 已测试模板实用性
+
+---
+
+## 🛠️ 如何添加新实用工具
+
+### 步骤 1: 识别需求
+
+参考 `workflows/create_custom_tool_workflow.md` 中的触发条件（复杂性、安全性、通用性、用户指令）。
+
+### 步骤 2: 开发工具
+
+1. **双模开发**: 尽量同时提供 Python (`tools/py/`) 和 Node.js (`tools/js/`) 版本。
+2. **零依赖**: 仅使用标准库。
+3. **JSON 输出**: 确保输出格式为 JSON，便于 AI 解析。
+
+### 步骤 3: 更新文档
+
+**文件**: `tools/README.md`
+
+**操作**: 在工具清单中添加新工具说明。
+
+### 验证清单
+
+- [ ] Python 版本已实现且通过测试
+- [ ] Node.js 版本已实现且通过测试
+- [ ] `tools/README.md` 已更新
+- [ ] 代码符合零依赖和 JSON 输出规范
 
 ---
 

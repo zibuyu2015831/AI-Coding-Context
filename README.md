@@ -20,6 +20,7 @@
 ✅ **多语言支持** - 9 种编程语言 + 11 种项目类型 + 25+主流框架
 ✅ **进度可控** - 大型项目分批执行，系统化完成
 ✅ **AI 角色库** - 标准化的专业 AI 角色库 (v3.0)
+✅ **实用工具库** - 标准化的跨平台工具集 (v3.0)
 
 ---
 
@@ -131,6 +132,11 @@ ai_documentation_framework/
 │   ├── incremental_update_workflow.md # 增量更新流程
 │   ├── monorepo_workflow.md    # Monorepo处理流程
 │   └── document_health_check.md # 文档健康度检查
+│
+├── tools/                      # 🛠️ 实用工具库 (v3.0)
+│   ├── py/                     # Python 实现
+│   ├── js/                     # Node.js 实现
+│   └── fallback/               # 降级命令
 │
 ├── guides/                     # 📚 详细指导
 │   ├── quick_start.md          # 快速开始

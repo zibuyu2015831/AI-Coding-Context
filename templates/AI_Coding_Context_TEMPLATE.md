@@ -69,6 +69,7 @@
 
 - [[工具文档1]](./tool1.md) - 说明
 - [[工具文档2]](./tool2.md) - 说明
+- [**实用脚本库**](./tools/README.md) - 标准化工具集 (Python/Node.js)
 
 ---
 
@@ -120,6 +121,10 @@
 #### 3️⃣ 沉淀知识
 
 完成后，若方案有价值（耗时>2h 或难度高），提炼到 `dev_docs/knowledge/`。
+
+#### 4️⃣ 沉淀工具
+
+若开发过程中遇到**高频重复**或**高稳定性要求**的操作，请参考 `workflows/create_custom_tool_workflow.md` 创建通用脚本工具，并更新 `tools/README.md`。
 
 **详细规范**: [plans/README.md](./plans/README.md)
 
