@@ -144,10 +144,6 @@ def test_login_success(client):
 ```
 ````
 
-```
-
----
-
 ## 🔗 协作角色
 
 ### 上游角色
@@ -209,4 +205,4 @@ def test_login_success(client):
 
 **模板版本**: v1.0
 **最后更新**: 2025-11-29
-```
+

@@ -215,7 +215,7 @@ ID: custom.graphql_designer
 
 - [AI 角色库总览](../README.md)
 - [自定义 Agent 模板](./_template.md)
-- [AI 辅助创建工作流](../workflows/create_custom_agent.md)
+- [AI 辅助创建工作流](../workflows/create_custom_agent_workflow.md)
 - [Personas 人格型 Agent](../personas/README.md)
 
 ---

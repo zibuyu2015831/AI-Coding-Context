@@ -14,6 +14,7 @@ ID: language_specific.base.frontend_engineer
 标签: [前端开发, 组件设计, 响应式布局, 交互实现]
 依赖: []
 被依赖: [language_specific.vue3_expert, language_specific.react_expert]
+可编辑性: customizable
 
 <!-- AGENT_META_END -->
 
