@@ -163,9 +163,9 @@ graph TD
 ### 统计
 
 - **总计**: 17 个
-- **已确认** (confirmed/): 4 个
+- **已确认** (confirmed/): 5 个
 - **已完成**: 4 个 (001, 016, 017, 013)
-- **待讨论** (pending/): 13 个
+- **待讨论** (pending/): 12 个
 
 ### 优先级分布
 
@@ -219,6 +219,17 @@ graph TD
 - **状态**: ✅ 已完成
 - **产物**: `/confirmed/013-ai-mutual-review/` 目录, `workflows/review_standards/`, `workflows/013-review-workflow.md`
 
+### P0 - 智能引导
+
+#### 4. 设计思维引导模式 [003]
+
+- **文件**: [003-design-thinking-guide.md](./confirmed/003-design-thinking-guide/003-design-thinking-guide.md)
+- **描述**: AI 作为思考伙伴，引导深度设计讨论
+- **价值**: 将 AI 从"代码生成器"转变为"架构思考伙伴"，返工率降低 50%
+- **确认日期**: 2025-12-02
+- **状态**: ✅ 已确认
+- **产物**: `/confirmed/003-design-thinking-guide/` 目录
+
 ### P1 - 高价值功能
 
 **注**: 016-配置管理系统已升级为 P0 基础设施并完成实施,见上方"P0 - 基础设施"部分
@@ -244,13 +255,6 @@ graph TD
 - **描述**: 识别并拦截人类的危险指令，防止冲动决策
 - **价值**: 阻止最大风险源，强制框架规范
 - **工作量**: 约 3 天
-
-#### 4. 设计思维引导模式
-
-- **文件**: [003-design-thinking-guide.md](./pending/003-design-thinking-guide.md)
-- **描述**: AI 作为思考伙伴，引导深度设计讨论
-- **价值**: 将 AI 从"代码生成器"转变为"架构思考伙伴"
-- **工作量**: 约 1 周
 
 #### 5. 强制文档摘要机制
 
