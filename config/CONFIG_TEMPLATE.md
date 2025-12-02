@@ -20,6 +20,13 @@ preferredRoles: []
 # 用户偏好
 verboseMode: false
 defaultHealthCheckMode: standard
+
+# 工具库配置 (V3.0 新增)
+tools:
+  preferredRuntime: python # 优先使用的运行时 (python|nodejs)
+  autoFallback: true # 工具失败时自动降级
+  timeoutSeconds: 10 # 工具超时时间(秒)
+  maxFileScan: 5000 # 最大扫描文件数
 ---
 
 # 框架配置说明
@@ -244,6 +251,73 @@ enforceDesignThinking: true # 强制设计思考
 enableADR: true # 记录架构决策
 aiCapabilityTier: advanced # 使用高级 AI
 ```
+
+---
+
+## 🛠️ 工具库配置
+
+**YAML 字段**: `tools` (对象)  
+**当前值**: 见 frontmatter  
+**对应优化点**: 017-实用脚本工具库
+
+**说明**: 配置工具库的运行行为和性能参数
+
+### `preferredRuntime`
+
+**类型**: `string`  
+**默认值**: `python`  
+**可选值**: `python` | `nodejs`
+
+**说明**: 当同时存在 Python 和 Node.js 版本时,优先使用哪个运行时
+
+```yaml
+tools:
+  preferredRuntime: nodejs # 优先使用 Node.js 版本
+```
+
+### `autoFallback`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 工具失败时是否自动降级
+
+- `true` - 自动降级（ripgrep 失败 → Python 遍历）
+- `false` - 失败即停止,不尝试降级
+
+### `timeoutSeconds`
+
+**类型**: `number`  
+**默认值**: `10`
+
+**说明**: 工具执行的最大超时时间(秒)
+
+**调优建议**:
+
+- 快速 CI 环境: `5`
+- 本地开发: `10`(默认)
+- 慢速服务器: `15-20`
+
+```yaml
+tools:
+  timeoutSeconds: 15 # 慢速环境延长超时
+```
+
+### `maxFileScan`
+
+**类型**: `number`  
+**默认值**: `5000`
+
+**说明**: 允许扫描的最大文件数,超过此数量时:
+
+- AI 会收到性能警告
+- 建议切换到 IDE 内置工具或缩小范围
+
+**调优建议**:
+
+- 小型项目: `1000`
+- 中型项目: `5000`(默认)
+- 大型项目: `10000`(需配合优化策略)
 
 ---
 

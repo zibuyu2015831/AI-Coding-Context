@@ -1,7 +1,57 @@
+"""
+文件读取工具 - 安全地读取文件内容（支持大文件分页）
+
+功能说明：
+- 自动检测二进制文件并跳过
+- 自动尝试多种编码（utf-8, gbk, latin-1）
+- 支持按行分页读取大文件
+- 统计总行数并标识是否截断
+
+使用方法：
+    python tools/py/file_reader.py --path "文件路径" [选项]
+
+参数说明：
+    --path PATH              要读取的文件路径（必需）
+    --offset NUM             起始行号（0-indexed，默认：0）
+    --limit NUM              最多读取行数（默认：1000）
+
+输出格式：
+    {
+      "data": {
+        "content": "文件内容（字符串）",
+        "lines_read": 读取的行数,
+        "total_lines": 文件总行数,
+        "truncated": 是否被截断(bool),
+        "is_binary": 是否为二进制文件(bool),
+        "encoding": "使用的编码"
+      },
+      "metadata": {
+        "elapsed_seconds": 耗时(秒),
+        "timeout_threshold": 10,
+        "version": "1.1.0"
+      }
+    }
+
+使用示例：
+    # 读取文件前 50 行
+    python tools/py/file_reader.py --path ./README.md --limit 50
+
+    # 读取第 100-200 行
+    python tools/py/file_reader.py --path ./log.txt --offset 100 --limit 100
+
+    # 读取整个文件
+    python tools/py/file_reader.py --path ./config.json
+
+版本信息：
+    版本：1.1.0
+    更新日期：2025-12-02
+"""
+
 import os
 import json
 import argparse
 import sys
+import time
 
 def is_binary_file(filepath, chunk_size=1024):
     """Check if file is binary by looking for null bytes in the first chunk."""
@@ -92,6 +142,8 @@ def read_file(filepath, offset, limit):
     }
 
 def main():
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description="Safe File Reader")
     parser.add_argument("--path", required=True, help="File path to read")
     parser.add_argument("--offset", type=int, default=0, help="Start line (0-indexed)")
@@ -100,7 +152,13 @@ def main():
     args = parser.parse_args()
     
     result = read_file(args.path, args.offset, args.limit)
-    print(json.dumps(result, indent=2))
+    
+    elapsed_time = round(time.time() - start_time, 2)
+    output = {
+        "data": result,
+        "metadata": {"elapsed_seconds": elapsed_time, "timeout_threshold": 10, "version": "1.1.0"}
+    }
+    print(json.dumps(output, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()

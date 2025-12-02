@@ -82,6 +82,7 @@
 | `workflows/monorepo_workflow.md`           | Monorepo 处理流程 | **Monorepo 项目必读** (v2.3)    |
 | `workflows/document_health_check.md`       | 文档健康度检查    | **检测到现有文档时必读** (v2.3) |
 | `workflows/create_custom_tool_workflow.md` | 自定义工具创建    | **需要创建新工具时必读** (v3.0) |
+| `workflows/013-review-workflow.md`         | AI 互审工作流     | **生成方案后必读** (v3.0)       |
 
 ### 实用工具库 (`tools/`) **[v3.0 新增]**
 
@@ -537,6 +538,26 @@ node tools/js/project_scanner.js --max-files 2000
 🔵 疑问事项: [列表]
 💡 优化建议: [列表]
 ```
+
+---
+
+### 步骤 4.5: AI 互审 (v3.0 新增)
+
+**在提交给用户审核之前，执行 AI 互审**：
+
+**必读**: `workflows/013-review-workflow.md`
+
+**执行逻辑**:
+
+1. **检测指令**: 检查用户是否使用了 `@review:skip` 等指令
+2. **评估复杂度**: 如果未指定指令，自动评估方案复杂度
+3. **执行审查**: 根据复杂度执行 0-3 轮审查
+4. **自动优化**: 如果发现可提升空间，自动优化方案
+
+**输出**:
+
+- 附带审查报告的方案
+- 明确的改进建议
 
 ---
 

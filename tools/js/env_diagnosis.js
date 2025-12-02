@@ -1,3 +1,48 @@
+/**
+ * 环境诊断工具 - 检测 Python 和 Node.js 运行环境
+ * 
+ * 功能说明：
+ * - 检测 Python 版本和可用性
+ * - 检测 Node.js 版本和可用性
+ * - 识别操作系统类型
+ * - 验证版本是否满足最低要求
+ * 
+ * 使用方法：
+ *   node tools/js/env_diagnosis.js
+ * 
+ * 参数说明：
+ *   无参数
+ * 
+ * 输出格式：
+ *   {
+ *     "data": {
+ *       "python": {
+ *         "version": "版本号",
+ *         "ok": 是否满足要求(bool)
+ *       },
+ *       "node": {
+ *         "version": "版本号",
+ *         "path": "可执行文件路径",
+ *         "ok": 是否满足要求(bool)
+ *       },
+ *       "os": "操作系统信息"
+ *     },
+ *     "metadata": {
+ *       "elapsed_seconds": 耗时(秒),
+ *       "timeout_threshold": 10,
+ *       "version": "1.1.0"
+ *     }
+ *   }
+ * 
+ * 使用示例：
+ *   // 检测当前环境
+ *   node tools/js/env_diagnosis.js
+ * 
+ * 版本信息：
+ *   版本：1.1.0
+ *   更新日期：2025-12-02
+ */
+
 const { execSync } = require('child_process');
 const os = require('os');
 
@@ -16,6 +61,8 @@ function checkPythonVersion() {
 }
 
 function main() {
+    const startTime = Date.now();
+    
     const nodeVersion = process.version;
     const pythonVersion = checkPythonVersion();
     const osInfo = `${os.type()} ${os.release()}`;
@@ -23,7 +70,7 @@ function main() {
     const status = {
         python: {
             version: pythonVersion,
-            ok: false // Will be updated if python is found and version is sufficient
+            ok: false
         },
         node: {
             version: nodeVersion,
@@ -45,7 +92,16 @@ function main() {
         status.python.ok = (major > 3) || (major === 3 && minor >= 6);
     }
     
-    console.log(JSON.stringify(status, null, 2));
+    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    const result = {
+        data: status,
+        metadata: {
+            elapsed_seconds: parseFloat(elapsedTime),
+            timeout_threshold: 10,
+            version: "1.1.0"
+        }
+    };
+    console.log(JSON.stringify(result, null, 2));
 }
 
 main();

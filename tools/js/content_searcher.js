@@ -1,3 +1,54 @@
+/**
+ * 内容搜索工具 - 在项目文件中搜索文本（类似 grep）
+ * 
+ * 功能说明：
+ * - 优先使用 ripgrep (rg) 进行高速搜索
+ * - 当 ripgrep 不可用时，自动降级到纯 JavaScript 实现
+ * - 支持正则表达式和固定字符串搜索
+ * - 支持文件包含/排除模式
+ * - 自动处理超时和编码问题
+ * 
+ * 使用方法：
+ *   node tools/js/content_searcher.js --query "搜索内容" [选项]
+ * 
+ * 参数说明：
+ *   --query QUERY            要搜索的文本（必需）
+ *   --path PATH              搜索根目录（默认：当前目录）
+ *   --include PATTERNS       逗号分隔的包含模式（如："*.js,*.ts"）
+ *   --exclude PATTERNS       逗号分隔的排除模式（如："node_modules,dist"）
+ *   --regex                  将查询视为正则表达式（默认：否）
+ *   --timeout SECONDS        搜索超时时间（默认：5秒）
+ * 
+ * 输出格式：
+ *   {
+ *     "data": {
+ *       "matches": [
+ *         {"file": "文件路径", "line": 行号, "content": "匹配内容"},
+ *         ...
+ *       ]
+ *     },
+ *     "metadata": {
+ *       "elapsed_seconds": 耗时(秒),
+ *       "timeout_threshold": 10,
+ *       "version": "1.1.0"
+ *     }
+ *   }
+ * 
+ * 使用示例：
+ *   // 搜索所有 TODO 注释
+ *   node tools/js/content_searcher.js --query "TODO" --path ./src
+ * 
+ *   // 仅在 JavaScript 文件中搜索
+ *   node tools/js/content_searcher.js --query "import" --include "*.js"
+ * 
+ *   // 使用正则表达式搜索
+ *   node tools/js/content_searcher.js --query "function\s+\w+" --regex
+ * 
+ * 版本信息：
+ *   版本：1.1.0
+ *   更新日期：2025-12-02
+ */
+
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
@@ -137,6 +188,8 @@ function fallbackSearch(query, rootPath, includes, excludes, isRegex, timeout) {
 }
 
 function main() {
+    const startTime = Date.now();
+    
     const args = process.argv.slice(2);
     const options = {
         query: '',
@@ -183,10 +236,25 @@ function main() {
         );
     }
     
+    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    
     if (matches.error) {
-        console.log(JSON.stringify(matches));
+        matches.metadata = {
+            elapsed_seconds: parseFloat(elapsedTime),
+            timeout_threshold: 10,
+            version: "1.1.0"
+        };
+        console.log(JSON.stringify(matches, null, 2));
     } else {
-        console.log(JSON.stringify({ matches: matches }, null, 2));
+        const result = {
+            data: { matches: matches },
+            metadata: {
+                elapsed_seconds: parseFloat(elapsedTime),
+                timeout_threshold: 10,
+                version: "1.1.0"
+            }
+        };
+        console.log(JSON.stringify(result, null, 2));
     }
 }
 

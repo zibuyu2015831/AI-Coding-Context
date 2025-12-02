@@ -114,6 +114,49 @@
 
 ---
 
+## 🛡️ AI 互审机制 (v3.0)
+
+**所有方案生成任务必须遵守以下互审规则**:
+
+### 1. 指令识别
+
+- **`@review:skip`**: 跳过审查，直接输出方案
+- **`@review:standard`**: 强制执行 1 轮标准审查
+- **`@review:deep`**: 强制执行 2 轮深度审查
+- **`@urgent`**: 紧急模式，跳过审查但标记为未审核
+
+### 2. 方案元数据 (必需)
+
+生成方案时，必须在 Frontmatter 中包含以下元数据：
+
+```yaml
+plan_metadata:
+  reliability: [0-100] # 可靠度自评
+  complexity_score: [0-100] # 复杂度分数
+  risk_level: [low/medium/high]
+  breaking_change: [true/false]
+```
+
+### 3. 审核报告元数据 (必需)
+
+生成审核报告时，必须在 Frontmatter 中包含以下元数据：
+
+```yaml
+review_metadata:
+  improvement_potential: [0-100] # 提升潜力
+  confidence_level: [0.0-1.0] # 置信度
+  p0_issues: [count] # P0问题数量
+  has_controversial_suggestions: [true/false] # 是否有争议
+```
+
+### 4. 自动审查逻辑
+
+- 若用户未指定指令，根据**复杂度**自动决定审查模式
+- 若方案可靠度 < 60 或 审查提升度 ≥ 20，**自动触发优化**
+- 详细逻辑参考: `workflows/013-review-workflow.md`
+
+---
+
 ## ⚠️ 禁止事项
 
 1. ❌ **不要臆测规范** - 不确定时先阅读文档或询问用户

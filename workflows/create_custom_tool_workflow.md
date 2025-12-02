@@ -52,6 +52,10 @@
    - 运行脚本，测试异常情况（如文件不存在、权限不足）。
 4. **文档更新**:
    - 更新 `tools/README.md`，在表格中添加新工具。
+   - **更新 `tools/CHANGELOG.md`**，在最新版本下记录新增工具（参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式）。
+     - 新工具：在 `### Added` 下添加
+     - 修改工具：在 `### Changed` 下添加
+     - 修复 Bug：在 `### Fixed` 下添加
 5. **提交交付**:
    - 告知用户已创建新工具，并简述用途。
 
@@ -61,3 +65,4 @@
 - [ ] 是否处理了异常情况？
 - [ ] 输出格式是否易于解析（推荐 JSON）？
 - [ ] 是否更新了 `tools/README.md`？
+- [ ] **是否更新了 `tools/CHANGELOG.md`？**

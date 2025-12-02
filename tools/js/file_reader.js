@@ -1,3 +1,52 @@
+/**
+ * 文件读取工具 - 安全地读取文件内容（支持大文件分页）
+ * 
+ * 功能说明：
+ * - 自动检测二进制文件并跳过
+ * - 自动尝试多种编码（utf8, latin1）
+ * - 支持按行分页读取大文件
+ * - 统计总行数并标识是否截断
+ * 
+ * 使用方法：
+ *   node tools/js/file_reader.js --path "文件路径" [选项]
+ * 
+ * 参数说明：
+ *   --path PATH              要读取的文件路径（必需）
+ *   --offset NUM             起始行号（0-indexed，默认：0）
+ *   --limit NUM              最多读取行数（默认：1000）
+ * 
+ * 输出格式：
+ *   {
+ *     "data": {
+ *       "content": "文件内容（字符串）",
+ *       "lines_read": 读取的行数,
+ *       "total_lines": 文件总行数,
+ *       "truncated": 是否被截断(bool),
+ *       "is_binary": 是否为二进制文件(bool),
+ *       "encoding": "使用的编码"
+ *     },
+ *     "metadata": {
+ *       "elapsed_seconds": 耗时(秒),
+ *       "timeout_threshold": 10,
+ *       "version": "1.1.0"
+ *     }
+ *   }
+ * 
+ * 使用示例：
+ *   // 读取文件前 50 行
+ *   node tools/js/file_reader.js --path ./README.md --limit 50
+ * 
+ *   // 读取第 100-200 行
+ *   node tools/js/file_reader.js --path ./log.txt --offset 100 --limit 100
+ * 
+ *   // 读取整个文件
+ *   node tools/js/file_reader.js --path ./config.json
+ * 
+ * 版本信息：
+ *   版本：1.1.0
+ *   更新日期：2025-12-02
+ */
+
 const fs = require('fs');
 
 function isBinaryFile(filePath, chunkSize = 1024) {
@@ -86,6 +135,8 @@ function readFile(filePath, offset, limit) {
 }
 
 function main() {
+    const startTime = Date.now();
+    
     const args = process.argv.slice(2);
     const options = {
         path: '',
@@ -106,7 +157,17 @@ function main() {
         process.exit(1);
     }
     
-    const result = readFile(options.path, options.offset, options.limit);
+    const fileData = readFile(options.path, options.offset, options.limit);
+    
+    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    const result = {
+        data: fileData,
+        metadata: {
+            elapsed_seconds: parseFloat(elapsedTime),
+            timeout_threshold: 10,
+            version: "1.1.0"
+        }
+    };
     console.log(JSON.stringify(result, null, 2));
 }
 

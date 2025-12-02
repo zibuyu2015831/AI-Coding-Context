@@ -1,6 +1,49 @@
+"""
+Git 仓库检查工具 - 获取 Git 仓库状态信息
+
+功能说明：
+- 检测当前目录是否为 Git 仓库
+- 获取当前分支名称
+- 列出所有未提交的变更文件
+- 检测仓库是否干净（无变更）
+
+使用方法：
+    python tools/py/git_inspector.py [--mode MODE]
+
+参数说明：
+    --mode MODE              检查模式（默认：status）
+                            可选值：status（仓库状态）
+
+输出格式：
+    {
+      "data": {
+        "branch": "分支名",
+        "changes": [
+          {"status": "状态码", "file": "文件路径"},
+          ...
+        ],
+        "clean": 是否干净(bool)
+      },
+      "metadata": {
+        "elapsed_seconds": 耗时(秒),
+        "timeout_threshold": 10,
+        "version": "1.1.0"
+      }
+    }
+
+使用示例：
+    # 检查仓库状态
+    python tools/py/git_inspector.py --mode status
+
+版本信息：
+    版本：1.1.0
+    更新日期：2025-12-02
+"""
+
 import json
 import subprocess
 import argparse
+import time
 
 def get_git_status():
     try:
@@ -35,14 +78,20 @@ def get_git_status():
         return {"error": str(e)}
 
 def main():
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description="Git Inspector")
     parser.add_argument("--mode", default="status", help="Inspection mode")
     args = parser.parse_args()
     
-    if args.mode == "status":
-        print(json.dumps(get_git_status(), indent=2))
-    else:
-        print(json.dumps({"error": f"Unknown mode: {args.mode}"}))
+    git_data = get_git_status() if args.mode == "status" else {"error": f"Unknown mode: {args.mode}"}
+    
+    elapsed_time = round(time.time() - start_time, 2)
+    result = {
+        "data": git_data,
+        "metadata": {"elapsed_seconds": elapsed_time, "timeout_threshold": 10, "version": "1.1.0"}
+    }
+    print(json.dumps(result, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()

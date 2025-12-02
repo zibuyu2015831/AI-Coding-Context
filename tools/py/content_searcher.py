@@ -1,3 +1,54 @@
+"""
+内容搜索工具 - 在项目文件中搜索文本（类似 grep）
+
+功能说明：
+- 优先使用 ripgrep (rg) 进行高速搜索
+- 当 ripgrep 不可用时，自动降级到纯 Python 实现
+- 支持正则表达式和固定字符串搜索
+- 支持文件包含/排除模式
+- 自动处理超时和编码问题
+
+使用方法：
+    python tools/py/content_searcher.py --query "搜索内容" [选项]
+
+参数说明：
+    --query QUERY            要搜索的文本（必需）
+    --path PATH              搜索根目录（默认：当前目录）
+    --include PATTERNS       逗号分隔的包含模式（如："*.py,*.js"）
+    --exclude PATTERNS       逗号分隔的排除模式（如："node_modules,dist"）
+    --regex                  将查询视为正则表达式（默认：否）
+    --timeout SECONDS        搜索超时时间（默认：5秒）
+
+输出格式：
+    {
+      "data": {
+        "matches": [
+          {"file": "文件路径", "line": 行号, "content": "匹配内容"},
+          ...
+        ]
+      },
+      "metadata": {
+        "elapsed_seconds": 耗时(秒),
+        "timeout_threshold": 10,
+        "version": "1.1.0"
+      }
+    }
+
+使用示例：
+    # 搜索所有 TODO 注释
+    python tools/py/content_searcher.py --query "TODO" --path ./src
+
+    # 仅在 Python 文件中搜索
+    python tools/py/content_searcher.py --query "import" --include "*.py"
+
+    # 使用正则表达式搜索
+    python tools/py/content_searcher.py --query "def\\s+\\w+" --regex
+
+版本信息：
+    版本：1.1.0
+    更新日期：2025-12-02
+"""
+
 import os
 import json
 import argparse
@@ -114,6 +165,8 @@ def fallback_search(query, root_path, includes, excludes, is_regex, timeout):
     return matches
 
 def main():
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description="Content Searcher")
     parser.add_argument("--query", required=True, help="Search query")
     parser.add_argument("--path", default=".", help="Root directory to search")
@@ -132,13 +185,19 @@ def main():
     
     if matches is None:
         # Fallback to python
-        # sys.stderr.write("Warning: rg not found, falling back to slow python search\n")
         matches = fallback_search(args.query, args.path, includes, excludes, args.regex, args.timeout)
     
+    elapsed_time = round(time.time() - start_time, 2)
+    
     if isinstance(matches, dict) and "error" in matches:
-         print(json.dumps(matches))
+         matches["metadata"] = {"elapsed_seconds": elapsed_time, "timeout_threshold": 10, "version": "1.1.0"}
+         print(json.dumps(matches, indent=2, ensure_ascii=False))
     else:
-         print(json.dumps({"matches": matches}, indent=2))
+         result = {
+             "data": {"matches": matches},
+             "metadata": {"elapsed_seconds": elapsed_time, "timeout_threshold": 10, "version": "1.1.0"}
+         }
+         print(json.dumps(result, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()

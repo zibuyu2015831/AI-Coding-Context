@@ -55,7 +55,7 @@
 | 010 | 跨项目知识复用       | P2     | REVIEW §3.2.4                    | 待讨论 |
 | 011 | 文档谬误修复工作流   | P1     | 用户洞察 + V2.3 扩展             | 待讨论 |
 | 012 | 强制文档摘要机制     | P0     | 用户洞察 + Token 优化需求        | 待讨论 |
-| 013 | AI 互审机制          | P0     | ANALYSIS §3.1.1                  | 待讨论 |
+| 013 | AI 互审机制          | P0     | ANALYSIS §3.1.1                  | 已确认 |
 | 014 | 文档阅读习惯引导机制 | P1     | 用户洞察 + Vibe Coding 分析      | 待讨论 |
 | 015 | 质量保证体系         | P1     | 框架演进需求                     | 已确认 |
 | 016 | 配置管理系统         | P0     | 基础设施需求                     | 已完成 |
@@ -71,7 +71,8 @@ dev/V3.0/
 ├── PROGRESS.md                  # 进度跟踪（里程碑、统计）
 ├── DISCUSSION_CONTEXT.md        # 本文档（讨论上下文）
 ├── confirmed/                   # 已确认的优化点
-│   └── 001-ai-agent-library/    # AI 角色库 (已完成)
+│   ├── 001-ai-agent-library/    # AI 角色库 (已完成)
+│   └── 013-ai-mutual-review/    # AI 互审机制 (已确认)
 └── pending/                     # 待讨论的优化点
     ├── 002-dangerous-command-guard.md
     ├── 003-design-thinking-guide.md
@@ -84,7 +85,6 @@ dev/V3.0/
     ├── 010-cross-project-knowledge.md
     ├── 011-doc-error-fix-workflow.md
     ├── 012-mandatory-doc-summary.md
-    ├── 013-ai-mutual-review.md
     ├── 014-doc-reading-habit-guide.md
     ├── 015-quality-assurance-system.md
     ├── 016-config-management-system.md

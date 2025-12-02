@@ -1,8 +1,57 @@
+"""
+项目结构扫描工具 - 生成项目目录树的 JSON 或文本表示
+
+功能说明：
+- 扫描指定目录，生成完整的目录树结构
+- 自动读取并尊重 .gitignore 规则
+- 支持限制扫描深度和每目录文件数
+- 支持输出 JSON 格式（供 AI 解析）或树形文本格式（供人类阅读）
+
+使用方法：
+    python tools/py/project_scanner.py [--path 路径] [选项]
+
+参数说明：
+    --path PATH              要扫描的根目录路径（默认：当前目录）
+    --ignore PATTERNS        逗号分隔的忽略模式（会自动叠加 .gitignore）
+    --follow-symlinks        跟随符号链接（默认：否）
+    --max-files NUM          每个目录最多显示的文件数（默认：1000）
+    --depth NUM              最大扫描深度（默认：无限制）
+    --format FORMAT          输出格式：json 或 tree（默认：json）
+
+输出格式（JSON模式）：
+    {
+      "data": {
+        "structure": {目录树对象},
+        "stats": {"files": 文件数, "dirs": 目录数}
+      },
+      "metadata": {
+        "elapsed_seconds": 耗时(秒),
+        "timeout_threshold": 10,
+        "version": "1.1.0"
+      }
+    }
+
+使用示例：
+    # 扫描当前项目（JSON 格式）
+    python tools/py/project_scanner.py --path . --max-files 100
+
+    # 扫描 src 目录（限制深度为 3）
+    python tools/py/project_scanner.py --path ./src --depth 3
+
+    # 生成人类可读的树形结构
+    python tools/py/project_scanner.py --format tree
+
+版本信息：
+    版本：1.1.0
+    更新日期：2025-12-02
+"""
+
 import os
 import json
 import argparse
 import fnmatch
 import sys
+import time
 from collections import deque
 
 def load_gitignore_patterns(root_dir):
@@ -121,6 +170,8 @@ def scan_project(root_dir, ignore_patterns, follow_symlinks, max_files_per_dir, 
     return structure, stats
 
 def main():
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description="Project Structure Scanner")
     parser.add_argument("--path", default=".", help="Root directory to scan")
     parser.add_argument("--ignore", help="Comma-separated glob patterns to ignore")
@@ -142,12 +193,23 @@ def main():
         args.depth
     )
     
+    elapsed_time = round(time.time() - start_time, 2)
+    
     if args.format == "json":
-        print(json.dumps({"structure": structure, "stats": stats}, indent=2))
+        result = {
+            "data": {"structure": structure, "stats": stats},
+            "metadata": {
+                "elapsed_seconds": elapsed_time,
+                "timeout_threshold": 10,
+                "version": "1.1.0"
+            }
+        }
+        print(json.dumps(result, indent=2, ensure_ascii=False))
     else:
         tree_lines = generate_tree(structure)
         print("\n".join(tree_lines))
         print(f"\nStats: {stats['files']} files, {stats['dirs']} directories")
+        print(f"Elapsed: {elapsed_time}s")
 
 if __name__ == "__main__":
     main()
