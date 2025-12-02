@@ -740,6 +740,259 @@ cp ../../templates/microservices_architecture_TEMPLATE.md \
 
 ---
 
+## ⚙️ 如何添加新配置项 (v3.0)
+
+### 步骤 1: 确定配置项需求
+
+**问题清单**:
+
+- 这个配置项属于哪个类别?(核心配置/功能开关/用户偏好)
+- 配置项的默认值是什么?
+- 有哪些可选值?
+- 影响框架的哪些模块?
+
+**示例**: 添加代码风格检查配置
+
+**需求分析**:
+
+- 类别: 功能开关
+- 默认值: `false`
+- 可选值: `true` / `false`
+- 影响模块: 文档生成流程,需要检查代码风格工具
+
+---
+
+### 步骤 2: 更新配置模板
+
+**文件**: `config/CONFIG_TEMPLATE.md`
+
+**操作 2.1**: 在 YAML frontmatter 中添加配置项
+
+```yaml
+---
+# ... 现有配置项 ...
+
+# 代码质量 (v3.1新增示例)
+enableCodeStyleCheck: false
+```
+
+**操作 2.2**: 在文档正文中添加详细说明
+
+````markdown
+## 🎨 代码风格检查
+
+**YAML 字段**: `enableCodeStyleCheck`  
+**当前值**: `false`  
+**版本**: v3.1 新增
+
+**说明**: 启用后,AI 会在生成文档时检查代码风格并记录问题
+
+**可选值**:
+
+- `true` - 启用
+  - 自动检测代码风格工具(ESLint/Prettier/Black 等)
+  - 在文档中记录代码风格问题
+  - 提供改进建议
+- `false` - 禁用(默认)
+  - 不检查代码风格
+  - 减少文档生成时间
+
+**使用场景**:
+
+```yaml
+# 团队项目,需要统一代码风格
+enableCodeStyleCheck: true
+
+# 个人项目,不关注代码风格
+enableCodeStyleCheck: false
+```
+
+**配置示例**:
+
+```yaml
+---
+enableCodeStyleCheck: true
+---
+```
+
+---
+````
+
+---
+
+### 步骤 3: 更新配置说明文档
+
+**文件**: `config/README.md`
+
+**操作**: 在"配置项说明"章节添加新配置项
+
+```markdown
+### 代码质量
+
+- `enableCodeStyleCheck` - 代码风格检查(v3.1 新增)
+```
+
+---
+
+### 步骤 4: 更新框架工作流
+
+根据配置项影响的模块,更新相应的工作流文档。
+
+**示例**: 如果配置影响文档生成流程
+
+**文件**: `workflows/generation_workflow.md`
+
+**操作**: 在生成流程中添加配置检查
+
+````markdown
+## 生成前检查
+
+**读取配置**:
+
+```
+if config.enableCodeStyleCheck:
+    检测代码风格工具
+    扫描代码风格问题
+    记录到问题报告中
+```
+````
+
+---
+
+### 步骤 5: 更新配置版本号
+
+**文件**: `config/CONFIG_TEMPLATE.md`
+
+**操作**: 更新 frontmatter 中的 `configVersion`
+
+```yaml
+---
+configVersion: "3.1" # 从3.0更新到3.1
+frameworkVersion: v3.1
+lastUpdated: 2025-12-02
+# ...
+---
+```
+
+---
+
+### 步骤 6: 文档关联
+
+如果新配置项对应某个优化点,在优化点文档中说明配置项。
+
+**文件**: `dev/V3.0/confirmed/XXX-优化点/XXX-优化点.md`
+
+**操作**: 添加配置项章节
+
+````markdown
+## ⚙️ 配置项
+
+**配置字段**: `enableCodeStyleCheck`  
+**配置文件**: `config/user_config.md`
+
+**如何启用**:
+
+1. 打开 `config/user_config.md`
+2. 修改 frontmatter:
+   ```yaml
+   enableCodeStyleCheck: true
+   ```
+````
+
+3. 保存文件,下次运行生效
+
+**相关文档**: [config/CONFIG_TEMPLATE.md](../../config/CONFIG_TEMPLATE.md)
+
+````
+
+---
+
+### 步骤 7: 更新变更日志(可选)
+
+**文件**: `dev/VERSION_HISTORY.md` 或相应版本的变更日志
+
+**操作**: 记录新增配置项
+
+```markdown
+### v3.1 配置项变更
+
+**新增**:
+- `enableCodeStyleCheck` - 代码风格检查开关
+````
+
+---
+
+### 验证清单
+
+- [ ] `config/CONFIG_TEMPLATE.md` frontmatter 已添加配置项
+- [ ] `config/CONFIG_TEMPLATE.md` 正文已添加详细说明
+  - [ ] 配置项说明
+  - [ ] 可选值说明
+  - [ ] 使用场景
+  - [ ] 配置示例
+- [ ] `config/README.md` 配置项列表已更新
+- [ ] 相关工作流已更新(如需要)
+- [ ] `configVersion` 已更新
+- [ ] 优化点文档已添加配置项章节(如适用)
+- [ ] 变更日志已更新(如大版本)
+
+---
+
+### 配置项命名规范
+
+**命名约定**:
+
+- 使用 camelCase 命名
+- 布尔值用 `enable` 或 `disable` 前缀
+- 枚举值用描述性名词
+- 避免缩写,保持可读性
+
+**示例**:
+
+✅ 好的命名:
+
+- `enableMutualReview`
+- `dangerousCommandGuard`
+- `defaultHealthCheckMode`
+
+❌ 不好的命名:
+
+- `mutualRev` (缩写不清晰)
+- `guardLevel` (不明确)
+- `mode` (太泛化)
+
+---
+
+### 配置项类型
+
+**1. 布尔开关**:
+
+```yaml
+enableFeature: true/false
+```
+
+**2. 枚举值**:
+
+```yaml
+guardLevel: strict/moderate/permissive
+```
+
+**3. 列表**:
+
+```yaml
+preferredRoles:
+  - role1
+  - role2
+```
+
+**4. 字符串**:
+
+```yaml
+documentLanguage: zh-CN
+```
+
+---
+
 ## 🧪 测试框架扩展
 
 ### 测试方法

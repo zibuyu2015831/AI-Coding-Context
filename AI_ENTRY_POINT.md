@@ -3,7 +3,7 @@
 > **AI 专用入口文档**  
 > **用途**: AI 读取此文件即可理解整个框架，自主决策生成流程  
 > **版本**: v2.3  
-> **最后更新**: 2025-11-28
+> **最后更新**: 2025-12-02
 >
 > ---
 >
@@ -123,6 +123,126 @@
 | ------------------------------- | ------------ | -------------- |
 | `reference/design_decisions.md` | 设计决策说明 | 了解设计理由时 |
 | `reference/framework_spec.md`   | 文档体系规范 | 生成任意文档时 |
+
+---
+
+## ⚙️ 步骤 -1: 读取配置（首要步骤，v3.0 新增）
+
+> 🎯 **执行时机**: AI 读取本文档后的**第一步**，在任何其他操作之前
+> 📁 **配置位置**: `config/` 目录
+
+### 配置读取流程
+
+**1. 检测配置文件**
+
+```bash
+# 检查用户配置是否存在
+test -f config/user_config.md && echo "存在" || echo "不存在"
+
+# Windows PowerShell
+Test-Path config/user_config.md
+```
+
+**2. 读取配置**
+
+```
+IF config/user_config.md 存在:
+    1. 解析 user_config.md 的 YAML frontmatter → userConfig
+    2. 解析 CONFIG_TEMPLATE.md 的 YAML frontmatter → defaultConfig
+    3. 合并配置 (user 覆盖 default) → finalConfig
+ELSE:
+    1. 解析 CONFIG_TEMPLATE.md → finalConfig
+    2. 标记需要首次配置引导
+```
+
+**3. 验证配置**
+
+```
+对于 finalConfig 中的每个字段:
+    - 检查值的有效性 (是否在允许范围内)
+    - 如无效, 使用 defaultConfig 对应值
+    - 记录警告信息
+```
+
+**4. 使用配置**
+
+配置加载完成后，将其应用到后续所有流程中：
+
+| 配置项                   | 影响模块     | 说明                     |
+| ------------------------ | ------------ | ------------------------ |
+| `documentLanguage`       | 文档生成     | 所有生成文档的语言       |
+| `enableMutualReview`     | AI 互审流程  | 是否启用方案互审         |
+| `dangerousCommandGuard`  | 命令执行保护 | 危险命令拦截级别         |
+| `enforceDesignThinking`  | 方案生成     | 是否强制深度设计思考     |
+| `enableADR`              | ADR 生成     | 是否记录架构决策         |
+| `aiCapabilityTier`       | 任务复杂度   | 根据 AI 能力调整任务粒度 |
+| `preferredRoles`         | 角色选择     | 优先使用的 AI 角色       |
+| `verboseMode`            | 输出详细度   | 控制日志和说明的详细程度 |
+| `defaultHealthCheckMode` | 文档健康检查 | 默认的健康检查深度       |
+
+### 首次配置引导
+
+**如果 `user_config.md` 不存在，执行以下流程**:
+
+```markdown
+📋 首次使用检测
+
+未检测到个人配置文件。为了更好地为您服务，请配置以下基本选项:
+
+1. **文档语言** (documentLanguage)
+   请选择生成文档的语言:
+
+   - A. 中文 (zh-CN) [默认]
+   - B. 英文 (en-US)
+   - C. 日语 (ja-JP)
+
+   请回复: A / B / C
+
+2. 其他配置项已使用默认值，您可以稍后在 config/user_config.md 中修改。
+
+配置完成后，将在 config/ 目录创建 user_config.md 文件。
+```
+
+**用户回复后**:
+
+1. 复制 `CONFIG_TEMPLATE.md` 到 `user_config.md`
+2. 修改 frontmatter 中用户选择的值
+3. 保存文件
+4. 继续后续流程
+
+### 配置降级策略
+
+**YAML 格式错误**:
+
+```
+警告: config/user_config.md YAML frontmatter 解析失败
+原因: [错误详情]
+降级: 使用 CONFIG_TEMPLATE.md 默认配置
+建议: 请检查 user_config.md 文件的 YAML 格式
+```
+
+**字段值无效**:
+
+```
+警告: 配置项 'documentLanguage' 值 'xxx' 无效
+降级: 使用默认值 'zh-CN'
+建议: 请参考 CONFIG_TEMPLATE.md 查看有效值
+```
+
+**CONFIG_TEMPLATE.md 缺失**:
+
+```
+错误: config/CONFIG_TEMPLATE.md 文件不存在
+影响: 无法加载默认配置
+建议: 框架文件可能损坏，请重新下载框架
+```
+
+### 配置系统文档
+
+完整配置说明请参阅:
+
+- [config/README.md](./config/README.md) - 配置系统使用指南
+- [config/CONFIG_TEMPLATE.md](./config/CONFIG_TEMPLATE.md) - 所有配置项详细说明
 
 ---
 

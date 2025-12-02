@@ -8,7 +8,35 @@
 
 ## 🌍 文档语言确认 (必须)
 
-**在开始任何检测前,AI 必须先询问用户文档语言偏好**:
+**v3.0 更新**: 现在支持从配置文件读取语言偏好
+
+### 语言确认优先级
+
+```
+1. config/user_config.md 中的 documentLanguage (最高优先级)
+   ↓
+2. 询问用户选择
+   ↓
+3. 默认值: zh-CN (中文)
+```
+
+### 执行流程
+
+**步骤 1: 检查配置文件**
+
+```bash
+# 读取用户配置中的 documentLanguage
+if config/user_config.md 存在:
+    读取 frontmatter 中的 documentLanguage
+    if documentLanguage 有效:
+        使用配置的语言,跳过询问
+    else:
+        继续步骤 2
+else:
+    继续步骤 2
+```
+
+**步骤 2: 询问用户(仅当配置不存在时)**
 
 ```markdown
 📝 在开始生成文档体系前,请确认:
@@ -17,10 +45,20 @@
 
 A. 中文 (推荐,默认)
 B. 英文  
-C. 其他语言 (请指定)
+C. 日语
 
-请回复 A / B / C-[语言名]
+请回复 A / B / C
+
+注意: 您的选择将保存到 config/user_config.md,下次无需重复配置
 ```
+
+**步骤 3: 保存用户选择**
+
+用户首次选择后:
+
+1. 如果 config/user_config.md 不存在,从 CONFIG_TEMPLATE.md 复制
+2. 更新 frontmatter 中的 documentLanguage 字段
+3. 保存文件
 
 ---
 

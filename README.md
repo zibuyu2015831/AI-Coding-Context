@@ -124,6 +124,12 @@ ai_documentation_framework/
 │   ├── project_types.md        # 项目类型识别与处理
 │   └── update_triggers.md      # 文档更新触发机制
 │
+├── config/                     # ⚙️ 配置系统 (v3.0)
+│   ├── README.md               # 配置系统使用指南
+│   ├── CONFIG_TEMPLATE.md      # 配置模板（框架默认值）
+│   ├── user_config.md          # 用户个人配置（不提交到Git）
+│   └── .gitignore              # 排除用户配置
+│
 ├── workflows/                  # 📋 流程文档
 │   ├── detection_workflow.md   # 项目检测详细流程
 │   ├── decision_workflow.md    # 策略决策详细流程
