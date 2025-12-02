@@ -27,6 +27,15 @@ tools:
   autoFallback: true # 工具失败时自动降级
   timeoutSeconds: 10 # 工具超时时间(秒)
   maxFileScan: 5000 # 最大扫描文件数
+
+# 设计思维引导配置 (V3.0 新增)
+design_thinking:
+  auto_trigger_threshold: 60 # 自动触发阈值 (0-100, 复杂度评分)
+  default_mode: standard # 默认引导模式 (standard|deep|quick)
+  expert_team:
+    include_security_expert: false # 是否默认包含安全专家
+    include_performance_expert: false # 是否默认包含性能专家
+  skip_trivial_tasks: true # 是否跳过简单任务 (如 Fix typo)
 ---
 
 # 框架配置说明
@@ -118,11 +127,13 @@ dangerousCommandGuard: permissive
 
 ## 🧠 设计思维引导
 
-**YAML 字段**: `enforceDesignThinking`  
-**当前值**: `false`  
+**YAML 字段**: `enforceDesignThinking` (全局开关) + `design_thinking` (详细配置)  
+**当前值**: `false` (全局) + 见 frontmatter (详细)  
 **对应优化点**: 003-设计思维引导
 
-**说明**: 是否强制 AI 进行深度设计思考(5 Why、多方案对比、边界定义)
+**说明**: 控制 AI 是否进行深度设计思考(5 Why、多方案对比、风险评估)
+
+### 全局开关 (`enforceDesignThinking`)
 
 **可选值**:
 
@@ -131,7 +142,79 @@ dangerousCommandGuard: permissive
   - 效果: AI 必须提供多个方案对比、深度分析
 - `false` - 不强制(默认)
   - 适用: 快速原型、小功能
-  - 效果: AI 可以快速给出方案
+  - 效果: 根据复杂度自动判断是否启动
+
+### 详细配置 (`design_thinking`)
+
+#### `auto_trigger_threshold`
+
+**类型**: `number` (0-100)  
+**默认值**: `60`
+
+**说明**: 自动触发设计思维引导的复杂度阈值
+
+- **≥ 60 分**: AI 会主动提议启动引导流程
+- **< 60 分**: 默认跳过,直接生成方案
+
+**调优建议**:
+
+```yaml
+# 严格模式 (更频繁引导)
+design_thinking:
+  auto_trigger_threshold: 40
+
+# 宽松模式 (仅复杂任务引导)
+design_thinking:
+  auto_trigger_threshold: 80
+```
+
+#### `default_mode`
+
+**类型**: `string`  
+**默认值**: `standard`  
+**可选值**: `standard` | `deep` | `quick`
+
+**说明**: 默认的引导模式
+
+- `standard` - 标准引导 (完整 5 步流程)
+- `deep` - 深度辩论 (多轮专家对话,适合复杂架构)
+- `quick` - 快速对齐 (仅确认目标、方案、验收)
+
+#### `expert_team`
+
+**类型**: `object`  
+**说明**: 配置专家团队组成
+
+- `include_security_expert`: 是否默认包含安全专家 (用于安全敏感项目)
+- `include_performance_expert`: 是否包含性能专家 (用于高性能要求项目)
+
+**示例**:
+
+```yaml
+design_thinking:
+  expert_team:
+    include_security_expert: true # 金融、支付类项目
+    include_performance_expert: true # 高并发系统
+```
+
+#### `skip_trivial_tasks`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否自动跳过简单任务 (如 Fix typo, 调整样式)
+
+- `true` - 自动跳过 (推荐)
+- `false` - 所有任务都判断复杂度
+
+### 使用指令覆盖配置
+
+即使配置了默认值,用户仍可通过指令覆盖:
+
+- `@think` / `@think:standard` - 强制标准引导
+- `@think:deep` - 强制深度辩论
+- `@think:quick` - 强制快速对齐
+- `@think:skip` - 强制跳过引导
 
 ---
 

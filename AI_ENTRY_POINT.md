@@ -498,6 +498,122 @@ node tools/js/project_scanner.js --max-files 2000
 
 ---
 
+### 步骤 3.5: 设计思维引导 (v3.0 新增) ⭐
+
+**目的**: 在生成方案前,引导 AI 进行深度设计思考,避免直接跳入代码实现。
+
+**触发时机**: 在步骤 3（确定子文档清单）之后,步骤 4（生成分析方案）之前。
+
+**相关文档**:
+
+- **角色定义**: `agents/runtime/design_facilitator.md`
+- **Prompt 模板**: `templates/prompts/design_thinking/step*.md`
+
+---
+
+#### 触发机制 (Hybrid Trigger)
+
+**A. 用户显式指令**:
+
+- `@think` / `@think:standard`: 启动标准引导流程 (完整 5 步)
+- `@think:deep`: 启动深度辩论模式 (多轮专家对话)
+- `@think:quick`: 快速对齐 (仅确认目标、方案、验收)
+- `@think:skip`: 跳过引导,直接进入步骤 4
+
+**B. 自动触发 (Auto-Trigger)**:
+
+当用户未明确指令时,基于复杂度评估决定:
+
+- **复杂度 ≥ 60 分** → **主动提议引导**:
+
+  ```markdown
+  🧠 检测到任务涉及核心模块 [Auth, Payment],建议先进行设计思维引导以降低风险。
+
+  是否启动? (Y/n)
+  ```
+
+- **复杂度 < 60 分** → 默认跳过
+- **Trivial 任务** (如 Fix typo) → 强制跳过
+
+**C. 配置集成**:
+
+用户可在 `config/user_config.md` 中自定义行为:
+
+```yaml
+design_thinking:
+  auto_trigger_threshold: 60 # 自动触发阈值 (0-100)
+  default_mode: "standard" # standard/deep/quick
+  expert_team:
+    include_security_expert: false # 是否默认包含安全专家
+```
+
+---
+
+#### 5 步引导流程
+
+**前置检查**: Facilitator 快速判断任务性质,简单任务直接跳过。
+
+**Step 1 - 问题本质 (The "Why")**:
+
+- **执行者**: ProductManager
+- **目标**: 通过 5 Why 分析挖掘业务价值
+- **参考**: `templates/prompts/design_thinking/step1_why.md`
+
+**Step 2 - 方案探索 (The "How")**:
+
+- **执行者**: ArchitectureAnalyst
+- **目标**: 提出 2-3 种可行方案并对比
+- **参考**: `templates/prompts/design_thinking/step2_how.md`
+
+**Step 3 - 风险与测试 (The "Risk")**:
+
+- **执行者**: ArchitectureAnalyst & TestEngineer
+- **目标**: 识别风险并制定测试策略
+- **参考**: `templates/prompts/design_thinking/step3_risk.md`
+
+**Step 4 - 反思与整合 (Synthesis & Reflection)**:
+
+- **执行者**: Facilitator
+- **目标**: 全局反思,识别冲突和知识空白
+- **参考**: `templates/prompts/design_thinking/step4_reflection.md`
+- **关键判断**:
+  - 若发现知识空白或高风险 → 回溯到 Step 2 深化
+  - 若专家意见冲突 → 呈现冲突,请用户裁决
+  - 若一切清晰 → 进入 Step 5
+
+**Step 5 - 最终决策 (Final Decision)**:
+
+- **执行者**: Facilitator
+- **目标**: 输出结构化决策方案
+- **参考**: `templates/prompts/design_thinking/step5_decision.md`
+- **输出格式**: 应符合 `implementation_plan.md` 标准
+
+---
+
+#### 输出无缝衔接
+
+设计思维引导的 Step 5 输出应直接可作为步骤 4（生成分析方案）的高质量输入,包含:
+
+- 背景与目标 (业务价值)
+- 推荐方案 (技术选型)
+- 风险与应对
+- 验收标准
+- 下一步行动
+
+**流程示意**:
+
+```
+步骤 3.5 (设计思维引导) → Step 5 输出决策方案
+  ↓
+步骤 4 (生成分析方案) ← 基于决策方案生成 generation_plan.md
+  ↓
+步骤 4.5 (AI 互审)
+  ↓
+步骤 5 (人工审核)
+```
+
+---
+
 ### 步骤 4: 生成分析方案（AI 执行）
 
 **使用模板**：

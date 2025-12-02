@@ -61,6 +61,8 @@
   - 补充 "设计思维引导" 核心概念。
 - [ ] **更新 `AI_RULES.md`**
   - 添加 P0 规则: "Complex Task requires Design Thinking"。
+- [ ] **更新 `config/CONFIG_TEMPLATE.md`**
+  - 增加 `design_thinking` 配置项模板 (阈值、模式、专家团队)。
 
 ### 阶段 4: 示例建设 (Example Construction)
 
