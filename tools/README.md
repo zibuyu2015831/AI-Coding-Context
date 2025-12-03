@@ -55,9 +55,17 @@ node tools/js/project_scanner.js --max-files 1000
 
 1. **双模实现**: 尽量同时提供 Python (`tools/py/`) 和 Node.js (`tools/js/`) 版本，以最大化环境兼容性。
 2. **零依赖**: 仅使用标准库，**严禁**引入需要 `pip install` or `npm install` 的第三方依赖。
-3. **错误处理**: 脚本应捕获异常并输出 JSON 格式的错误信息，避免直接 Crash。
-4. **文档更新**: 创建新工具后，**必须**更新本 `README.md` 的工具清单。
-5. **变更记录**: 创建或修改工具后，**必须**更新 `tools/CHANGELOG.md`，记录变更内容（遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式）。
+3. **详细注释**: **所有脚本必须在文件顶部添加详细文档注释**，包括：
+   - 功能说明（3-5 个要点）
+   - 使用方法（命令行示例）
+   - 参数说明（所有参数的详细说明）
+   - 输出格式（JSON 结构示例）
+   - 使用示例（3-4 个实际用例）
+   - 版本信息（版本号和更新日期）
+   - 参考现有脚本（如 `timestamp_analyzer.py`）的注释格式
+4. **错误处理**: 脚本应捕获异常并输出 JSON 格式的错误信息，避免直接 Crash。
+5. **文档更新**: 创建新工具后，**必须**更新本 `README.md` 的工具清单。
+6. **变更记录**: 创建或修改工具后，**必须**更新 `tools/CHANGELOG.md`，记录变更内容（遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 格式）。
 
 ### 变更记录规范
 

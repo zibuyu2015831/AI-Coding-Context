@@ -3,7 +3,7 @@
 **当前阶段**: 规划与讨论  
 **开始日期**: 2025-11-29  
 **目标发布**: 2026-Q2  
-**最后更新**: 2025-12-02
+**最后更新**: 2025-12-03
 
 ---
 
@@ -13,8 +13,8 @@
 
 ```
 总优化点: 17个
-├── 已确认 (confirmed/): 5个 (29.41%)
-├── 待讨论 (pending/):   12个 (70.59%)
+├── 已确认 (confirmed/): 6个 (35.29%)
+├── 待讨论 (pending/):   11个 (64.71%)
 ├── 开发中:              0个
 └── 已完成:              4个 (001-AI角色库, 016-配置管理系统, 017-实用脚本工具库, 013-AI互审机制)
 ```
@@ -60,7 +60,9 @@ P2 (增强功能): 4个
 - [x] 确认 003-design-thinking-guide.md ✅ 2025-12-02 (P0 智能引导)
   - **状态**: 🟢 已确认
   - **产物**: `/confirmed/003-design-thinking-guide/` 目录
-- [ ] 讨论 012-mandatory-doc-summary.md (依赖 001)
+- [x] 确认 012-mandatory-doc-summary.md ✅ 2025-12-03 (P0 核心能力)
+  - **状态**: 🟢 已确认
+  - **产物**: `/confirmed/012-mandatory-doc-summary/` 目录
 - [ ] 讨论 004-adr-system.md
 - [ ] 讨论 005-complexity-dashboard.md
 - [ ] 讨论 006-auto-review-report.md
