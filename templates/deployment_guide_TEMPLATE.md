@@ -1,3 +1,13 @@
+---
+title: [项目名称] 部署文档
+summary: [100-200字概述：项目部署流程、环境配置、运维操作和故障排查指南，支持传统部署、Docker和Kubernetes]
+keywords: 部署 | Docker | Kubernetes | CI/CD | 运维 | 环境配置
+scope: 项目部署文档 (dev_docs/)
+related_files: [列出部署相关的配置文件，如 "docker-compose.yml | k8s/deployment.yaml" 或 "无"]
+dependencies: [列出相关文档] | 无
+verified_at: [YYYY-MM-DD 格式日期]
+---
+
 # 部署文档模板
 
 > **用途**: 记录项目的部署流程、环境配置和运维操作  
@@ -14,7 +24,7 @@
 | 环境           | 用途     | URL                   | 部署频率 |
 | -------------- | -------- | --------------------- | -------- |
 | **开发环境**   | 开发测试 | [dev.example.com]     | 每次提交 |
-| **测试环境**   | QA测试   | [test.example.com]    | 每日构建 |
+| **测试环境**   | QA 测试  | [test.example.com]    | 每日构建 |
 | **预发布环境** | 生产验证 | [staging.example.com] | 发布前   |
 | **生产环境**   | 线上服务 | [www.example.com]     | 定期发布 |
 
@@ -99,7 +109,7 @@ cp .env.example .env
 
 ### 1. 传统部署（非容器）
 
-#### 步骤1: 环境准备
+#### 步骤 1: 环境准备
 
 ```bash
 # 创建部署目录
@@ -114,7 +124,7 @@ sudo apt-get install -y nodejs
 npm install -g pm2
 ```
 
-#### 步骤2: 代码部署
+#### 步骤 2: 代码部署
 
 ```bash
 # 拉取代码
@@ -128,7 +138,7 @@ npm ci --production
 npm run build
 ```
 
-#### 步骤3: 配置环境变量
+#### 步骤 3: 配置环境变量
 
 ```bash
 # 创建环境变量文件
@@ -140,7 +150,7 @@ API_KEY=[api-key]
 EOF
 ```
 
-#### 步骤4: 启动服务
+#### 步骤 4: 启动服务
 
 ```bash
 # 使用PM2启动
@@ -151,7 +161,7 @@ pm2 startup
 
 ---
 
-### 2. Docker部署
+### 2. Docker 部署
 
 #### Dockerfile
 
@@ -230,7 +240,7 @@ docker-compose down
 
 ---
 
-### 3. Kubernetes部署
+### 3. Kubernetes 部署
 
 #### deployment.yaml
 
@@ -322,9 +332,9 @@ kubectl rollout undo deployment/app
 | `NODE_ENV`     | 运行环境   | production      | 否       |
 | `PORT`         | 服务端口   | 3000            | 否       |
 | `DATABASE_URL` | 数据库连接 | postgres://...  | ✅ 是    |
-| `REDIS_URL`    | Redis连接  | redis://...     | ✅ 是    |
-| `API_KEY`      | API密钥    | sk\_...         | ✅ 是    |
-| `JWT_SECRET`   | JWT密钥    | [random-string] | ✅ 是    |
+| `REDIS_URL`    | Redis 连接 | redis://...     | ✅ 是    |
+| `API_KEY`      | API 密钥   | sk\_...         | ✅ 是    |
+| `JWT_SECRET`   | JWT 密钥   | [random-string] | ✅ 是    |
 
 ### 可选环境变量
 
@@ -336,7 +346,7 @@ kubectl rollout undo deployment/app
 
 ---
 
-## 🌐 Nginx配置
+## 🌐 Nginx 配置
 
 ```nginx
 # /etc/nginx/sites-available/app
@@ -419,7 +429,7 @@ curl https://example.com/health
 
 ---
 
-## 🔄 CI/CD配置
+## 🔄 CI/CD 配置
 
 ### GitHub Actions
 
@@ -456,7 +466,7 @@ jobs:
 
 ### 常见问题
 
-**问题1**: 服务无法启动
+**问题 1**: 服务无法启动
 
 ```bash
 # 检查日志
@@ -471,7 +481,7 @@ netstat -tlnp | grep :3000
 printenv | grep [VAR_NAME]
 ```
 
-**问题2**: 数据库连接失败
+**问题 2**: 数据库连接失败
 
 ```bash
 # 测试连接
@@ -481,7 +491,7 @@ psql [DATABASE_URL]
 telnet [db-host] 5432
 ```
 
-**问题3**: 内存溢出
+**问题 3**: 内存溢出
 
 ```bash
 # 查看内存使用
@@ -500,12 +510,12 @@ NODE_OPTIONS="--max-old-space-size=4096" npm start
 部署前确认:
 
 - [ ] 所有敏感信息使用环境变量
-- [ ] HTTPS已启用
+- [ ] HTTPS 已启用
 - [ ] 防火墙规则正确配置
 - [ ] 数据库访问限制
 - [ ] 日志不包含敏感信息
 - [ ] 依赖项安全扫描通过
-- [ ] API速率限制已启用
+- [ ] API 速率限制已启用
 
 ---
 
@@ -514,10 +524,10 @@ NODE_OPTIONS="--max-old-space-size=4096" npm start
 ### 版本发布步骤
 
 1. **代码冻结** - 停止新功能合并
-2. **测试验证** - 在staging环境全面测试
+2. **测试验证** - 在 staging 环境全面测试
 3. **创建发布分支** - `git checkout -b release/v1.0.0`
-4. **更新版本号** - 修改package.json等
-5. **打Tag** - `git tag v1.0.0`
+4. **更新版本号** - 修改 package.json 等
+5. **打 Tag** - `git tag v1.0.0`
 6. **部署到生产** - 执行部署流程
 7. **验证** - 检查生产环境
 8. **通知** - 通知团队发布完成
@@ -566,5 +576,5 @@ psql [DATABASE_URL] < backup_20231127.sql
 
 - **创建日期**: YYYY-MM-DD
 - **最后更新**: YYYY-MM-DD
-- **维护者**: [DevOps团队]
+- **维护者**: [DevOps 团队]
 - **紧急联系**: [联系方式]

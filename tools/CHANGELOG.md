@@ -7,6 +7,16 @@
 
 ---
 
+## [1.2.0] - 2025-12-03
+
+### Added
+
+- 新增 `summary_extractor.py` & `.js` - 提取文档 YAML Frontmatter 摘要
+- 新增 `summary_validator.py` & `.js` - 验证摘要格式、必填字段和关联文件存在性
+- 新增 `summary_related_checker.py` & `.js` - 检测代码变更影响的文档（基于 related_files）
+- 新增 `summary_index_generator.py` & `.js` - 生成文档摘要索引页（暂不启用）
+- 支持 012-强制文档摘要机制，提升文档定位效率和更新准确性
+
 ## [1.1.0] - 2025-12-02
 
 ### Added

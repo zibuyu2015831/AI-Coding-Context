@@ -1,3 +1,13 @@
+---
+title: [项目名称] AI Rules
+summary: [100-200字概述：项目级AI规则配置，定义核心开发规范、文档阅读触发器、工作流程和禁止事项，在IDE中自动应用]
+keywords: AI Rules | [技术栈] | [框架名称] | 开发规范 | 工作流
+scope: AI编码规则配置
+related_files: 无
+dependencies: dev_docs/AI_Coding_Context.md | [列出相关子文档]
+verified_at: [YYYY-MM-DD 格式日期]
+---
+
 # AI Rules - [项目名称]
 
 > **用途**: 项目级 AI 规则，在 IDE 中配置后每次 AI 交互都会自动应用  

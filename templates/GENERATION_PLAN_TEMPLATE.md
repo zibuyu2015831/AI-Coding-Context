@@ -1,3 +1,13 @@
+---
+title: [项目名称] 文档生成方案
+summary: [100-200字概述：AI文档生成的详细执行方案，包括项目分析、代码模式提取、文档规划和质量保证措施]
+keywords: 文档生成 | 方案 | 项目分析 | 代码提取 | 质量保证
+scope: 文档生成方案 (dev_docs/_analysis/)
+related_files: 无
+dependencies: workflows/generation_workflow.md | templates/AI_Coding_Context_TEMPLATE.md
+verified_at: [YYYY-MM-DD 格式日期]
+---
+
 # 文档生成方案模板
 
 > **用途**: 在正式生成文档前，先创建分析方案，经人工审核后再执行  

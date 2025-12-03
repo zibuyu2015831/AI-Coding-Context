@@ -323,6 +323,83 @@ else:
 
 ---
 
+#### D. 摘要健康度检查（最多-5 分）⭐ (V3.0)
+
+文档摘要的完整性和时效性影响自动化更新检测能力
+
+| 摘要问题                 | 扣分  | 说明                 |
+| ------------------------ | ----- | -------------------- |
+| 所有文档缺少摘要         | -5 分 | 无法自动检测更新需求 |
+| 部分文档缺少摘要         | -3 分 | 自动检测能力受限     |
+| 摘要格式错误             | -2 分 | 工具无法解析         |
+| verified_at 过期 > 90 天 | -2 分 | 摘要过时             |
+| related_files 不准确     | -3 分 | 关联检测失效         |
+| 所有文档摘要完整且准确   | 0 分  | 理想状态             |
+
+**检查方法**:
+
+```bash
+# 使用摘要验证工具批量检查
+python tools/py/summary_validator.py --batch-mode --dir dev_docs/
+```
+
+输出示例：
+
+```json
+{
+  "total_documents": 15,
+  "documents_with_summary": 12,
+  "documents_without_summary": 3,
+  "format_errors": 1,
+  "expired_summaries": 5,
+  "file_not_found_errors": 2,
+  "overall_health": "中等"
+}
+```
+
+**扣分计算**:
+
+```python
+total_deduct = 0
+
+# 1. 缺少摘要
+missing_rate = missing_count / total_docs
+if missing_rate >= 0.8:  # 80%+文档缺少摘要
+    total_deduct += 5
+elif missing_rate >= 0.3:  # 30%+文档缺少摘要
+    total_deduct += 3
+
+# 2. 格式错误
+if format_error_count > 0:
+    total_deduct += 2
+
+# 3. 过期摘要
+expired_rate = expired_count / docs_with_summary
+if expired_rate >= 0.5:  # 50%+摘要过期
+    total_deduct += 2
+
+# 4. related_files 不准确
+if file_not_found_errors >= 3:
+    total_deduct += 3
+
+# 上限5分
+total_deduct = min(total_deduct, 5)
+```
+
+**为什么重要**:
+
+- ✅ **自动化检测**: 准确的摘要支持自动检测需要更新的文档
+- ✅ **节省时间**: 无需人工逐个分析文档
+- ✅ **时效性追踪**: `verified_at` 字段监控文档健康度
+
+**注意事项**:
+
+- 如果文档是 V3.0 之前生成的，缺少摘要是正常的，不应扣分
+- 可以通过检查文档生成日期来判断是否应该有摘要
+- 建议在更新文档时同步添加摘要
+
+---
+
 ### 健康度等级划分
 
 | 分数范围  | 等级    | 评价             | 建议操作                   |

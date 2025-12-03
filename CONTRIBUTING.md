@@ -403,6 +403,26 @@ Assets/
 
 ---
 
+## 📋 必需：YAML Frontmatter (v3.0)
+
+所有文档模板必须包含标准化的 YAML 摘要头：
+
+```yaml
+---
+title: [文档标题]
+summary: [文档概述]
+keywords: [关键词1] | [关键词2]
+scope: [文档范围]
+related_files: [关联代码文件]
+dependencies: [依赖文档]
+verified_at: [YYYY-MM-DD]
+---
+```
+
+详见: `reference/SUMMARY_FORMAT_SPEC.md`
+
+---
+
 ## 📋 服务清单
 
 ### 服务概览

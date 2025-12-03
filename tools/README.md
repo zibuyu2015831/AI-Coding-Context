@@ -16,16 +16,20 @@ tools/
 
 所有工具均提供 Python 和 Node.js 双版本，功能保持一致。
 
-| 工具名称             | 功能描述                     | 典型用途                                    |
-| :------------------- | :--------------------------- | :------------------------------------------ |
-| `project_scanner`    | 扫描项目结构，生成 JSON 树   | 快速了解项目规模与结构，自动忽略 .gitignore |
-| `file_reader`        | 安全读取文件内容             | 读取大文件、处理编码、检测二进制文件        |
-| `content_searcher`   | 高效搜索内容 (类 grep)       | 查找代码引用、TODO、特定字符串              |
-| `file_finder`        | 查找文件 (类 find)           | 根据文件名模式查找文件                      |
-| `env_diagnosis`      | 环境诊断                     | 检查 Python/Node.js 版本及可用性            |
-| `git_inspector`      | Git 信息检查                 | 获取当前分支、变更状态                      |
-| `timestamp_analyzer` | 文件时间戳采集 (V1.1.0 新增) | 供 AI 分析文档健康度，判断文档是否过期      |
-| `git_diff_analyzer`  | Git 差异分析 (V1.1.0 新增)   | 供 AI 判断哪些文档需要更新                  |
+| 工具名称                  | 功能描述                     | 典型用途                                     |
+| :------------------------ | :--------------------------- | :------------------------------------------- |
+| `project_scanner`         | 扫描项目结构，生成 JSON 树   | 快速了解项目规模与结构，自动忽略 .gitignore  |
+| `file_reader`             | 安全读取文件内容             | 读取大文件、处理编码、检测二进制文件         |
+| `content_searcher`        | 高效搜索内容 (类 grep)       | 查找代码引用、TODO、特定字符串               |
+| `file_finder`             | 查找文件 (类 find)           | 根据文件名模式查找文件                       |
+| `env_diagnosis`           | 环境诊断                     | 检查 Python/Node.js 版本及可用性             |
+| `git_inspector`           | Git 信息检查                 | 获取当前分支、变更状态                       |
+| `timestamp_analyzer`      | 文件时间戳采集 (V1.1.0 新增) | 供 AI 分析文档健康度，判断文档是否过期       |
+| `git_diff_analyzer`       | Git 差异分析 (V1.1.0 新增)   | 供 AI 判断哪些文档需要更新                   |
+| `summary_extractor`       | 文档摘要提取 (V1.2.0 新增)   | 提取文档 YAML Frontmatter 摘要               |
+| `summary_validator`       | 摘要格式验证 (V1.2.0 新增)   | 验证摘要格式、必填字段和关联文件存在性       |
+| `summary_related_checker` | 关联文档检查 (V1.2.0 新增)   | 检测代码变更影响的文档（基于 related_files） |
+| `summary_index_generator` | 摘要索引生成 (V1.2.0 新增)   | 生成文档摘要索引页（暂不启用）               |
 
 ## 🚀 使用指南
 
@@ -196,6 +200,8 @@ tools:
 | `file_reader.py`                 | <0.1s        | <0.2s        | <0.5s      | 无限制   |
 | `env_diagnosis.py`               | <0.5s        | <0.5s        | <0.5s      | 无限制   |
 | `git_inspector.py`               | <0.5s        | <1s          | 1-3s       | 无限制   |
+| `summary_extractor.py`           | <0.2s        | <0.5s        | 1-2s       | 无限制   |
+| `summary_validator.py`           | <0.2s        | <0.5s        | 1-2s       | 无限制   |
 
 > **注意**: 实际性能受硬件、磁盘 I/O、文件分布等因素影响，以上数据仅供参考。
 

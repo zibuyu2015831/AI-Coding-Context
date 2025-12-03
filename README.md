@@ -321,5 +321,6 @@ AI 会自动完成所有检测和决策。
 - `guides/quick_start.md` - 详细的使用步骤
 - `guides/project_types.md` - 了解支持的项目类型
 - `reference/framework_spec.md` - 深入了解框架设计
+- `reference/SUMMARY_FORMAT_SPEC.md` - 文档摘要规范 (V3.0)
 
 ---

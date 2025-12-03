@@ -16,7 +16,7 @@
 ├── 已确认 (confirmed/): 6个 (35.29%)
 ├── 待讨论 (pending/):   11个 (64.71%)
 ├── 开发中:              0个
-└── 已完成:              4个 (001-AI角色库, 016-配置管理系统, 017-实用脚本工具库, 013-AI互审机制)
+└── 已完成:              5个 (001-AI角色库, 016-配置管理系统, 017-实用脚本工具库, 013-AI互审机制, 012-强制文档摘要机制)
 ```
 
 ### 优先级分布
@@ -61,8 +61,8 @@ P2 (增强功能): 4个
   - **状态**: 🟢 已确认
   - **产物**: `/confirmed/003-design-thinking-guide/` 目录
 - [x] 确认 012-mandatory-doc-summary.md ✅ 2025-12-03 (P0 核心能力)
-  - **状态**: 🟢 已确认
-  - **产物**: `/confirmed/012-mandatory-doc-summary/` 目录
+  - **状态**: 🟢 已完成
+  - **产物**: `/confirmed/012-mandatory-doc-summary/` 目录, `tools/py/summary_*.py`, `tools/js/summary_*.js`
 - [ ] 讨论 004-adr-system.md
 - [ ] 讨论 005-complexity-dashboard.md
 - [ ] 讨论 006-auto-review-report.md
@@ -266,6 +266,18 @@ P2 (增强功能): 4个
   - 产物: `/confirmed/003-design-thinking-guide/` 目录
   - 价值: 将 AI 从"代码生成器"转变为"架构思考伙伴"，返工率降低 50%
   - 已确认优化点: 5 个 (001, 016, 017, 013, 003)
+
+### 2025-12-03
+
+**[优化点完成]**
+
+- 012-mandatory-doc-summary.md (强制文档摘要机制) 开发完成 ✅
+  - 类型: 核心能力 (P0)
+  - 状态: 🟢 已完成
+  - 产物: 4 个 Python 工具 + 4 个 JS 工具 (`summary_extractor`, `summary_validator`, `summary_related_checker`, `summary_index_generator`)
+  - 集成: 已更新 `tools/README.md`, `tools/CHANGELOG.md` 及相关工作流文档
+  - 价值: 提升文档定位效率，支持自动化更新检测，节省 Token
+  - 已完成优化点: 5 个 (001, 016, 017, 013, 012)
 
 ---
 

@@ -145,6 +145,106 @@ graph TD
 
 ---
 
+### 步骤 1.5: 自动检测受影响文档 ⭐ (V3.0)
+
+**目的**: 使用文档摘要机制自动识别哪些文档需要更新
+
+**前提**: 文档已包含 YAML Frontmatter 摘要（`related_files` 字段）
+
+**操作步骤**:
+
+1. **获取代码变更列表**
+
+使用 Git 差异分析工具：
+
+```bash
+# 获取最近7天的代码变更
+python tools/py/git_diff_analyzer.py --since "7 days ago"
+```
+
+输出示例：
+
+```json
+{
+  "changed_files": [
+    "src/api/user.ts",
+    "src/api/post.ts",
+    "src/store/userStore.ts"
+  ],
+  "change_types": {
+    "src/api/user.ts": "modified",
+    "src/api/post.ts": "added",
+    "src/store/userStore.ts": "modified"
+  }
+}
+```
+
+2. **检测受影响的文档**
+
+使用摘要关联检查工具：
+
+```bash
+# 方式1: 管道模式（推荐）
+python tools/py/git_diff_analyzer.py --since "7 days ago" | \
+python tools/py/summary_related_checker.py --from-stdin
+
+# 方式2: 手动指定变更文件
+python tools/py/summary_related_checker.py --changed-files "src/api/user.ts,src/api/post.ts"
+```
+
+输出示例：
+
+```json
+{
+  "affected_documents": [
+    {
+      "file": "dev_docs/api_layer.md",
+      "related_changes": ["src/api/user.ts"],
+      "priority": "P0",
+      "reason": "related_files 包含 src/api/user.ts"
+    },
+    {
+      "file": "dev_docs/state_management.md",
+      "related_changes": ["src/store/userStore.ts"],
+      "priority": "P1",
+      "reason": "related_files 包含 src/store/userStore.ts"
+    }
+  ],
+  "update_suggestions": [
+    {
+      "document": "dev_docs/api_layer.md",
+      "action": "更新用户API章节，检查`src/api/user.ts`的变更内容"
+    },
+    {
+      "document": "dev_docs/state_management.md",
+      "action": "更新用户状态管理示例"
+    }
+  ]
+}
+```
+
+3. **验证检测结果**
+
+```markdown
+- [ ] 检查是否有遗漏的文档（工具无法检测到的）
+- [ ] 确认优先级判断是否合理
+- [ ] 检查是否有误报（不需要更新的文档）
+```
+
+**优势**:
+
+- ✅ **自动化**: 无需人工逐个分析文档
+- ✅ **准确**: 基于明确的文件路径关联
+- ✅ **节省时间**: 从 30 分钟分析降低到 1 分钟
+
+**注意事项**:
+
+- 如果文档没有摘要，工具无法检测到关联
+- 如果文档的 `related_files` 不准确，可能漏检或误报
+- 建议结合人工判断进行最终确认
+
+---
+
 ### 步骤 2: 准备更新方案
 
 **目的**: 让 AI 理解需要如何更新
@@ -322,6 +422,74 @@ grep -n "POST /api/v1/payments" dev_docs/api_design.md
 # 检查数据库文档
 
 grep -n "Payment" dev_docs/database_schema.md
+```
+
+---
+
+### 步骤 4.5: 更新文档摘要 ⭐ (V3.0)
+
+**目的**: 更新文档摘要中的 `verified_at` 字段和 `related_files` 字段（如有必要）
+
+**操作步骤**:
+
+1. **更新 verified_at 字段**
+
+所有被更新的文档，都必须更新 `verified_at` 为当前日期：
+
+```yaml
+---
+title: API 层设计规范
+summary: ...
+keywords: ...
+scope: ...
+related_files: ...
+dependencies: ...
+verified_at: 2025-12-03 # ← 更新为当前日期
+---
+```
+
+2. **更新 related_files 字段（如有必要）**
+
+如果文档新增了对代码文件的引用，需要更新 `related_files`：
+
+**示例** - 在 `api_layer.md` 中新增了支付 API 示例：
+
+```yaml
+# 修改前
+related_files: src/api/http.ts | src/api/types.ts | src/api/user.ts
+
+# 修改后（新增了 src/api/payment.ts）
+related_files: src/api/http.ts | src/api/types.ts | src/api/user.ts | src/api/payment.ts
+```
+
+3. **验证摘要格式**
+
+使用摘要验证工具检查：
+
+```bash
+# 验证所有被更新的文档
+python tools/py/summary_validator.py --file dev_docs/api_layer.md
+python tools/py/summary_validator.py --file dev_docs/database_schema.md
+```
+
+确认：
+
+- [ ] YAML 格式正确
+- [ ] verified_at 已更新为当前日期
+- [ ] related_files 包含所有提及的代码文件
+- [ ] 字段格式为单行 `|` 分隔
+
+**为什么重要**:
+
+- **时效性追踪**: `verified_at` 字段用于监控文档健康度（超过 90 天触发告警）
+- **准确的关联**: 更新 `related_files` 确保下次代码变更时能准确检测到需要更新的文档
+
+**快速检查**:
+
+```bash
+# 检查所有文档的 verified_at 是否过期
+python tools/py/summary_validator.py --batch-mode --dir dev_docs/ | \
+grep "过期"
 ```
 
 ---

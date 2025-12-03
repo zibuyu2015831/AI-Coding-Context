@@ -1,3 +1,13 @@
+---
+title: [文档标题，如 "项目名称 AI编程上下文"]
+summary: [100-200字概述：本文档作为AI辅助编程的快速上下文入口，提供项目架构、开发规范、核心代码模式和常见任务指引]
+keywords: [关键词1] | [关键词2] | [关键词3] | [技术栈] | [框架名称]
+scope: [文档范围，如 "整个项目 (全局上下文)"]
+related_files: [列出文档中提及的核心代码文件，如 "src/main.ts | src/App.vue | src/router/index.ts" 或 "无"]
+dependencies: [列出依赖的其他文档，如 "dev_docs/architecture_overview.md | dev_docs/api_layer.md" 或 "无"]
+verified_at: [YYYY-MM-DD 格式日期]
+---
+
 # 主文档模板 (AI_Coding_Context.md)
 
 > **使用说明**: 将 `[PROJECT_NAME]`、`[VERSION]` 等占位符替换为实际值

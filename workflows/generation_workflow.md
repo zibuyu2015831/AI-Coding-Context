@@ -292,6 +292,106 @@ README.md 包含：
 
 ---
 
+### 步骤 2.5: 为所有文档添加摘要 ⭐ (V3.0)
+
+**目的**: 为生成的所有文档添加标准化 YAML Frontmatter 摘要，支持快速判断相关性和自动更新检测
+
+**AI 指令模板**:
+
+```
+请为刚生成的所有文档（主文档和子文档）添加 YAML Frontmatter 摘要。
+
+参考格式规范: reference/SUMMARY_FORMAT_SPEC.md
+参考示例: reference/examples/summary_examples/
+
+每个文档开头添加以下格式的摘要：
+
+---
+title: [文档标题]
+summary: [100-200字概述，说明核心内容]
+keywords: [关键词1] | [关键词2] | [关键词3] ...
+scope: [文档范围，如 "前端API层 (src/api/)"]
+related_files: [文件路径1] | [文件路径2] | ...
+dependencies: [依赖文档1] | [依赖文档2] | ...
+verified_at: [YYYY-MM-DD]
+---
+
+**重要提示**：
+1. related_files 必须列出文档中所有提及的源代码文件（不包含其他文档）
+2. dependencies 列出相关的其他文档
+3. 所有字段使用 `|` 分隔，必须单行格式
+4. verified_at 使用当前日期（YYYY-MM-DD格式）
+```
+
+**related_files 提取规则**:
+
+对于不同类型的文档：
+
+1. **架构文档**: 包含架构示意图中的关键文件（入口文件、核心配置）
+
+   - ✅ 包含: `src/main.ts | src/App.vue | src/router/index.ts`
+   - ❌ 不包含: 所有页面组件和通用组件
+
+2. **API 文档**: 包含核心文件 + 2-3 个示例文件
+
+   - ✅ 包含: `src/api/http.ts | src/api/types.ts | src/api/user.ts`
+   - ❌ 不包含: 所有 20+个业务 API 文件
+
+3. **工作流文档**: 通常为 `无`
+
+   - ✅ 例外: 如详细说明某个脚本，则包含该脚本文件
+
+4. **工具文档**: 必须包含工具文件
+   - ✅ 包含: `tools/py/analyzer.py | tools/js/analyzer.js`
+
+**示例输出**（API 文档）:
+
+```markdown
+---
+title: API 层设计规范
+summary: 定义前端 API 调用的统一接口规范，包括请求封装、错误处理、拦截器配置和 TypeScript 类型定义
+keywords: API | HTTP | Axios | 错误处理 | 拦截器 | TypeScript
+scope: 前端 API 层 (src/api/)
+related_files: src/api/http.ts | src/api/types.ts | src/api/interceptors.ts | src/api/user.ts
+dependencies: dev_docs/state_management.md | dev_docs/authentication.md
+verified_at: 2025-12-03
+---
+
+# API 层设计规范
+
+（原有文档内容...)
+```
+
+**质量检查**:
+
+生成摘要后，使用摘要验证工具检查：
+
+```bash
+# Python
+python tools/py/summary_validator.py --file dev_docs/api_layer.md
+
+# Node.js
+node tools/js/summary_validator.js --file dev_docs/api_layer.md
+```
+
+验证内容：
+
+- [ ] YAML 格式正确
+- [ ] 所有 7 个字段都存在
+- [ ] related_files 中的文件确实存在
+- [ ] 字段使用 `|` 分隔且为单行格式
+- [ ] keywords 包含 3-8 个关键词
+- [ ] summary 长度适中（100-200 字）
+
+**为什么重要**:
+
+1. **节省 Token**: AI 读取摘要即可判断是否需要完整阅读，节省 60-70% Token
+2. **自动检测更新**: 通过 related_files 字段，代码变更时自动检测需要更新的文档
+3. **快速定位**: 通过 keywords 和 scope 快速查找相关文档
+4. **追踪时效性**: verified_at 字段监控文档健康度
+
+---
+
 ## ✅ 阶段 3: 验证优化（1 小时）
 
 ### 步骤 3.1: 文档完整性检查

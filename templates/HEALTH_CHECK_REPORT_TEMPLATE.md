@@ -1,3 +1,13 @@
+---
+title: [项目名称] 文档健康度报告
+summary: [100-200字概述：文档健康度检查的评估报告，包括健康度评分、变更统计、风险评估和更新建议]
+keywords: 健康度检查 | 文档评估 | 变更统计 | 更新建议
+scope: 文档健康度报告 (dev_docs/_analysis/)
+related_files: 无
+dependencies: workflows/document_health_check.md | workflows/incremental_update_workflow.md
+verified_at: [YYYY-MM-DD 格式日期]
+---
+
 # 文档健康度报告模板
 
 > **版本**: v2.3  
