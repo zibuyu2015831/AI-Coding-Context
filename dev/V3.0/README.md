@@ -230,6 +230,17 @@ graph TD
 - **状态**: ✅ 已确认
 - **产物**: `/confirmed/003-design-thinking-guide/` 目录
 
+#### 5. 强制文档摘要机制 ⭐ [012]
+
+- **文件**: [012-mandatory-doc-summary.md](./confirmed/012-mandatory-doc-summary/012-mandatory-doc-summary.md)
+- **描述**: 所有文档强制包含标准化摘要，支持智能文档推荐
+- **价值**: 节省 30-50% Token，降低认知负荷 62%
+- **确认日期**: 2025-12-03
+- **完成日期**: 2025-12-03
+- **状态**: ✅ 已完成
+- **产物**: `/confirmed/012-mandatory-doc-summary/` 目录, `tools/py/summary_*.py`, `tools/js/summary_*.js`
+- **依赖**: 001 (AI 角色库) - 需要 `summary_generator` 角色
+
 ### P1 - 高价值功能
 
 **注**: 016-配置管理系统已升级为 P0 基础设施并完成实施,见上方"P0 - 基础设施"部分
@@ -255,17 +266,6 @@ graph TD
 - **描述**: 识别并拦截人类的危险指令，防止冲动决策
 - **价值**: 阻止最大风险源，强制框架规范
 - **工作量**: 约 3 天
-
-#### 5. 强制文档摘要机制 ⭐ [012]
-
-- **文件**: [012-mandatory-doc-summary.md](./confirmed/012-mandatory-doc-summary/012-mandatory-doc-summary.md)
-- **描述**: 所有文档强制包含标准化摘要，支持智能文档推荐
-- **价值**: 节省 30-50% Token，降低认知负荷 62%
-- **确认日期**: 2025-12-03
-- **完成日期**: 2025-12-03
-- **状态**: ✅ 已完成
-- **产物**: `/confirmed/012-mandatory-doc-summary/` 目录, `tools/py/summary_*.py`, `tools/js/summary_*.js`
-- **依赖**: 001 (AI 角色库) - 需要 `summary_generator` 角色
 
 ### P1 - 高价值功能
 

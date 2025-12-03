@@ -45,7 +45,7 @@
 | --- | -------------------- | ------ | -------------------------------- | ------ |
 | 001 | AI 角色库            | P0     | 用户洞察 + 专业化分工需求        | 已完成 |
 | 002 | 危险指令拦截         | P0     | ANALYSIS §3.2.2 + 现状.md        | 待讨论 |
-| 003 | 设计思维引导         | P0     | ANALYSIS §3.3.1 + 现状.md 方法 3 | 待讨论 |
+| 003 | 设计思维引导         | P0     | ANALYSIS §3.3.1 + 现状.md 方法 3 | 已确认 |
 | 004 | ADR 系统             | P1     | ANALYSIS §3.3.2                  | 待讨论 |
 | 005 | 复杂度仪表盘         | P1     | ANALYSIS §3.1.2                  | 待讨论 |
 | 006 | 自动审查报告         | P1     | ANALYSIS §3.2.1 + 现状.md 方法 2 | 待讨论 |
@@ -54,8 +54,8 @@
 | 009 | 文档自动修复         | P2     | REVIEW §3.2.3                    | 待讨论 |
 | 010 | 跨项目知识复用       | P2     | REVIEW §3.2.4                    | 待讨论 |
 | 011 | 文档谬误修复工作流   | P1     | 用户洞察 + V2.3 扩展             | 待讨论 |
-| 012 | 强制文档摘要机制     | P0     | 用户洞察 + Token 优化需求        | 待讨论 |
-| 013 | AI 互审机制          | P0     | ANALYSIS §3.1.1                  | 已确认 |
+| 012 | 强制文档摘要机制     | P0     | 用户洞察 + Token 优化需求        | 已完成 |
+| 013 | AI 互审机制          | P0     | ANALYSIS §3.1.1                  | 已完成 |
 | 014 | 文档阅读习惯引导机制 | P1     | 用户洞察 + Vibe Coding 分析      | 待讨论 |
 | 015 | 质量保证体系         | P1     | 框架演进需求                     | 已确认 |
 | 016 | 配置管理系统         | P0     | 基础设施需求                     | 已完成 |
@@ -72,10 +72,13 @@ dev/V3.0/
 ├── DISCUSSION_CONTEXT.md        # 本文档（讨论上下文）
 ├── confirmed/                   # 已确认的优化点
 │   ├── 001-ai-agent-library/    # AI 角色库 (已完成)
-│   └── 013-ai-mutual-review/    # AI 互审机制 (已确认)
+│   ├── 003-design-thinking-guide/ # 设计思维引导 (已确认)
+│   ├── 012-mandatory-doc-summary/ # 强制文档摘要 (已完成)
+│   ├── 013-ai-mutual-review/    # AI 互审机制 (已完成)
+│   ├── 016-unified-config-system/ # 配置管理系统 (已完成)
+│   └── 017-utility-script-library/ # 实用脚本工具库 (已完成)
 └── pending/                     # 待讨论的优化点
     ├── 002-dangerous-command-guard.md
-    ├── 003-design-thinking-guide.md
     ├── 004-adr-system.md
     ├── 005-complexity-dashboard.md
     ├── 006-auto-review-report.md
@@ -84,11 +87,8 @@ dev/V3.0/
     ├── 009-doc-auto-repair.md
     ├── 010-cross-project-knowledge.md
     ├── 011-doc-error-fix-workflow.md
-    ├── 012-mandatory-doc-summary.md
     ├── 014-doc-reading-habit-guide.md
-    ├── 015-quality-assurance-system.md
-    ├── 016-config-management-system.md
-    └── 017-utility-script-library.md
+    └── 015-quality-assurance-system.md
 ```
 
 ---
