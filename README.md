@@ -1,7 +1,7 @@
-# AI Coding Context Framework (ACC)
+# AI Coding Context Framework (AICC)
 
 > **AI 编程上下文框架** (AI Coding Context Framework)  
-> **简称**: AI Coding Context / ACC  
+> **简称**: AI Coding Context / AICC  
 > **宣传语**: 让 AI 深度理解你的项目，从"代码生成器"进化为"架构思考伙伴"
 > **面向人类开发者的完整介绍** | 如果你是 AI，请阅读 `AI_ENTRY_POINT.md`
 
