@@ -1,30 +1,6 @@
----
-title: ACC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
-summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V2.3 稳定能力和 V3.0 基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
-keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
-scope: ACC 框架自身的全局框架上下文与版本快照（dev/ 目录）
-related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | quality/README.md | reference/design_decisions.md | reference/SUMMARY_FORMAT_SPEC.md
-dependencies: reference/SUMMARY_FORMAT_SPEC.md | reference/design_decisions.md
-verified_at: 2025-12-04
----
-
-**当前框架版本**: V2.3  
-**开发中的版本**: V3.0（基础设施阶段）
-
-**V3.0 已完成模块（基础设施）**：
-
-- ✅ 001-AI 角色库（agents/）
-- ✅ 003-设计思维引导
-- ✅ 012-强制文档摘要机制（SUMMARY_FORMAT_SPEC + summary_* 工具）
-- ✅ 013-AI 互审机制
-- ✅ 016-配置管理系统（config/）
-- ✅ 017-实用脚本工具库（tools/）
-
-**剩余关键能力（规划中）**：
-
-- P0：危险指令拦截系统
-- P1：ADR 系统、复杂度仪表盘、自动审查报告
-- P2：学习曲线追踪、AI 能力分级、文档自修复、跨项目知识复用
+**当前框架版本**: V2.3
+**开发中的版本**: V3.0 (基础设施阶段)
+**V3.0 已完成模块**: AI 角色库, 配置管理系统, 实用脚本工具库, AI 互审机制, 强制文档摘要机制
 
 ---
 
@@ -289,33 +265,12 @@ V3.0: ADR系统 + 演进历史
 
 ### 3.1 目录结构详解
 
-#### 3.1.1 框架仓库结构（ai_coding_context/）
-
-```text
-ai_coding_context/
-├── AI_ENTRY_POINT.md         # AI 入口（AI 读这个）
-├── README.md                 # 对人类的框架介绍（取代早期 INTRODUCTION.md）
-├── core/                     # 核心规范（语言/安全/项目类型/更新触发）
-├── dev/                      # 框架开发与版本规划文档
-│   ├── FRAMEWORK_CONTEXT.md  # 本文档，全局上下文
-│   └── V3.0/                 # V3.0 规划与进度
-├── config/                   # 配置管理系统（user_config + CONFIG_TEMPLATE）
-├── tools/                    # 实用脚本工具库（project_scanner, content_searcher, summary_* 等）
-├── agents/                   # AI 角色库（runtime/development/language_specific/workflows 等）
-├── quality/                  # 文档质量保证体系（标准、审查工作流、contexts 模板）
-├── guides/                   # 使用与适配指南
-├── templates/                # 各类文档模板
-└── reference/                # 设计决策与摘要规范等参考文档
 ```
-
-#### 3.1.2 典型用户项目结构（复制框架后的目标形态）
-
-```text
 project_root/
-├── agents/                        # 🆕 AI 角色库 (V3.0)
+├── agents/                        # 🆕 AI角色库 (V3.0)
+│   ├── core/                      # 核心文档 (README, GUIDE, TEMPLATE)
 │   ├── runtime/                   # 框架运行时角色
 │   ├── development/               # 用户开发时角色
-│   ├── language_specific/         # 语言专属角色
 │   └── examples/                  # 角色使用示例
 │
 ├── config/                        # 🆕 配置管理系统 (V3.0)
@@ -325,32 +280,32 @@ project_root/
 │   └── .system/                   # 系统级配置(推荐值)
 │
 ├── tools/                         # 🆕 实用脚本工具库 (V3.0)
-│   ├── py/                        # Python 脚本
-│   ├── js/                        # Node.js 脚本
+│   ├── py/                        # Python脚本
+│   ├── js/                        # Node.js脚本
 │   ├── fallback/                  # 降级方案
 │   └── README.md                  # 工具使用文档
 │
-├── AI_Coding_Context.md           # 主文档（唯一入口，面向当前业务项目）
+├── AI_Coding_Context.md           # 主文档（唯一入口）
 │
-├── dev_docs/                      # AI 文档目录
+├── dev_docs/                      # AI文档目录
 │   ├── _analysis/                 # 分析数据
 │   │   └── generation_progress.md
 │   │
-│   ├── api_layer.md               # API 规范（前端）
+│   ├── api_layer.md               # API规范（前端）
 │   ├── state_management.md        # 状态管理（前端）
 │   ├── database_schema.md         # 数据库（后端）
 │   ├── authentication.md          # 认证（后端）
 │   │
 │   ├── plans/                     # 方案文档
 │   │   ├── features/              # 功能方案
-│   │   └── bugs/                  # Bug 修复方案
+│   │   └── bugs/                  # Bug修复方案
 │   │
 │   └── knowledge/                 # 知识库
 │       ├── troubleshooting/       # 问题解决
 │       ├── patterns/              # 架构模式
 │       └── performance/           # 性能优化
 │
-└── AI_RULES.md                    # AI 规则（IDE 集成，内容来自 dev_docs/rules/combined/）
+└── AI_RULES.md                    # AI规则（IDE集成）
 ```
 
 ### 3.2 核心概念
@@ -424,7 +379,7 @@ project_root/
 - 开发时角色 (frontend_expert, backend_expert, devops_expert 等)
 - 自定义角色支持 (用户可定义项目特定角色)
 
-**价值**: 提升 AI 输出质量稳定性 29%, 降低 Prompt 编写门槛 90%
+**价值**: 提升 AI 输出质量稳定性 29%,降低 Prompt 编写门槛 90%
 
 #### 概念 7: 配置系统 (config/) - V3.0 ⭐
 
@@ -437,7 +392,7 @@ project_root/
 - 功能开关控制 (V3.0 特性)
 - 人类可读的 Markdown + YAML 格式
 
-**用途**: 消除重复询问, 个性化框架行为
+**用途**: 消除重复询问,个性化框架行为
 
 #### 概念 8: 工具库 (tools/) - V3.0 ⭐
 
@@ -453,46 +408,26 @@ project_root/
 ### 3.3 文档生命周期
 
 ```
-阶段 1: 生成
+阶段1: 生成
   输入: 项目代码
   过程: 分析 → 方案 → 审核 → 生成
   输出: 主文档 + 子文档 + AI_RULES
 
-阶段 2: 使用
+阶段2: 使用
   使用者: AI + 人类开发者
   频率: 每次编码都参考
-  工具: IDE 集成 AI_RULES
+  工具: IDE集成AI_RULES
 
-阶段 3: 维护
+阶段3: 维护
   触发: 代码变更（P0/P1/P2）
   方式: 增量更新
-  周期: 即时 / 每周 / 每月 / 每季度
+  周期: 即时/每周/每月/每季度
 
-阶段 4: 演进
+阶段4: 演进
   场景: 架构升级、技术栈变更
   方法: 重大更新或重新生成
   记录: 版本控制 + ADR（V3.0+）
 ```
-
-### 3.4 在质量审查工作流中的使用方式
-
-> 本节面向 AI 和框架维护者，说明在 `quality/` 体系下如何使用本文件。
-
-- 在审查任意核心文档之前：
-  - **先加载本文件**（`dev/FRAMEWORK_CONTEXT.md`），构建对 ACC 框架的全局模型：
-    - 顶层目录与职责
-    - V2.3 能力与 V3.0 基础设施
-    - 质量体系与摘要机制的大致结构
-- 然后根据被审查的目标文档，从 `quality/contexts/` 中选择对应的审查上下文文件：
-  - 例如审查 `AI_ENTRY_POINT.md` 时，先加载 `quality/contexts/AI_ENTRY_POINT.md`
-- 审查过程中，如涉及以下内容，再按需展开：
-  - 配置行为 → 查阅 `config/README.md`
-  - 工具使用与性能 → 查阅 `tools/README.md`
-  - AI 角色行为与职责 → 查阅 `agents/README.md`
-  - 摘要格式与校验规则 → 查阅 `reference/SUMMARY_FORMAT_SPEC.md`
-  - 设计理念与权衡 → 查阅 `reference/design_decisions.md`
-- 若本文件与其他文档在“目录结构 / 模块角色”方面出现冲突：
-  - **以本文件为全局结构与职责划分的最终裁决**，并在审查报告中记录该冲突，后续修正文档。
 
 ---
 
@@ -509,7 +444,7 @@ project_root/
 **战略式编程 (Strategic Programming)**
 
 - 定义: 产出卓越设计，确保有效工作
-- 方法: 持续投入 10-20% 时间进行设计改进
+- 方法: 持续投入 10-20%时间进行设计改进
 - 结果: 短期投入，长期回报
 
 ### 4.2 Vibe Coding 概念
@@ -524,7 +459,7 @@ project_root/
 
 1. **变更放大** (Change Amplification): 简单变更需要在多个层级修改
 2. **认知负荷** (Cognitive Load): 需要大量时间掌握正确的上下文
-3. **未知的未知** (Unknown Unknowns): 新 session 不知道 "雷区"
+3. **未知的未知** (Unknown Unknowns): 新 session 不知道"雷区"
 
 ### 4.3 优先级和状态
 
@@ -560,7 +495,7 @@ project_root/
 
 **理由**:
 
-1. 避免返工 - 提前发现问题，减少 50% 返工
+1. 避免返工 - 提前发现问题，减少 50%返工
 2. 引导思考 - 强制用户和 AI 深度思考
 3. 风险控制 - 重大变更提前评估影响
 4. 知识沉淀 - 方案本身就是知识
@@ -573,7 +508,7 @@ project_root/
 
 ### 5.3 为什么分层文档？
 
-**决策**: 主文档 + 子文档分层结构
+**决策**: 主文档+子文档分层结构
 
 **理由**:
 
@@ -584,7 +519,7 @@ project_root/
 
 **对比**:
 
-- 单文件: 5000+ 行，查找困难，更新成本高
+- 单文件: 5000+行，查找困难，更新成本高
 - 分层: 主文档 500 行，子文档 200-300 行，3 秒定位，更新成本低
 
 ### 5.4 为什么要进度记录？
@@ -673,7 +608,8 @@ project_root/
 
 ### 用户文档
 
-- [README.md](../README.md) - GitHub 首页 & 用户入门指南
+- [README.md](../README.md) - GitHub 首页
+- [INTRODUCTION.md](../INTRODUCTION.md) - 用户入门指南
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - 贡献指南
 
 ### AI 使用文档
@@ -684,19 +620,17 @@ project_root/
 
 - [dev/FRAMEWORK_CONTEXT.md](./FRAMEWORK_CONTEXT.md) - 本文档（全局上下文）
 - [dev/VERSION_HISTORY.md](./VERSION_HISTORY.md) - 详细版本历史
-- [dev/V3.0/](./V3.0/) - V3.0 规划与进度
+- [dev/V3.0/](./V3.0/) - V3.0 规划
 
 ### 参考文档
 
 - [dev/reference/AI 编程的现状.md](./reference/AI编程的现状.md) - V3.0 理论基础
 - [dev/reference/AI_PROGRAMMING_ANALYSIS.md](./reference/AI_PROGRAMMING_ANALYSIS.md) - V3.0 方案分析
-- [reference/design_decisions.md](../reference/design_decisions.md) - 框架设计决策说明
-- [reference/SUMMARY_FORMAT_SPEC.md](../reference/SUMMARY_FORMAT_SPEC.md) - 文档摘要格式规范
-- [quality/README.md](../quality/README.md) - 文档质量保证体系与审查工作流
+- [DOCUMENT_OPTIMIZATION_GUIDE.md](../DOCUMENT_OPTIMIZATION_GUIDE.md) - 文档优化指南
 
 ---
 
-**文档版本**: v2.0（结构升级，接入 V3.0 基础设施与摘要规范）  
-**最后更新**: 2025-12-04  
+**文档版本**: v1.2  
+**最后更新**: 2025-12-02  
 **维护者**: Framework Team  
 **反馈**: 欢迎在 dev/discussions/提出改进建议
