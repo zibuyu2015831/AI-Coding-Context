@@ -168,7 +168,7 @@ src/
 **AI 指令模板**:
 
 ```
-基于之前的分析，请生成主文档 AI_Coding_Context.md，
+基础之前的分析，请生成主文档 ai_coding_context.md（根目录），
 包含以下章节（参考 ai_documentation_framework/README.md 规范）：
 
 1. 文档定位说明

@@ -751,12 +751,12 @@ design_thinking:
 
 **生成顺序**：
 
-1. 主文档 `dev_docs/AI_Coding_Context.md`
+1. 主文档 `ai_coding_context.md`（根目录）
 2. 高优先级子文档（3 个）
 3. 中优先级子文档（按批次）
 4. 可选子文档（按需求）
 5. `plans/` 和 `knowledge/` 目录结构
-6. **AI Rules 文件** `dev_docs/AI_RULES.md` ⭐ **新增**
+6. **AI Rules 文件** `ai_rules.md`（根目录）⭐ **新增**
 
 ---
 
