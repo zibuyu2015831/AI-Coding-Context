@@ -350,7 +350,7 @@ project_root/
 │       ├── patterns/              # 架构模式
 │       └── performance/           # 性能优化
 │
-└── AI_RULES.md                    # AI 规则（IDE 集成，内容来自 dev_docs/rules/combined/）
+└── AI_RULES.md                    # AI 规则（用于 IDE 集成）
 ```
 
 ### 3.2 核心概念
