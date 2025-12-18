@@ -39,12 +39,11 @@
    - 文档自动修复
    - 跨项目知识复用
 
-### 当前 18 个优化点
+### 当前 17 个优化点
 
 | #   | 名称                      | 优先级 | 来源                                | 状态   |
 | --- | ------------------------- | ------ | ----------------------------------- | ------ |
 | 001 | AI 角色库                 | P0     | 用户洞察 + 专业化分工需求           | 已完成 |
-| 002 | 危险指令拦截(含 Git 安全) | P0     | ANALYSIS §3.2.2 + 用户 Git 安全需求 | 待讨论 |
 | 003 | 设计思维引导              | P0     | ANALYSIS §3.3.1 + 现状.md 方法 3    | 已完成 |
 | 004 | ADR 系统                  | P1     | ANALYSIS §3.3.2                     | 待讨论 |
 | 005 | 复杂度仪表盘              | P1     | ANALYSIS §3.1.2                     | 待讨论 |
@@ -62,6 +61,12 @@
 | 017 | 实用脚本工具库            | P0     | 用户提议                            | 已完成 |
 | 018 | Commit-Guided 文档更新    | P1     | 用户提议 + Git Commit as Prompt     | 待讨论 |
 
+**已归档的优化点**:
+
+| #   | 名称                      | 优先级 | 来源                                | 状态   |
+| --- | ------------------------- | ------ | ----------------------------------- | ------ |
+| 002 | 危险指令拦截(含 Git 安全) | P0     | ANALYSIS §3.2.2 + 用户 Git 安全需求 | 已归档 |
+
 ---
 
 ## 📁 V3.0 目录结构
@@ -78,18 +83,19 @@ dev/V3.0/
 │   ├── 013-ai-mutual-review/    # AI 互审机制 (已完成)
 │   ├── 016-unified-config-system/ # 配置管理系统 (已完成)
 │   └── 017-utility-script-library/ # 实用脚本工具库 (已完成)
-└── pending/                     # 待讨论的优化点
-    ├── 002-dangerous-command-guard.md
-    ├── 004-adr-system.md
-    ├── 005-complexity-dashboard.md
-    ├── 006-auto-review-report.md
-    ├── 007-learning-curve-tracking.md
-    ├── 008-ai-capability-tiering.md
-    ├── 009-doc-auto-repair.md
-    ├── 010-cross-project-knowledge.md
-    ├── 011-doc-error-fix-workflow.md
-    ├── 014-doc-reading-habit-guide.md
-    └── 015-quality-assurance-system.md
+├── pending/                     # 待讨论的优化点
+│   ├── 004-adr-system.md
+│   ├── 005-complexity-dashboard.md
+│   ├── 006-auto-review-report.md
+│   ├── 007-learning-curve-tracking.md
+│   ├── 008-ai-capability-tiering.md
+│   ├── 009-doc-auto-repair.md
+│   ├── 010-cross-project-knowledge.md
+│   ├── 011-doc-error-fix-workflow.md
+│   ├── 014-doc-reading-habit-guide.md
+│   └── 015-quality-assurance-system.md
+└── archived/                    # 已归档的优化点
+    └── 002-dangerous-command-guard.md
 ```
 
 ---
@@ -148,7 +154,7 @@ graph TD
 
 当发现新的优化需求时：
 
-1.  **创建文档**: 在 `dev/V3.0/pending/` 下创建 `XXX-name.md` (XXX 从 017 开始递增)。
+1.  **创建文档**: 在 `dev/V3.0/pending/` 下创建 `XXX-name.md` (XXX 从 019 开始递增)。
 2.  **更新索引**: 在 `dev/V3.0/README.md` 的 "待讨论" 列表中添加条目。
 3.  **更新进度**: 在 `dev/V3.0/PROGRESS.md` 中添加新行并更新统计数据。
 
@@ -165,6 +171,17 @@ graph TD
 3.  **索引更新**:
     - `dev/V3.0/README.md`: 移动到 "已确认的优化点" 章节。
     - `dev/V3.0/PROGRESS.md`: 更新状态为 "已确认"。
+
+### 特殊情况：优化点归档 (Archiving)
+
+对于经过讨论决定不实施的优化点：
+
+1.  **状态更新**: 将文档内状态改为 `🔴 已归档`。
+2.  **文件移动**: 将文件从 `pending/` 移动到 `archived/` 目录。
+3.  **文档更新**:
+    - 在相关文档中添加"已归档"说明
+    - 更新统计信息和优先级分布
+    - 在DISCUSSION_CONTEXT.md中添加归档记录
 
 ### 阶段 4: 开发与实施 (Implementation)
 
@@ -203,7 +220,7 @@ graph TD
 
 **命名规范**:
 
-- 序号: 从 011 开始递增
+- 序号: 从 019 开始递增
 - 名称: 简短英文名（小写+连字符）
 - 示例: `011-context-auto-refresh.md`
 
