@@ -15,7 +15,7 @@ verified_at: 2025-12-04
 
 - ✅ 001-AI 角色库（agents/）
 - ✅ 003-设计思维引导
-- ✅ 012-强制文档摘要机制（SUMMARY_FORMAT_SPEC + summary_* 工具）
+- ✅ 012-强制文档摘要机制（SUMMARY*FORMAT_SPEC + summary*\* 工具）
 - ✅ 013-AI 互审机制
 - ✅ 016-配置管理系统（config/）
 - ✅ 017-实用脚本工具库（tools/）
@@ -318,12 +318,6 @@ project_root/
 │   ├── language_specific/         # 语言专属角色
 │   └── examples/                  # 角色使用示例
 │
-├── config/                        # 🆕 配置管理系统 (V3.0)
-│   ├── README.md                  # 配置系统使用指南
-│   ├── CONFIG_TEMPLATE.md         # 配置模板
-│   ├── MIGRATION_GUIDE.md         # 迁移指南
-│   └── .system/                   # 系统级配置(推荐值)
-│
 ├── tools/                         # 🆕 实用脚本工具库 (V3.0)
 │   ├── py/                        # Python 脚本
 │   ├── js/                        # Node.js 脚本
@@ -336,6 +330,7 @@ project_root/
 │   ├── _analysis/                 # 分析数据
 │   │   └── generation_progress.md
 │   │
+│   ├── configuration.md           # ✅ 项目配置文档（必需）
 │   ├── api_layer.md               # API 规范（前端）
 │   ├── state_management.md        # 状态管理（前端）
 │   ├── database_schema.md         # 数据库（后端）
@@ -353,6 +348,27 @@ project_root/
 └── AI_RULES.md                    # AI 规则（用于 IDE 集成）
 ```
 
+**⚠️ 重要说明 - 配置目录**:
+
+> **框架配置 vs 项目配置**
+>
+> 1. **框架配置** (`ai_coding_context/config/`)
+>
+>    - 位置: 仅在框架仓库中
+>    - 用途: 控制框架行为（语言偏好、功能开关等）
+>    - **不复制到用户项目**
+>
+> 2. **项目配置文档** (`dev_docs/configuration.md`)
+>    - 位置: 用户项目的 dev_docs/ 目录
+>    - 用途: 说明项目如何管理配置（环境变量、配置文件等）
+>    - **作为子文档生成**
+
+**注意事项**:
+
+1. 框架配置（`ai_coding_context/config/`）保留在框架仓库，不复制到项目
+2. 项目配置通过 `dev_docs/configuration.md` 文档说明（非配置文件）
+3. `configuration.md` 是必需的子文档，记录项目的配置管理方式
+
 ### 3.2 核心概念
 
 #### 概念 1: 主文档 (AI_Coding_Context.md)
@@ -369,7 +385,7 @@ project_root/
 
 **特点**: 只有一个、高密度信息、链接丰富
 
-#### 概念 2: 子文档 (dev_docs/*.md)
+#### 概念 2: 子文档 (dev_docs/\*.md)
 
 **定位**: 详细规范，分类管理
 

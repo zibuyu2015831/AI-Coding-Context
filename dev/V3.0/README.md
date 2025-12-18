@@ -163,14 +163,14 @@ graph TD
 ### 统计
 
 - **总计**: 18 个
-- **已确认** (confirmed/): 6 个
+- **已确认** (confirmed/): 7 个
 - **已完成**: 6 个 (001, 003, 012, 013, 016, 017)
-- **待讨论** (pending/): 12 个
+- **待讨论** (pending/): 11 个
 
 ### 优先级分布
 
-- **P0** (必须实现): 5 个
-- **P1** (高价值): 8 个 (+1 Commit-Guided Documentation)
+- **P0** (必须实现): 6 个 (含 018)
+- **P1** (高价值): 8 个
 - **P2** (增强功能): 4 个
 
 ---
@@ -218,6 +218,15 @@ graph TD
 - **完成日期**: 2025-12-02
 - **状态**: ✅ 已完成
 - **产物**: `/confirmed/013-ai-mutual-review/` 目录, `workflows/review_standards/`, `workflows/013-review-workflow.md`
+
+#### 3. Commit-Guided Documentation ⭐ [018] 🆕
+
+- **文件**: [018-commit-guided-documentation.md](./confirmed/018-commit-guided-documentation/018-commit-guided-documentation.md)
+- **描述**: 基于结构化 Commit 信息的自动化文档更新系统,整合 Git 安全规范
+- **价值**: 节省 80%解释工作,95%主分支污染风险降低,形成"设计 → 实施 → 验证"完整闭环
+- **确认日期**: 2025-12-11
+- **状态**: 🔵 开发中
+- **依赖**: 001 (AI 角色库) - 需要 `commit_analyst` 角色
 
 ### P0 - 智能引导
 

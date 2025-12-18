@@ -33,9 +33,7 @@
 
 ### 框架能力
 
-- ✅ 支持 9 种编程语言（Python/Java/Go/Rust/PHP/Ruby/C++/JS/TS）
-- ✅ 支持 11 种项目类型（前端/后端/全栈/CLI/库/脚本/移动/桌面/Serverless/容器化/数据科学）
-- ✅ 涵盖 25+主流框架,支持自动识别其他框架
+- ✅ 涵盖 25+ 主流框架,支持自动识别其他框架
 - ✅ 自动发现代码问题和技术债务
 - ✅ 提供完整的进度跟踪机制
 - ✅ 提供标准化的专业 AI 角色库 (Agent Library)
@@ -49,19 +47,19 @@
 | 文件                | 用途              | AI 何时读取      |
 | ------------------- | ----------------- | ---------------- |
 | `AI_ENTRY_POINT.md` | AI 入口（本文档） | **首次使用必读** |
-| `INTRODUCTION.md`   | 人类入门指南      | 无需读取         |
+| `INTRODUCTION.md`   | 人类入门指南      | AI 无需读取      |
 
-### 核心规范 (`core/`) **[v2.2 新增]**
+### 核心规范 (`core/`)
 
-| 文件                               | 用途               | AI 何时读取                   |
-| ---------------------------------- | ------------------ | ----------------------------- |
-| `core/language_rules.md`           | 文档语言确认       | **开始前必读**                |
-| `core/security_rules.md`           | 敏感信息脱敏规范   | **生成文档时必读**            |
-| `core/project_types.md`            | 项目类型识别与处理 | **决策子文档清单必读**        |
-| `core/update_triggers.md`          | 文档更新触发机制   | 生成完成后阅读                |
-| `reference/SUMMARY_FORMAT_SPEC.md` | 文档摘要规范       | **生成任意文档时必读** (v3.0) |
+| 文件                               | 用途               | AI 何时读取            |
+| ---------------------------------- | ------------------ | ---------------------- |
+| `core/language_rules.md`           | 文档语言确认       | **开始前必读**         |
+| `core/security_rules.md`           | 敏感信息脱敏规范   | **生成文档时必读**     |
+| `core/project_types.md`            | 项目类型识别与处理 | **决策子文档清单必读** |
+| `core/update_triggers.md`          | 文档更新触发机制   | **生成完成后必读**     |
+| `reference/SUMMARY_FORMAT_SPEC.md` | 文档摘要规范       | **生成任意文档时必读** |
 
-### AI 角色库 (`agents/`) **[v3.0 新增]**
+### AI 角色库 (`agents/`)
 
 | 文件                            | 用途         | AI 何时读取            |
 | ------------------------------- | ------------ | ---------------------- |
@@ -71,21 +69,21 @@
 | `agents/language_specific/*.md` | 语言专属角色 | 特定语言开发时         |
 | `agents/workflows/*.md`         | 协作工作流   | 执行复杂任务时         |
 
-### 流程文档 (`workflows/`) **[v2.2 新增]**
+### 流程文档 (`workflows/`)
 
-| 文件                                       | 用途              | AI 何时读取                     |
-| ------------------------------------------ | ----------------- | ------------------------------- |
-| `workflows/detection_workflow.md`          | 项目检测详细流程  | 执行步骤 0-1 时参考             |
-| `workflows/decision_workflow.md`           | 策略决策详细流程  | 执行步骤 2-3 时参考             |
-| `workflows/generation_workflow.md`         | 文档生成详细流程  | 执行步骤 4-6 时参考             |
-| `workflows/progress_tracking.md`           | 进度记录机制      | 了解进度管理时参考              |
-| `workflows/incremental_update_workflow.md` | 增量更新流程      | 执行增量更新时参考 (v2.3)       |
-| `workflows/monorepo_workflow.md`           | Monorepo 处理流程 | **Monorepo 项目必读** (v2.3)    |
-| `workflows/document_health_check.md`       | 文档健康度检查    | **检测到现有文档时必读** (v2.3) |
-| `workflows/create_custom_tool_workflow.md` | 自定义工具创建    | **需要创建新工具时必读** (v3.0) |
-| `workflows/013-review-workflow.md`         | AI 互审工作流     | **生成方案后必读** (v3.0)       |
+| 文件                                       | 用途              | AI 何时读取              |
+| ------------------------------------------ | ----------------- | ------------------------ |
+| `workflows/detection_workflow.md`          | 项目检测详细流程  | 执行步骤 0-1 时参考      |
+| `workflows/decision_workflow.md`           | 策略决策详细流程  | 执行步骤 2-3 时参考      |
+| `workflows/generation_workflow.md`         | 文档生成详细流程  | 执行步骤 4-6 时参考      |
+| `workflows/progress_tracking.md`           | 进度记录机制      | 了解进度管理时参考       |
+| `workflows/incremental_update_workflow.md` | 增量更新流程      | 执行增量更新时参考       |
+| `workflows/monorepo_workflow.md`           | Monorepo 处理流程 | **Monorepo 项目必读**    |
+| `workflows/document_health_check.md`       | 文档健康度检查    | **检测到现有文档时必读** |
+| `workflows/create_custom_tool_workflow.md` | 自定义工具创建    | **需要创建新工具时必读** |
+| `workflows/013-review-workflow.md`         | AI 互审工作流     | **生成方案后必读**       |
 
-### 实用工具库 (`tools/`) **[v3.0 新增]**
+### 实用工具库 (`tools/`)
 
 | 文件                  | 用途             | AI 何时使用             |
 | --------------------- | ---------------- | ----------------------- |
@@ -101,8 +99,8 @@
 | `guides/quick_start.md`              | 快速开始          | 需要了解使用流程时          |
 | `guides/project_types.md`            | 项目类型适配      | **决策子文档清单时必读**    |
 | `guides/language_support.md`         | 多语言分析        | **分析非 JS/TS 项目时必读** |
-| `guides/ai_rules_maintenance.md`     | AI Rules 维护指南 | **生成完成后阅读** (v2.3)   |
-| `guides/configuration_management.md` | 配置管理最佳实践  | 了解配置方案时参考 (v2.3)   |
+| `guides/ai_rules_maintenance.md`     | AI Rules 维护指南 | **生成完成后阅读**          |
+| `guides/configuration_management.md` | 配置管理最佳实践  | 了解配置方案时参考          |
 
 ### 模板文档 (`templates/`)
 
@@ -245,6 +243,51 @@ ELSE:
 
 - [config/README.md](./config/README.md) - 配置系统使用指南
 - [config/CONFIG_TEMPLATE.md](./config/CONFIG_TEMPLATE.md) - 所有配置项详细说明
+
+### 配置系统说明 (V3.0)
+
+#### 两种配置
+
+框架中存在**两种不同性质的配置**，必须严格区分：
+
+1. **框架配置** (`ai_coding_context/config/`)
+
+   - **用途**: 控制框架行为（文档语言、功能开关等）
+   - **位置**: 框架仓库，不复制到用户项目
+   - **读取时机**: 文档生成前读取
+   - **示例**: `documentLanguage: zh-CN`, `enableMutualReview: true`
+
+2. **项目配置文档** (`dev_docs/configuration.md`)
+   - **用途**: 说明业务项目如何管理配置
+   - **位置**: 用户项目的 dev_docs/ 目录
+   - **生成时机**: 文档生成时自动创建
+   - **内容**: 环境变量说明、配置文件结构、配置加载流程等
+
+#### 配置读取流程
+
+```mermaid
+graph LR
+    A[开始生成文档] --> B[读取框架配置]
+    B --> C[ai_coding_context/config/user_config.md]
+    C --> D[根据配置调整策略]
+    D --> E[分析项目配置方式]
+    E --> F[生成 dev_docs/configuration.md]
+```
+
+#### 为什么不复制 config/ 到用户项目？
+
+**设计理由**:
+
+1. **职责分离**: 框架配置控制框架行为，项目配置说明项目特性
+2. **避免混淆**: 用户项目的 `config/` 通常是业务配置目录
+3. **集中管理**: 框架配置统一管理，跨项目复用
+4. **清晰边界**: 框架配置在框架仓库，项目文档在项目仓库
+
+**正确做法**:
+
+- ✅ 框架配置: 保留在 `ai_coding_context/config/`
+- ✅ 项目配置: 生成 `dev_docs/configuration.md` 文档
+- ❌ 错误: 将框架 `config/` 复制到用户项目
 
 ---
 

@@ -272,6 +272,142 @@ review_metadata:
 
 ---
 
+## 🔒 Git 操作安全规范 (v3.0)
+
+**所有 Git 操作必须遵守以下安全规范,保护主分支和生产环境**:
+
+### 1. 绝对禁止区 (RED ZONE) ⛔
+
+**AI 绝对不能执行的 Git 操作**:
+
+#### 保护分支操作
+
+- ⛔ 在 `main`, `master`, `production`, `release/*` 分支上 commit 或 push
+- ⛔ 从保护分支直接创建 feature 分支
+
+#### 危险的历史重写
+
+- ⛔ `git reset --hard`
+- ⛔ `git rebase`
+- ⛔ `git push --force` 或 `git push -f`
+
+#### 合并操作
+
+- ⛔ `git merge` (除了 `git merge --abort`)
+- ⛔ 用户必须手动处理所有合并
+
+#### 分支删除和标签操作
+
+- ⛔ `git branch -D` (强制删除)
+- ⛔ 创建/删除/修改标签
+
+### 2. 受限操作区 (YELLOW ZONE) ⚠️
+
+**需明确用户授权的操作**:
+
+- `git checkout -b [feature-branch]` - 需确认分支名
+- `git commit` - 需审核 commit message
+- `git push origin [feature-branch]` - 需确认推送分支
+
+### 3. 安全操作区 (GREEN ZONE) ✅
+
+**可自动执行的操作**:
+
+- `git status`, `git log`, `git diff` - 查看操作
+- `git add` - 暂存文件
+- `git pull` - 拉取代码
+- `git checkout [branch]` - 切换到非保护分支
+- `git merge --abort`, `git rebase --abort` - 中止操作
+
+### 4. 推荐 Git 工作流
+
+**标准流程**:
+
+```
+main/master (保护) → dev → feature/xxx (AI开发) → PR (用户合并) → dev → main
+```
+
+**职责分工**:
+
+- **AI 可以**: 创建 feature 分支、开发代码、提交和推送到 feature 分支
+- **用户必须**: 合并 PR、解决冲突、发布 tag、操作保护分支
+
+**完整示例**:
+
+```bash
+# Step 1: AI创建feature分支(需确认)
+git checkout dev
+git pull origin dev
+git checkout -b feature/user-points-system
+✅ 分支名符合规范,是否创建? (Y/n)
+
+# Step 2: AI开发和提交(需审核commit message)
+git add src/models/user.py src/api/points.py
+git commit -m "prompt(feature): 新增用户积分系统
+WHAT: 实现积分累积和兑换功能
+WHY: 提升用户活跃度
+HOW: User模型新增points字段,API端点/api/points"
+✅ Commit message质量评分: 85/100,是否提交? (Y/n)
+
+# Step 3: AI推送(需确认)
+git push origin feature/user-points-system
+✅ 推送到feature分支,是否执行? (Y/n)
+
+# Step 4: AI提示用户创建PR
+"代码已推送到 feature/user-points-system
+请在GitHub/GitLab创建PR并合并到dev"
+
+# Step 5-7: 用户手动操作
+# (在Web界面创建PR、审核、合并)
+```
+
+### 5. Git 安全检查工具
+
+**在执行 Git 操作前,AI 应使用安全检查工具**:
+
+```bash
+# 检查当前分支
+python tools/py/git_safety.py --mode check-branch
+
+# 验证Git命令
+python tools/py/git_safety.py --mode validate-command --command "git push origin main"
+
+# 建议分支名
+python tools/py/git_safety.py --mode suggest-branch --branch-name "用户积分系统"
+```
+
+### 6. 多层防护机制
+
+- **Layer 1**: AI Rules (本规则,AI 自律)
+- **Layer 2**: git_safety.py (工具检查)
+- **Layer 3**: 013 互审机制 (二次验证)
+- **Layer 4**: Pre-commit Hook (可选本地拦截)
+
+### 7. 违规处理
+
+**如果 AI 尝试执行 RED ZONE 操作**:
+
+```
+⛔ 操作被拒绝: 禁止在保护分支main上commit
+
+原因: 违反Git安全规范 (RED ZONE)
+建议: git checkout -b feature/your-feature-name
+
+详细规范: workflows/git_safety_workflow.md
+```
+
+### 8. 配置参考
+
+用户可在 `config/user_config.md` 中配置 Git 安全行为:
+
+- `git_safety.mode`: 安全模式 (strict/standard/permissive)
+- `git_safety.protected_branches`: 自定义保护分支列表
+- `git_safety.require_branch_naming`: 是否强制分支命名规范
+
+详细说明: `workflows/git_safety_workflow.md`
+
+---
+
 ## ⚠️ 禁止事项
 
 1. ❌ **不要臆测规范** - 不确定时先阅读文档或询问用户

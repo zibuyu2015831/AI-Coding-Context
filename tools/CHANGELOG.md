@@ -7,6 +7,43 @@
 
 ---
 
+## [1.3.0] - 2025-12-11
+
+### Added
+
+- 新增 `git_safety.py` & `.js` - Git 安全检查工具
+  - 检查当前分支是否为保护分支（main/master/production 等）
+  - 验证 Git 命令是否安全（RED ZONE: force push, reset --hard 等）
+  - 建议符合规范的分支名（feature/bugfix/refactor/docs）
+  - 包含 29 个单元测试，覆盖率 >95%
+- 新增 `commit_parser.py` & `.js` - Commit 解析工具
+  - 解析结构化 commit（prompt:格式）提取 WHAT/WHY/HOW
+  - 解析 Conventional Commits 格式
+  - 传统 commit 降级处理
+  - 支持 commit 聚合和合并分析
+- 新增 `commit_quality_scorer.py` & `.js` - Commit 质量评分工具
+  - 5 维度评分：WHAT 清晰度(30 分)、WHY 深度(30 分)、HOW 完整性(20 分)、粒度合理性(10 分)、可测试性(10 分)
+  - 自动生成改进建议
+  - 识别优质 commit（≥80 分）
+- 新增 `commit_aggregator.py` & `.js` - Commit 聚合工具
+  - 同类 commit 聚合
+  - Token 优化（实测减少 85.91%）
+  - 智能过滤规则
+- 新增 `commit_template_cli.py` - Commit 模板 CLI 工具（仅 Python）
+  - 交互式向导生成结构化 commit
+  - 实时质量评分
+  - 快速模式支持
+- 支持 018-Commit-Guided Documentation 优化点
+  - 实现 Commit-as-Prompt 理念
+  - 整合 Git 安全规范
+  - 为文档自动更新提供基础工具
+
+### Performance
+
+- 所有新工具响应时间 <0.1 秒
+- commit_parser 解析 100 个 commit <5 秒
+- Token 优化效果超预期（85.91% vs 目标 30%）
+
 ## [1.2.0] - 2025-12-03
 
 ### Added

@@ -44,7 +44,26 @@
 - [ ] 是否有适当注释？
 - [ ] 命名是否规范？
 
+### 8. Commit 质量 (权重: 5%) 🆕
+
+- [ ] Commit message 是否符合 prompt: 格式？
+- [ ] WHAT/WHY/HOW 是否完整清晰？
+- [ ] Commit 粒度是否合理（单一职责）？
+- [ ] 是否说明了验收标准？
+
+### 9. Git 安全规范 (权重: 5%) 🆕
+
+- [ ] 是否避免在保护分支直接操作？
+- [ ] 是否避免使用危险命令（force push, reset --hard）？
+- [ ] 分支命名是否符合规范？
+- [ ] 是否由用户手动执行 merge 操作？
+
 ## 合格标准
 
 - **合格线**: ≥ 70 分
 - **优秀线**: ≥ 85 分
+
+## 参考
+
+- Commit 质量评分: `tools/py/commit_quality_scorer.py`
+- Git 安全检查: `workflows/git_safety_workflow.md`

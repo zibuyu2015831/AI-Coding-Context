@@ -16,20 +16,25 @@ tools/
 
 所有工具均提供 Python 和 Node.js 双版本，功能保持一致。
 
-| 工具名称                  | 功能描述                     | 典型用途                                     |
-| :------------------------ | :--------------------------- | :------------------------------------------- |
-| `project_scanner`         | 扫描项目结构，生成 JSON 树   | 快速了解项目规模与结构，自动忽略 .gitignore  |
-| `file_reader`             | 安全读取文件内容             | 读取大文件、处理编码、检测二进制文件         |
-| `content_searcher`        | 高效搜索内容 (类 grep)       | 查找代码引用、TODO、特定字符串               |
-| `file_finder`             | 查找文件 (类 find)           | 根据文件名模式查找文件                       |
-| `env_diagnosis`           | 环境诊断                     | 检查 Python/Node.js 版本及可用性             |
-| `git_inspector`           | Git 信息检查                 | 获取当前分支、变更状态                       |
-| `timestamp_analyzer`      | 文件时间戳采集 (V1.1.0 新增) | 供 AI 分析文档健康度，判断文档是否过期       |
-| `git_diff_analyzer`       | Git 差异分析 (V1.1.0 新增)   | 供 AI 判断哪些文档需要更新                   |
-| `summary_extractor`       | 文档摘要提取 (V1.2.0 新增)   | 提取文档 YAML Frontmatter 摘要               |
-| `summary_validator`       | 摘要格式验证 (V1.2.0 新增)   | 验证摘要格式、必填字段和关联文件存在性       |
-| `summary_related_checker` | 关联文档检查 (V1.2.0 新增)   | 检测代码变更影响的文档（基于 related_files） |
-| `summary_index_generator` | 摘要索引生成 (V1.2.0 新增)   | 生成文档摘要索引页（暂不启用）               |
+| 工具名称                  | 功能描述                      | 典型用途                                     |
+| :------------------------ | :---------------------------- | :------------------------------------------- |
+| `project_scanner`         | 扫描项目结构，生成 JSON 树    | 快速了解项目规模与结构，自动忽略 .gitignore  |
+| `file_reader`             | 安全读取文件内容              | 读取大文件、处理编码、检测二进制文件         |
+| `content_searcher`        | 高效搜索内容 (类 grep)        | 查找代码引用、TODO、特定字符串               |
+| `file_finder`             | 查找文件 (类 find)            | 根据文件名模式查找文件                       |
+| `env_diagnosis`           | 环境诊断                      | 检查 Python/Node.js 版本及可用性             |
+| `git_inspector`           | Git 信息检查                  | 获取当前分支、变更状态                       |
+| `timestamp_analyzer`      | 文件时间戳采集 (V1.1.0 新增)  | 供 AI 分析文档健康度，判断文档是否过期       |
+| `git_diff_analyzer`       | Git 差异分析 (V1.1.0 新增)    | 供 AI 判断哪些文档需要更新                   |
+| `summary_extractor`       | 文档摘要提取 (V1.2.0 新增)    | 提取文档 YAML Frontmatter 摘要               |
+| `summary_validator`       | 摘要格式验证 (V1.2.0 新增)    | 验证摘要格式、必填字段和关联文件存在性       |
+| `summary_related_checker` | 关联文档检查 (V1.2.0 新增)    | 检测代码变更影响的文档（基于 related_files） |
+| `summary_index_generator` | 摘要索引生成 (V1.2.0 新增)    | 生成文档摘要索引页（暂不启用）               |
+| `git_safety`              | Git 安全检查 (V1.3.0 新增)    | 检查保护分支、验证危险命令、建议分支名       |
+| `commit_parser`           | Commit 解析 (V1.3.0 新增)     | 解析结构化/传统 commit，提取 WHAT/WHY/HOW    |
+| `commit_quality_scorer`   | Commit 质量评分 (V1.3.0 新增) | 5 维度评分，生成改进建议                     |
+| `commit_aggregator`       | Commit 聚合 (V1.3.0 新增)     | 同类 commit 聚合，Token 优化（减少 85%+）    |
+| `commit_template_cli`     | Commit 模板 CLI (V1.3.0 新增) | 交互式生成结构化 commit message              |
 
 ## 🚀 使用指南
 

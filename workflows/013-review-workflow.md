@@ -121,3 +121,47 @@ def should_auto_fix(plan, review):
 - **自动优化 (Auto Fix)**: AI 生成器根据审核报告自动修改方案（限 1 轮），然后提交用户。
 - **提示对比 (Suggest Review)**: 提示用户“审核者建议改进（可提升 XX 分），请评估”。
 - **直接通过 (Direct Approve)**: 不打扰用户，直接展示最终方案。
+---
+
+## 5. 审查维度扩展 🆕
+
+### 5.1 Commit 质量审查
+
+审查者应检查方案中建议的 commit 策略:
+
+- **WHAT 清晰度**: 是否一句话说清楚做了什么 (满分30)
+- **WHY 深度**: 是否说明了业务动机或技术原因 (满分30)
+- **HOW 完整性**: 是否说明了实现策略和风险 (满分20)
+- **粒度合理性**: commit 大小是否适中 (满分10)
+- **可测试性**: 是否说明了如何验证 (满分10)
+
+**评分标准**:
+- 分数 < 60: 强制人工介入,要求改进 commit 策略
+- 分数 60-80: 给出优化建议但不阻塞
+- 分数 > 80: 优质 commit,可直接通过
+
+### 5.2 Git 安全规范审查
+
+审查者应检查方案中的 Git 操作:
+
+**RED ZONE 违规 (零容忍)**:
+- ⛔ 在保护分支 (main/master/production) 直接操作
+- ⛔ 使用危险命令 (git reset --hard, git push --force)
+- ⛔ 执行 merge 操作 (除 git merge --abort)
+- ⛔ 强制删除分支或标签
+
+**YELLOW ZONE 检查 (需明确授权)**:
+- ⚠️ 创建 feature 分支的命名规范
+- ⚠️ commit message 格式
+- ⚠️ push 到远程分支的确认
+
+**判定规则**:
+- 发现任何 RED ZONE 违规  强制阻塞,要求修改方案
+- 发现 YELLOW ZONE 问题  标记警告,建议改进
+
+**参考**: 详见 workflows/git_safety_workflow.md 和 	emplates/AI_RULES_TEMPLATE.md 的 Git 安全规范章节
+
+---
+
+**版本**: 1.1  
+**最后更新**: 2025-12-11
