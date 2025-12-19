@@ -220,7 +220,7 @@ graph TD
 - **确认日期**: 2025-12-02
 - **完成日期**: 2025-12-02
 - **状态**: ✅ 已完成
-- **产物**: `/confirmed/013-ai-mutual-review/` 目录, `workflows/review_standards/`, `workflows/013-review-workflow.md`
+- **产物**: `/confirmed/013-ai-mutual-review/` 目录, `workflows/review_standards/`, `workflows/review-workflow.md`
 
 #### 3. Commit-Guided Documentation ⭐ [018] 🆕
 

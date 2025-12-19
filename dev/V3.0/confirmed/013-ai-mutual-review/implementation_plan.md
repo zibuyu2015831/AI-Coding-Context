@@ -47,11 +47,11 @@
 - **关注点**: 准确性 (30%), 清晰度 (25%), 完整性 (20%).
 - **合格线**: 75 分.
 
-### 2. 工作流逻辑实现 (`workflows/013-review-workflow.md`)
+### 2. 工作流逻辑实现 (`workflows/review-workflow.md`)
 
 定义审查流程的核心逻辑，包括决策树、复杂度评估和可靠度判断。
 
-#### [NEW] `workflows/013-review-workflow.md`
+#### [NEW] `workflows/review-workflow.md`
 
 **A. 复杂度评估逻辑 (混合模式)**
 

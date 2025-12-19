@@ -4,7 +4,7 @@ summary: 中型项目的完整文档生成方案,包含详细分析、代码模�
 keywords: 文档生成 | 中型项目 | AI互审 | 子文档规划 | 维护
 scope: 文档生成方案 (dev_docs/_analysis/)
 related_files: 无
-dependencies: workflows/generation_workflow.md | workflows/013-review-workflow.md
+dependencies: workflows/generation_workflow.md | workflows/review-workflow.md
 verified_at: [YYYY-MM-DD 格式日期]
 ---
 

@@ -634,7 +634,7 @@ last_updated: 2025-12-03 (来自commit date)
 - [ ] 创建 `agents/runtime/commit_analyst.md`
 - [ ] 更新 `templates/AI_RULES_TEMPLATE.md` (添加 Git 安全规范)
 - [ ] 更新 `agents/runtime/design_facilitator.md` (Step 5 增加 Commit 指导) 🆕
-- [ ] 更新 `workflows/013-review-workflow.md` (新增 commit 质量审查维度) 🆕
+- [ ] 更新 `workflows/review-workflow.md` (新增 commit 质量审查维度) 🆕
 - [ ] 更新 `workflows/review_standards/*.md` (新增 Git 安全检查点) 🆕
 
 ### 阶段 4: 配置、文档与集成测试 (Week 7-8)

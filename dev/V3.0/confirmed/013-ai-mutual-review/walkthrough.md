@@ -5,7 +5,7 @@
 ## 验证环境准备
 
 1. 确保 `workflows/review_standards/` 目录下存在 4 个标准文件。
-2. 确保 `workflows/013-review-workflow.md` 存在。
+2. 确保 `workflows/review-workflow.md` 存在。
 3. 确保 `AI_ENTRY_POINT.md` 已包含 "步骤 4.5: AI 互审"。
 4. 确保项目 `AI_RULES.md` 已更新（或重新生成）。
 

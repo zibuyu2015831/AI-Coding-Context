@@ -163,7 +163,7 @@ review_metadata:
 
 - 若用户未指定指令，根据**复杂度**自动决定审查模式
 - 若方案可靠度 < 60 或 审查提升度 ≥ 20，**自动触发优化**
-- 详细逻辑参考: `workflows/013-review-workflow.md`
+- 详细逻辑参考: `workflows/review-workflow.md`
 
 ---
 

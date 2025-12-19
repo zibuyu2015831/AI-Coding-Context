@@ -4,7 +4,7 @@ summary: 大型复杂项目的完整文档生成方案,包含深度分析、设�
 keywords: 文档生成 | 大型项目 | 设计思维 | AI互审 | 批次规划 | 维护
 scope: 文档生成方案 (dev_docs/_analysis/)
 related_files: 无
-dependencies: workflows/generation_workflow.md | workflows/013-review-workflow.md | templates/prompts/design_thinking/
+dependencies: workflows/generation_workflow.md | workflows/review-workflow.md | templates/prompts/design_thinking/
 verified_at: [YYYY-MM-DD 格式日期]
 ---
 

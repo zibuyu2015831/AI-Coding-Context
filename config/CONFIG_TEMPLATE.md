@@ -11,7 +11,6 @@ lastUpdated: 2025-12-01
 
 # V3.0 功能开关
 enableMutualReview: false
-dangerousCommandGuard: moderate
 enforceDesignThinking: false
 enableADR: false
 aiCapabilityTier: auto
@@ -21,14 +20,14 @@ preferredRoles: []
 verboseMode: false
 defaultHealthCheckMode: standard
 
-# 工具库配置 (V3.0 新增)
+# 工具库配置
 tools:
   preferredRuntime: python # 优先使用的运行时 (python|nodejs)
   autoFallback: true # 工具失败时自动降级
   timeoutSeconds: 10 # 工具超时时间(秒)
   maxFileScan: 5000 # 最大扫描文件数
 
-# 设计思维引导配置 (V3.0 新增)
+# 设计思维引导配置
 design_thinking:
   auto_trigger_threshold: 60 # 自动触发阈值 (0-100, 复杂度评分)
   default_mode: standard # 默认引导模式 (standard|deep|quick)
@@ -37,7 +36,7 @@ design_thinking:
     include_performance_expert: false # 是否默认包含性能专家
   skip_trivial_tasks: true # 是否跳过简单任务 (如 Fix typo)
 
-# Git 安全规范配置 (V3.0 新增)
+# Git 安全规范配置
 git_safety:
   mode: standard # 安全模式 (strict|standard|permissive)
   protected_branches: ["main", "master", "production"] # 保护分支列表
@@ -45,7 +44,7 @@ git_safety:
   warn_on_large_commit: true # 单commit超过500行时警告
   enable_pre_commit_hook: false # 是否启用 pre-commit hook
 
-# Commit-Guided Documentation 配置 (V3.0 新增)
+# Commit-Guided Documentation 配置
 commit_guided_documentation:
   enabled: true # 是否启用 Commit-Guided 功能
   commit_format:
@@ -65,7 +64,7 @@ commit_guided_documentation:
 
 # 框架配置说明
 
-> 📝 本文档记录您的个性化配置
+> 📝 本文档记录用户的个性化配置
 >
 > **配置方式**: 修改上方 YAML frontmatter 中的值
 > **生效时机**: 下次运行框架时自动应用
@@ -110,43 +109,6 @@ documentLanguage: en-US # 切换到英文
 
 - ✅ 启用: 方案质量更高,发现更多问题,但生成时间 +20%
 - ❌ 禁用: 生成更快,但可能遗漏问题
-
----
-
-## 🛡️ 危险指令拦截
-
-**YAML 字段**: `dangerousCommandGuard`  
-**当前值**: `moderate`  
-**对应优化点**: 002-危险指令拦截
-
-**说明**: 防止 AI 执行可能导致数据丢失的危险命令
-
-**可选值**:
-
-- `strict` - 严格模式
-  - **适用**: 生产环境、重要项目
-  - **拦截**: 文件删除、数据库删除、系统级操作
-  - **行为**: 拦截并拒绝执行
-- `moderate` - 适中模式(默认)
-  - **适用**: 开发环境
-  - **拦截**: 数据库删除、系统级操作
-  - **警告**: 文件删除
-- `permissive` - 宽松模式
-  - **适用**: 个人学习项目
-  - **行为**: 仅警告,不拦截
-
-**使用场景**:
-
-```yaml
-# 生产环境
-dangerousCommandGuard: strict
-
-# 开发环境
-dangerousCommandGuard: moderate
-
-# 个人学习项目
-dangerousCommandGuard: permissive
-```
 
 ---
 
@@ -335,7 +297,6 @@ preferredRoles:
 ```yaml
 documentLanguage: zh-CN
 enableMutualReview: false # 快速开发
-dangerousCommandGuard: permissive # 宽松保护
 enforceDesignThinking: false # 不强制
 aiCapabilityTier: auto
 ```
@@ -345,7 +306,6 @@ aiCapabilityTier: auto
 ```yaml
 documentLanguage: zh-CN
 enableMutualReview: false
-dangerousCommandGuard: moderate # 适度保护(默认)
 enforceDesignThinking: false
 aiCapabilityTier: auto
 ```
@@ -354,7 +314,6 @@ aiCapabilityTier: auto
 
 ```yaml
 enableMutualReview: true # 保证质量
-dangerousCommandGuard: strict # 严格保护
 enforceDesignThinking: true # 强制设计思考
 enableADR: true # 记录架构决策
 aiCapabilityTier: advanced # 使用高级 AI

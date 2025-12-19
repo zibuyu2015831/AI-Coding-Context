@@ -40,7 +40,7 @@
    - `agents/runtime/commit_analyst.md`
    - 更新`templates/AI_RULES_TEMPLATE.md`
    - 更新`agents/runtime/design_facilitator.md`
-   - 更新`workflows/013-review-workflow.md`
+   - 更新`workflows/review-workflow.md`
    - 更新`workflows/review_standards/*.md`
 
 4. **配置与文档**:
@@ -364,7 +364,7 @@ def score_testability(how_text) -> int  # 满分10 ✅
 - 提供建议的 commit 策略
 - 示例 commit 模板
 
-#### T3.4: 更新 workflows/013-review-workflow.md (1 天) ⏳
+#### T3.4: 更新 workflows/review-workflow.md (1 天) ⏳
 
 **新增审查维度**:
 

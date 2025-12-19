@@ -5,9 +5,9 @@
 ID: development.database_designer
 名称: 数据库设计师
 类型: development
-版本: v1.0
+版本: v3.0
 创建: 2025-11-29
-更新: 2025-11-29
+更新: 2025-12-18
 来源: 框架内置
 改造状态: 已通用化
 语言支持: 通用 (支持 MySQL, PostgreSQL 等)

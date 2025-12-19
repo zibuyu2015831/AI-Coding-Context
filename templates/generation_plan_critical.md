@@ -4,7 +4,7 @@ summary: 超大型/关键项目的完整文档生成方案,包含全面深度分
 keywords: 文档生成 | 超大型项目 | 关键系统 | 设计思维 | 多轮互审 | 批次规划
 scope: 文档生成方案 (dev_docs/_analysis/)
 related_files: 无
-dependencies: workflows/generation_workflow.md | workflows/013-review-workflow.md | templates/prompts/design_thinking/
+dependencies: workflows/generation_workflow.md | workflows/review-workflow.md | templates/prompts/design_thinking/
 verified_at: [YYYY-MM-DD 格式日期]
 ---
 

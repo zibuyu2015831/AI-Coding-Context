@@ -82,7 +82,7 @@ P2 (增强功能): 4个
   - **产物**: `/tools` 目录已创建 (py/, js/, fallback/, README.md)
 - [x] 确认 018-commit-guided-documentation.md ✅ 2025-12-11 ⭐ (P0 核心防护)
   - **状态**: ✅ 已完成 (2025-12-18)
-  - **产物**: `/confirmed/018-commit-guided-documentation/` 目录, tools/目录下的commit相关工具, agents/runtime/commit_analyst.md, workflows/commit_guided_update.md和git_safety_workflow.md
+  - **产物**: `/confirmed/018-commit-guided-documentation/` 目录, tools/目录下的 commit 相关工具, agents/runtime/commit_analyst.md, workflows/commit_guided_update.md 和 git_safety_workflow.md
   - **依赖**: 001 (需要 commit_analyst 角色)
 
 **预计完成**: 2025-12-31
@@ -187,15 +187,15 @@ P2 (增强功能): 4个
 
 - 002-dangerous-command-guard.md (危险指令拦截) 已移至 archived/ 目录
   - 原因: 经过讨论决定排除此优化点
-  - 影响: P0优化点数量从6个减少到5个，总优化点数从18个减少到17个
-  - 相关依赖: 016配置管理系统不再需要支持002的功能
+  - 影响: P0 优化点数量从 6 个减少到 5 个，总优化点数从 18 个减少到 17 个
+  - 相关依赖: 016 配置管理系统不再需要支持 002 的功能
 
 **[优化点完成]**
 
 - 018-commit-guided-documentation.md (Commit-Guided Documentation) 已完成 ✅
   - 状态: 从开发中更新为已完成
-  - 产物: tools/目录下的commit相关工具, agents/runtime/commit_analyst.md, workflows/commit_guided_update.md和git_safety_workflow.md
-  - 影响: 所有P0优化点现已完成
+  - 产物: tools/目录下的 commit 相关工具, agents/runtime/commit_analyst.md, workflows/commit_guided_update.md 和 git_safety_workflow.md
+  - 影响: 所有 P0 优化点现已完成
 
 ### 2025-11-29
 
@@ -274,7 +274,7 @@ P2 (增强功能): 4个
 - 013-ai-mutual-review.md (AI 互审机制) 开发完成 ✅
   - 类型: 核心防护 (P0)
   - 状态: 🟢 已完成
-  - 产物: 审查标准库 (`workflows/review_standards/`), 工作流逻辑 (`workflows/013-review-workflow.md`), 集成 (`AI_ENTRY_POINT.md`, `AI_RULES.md`)
+  - 产物: 审查标准库 (`workflows/review_standards/`), 工作流逻辑 (`workflows/review-workflow.md`), 集成 (`AI_ENTRY_POINT.md`, `AI_RULES.md`)
   - 价值: 实现了对抗式编程和分级审查机制
   - 已完成优化点: 4 个 (001, 016, 017, 013)
 

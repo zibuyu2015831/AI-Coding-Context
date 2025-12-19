@@ -643,7 +643,7 @@ python tools/py/git_audit.py --since "30 days ago"
 
 - [workflows/commit_guided_update.md](./commit_guided_update.md) - Commit 引导文档更新
 - [templates/AI_RULES_TEMPLATE.md](../templates/AI_RULES_TEMPLATE.md) - AI 规则模板
-- [workflows/013-review-workflow.md](./013-review-workflow.md) - AI 互审工作流
+- [workflows/review-workflow.md](./review-workflow.md) - AI 互审工作流
 
 ---
 
