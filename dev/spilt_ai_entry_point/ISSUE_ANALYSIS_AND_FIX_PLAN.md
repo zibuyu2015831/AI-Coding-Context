@@ -223,7 +223,7 @@ node tools/js/env_diagnosis.js
 # Unix: tools/fallback/commands_unix.md
 ```
 
-**详细操作**: 参见 [检测流程](./workflows/detection_workflow.md#环境预检)
+**详细操作**: 参见 [检测流程](../../workflows/detection_workflow.md#环境预检)
 
 **注意**: 详细的错误处理流程见问题 #5 的修复方案。
 
@@ -453,7 +453,7 @@ C. 重新生成文档
 3. 初始化进度状态（0/N 完成）
 4. 记录开始时间
 
-**详细说明**: 参见 [进度记录机制](./workflows/progress_tracking.md)
+**详细说明**: 参见 [进度记录机制](../../workflows/progress_tracking.md)
 
 ---
 

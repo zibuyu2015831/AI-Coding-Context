@@ -7,6 +7,35 @@
 
 ---
 
+## [1.3.1] - 2025-12-19
+
+### Added
+
+- 新增 `install_hooks.js` - Git Hooks 安装工具 Node.js 版本
+  - 自动检测 Git 仓库根目录
+  - 安装/卸载 pre-commit hook
+  - 支持备份和恢复现有 hook
+  - 跨平台兼容（Windows, macOS, Linux）
+  - 包含 7 个单元测试，覆盖核心功能
+- 新增 `commit_template_cli.js` - Commit 模板 CLI 工具 Node.js 版本
+  - 交互式向导生成结构化 commit message
+  - 支持快速模式（命令行参数）
+  - 集成质量评分和改进建议
+  - 符合 Commit-as-Prompt 规范
+  - 包含 8 个单元测试，覆盖格式生成和参数解析
+
+### Changed
+
+- 更新 `tools/README.md`，将 `install_hooks` 添加到工具清单
+- 完善双模实现原则，所有 CLI 工具现在都有 Python 和 Node.js 版本
+
+### Performance
+
+- 所有新工具响应时间 <1 秒
+- 零依赖，仅使用 Node.js 标准库
+
+---
+
 ## [1.3.0] - 2025-12-11
 
 ### Added
