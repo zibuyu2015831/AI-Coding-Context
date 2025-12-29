@@ -27,35 +27,312 @@
 
 ---
 
+## ⚠️ 框架边界声明 (CRITICAL: Framework Boundary)
+
+> **本节对 AI 至关重要,必须在开始任何分析前阅读并遵守**
+
+### 什么是框架边界？
+
+**AI Coding Context (AICC)** 是一个辅助工具框架，用于帮助生成项目文档。
+**框架本身不是用户的业务代码**，在分析项目时必须将其排除。
+
+**类比**：
+
+- 框架 = 医生的听诊器（工具）
+- 用户项目 = 病人（分析目标）
+- AI 的任务 = 诊断病人，而不是研究听诊器
+
+### 框架位置与识别
+
+**典型位置**：
+
+- `<项目根目录>/ai_coding_context/`（最常见）
+- `<项目根目录>/.ai/`（点开头目录）
+- `<项目根目录>/docs/ai_context/`（文档子目录）
+- 用户自定义的其他位置
+
+**识别标志**：
+
+- 包含本文件 `AI_ENTRY_POINT.md` 的目录即为框架根目录
+- 该目录下通常包含 `core/`、`workflows/`、`templates/`、`agents/`、`tools/` 等子目录
+
+**检测命令**：
+
+```bash
+# Windows PowerShell
+Test-Path ai_coding_context/AI_ENTRY_POINT.md
+
+# Linux/Mac
+test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_context/" || echo "未检测到标准位置"
+```
+
+### 🚫 排除规则 (MUST EXCLUDE)
+
+在执行以下操作时，**必须排除**这些内容：
+
+#### 1. 框架目录（最高优先级）
+
+```
+❌ 不得分析、统计、引用的内容：
+- 整个框架目录（ai_coding_context/ 或其他名称）
+  - core/
+  - workflows/
+  - templates/
+  - agents/
+  - tools/
+  - guides/
+  - reference/
+  - config/（框架配置，不是项目配置）
+
+✅ 唯一例外：
+- 可以读取框架文件以理解工作流和规范
+- 但不得将框架文件内容纳入项目分析结果
+```
+
+#### 2. 框架生成的临时文件
+
+```
+❌ dev_docs/_analysis/（分析过程文件）
+  - generation_plan.md
+  - project_analysis_report.md
+  - generation_progress.md
+```
+
+#### 3. 其他标准排除目录
+
+```
+❌ 依赖与构建产物：
+  - node_modules/
+  - venv/, env/, .env/
+  - dist/, build/
+  - target/（Java）
+  - __pycache__/
+
+❌ 版本控制：
+  - .git/
+  - .svn/
+
+❌ IDE 配置：
+  - .vscode/
+  - .idea/
+  - *.swp
+```
+
+### ✅ 分析目标 (MUST ANALYZE)
+
+**用户的业务代码**，通常包括：
+
+```
+✅ 源代码目录：
+  - src/
+  - lib/
+  - app/
+  - components/
+  - pages/
+  - api/
+  - services/
+  - utils/
+  - （根据项目类型可能有不同命名）
+
+✅ 配置文件：
+  - package.json
+  - tsconfig.json
+  - requirements.txt
+  - pom.xml
+  - Cargo.toml
+  - .env.example（示例配置）
+
+✅ 项目文档：
+  - README.md（项目的说明文档）
+  - docs/（项目自己的文档，非框架生成）
+  - CONTRIBUTING.md
+  - CHANGELOG.md
+
+✅ 框架已生成的文档体系（如果存在）：
+  - dev_docs/AI_Coding_Context.md（主文档）
+  - dev_docs/*.md（生成的子文档）
+  - dev_docs/knowledge/（知识库）
+  - AI_RULES.md
+```
+
+### 实际操作示例
+
+#### ❌ 错误做法
+
+**场景**：扫描项目文档时包含了框架文件
+
+```bash
+# 错误命令（未排除框架）
+python tools/py/project_scanner.py .
+
+# 错误结果
+项目文档列表：
+- README.md
+- ai_coding_context/core/language_rules.md  ← 这是框架文件！
+- ai_coding_context/templates/GENERATION_PLAN_TEMPLATE.md  ← 这是框架文件！
+- src/README.md
+
+→ 导致：生成的文档中包含了框架自身的说明
+```
+
+#### ✅ 正确做法
+
+**场景**：明确排除框架目录
+
+```bash
+# 正确命令（排除框架）
+python tools/py/project_scanner.py . --exclude-standard
+
+# 或手动指定
+python tools/py/project_scanner.py . --ignore "ai_coding_context,node_modules,.git"
+
+# 正确结果
+项目文档列表：
+- README.md
+- src/README.md
+
+已排除目录：
+- ai_coding_context/（框架）
+- node_modules/（依赖）
+
+→ 结果：只分析用户的业务代码和文档
+```
+
+### 不确定时的处理原则
+
+如果无法确定框架位置或分析边界，**必须**：
+
+1. **列出候选目录**
+
+   ```
+   检测到以下可能是框架的目录：
+   - ai_coding_context/（包含 AI_ENTRY_POINT.md）
+   - .ai/（名称模式匹配）
+   ```
+
+2. **询问用户确认**
+
+   ```
+   我将在分析时排除以上目录，这样对吗？
+   如果框架位于其他位置，请告知。
+   ```
+
+3. **记录决策**
+   在 `dev_docs/_analysis/generation_plan.md` 中记录：
+
+   ```markdown
+   ## 框架边界确认
+
+   - 框架位置: `ai_coding_context/`
+   - 排除目录: `ai_coding_context/`, `node_modules/`, `.git/`
+   - 确认方式: 自动检测到 AI_ENTRY_POINT.md
+   ```
+
+### 特殊场景处理
+
+#### 场景 1：框架在非标准位置
+
+**用户可能的操作**：
+
+```bash
+# 用户将框架重命名或移动
+mv ai_coding_context .my_ai_tools
+```
+
+**AI 的处理**：
+
+1. 搜索 `AI_ENTRY_POINT.md` 文件位置
+2. 确定框架根目录
+3. 询问用户确认
+
+#### 场景 2：多个项目共享一个框架
+
+**结构示例**：
+
+```
+workspace/
+├── ai_coding_context/（共享框架）
+├── project_a/
+└── project_b/
+```
+
+**AI 的处理**：
+
+1. 识别当前工作目录（如 `project_a/`）
+2. 排除框架目录（`../ai_coding_context/`）
+3. 只分析当前项目
+
+#### 场景 3：框架已被版本管理
+
+**用户操作**：
+
+```bash
+# 用户将框架加入 Git
+git add ai_coding_context/
+```
+
+**AI 的处理**：
+
+- 依然排除框架目录
+- 在生成的 `.gitignore` 建议中，不建议忽略框架
+- 在文档中说明："框架已纳入版本管理，这符合预期"
+
+---
+
+### 检查清单
+
+在开始任何分析或生成任务前，AI 应完成以下检查：
+
+- [ ] 已确定框架根目录位置
+- [ ] 已在所有扫描/统计命令中添加框架排除参数
+- [ ] 已验证扫描结果不包含框架文件
+- [ ] 如有疑问，已询问用户确认
+
+**完成此清单后，方可继续后续步骤。**
+
+---
+
 ## 📖 术语表 (Glossary)
 
 为确保文档一致性，所有术语必须使用以下标准写法：
 
 ### 文件路径标准
 
-| 术语 | 标准写法 | 说明 |
-|------|----------|------|
-| 框架名称 | `ai_coding_context` | 本框架名称，也是根目录的名称 |
-| 框架入口文档 | `AI_ENTRY_POINT.md` | 本文档（位于框架根目录） |
-| 用户项目主文档 | `dev_docs/AI_Coding_Context.md` | 用户项目的文档入口（注意大小写） |
-| 用户配置文件 | `config/user_config.md` | 用户个人配置（相对于框架根目录） |
-| 配置模板 | `config/CONFIG_TEMPLATE.md` | 默认配置模板 |
-| 分析方案 | `dev_docs/_analysis/generation_plan.md` | 生成方案文档 |
-| 问题报告 | `dev_docs/_analysis/project_analysis_report.md` | 项目问题报告 |
-| 进度记录 | `dev_docs/_analysis/generation_progress.md` | 生成进度跟踪 |
+| 术语           | 标准写法                                        | 说明                             |
+| -------------- | ----------------------------------------------- | -------------------------------- |
+| 框架名称       | `ai_coding_context`                             | 本框架名称，也是根目录的名称     |
+| 框架入口文档   | `AI_ENTRY_POINT.md`                             | 本文档（位于框架根目录）         |
+| 用户项目主文档 | `dev_docs/AI_Coding_Context.md`                 | 用户项目的文档入口（注意大小写） |
+| 用户配置文件   | `config/user_config.md`                         | 用户个人配置（相对于框架根目录） |
+| 配置模板       | `config/CONFIG_TEMPLATE.md`                     | 默认配置模板                     |
+| 分析方案       | `dev_docs/_analysis/generation_plan.md`         | 生成方案文档                     |
+| 问题报告       | `dev_docs/_analysis/project_analysis_report.md` | 项目问题报告                     |
+| 进度记录       | `dev_docs/_analysis/generation_progress.md`     | 生成进度跟踪                     |
 
 ### 工具脚本标准
 
-| 术语 | 标准写法 | 说明 |
-|------|----------|------|
-| 环境诊断工具 | `tools/py/env_diagnosis.py` | Python 版本（优先） |
-| 环境诊断工具 | `tools/js/env_diagnosis.js` | Node.js 版本（降级） |
-| 项目扫描器 | `tools/py/project_scanner.py` | Python 版本（优先） |
-| 项目扫描器 | `tools/js/project_scanner.js` | Node.js 版本（降级） |
-| Git 变更分析 | `tools/py/git_diff_analyzer.py` | 分析代码变更 |
-| 摘要关联检查 | `tools/py/summary_related_checker.py` | 检查文档关联 |
+| 术语         | 标准写法                              | 说明                 |
+| ------------ | ------------------------------------- | -------------------- |
+| 环境诊断工具 | `tools/py/env_diagnosis.py`           | Python 版本（优先）  |
+| 环境诊断工具 | `tools/js/env_diagnosis.js`           | Node.js 版本（降级） |
+| 项目扫描器   | `tools/py/project_scanner.py`         | Python 版本（优先）  |
+| 项目扫描器   | `tools/js/project_scanner.js`         | Node.js 版本（降级） |
+| Git 变更分析 | `tools/py/git_diff_analyzer.py`       | Python 版本（优先）  |
+| Git 变更分析 | `tools/js/git_diff_analyzer.js`       | Node.js 版本（降级）|
+| 摘要关联检查 | `tools/py/summary_related_checker.py` | 检查文档关联         |
+
+### 框架边界术语
+
+| 术语       | 标准写法             | 说明                                  |
+| ---------- | -------------------- | ------------------------------------- |
+| 框架边界   | Framework Boundary   | AICC 框架与用户项目的物理边界         |
+| 框架根目录 | Framework Root       | 包含 `AI_ENTRY_POINT.md` 的目录       |
+| 项目根目录 | Project Root         | 用户业务项目的根目录（通常是 Git 根） |
+| 分析目标   | Analysis Target      | 需要分析的用户业务代码                |
+| 排除目录   | Excluded Directories | 不应被分析的目录（框架、依赖等）      |
 
 **规则**:
+
 1. 所有文件路径必须包含完整的相对路径（从框架根目录或项目根目录开始）
 2. 文件名大小写敏感，严格遵守上表
 3. 引用文档时，首次出现使用完整路径，后续可使用术语别名
@@ -86,7 +363,7 @@ graph TD
     %% 阶段 0: 初始化与路由
     Start((入口: AI_ENTRY_POINT)) --> S0[Step 0: 环境预检<br/>Env Diagnosis]
     S0 --> S1[Step 1: 上下文识别与路由<br/>Context Routing]
-    
+
     S1 --> D1{识别结果?}
     D1 -- 无文档 --> PathA[路径 A: 首次生成流程]
     D1 -- 有文档 --> PathB[路径 B: 文档健康度检查]
@@ -98,14 +375,14 @@ graph TD
         S2[Step 2: 读取框架配置] --> S3[Step 3: 项目扫描/获取结构化数据]
         S3 --> S4[Step 4: 规模策略决策<br/>Small/Med/Large]
         S4 --> S5[Step 5: 确定子文档清单]
-        
+
         %% 设计思维引导
         S5 --> S55[<b>Step 5.5: 设计思维引导</b><br/>Role: Facilitator]
         S55 --> S6[Step 6: 生成分析方案与问题报告]
-        
+
         S6 --> S7[Step 7: AI 内部互审<br/>Mutual Review]
         S7 --> S75{<b>Step 7.5: 等待人工审核</b>}
-        
+
         %% 执行与进度记录
         S75 -- 审核通过 --> S8[Step 8: 执行文档生成]
         S8 --> Progress((进度记录机制<br/>Progress Tracking))
@@ -116,11 +393,11 @@ graph TD
     subgraph Maintenance [持续维护与自愈]
         PathB --> HealthCheck[模式 1/2/3 评估]
         HealthCheck --> |需要更新| S75
-        
+
         PathC --> Diff[Git Diff 分析变更]
         Diff --> DocLoc[定位关联文档摘要]
         DocLoc --> SmartUpdate[智能局部更新]
-        
+
         PathD --> SpecificTask[执行特定任务]
     end
 
@@ -137,7 +414,6 @@ graph TD
 ```
 
 ---
-
 
 ## 📁 框架文件索引
 
@@ -160,21 +436,21 @@ graph TD
 
 ### 工作流路径文档 (`workflows/`)
 
-| 文件                                  | 用途                 | AI 何时读取                  |
-| ------------------------------------- | -------------------- | ---------------------------- |
-| `workflows/path_a_first_generation.md` | 路径 A: 首次生成流程 | **路由到路径 A 时立即读取**  |
-| `workflows/path_b_health_check.md`     | 路径 B: 文档健康检查 | **路由到路径 B 时立即读取**  |
-| `workflows/path_c_incremental_update.md` | 路径 C: 增量更新   | **路由到路径 C 时立即读取**  |
-| `workflows/path_d_specific_tasks.md`   | 路径 D: 特定任务     | **路由到路径 D 时立即读取**  |
+| 文件                                     | 用途                 | AI 何时读取                 |
+| ---------------------------------------- | -------------------- | --------------------------- |
+| `workflows/path_a_first_generation.md`   | 路径 A: 首次生成流程 | **路由到路径 A 时立即读取** |
+| `workflows/path_b_health_check.md`       | 路径 B: 文档健康检查 | **路由到路径 B 时立即读取** |
+| `workflows/path_c_incremental_update.md` | 路径 C: 增量更新     | **路由到路径 C 时立即读取** |
+| `workflows/path_d_specific_tasks.md`     | 路径 D: 特定任务     | **路由到路径 D 时立即读取** |
 
 ### 共享资源文档 (`workflows/shared/`)
 
-| 文件                                    | 用途             | AI 何时读取      |
-| --------------------------------------- | ---------------- | ---------------- |
-| `workflows/shared/failure_handling.md`  | 故障降级决策     | 遇到故障时       |
-| `workflows/shared/special_scenarios.md` | 特殊场景处理     | 检测到特殊场景时 |
-| `workflows/shared/ai_checklist.md`      | AI 自检项清单    | 生成方案或文档时 |
-| `workflows/progress_tracking.md`        | 进度记录机制     | 路径 A Step 8 时 |
+| 文件                                    | 用途          | AI 何时读取      |
+| --------------------------------------- | ------------- | ---------------- |
+| `workflows/shared/failure_handling.md`  | 故障降级决策  | 遇到故障时       |
+| `workflows/shared/special_scenarios.md` | 特殊场景处理  | 检测到特殊场景时 |
+| `workflows/shared/ai_checklist.md`      | AI 自检项清单 | 生成方案或文档时 |
+| `workflows/progress_tracking.md`        | 进度记录机制  | 路径 A Step 8 时 |
 
 ### 其他流程文档 (`workflows/`)
 
@@ -250,16 +526,19 @@ graph TD
 **执行工具**: `tools/py/env_diagnosis.py` (优先) 或 `tools/js/env_diagnosis.js` (降级)
 
 **成功输出示例**:
+
 ```markdown
 ✅ 环境预检完成
 
 **检测结果**:
+
 - 操作系统: Windows 11
 - Shell: PowerShell 7.3
 - Python: 3.11.5 ✅
 - Node.js: 18.17.0 ✅
 
 **后续命令策略**:
+
 - 优先使用 PowerShell 命令
 - 统计工具优先使用 Python 脚本
 ```
@@ -268,7 +547,7 @@ graph TD
 
 **详细操作**: 参见 [workflows/detection_workflow.md](./workflows/detection_workflow.md#环境预检)
 
-**完整的错误处理策略**: 包括所有错误类型、降级方案和Fallback命令，详见上述文档
+**完整的错误处理策略**: 包括所有错误类型、降级方案和 Fallback 命令，详见上述文档
 
 ---
 
@@ -282,18 +561,20 @@ graph TD
 AI 应依次检测以下上下文信息：
 
 1. **检测现有文档体系**
+
    ```bash
    # 跨平台命令
    # Windows PowerShell
    Test-Path dev_docs
    Test-Path dev_docs/AI_Coding_Context.md
-   
+
    # Linux/Mac
    test -d dev_docs && echo "存在" || echo "不存在"
    test -f dev_docs/AI_Coding_Context.md && echo "文档存在" || echo "文档不存在"
    ```
 
 2. **检测 Git 提交上下文**
+
    - 用户是否使用了 `@commit` 指令
    - 是否在 Git 提交流程中
 
@@ -302,13 +583,13 @@ AI 应依次检测以下上下文信息：
 
 #### 1.2 路由决策表
 
-| 检测结果 | 路由目标 | 说明 |
-|---------|---------|------|
-| `dev_docs/` 不存在 | **路径 A: 首次生成流程** | 执行 Step 2-8 |
-| `dev_docs/` 存在 + 主文档存在 | **路径 B: 文档健康检查** | 评估文档状态 |
-| `dev_docs/` 存在但文档不完整 | **询问用户** | 修复 or 重新生成 |
-| 检测到 `@commit` 或 Git 上下文 | **路径 C: 增量更新流程** | 智能局部更新 |
-| 检测到显式指令 (`@think`, `@review`) | **路径 D: 特定任务** | 执行对应模块 |
+| 检测结果                             | 路由目标                 | 说明             |
+| ------------------------------------ | ------------------------ | ---------------- |
+| `dev_docs/` 不存在                   | **路径 A: 首次生成流程** | 执行 Step 2-8    |
+| `dev_docs/` 存在 + 主文档存在        | **路径 B: 文档健康检查** | 评估文档状态     |
+| `dev_docs/` 存在但文档不完整         | **询问用户**             | 修复 or 重新生成 |
+| 检测到 `@commit` 或 Git 上下文       | **路径 C: 增量更新流程** | 智能局部更新     |
+| 检测到显式指令 (`@think`, `@review`) | **路径 D: 特定任务**     | 执行对应模块     |
 
 ---
 
@@ -318,21 +599,21 @@ AI 应依次检测以下上下文信息：
 
 ### 主要路径
 
-| 路由目标 | 触发条件 | 文档路径 | 何时读取 |
-|---------|---------|---------|---------|
-| **路径 A** | `dev_docs/` 不存在 | [workflows/path_a_first_generation.md](./workflows/path_a_first_generation.md) | **立即读取** - 执行首次生成流程 |
-| **路径 B** | `dev_docs/` 存在 + 主文档存在 | [workflows/path_b_health_check.md](./workflows/path_b_health_check.md) | **立即读取** - 执行健康度检查 |
-| **路径 C** | 检测到 `@commit` 或 Git 上下文 | [workflows/path_c_incremental_update.md](./workflows/path_c_incremental_update.md) | **立即读取** - 执行增量更新 |
-| **路径 D** | 检测到显式指令 | [workflows/path_d_specific_tasks.md](./workflows/path_d_specific_tasks.md) | **立即读取** - 执行特定任务 |
+| 路由目标   | 触发条件                       | 文档路径                                                                           | 何时读取                        |
+| ---------- | ------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------- |
+| **路径 A** | `dev_docs/` 不存在             | [workflows/path_a_first_generation.md](./workflows/path_a_first_generation.md)     | **立即读取** - 执行首次生成流程 |
+| **路径 B** | `dev_docs/` 存在 + 主文档存在  | [workflows/path_b_health_check.md](./workflows/path_b_health_check.md)             | **立即读取** - 执行健康度检查   |
+| **路径 C** | 检测到 `@commit` 或 Git 上下文 | [workflows/path_c_incremental_update.md](./workflows/path_c_incremental_update.md) | **立即读取** - 执行增量更新     |
+| **路径 D** | 检测到显式指令                 | [workflows/path_d_specific_tasks.md](./workflows/path_d_specific_tasks.md)         | **立即读取** - 执行特定任务     |
 
 ### 共享资源（按需引用）
 
-| 资源类型 | 文档路径 | 何时读取 |
-|---------|---------|---------|
-| 进度记录机制 | [workflows/progress_tracking.md](./workflows/progress_tracking.md) | 路径 A 执行 Step 8 时 |
-| 故障降级决策 | [workflows/shared/failure_handling.md](./workflows/shared/failure_handling.md) | 遇到故障时 |
-| 特殊场景处理 | [workflows/shared/special_scenarios.md](./workflows/shared/special_scenarios.md) | 检测到特殊场景时 |
-| AI 自检项 | [workflows/shared/ai_checklist.md](./workflows/shared/ai_checklist.md) | 生成方案或文档时 |
+| 资源类型     | 文档路径                                                                         | 何时读取              |
+| ------------ | -------------------------------------------------------------------------------- | --------------------- |
+| 进度记录机制 | [workflows/progress_tracking.md](./workflows/progress_tracking.md)               | 路径 A 执行 Step 8 时 |
+| 故障降级决策 | [workflows/shared/failure_handling.md](./workflows/shared/failure_handling.md)   | 遇到故障时            |
+| 特殊场景处理 | [workflows/shared/special_scenarios.md](./workflows/shared/special_scenarios.md) | 检测到特殊场景时      |
+| AI 自检项    | [workflows/shared/ai_checklist.md](./workflows/shared/ai_checklist.md)           | 生成方案或文档时      |
 
 ### 🔍 快速判断：我应该读哪个文档？
 
@@ -344,6 +625,7 @@ AI 应依次检测以下上下文信息：
 ### 使用说明
 
 **AI 执行流程**:
+
 1. 读取 `AI_ENTRY_POINT.md`（主文档）
 2. 执行 Step 0（环境预检）
 3. 执行 Step 1（上下文识别与路由）
@@ -352,6 +634,7 @@ AI 应依次检测以下上下文信息：
 6. 需要时，读取共享资源文档
 
 **关键原则**:
+
 - ✅ **按需加载**: 只读取当前路径需要的文档
 - ✅ **单一职责**: 每个文档只关注一个路径或功能
 - ✅ **避免重复**: 共享内容统一管理，通过引用使用
@@ -396,6 +679,7 @@ AI 应依次检测以下上下文信息：
 ## 🎯 成功标志
 
 **方案阶段成功**：
+
 - ✅ 准确检测项目信息
 - ✅ 合理选择生成策略
 - ✅ 生成可验证的方案
@@ -403,6 +687,7 @@ AI 应依次检测以下上下文信息：
 - ✅ 获得用户审核通过
 
 **文档生成成功**：
+
 - ✅ 按方案准确执行
 - ✅ 文档结构完整
 - ✅ 代码示例真实

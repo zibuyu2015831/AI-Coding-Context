@@ -1,8 +1,8 @@
 ---
-title: ACC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
+title: AICC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
 summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V2.3 稳定能力和 V3.0 基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
 keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
-scope: ACC 框架自身的全局框架上下文与版本快照（dev/ 目录）
+scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
 related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | quality/README.md | reference/design_decisions.md | reference/SUMMARY_FORMAT_SPEC.md
 dependencies: reference/SUMMARY_FORMAT_SPEC.md | reference/design_decisions.md
 verified_at: 2025-12-04
@@ -495,7 +495,7 @@ project_root/
 > 本节面向 AI 和框架维护者，说明在 `quality/` 体系下如何使用本文件。
 
 - 在审查任意核心文档之前：
-  - **先加载本文件**（`dev/FRAMEWORK_CONTEXT.md`），构建对 ACC 框架的全局模型：
+  - **先加载本文件**（`dev/FRAMEWORK_CONTEXT.md`），构建对 AICC 框架的全局模型：
     - 顶层目录与职责
     - V2.3 能力与 V3.0 基础设施
     - 质量体系与摘要机制的大致结构

@@ -1,5 +1,5 @@
 ---
-title: ACC 框架 V3.0 特性落地优化方案 (V2)
+title: AICC 框架 V3.0 特性落地优化方案 (V2)
 summary: 综合审核意见和用户反馈的优化方案，解决V3.0特性应用率低（30%）问题，包括强制AI互审、多模板智能选择、持续维护规划等7大优化任务
 keywords: 框架优化 | V3.0 特性 | AI 互审 | 多模板选择 | 持续维护 | 工作流改进
 scope: 框架自身优化（workflows/, templates/, AI_ENTRY_POINT.md）
@@ -8,7 +8,7 @@ dependencies: dev/FRAMEWORK_CONTEXT.md | dev/V3.0/README.md
 verified_at: 2025-12-16
 ---
 
-# ACC 框架 V3.0 特性落地优化方案 (V2)
+# AICC 框架 V3.0 特性落地优化方案 (V2)
 
 ## 📋 方案元信息
 
@@ -597,8 +597,8 @@ graph LR
     E --> F[生成 dev_docs/configuration.md]
 ```
 
-
 **预期效果**:
+
 - 消除用户对配置目录位置的困惑
 - 明确框架配置和项目配置的区别
 - 确保项目配置文档正确生成在 `dev_docs/` 目录下
@@ -606,6 +606,7 @@ graph LR
 **工作量**: 1-1.5 小时
 
 **验收标准**:
+
 - [ ] FRAMEWORK_CONTEXT.md 目录结构不再包含 `config/`
 - [ ] 工作流明确说明两种配置的区别
 - [ ] 所有模板包含 `dev_docs/configuration.md` 作为必需子文档
@@ -775,4 +776,8 @@ graph LR
 | 强制性检查      | 基础        | 完善（3 级）  | 提升执行率     |
 | 维护触发条件    | 模糊        | 明确表格      | 可操作性       |
 | 预计耗时        | 12.5-17.5h  | 10-13h (P0)   | 移除兼容性     |
+
 ```
+
+```
+````

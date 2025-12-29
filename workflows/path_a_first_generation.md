@@ -20,7 +20,7 @@ graph TD
     G --> H[Step 7: AI 互审]
     H --> I[Step 7.5: 等待人工审核]
     I --> J[Step 8: 执行文档生成]
-    
+
     style A fill:#fff9c4
     style F fill:#e1f5fe
     style I fill:#ffebee
@@ -47,6 +47,7 @@ graph TD
 ℹ️ 提示：未检测到个人配置文件
 
 当前使用默认配置：
+
 - 文档语言: 中文 (zh-CN)
 - AI 互审: 启用
 - 详细模式: 关闭
@@ -55,7 +56,6 @@ graph TD
 如需自定义配置，请参考：config/CONFIG_TEMPLATE.md
 或回复 "配置向导" 进入交互式配置
 ```
-
 
 ### 配置向导（可选，用户主动触发）
 
@@ -89,21 +89,22 @@ graph TD
 
 ### 配置影响表
 
-| 配置项 | 影响模块 | 说明 |
-|--------|---------|------|
-| `documentLanguage` | 文档生成 | 所有生成文档的语言 |
-| `enableMutualReview` | AI 互审流程 | 是否启用方案互审 |
-| `dangerousCommandGuard` | 命令执行保护 | 危险命令拦截级别 |
-| `enforceDesignThinking` | 方案生成 | 是否强制深度设计思考 |
-| `enableADR` | ADR 生成 | 是否记录架构决策 |
-| `aiCapabilityTier` | 任务复杂度 | 根据 AI 能力调整任务粒度 |
-| `preferredRoles` | 角色选择 | 优先使用的 AI 角色 |
-| `verboseMode` | 输出详细度 | 控制日志和说明的详细程度 |
-| `defaultHealthCheckMode` | 文档健康检查 | 默认的健康检查深度 |
+| 配置项                   | 影响模块     | 说明                     |
+| ------------------------ | ------------ | ------------------------ |
+| `documentLanguage`       | 文档生成     | 所有生成文档的语言       |
+| `enableMutualReview`     | AI 互审流程  | 是否启用方案互审         |
+| `dangerousCommandGuard`  | 命令执行保护 | 危险命令拦截级别         |
+| `enforceDesignThinking`  | 方案生成     | 是否强制深度设计思考     |
+| `enableADR`              | ADR 生成     | 是否记录架构决策         |
+| `aiCapabilityTier`       | 任务复杂度   | 根据 AI 能力调整任务粒度 |
+| `preferredRoles`         | 角色选择     | 优先使用的 AI 角色       |
+| `verboseMode`            | 输出详细度   | 控制日志和说明的详细程度 |
+| `defaultHealthCheckMode` | 文档健康检查 | 默认的健康检查深度       |
 
 ### 配置降级策略
 
 **YAML 格式错误**:
+
 ```
 警告: config/user_config.md YAML frontmatter 解析失败
 原因: [错误详情]
@@ -112,6 +113,7 @@ graph TD
 ```
 
 **字段值无效**:
+
 ```
 警告: 配置项 'documentLanguage' 值 'xxx' 无效
 降级: 使用默认值 'zh-CN'
@@ -121,6 +123,7 @@ graph TD
 ### 配置系统文档
 
 完整配置说明请参阅:
+
 - [config/README.md](../config/README.md) - 配置系统使用指南
 - [config/CONFIG_TEMPLATE.md](../config/CONFIG_TEMPLATE.md) - 所有配置项详细说明
 
@@ -131,15 +134,97 @@ graph TD
 > 🎯 **目的**: 获取项目的结构化数据  
 > 🛠️ **工具**: `project_scanner.py` / `project_scanner.js`
 
+### ⚠️ 框架边界检查（必需步骤）
+
+> **在执行项目扫描前，必须先确定框架位置并在扫描命令中排除！**
+
+#### 1. 确定框架位置
+
+```bash
+# Windows PowerShell
+Test-Path ai_coding_context/AI_ENTRY_POINT.md
+
+# Linux/Mac
+test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_context/" || echo "未检测到标准位置"
+```
+
+**识别标志**：包含 `AI_ENTRY_POINT.md` 的目录即为框架根目录
+
+**常见位置**：
+
+- `ai_coding_context/`（最常见）
+- `.ai/`（点开头目录）
+- `docs/ai_context/`（文档子目录）
+- 用户自定义的其他位置
+
+#### 2. 在扫描命令中添加排除参数
+
+**推荐方式（使用 --exclude-standard）**：
+
+```bash
+# Python 版本（推荐）- 自适应输出
+python tools/py/project_scanner.py . --exclude-standard
+
+# Node.js 版本 - 自适应输出
+node tools/js/project_scanner.js . --exclude-standard
+```
+
+`--exclude-standard` 会自动排除：
+
+- 框架目录（自动检测）
+- node_modules/、venv/ 等依赖
+- .git/、.svn/ 等版本控制
+- .vscode/、.idea/ 等 IDE 配置
+
+**手动指定方式**：
+
+```bash
+# 如果 --exclude-standard 不可用，手动指定
+python tools/py/project_scanner.py . --ignore "ai_coding_context,node_modules,.git" --max-files 2000
+```
+
+#### 3. 验证扫描结果
+
+**检查输出中是否包含框架文件**：
+
+❌ **错误示例**（包含框架文件）：
+
+```
+项目文档列表：
+- README.md
+- ai_coding_context/core/language_rules.md  ← 这是框架文件！
+- src/README.md
+```
+
+✅ **正确示例**（已排除框架）：
+
+```
+项目文档列表：
+- README.md
+- src/README.md
+
+已排除目录：
+- ai_coding_context/（框架）
+- node_modules/（依赖）
+```
+
+**如果扫描结果包含框架文件，立即停止并重新扫描！**
+
+---
+
 ### 使用项目扫描器
 
 **执行命令**:
-```bash
-# Python 版本 (推荐)
-python tools/py/project_scanner.py --max-files 2000
 
-# Node.js 版本
-node tools/js/project_scanner.js --max-files 2000
+```bash
+# Python 版本 (推荐) - 自适应输出
+python tools/py/project_scanner.py . --exclude-standard
+
+# Node.js 版本 - 自适应输出
+node tools/js/project_scanner.js . --exclude-standard
+
+# 摘要模式（大型项目推荐）
+python tools/py/project_scanner.py --mode summary --exclude-standard
 ```
 
 ### 检测内容
@@ -182,6 +267,7 @@ node tools/js/project_scanner.js --max-files 2000
 ### 降级方案
 
 **工具不可用时**:
+
 ```bash
 # 使用基础命令统计
 # Windows PowerShell
@@ -200,12 +286,12 @@ find . -type f | wc -l
 
 ### 策略选择表
 
-| 检测到的规模 (文件数) | 自动选择策略 | 执行方式 |
-|---------------------|-------------|---------|
-| < 50 文件 | 🟢 小型项目策略 | 一次性完成（2-4 小时） |
-| 50-200 文件 | 🟡 中型项目策略 | 分 2-3 批（8-12 小时） |
-| 200-500 文件 | 🔴 大型项目策略 | 分 5-8 批（1-2 天） |
-| > 500 文件 | 🟣 超大型项目策略 | 分 10+批，按模块（1-2 周） |
+| 检测到的规模 (文件数) | 自动选择策略      | 执行方式                   |
+| --------------------- | ----------------- | -------------------------- |
+| < 50 文件             | 🟢 小型项目策略   | 一次性完成（2-4 小时）     |
+| 50-200 文件           | 🟡 中型项目策略   | 分 2-3 批（8-12 小时）     |
+| 200-500 文件          | 🔴 大型项目策略   | 分 5-8 批（1-2 天）        |
+| > 500 文件            | 🟣 超大型项目策略 | 分 10+批，按模块（1-2 周） |
 
 ### 复杂度因子调整
 
@@ -213,14 +299,15 @@ find . -type f | wc -l
 
 **复杂度因素**:
 
-| 因素 | 影响 | 识别特征 |
-|------|------|---------|
-| Monorepo | +1 级 | workspace 配置、多包目录 |
-| 微服务架构 | +1 级 | Docker Compose、多服务 |
-| 混合语言 | +0.5 | ≥3 种编程语言 |
-| 多租户架构 | +0.5 | tenant 相关代码、多品牌配置 |
+| 因素       | 影响  | 识别特征                    |
+| ---------- | ----- | --------------------------- |
+| Monorepo   | +1 级 | workspace 配置、多包目录    |
+| 微服务架构 | +1 级 | Docker Compose、多服务      |
+| 混合语言   | +0.5  | ≥3 种编程语言               |
+| 多租户架构 | +0.5  | tenant 相关代码、多品牌配置 |
 
 **计算公式**:
+
 ```
 最终策略级别 = 基础级别 + 复杂度因子之和
 
@@ -232,6 +319,7 @@ find . -type f | wc -l
 ```
 
 **示例**:
+
 ```markdown
 中型项目 (1 级) + Monorepo (+1) + 混合语言 (+0.5)
 = 2.5 级 → 大型项目策略
@@ -288,16 +376,19 @@ summary:
 
 ```markdown
 必需子文档（P0）:
+
 - architecture_overview.md
 - api_layer.md
 - state_management.md
 
 推荐子文档（P1）:
+
 - routing_guide.md
 - component_guide.md
 - testing_guide.md
 
 可选子文档（P2）:
+
 - styling_guide.md
 - form_validation.md
 ```
@@ -306,14 +397,14 @@ summary:
 
 **常见项目类型**:
 
-| 项目类型 | 识别特征 | 核心子文档 |
-|---------|---------|-----------|
-| Vue 3 前端 | `package.json` 中有 `vue@3.x` | architecture, api, state, routing, component |
-| React 前端 | `package.json` 中有 `react` | architecture, api, state, routing, component |
-| Node.js 后端 | `package.json` + Express/Koa | architecture, api, database, auth, deployment |
-| Python 后端 | `requirements.txt` + Flask/Django | architecture, api, database, auth, deployment |
-| 全栈项目 | 前端 + 后端 | 前端文档 + 后端文档 |
-| Monorepo | workspace 配置 | 参见特殊场景处理 |
+| 项目类型     | 识别特征                          | 核心子文档                                    |
+| ------------ | --------------------------------- | --------------------------------------------- |
+| Vue 3 前端   | `package.json` 中有 `vue@3.x`     | architecture, api, state, routing, component  |
+| React 前端   | `package.json` 中有 `react`       | architecture, api, state, routing, component  |
+| Node.js 后端 | `package.json` + Express/Koa      | architecture, api, database, auth, deployment |
+| Python 后端  | `requirements.txt` + Flask/Django | architecture, api, database, auth, deployment |
+| 全栈项目     | 前端 + 后端                       | 前端文档 + 后端文档                           |
+| Monorepo     | workspace 配置                    | 参见特殊场景处理                              |
 
 **详细说明**: 参见 [guides/project_types.md](../guides/project_types.md)
 
@@ -327,17 +418,20 @@ summary:
 ### 触发机制
 
 **A. 用户显式指令**:
+
 - `@think` / `@think:standard`: 启动标准引导流程 (完整 5 步)
 - `@think:deep`: 启动深度辩论模式 (多轮专家对话)
 - `@think:quick`: 快速对齐 (仅确认目标、方案、验收)
 - `@think:skip`: 跳过引导，直接进入步骤 6
 
 **B. 自动触发**:
+
 - **复杂度 ≥ 60 分** → 主动提议引导
 - **复杂度 < 60 分** → 默认跳过
 - **Trivial 任务** → 强制跳过
 
 **C. 配置集成**:
+
 ```yaml
 design_thinking:
   auto_trigger_threshold: 60
@@ -347,22 +441,27 @@ design_thinking:
 ### 5 步引导流程
 
 **Step 1 - 问题本质 (The "Why")**:
+
 - 执行者: ProductManager
 - 目标: 通过 5 Why 分析挖掘业务价值
 
 **Step 2 - 方案探索 (The "How")**:
+
 - 执行者: ArchitectureAnalyst
 - 目标: 提出 2-3 种可行方案并对比
 
 **Step 3 - 风险与测试 (The "Risk")**:
+
 - 执行者: ArchitectureAnalyst & TestEngineer
 - 目标: 识别风险并制定测试策略
 
 **Step 4 - 反思与整合 (Synthesis & Reflection)**:
+
 - 执行者: Facilitator
 - 目标: 全局反思，识别冲突和知识空白
 
 **Step 5 - 最终决策 (Final Decision)**:
+
 - 执行者: Facilitator
 - 目标: 输出结构化决策方案
 
@@ -412,10 +511,12 @@ design_thinking:
 ### 使用模板
 
 **模板 1**: `templates/GENERATION_PLAN_TEMPLATE.md`
+
 - 分析方案的标准结构
 - 包含所有必需章节
 
 **模板 2**: `templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md`
+
 - 问题报告的标准结构
 - 问题分类和优先级
 
@@ -435,12 +536,12 @@ design_thinking:
 
 ### 审查轮数
 
-| 复杂度评分 | 审查轮数 | 说明 |
-|-----------|---------|------|
-| < 30 分 | 0 轮 | 简单项目，无需审查 |
-| 30-60 分 | 1 轮 | 基础审查 |
-| 60-80 分 | 2 轮 | 深度审查 |
-| > 80 分 | 3 轮 | 全局审查 |
+| 复杂度评分 | 审查轮数 | 说明               |
+| ---------- | -------- | ------------------ |
+| < 30 分    | 0 轮     | 简单项目，无需审查 |
+| 30-60 分   | 1 轮     | 基础审查           |
+| 60-80 分   | 2 轮     | 深度审查           |
+| > 80 分    | 3 轮     | 全局审查           |
 
 ### 输出
 
@@ -461,21 +562,25 @@ design_thinking:
 ✅ 已完成项目分析和方案生成！
 
 📊 项目信息：
+
 - 语言: [X]
 - 类型: [X]
 - 规模: [X] (X 个文件, X 行代码)
 - 策略: [X]
 
 📋 生成的文档：
-1. dev_docs/_analysis/generation_plan.md
-2. dev_docs/_analysis/project_analysis_report.md
+
+1. dev_docs/\_analysis/generation_plan.md
+2. dev_docs/\_analysis/project_analysis_report.md
 
 ⚠️ 发现的问题：
+
 - 🔴 严重问题: X 个
 - 🟡 警告问题: X 个
 - 🔵 疑问事项: X 个
 
 🔍 请审核以下内容：
+
 1. 方案文档中的数据是否准确
 2. 问题报告中的问题是否合理
 3. 疑问事项需要你确认
@@ -497,13 +602,13 @@ design_thinking:
 **使用模板**: `templates/PROGRESS_TEMPLATE.md`
 
 **初始化步骤**:
+
 1. 复制模板到目标路径
 2. 填写项目基本信息（规模、策略、子文档清单）
 3. 初始化进度状态（0/N 完成）
 4. 记录开始时间
 
 **详细说明**: 参见 [workflows/progress_tracking.md](./progress_tracking.md)
-
 
 ### 8.2 根据项目规模执行生成
 
@@ -512,6 +617,7 @@ design_thinking:
 **执行方式**: 一次性生成所有文档
 
 **进度记录要求**:
+
 1. ✅ 创建进度文件（初始状态：0/N）
 2. ✅ 开始生成所有文档
 3. ✅ 每完成一个文档，更新进度（X/N）
@@ -519,6 +625,7 @@ design_thinking:
 5. ✅ 记录完成时间和总耗时
 
 **示例进度更新**:
+
 ```markdown
 ## 生成进度
 
@@ -541,6 +648,7 @@ design_thinking:
 **执行方式**: 分 2-3 批生成，每批完成后更新进度
 
 **进度记录要求**:
+
 1. ✅ 创建进度文件，标注分批计划
 2. ✅ 每批开始前，标记当前批次
 3. ✅ 每完成一个文档，更新进度
@@ -548,27 +656,31 @@ design_thinking:
 5. ✅ 全部完成后，更新为完成状态
 
 **示例进度更新**:
+
 ```markdown
 ## 生成进度
 
 ### 第 1 批（核心文档）
+
 - [x] 主文档 AI_Coding_Context.md (1/10)
 - [x] architecture_overview.md (2/10)
 - [x] api_layer.md (3/10)
-**批次状态**: ✅ 已完成 (2025-12-19 12:00)
+      **批次状态**: ✅ 已完成 (2025-12-19 12:00)
 
 ### 第 2 批（功能文档）
+
 - [x] state_management.md (4/10)
 - [x] routing_guide.md (5/10)
 - [x] component_guide.md (6/10)
-**批次状态**: ✅ 已完成 (2025-12-19 14:30)
+      **批次状态**: ✅ 已完成 (2025-12-19 14:30)
 
 ### 第 3 批（辅助文档）
+
 - [x] testing_guide.md (7/10)
 - [x] deployment_guide.md (8/10)
 - [x] performance_optimization.md (9/10)
 - [x] troubleshooting.md (10/10)
-**批次状态**: ✅ 已完成 (2025-12-19 16:00)
+      **批次状态**: ✅ 已完成 (2025-12-19 16:00)
 
 **总体状态**: ✅ 已完成
 **总耗时**: 6 小时
@@ -581,6 +693,7 @@ design_thinking:
 **执行方式**: 分 5-8 批，详细进度跟踪
 
 **进度记录要求**:
+
 1. ✅ 创建进度文件，详细列出所有批次和文档
 2. ✅ 每批开始前，标记当前批次和预计耗时
 3. ✅ 每完成一个文档，立即更新进度
@@ -594,6 +707,7 @@ design_thinking:
 **执行方式**: 按模块分批，10+ 批次，详细进度跟踪
 
 **进度记录要求**:
+
 1. ✅ 创建进度文件，按模块组织批次
 2. ✅ 每个模块独立跟踪进度
 3. ✅ 支持跨会话断点续传
@@ -623,6 +737,7 @@ design_thinking:
 **使用模板**: `templates/AI_RULES_TEMPLATE.md`
 
 **内容包含**:
+
 - 项目概述
 - 技术栈说明
 - 开发规范
@@ -639,12 +754,12 @@ design_thinking:
 
 ### 为什么需要？
 
-| 价值 | 说明 |
-|------|------|
+| 价值                | 说明                                  |
+| ------------------- | ------------------------------------- |
 | 会话中断恢复 ⭐⭐⭐ | AI 会话可能随时中断，记录进度避免重复 |
-| 便于用户审核 ⭐⭐⭐ | 随时了解当前进度，预估剩余工作量 |
-| 质量保证 ⭐⭐ | 强制按顺序完成，避免遗漏 |
-| 协作友好 ⭐ | 多人协作或交接工作时快速了解进度 |
+| 便于用户审核 ⭐⭐⭐ | 随时了解当前进度，预估剩余工作量      |
+| 质量保证 ⭐⭐       | 强制按顺序完成，避免遗漏              |
+| 协作友好 ⭐         | 多人协作或交接工作时快速了解进度      |
 
 ### 如何记录？
 
@@ -662,6 +777,7 @@ design_thinking:
 **详细说明**: 参见 [workflows/shared/special_scenarios.md](./shared/special_scenarios.md#场景-1-多语言项目)
 
 **快速概览**:
+
 - 识别主要语言和次要语言
 - 分别说明各语言的用途
 - 为每种语言生成对应的子文档
@@ -673,6 +789,7 @@ design_thinking:
 **详细说明**: 参见 [workflows/shared/special_scenarios.md](./shared/special_scenarios.md#场景-2-monorepo-项目)
 
 **快速概览**:
+
 - **策略 1**: 全局文档（推荐，技术栈统一）
 - **策略 2**: 独立文档（技术栈差异大）
 - **策略 3**: 部分生成（只关注部分子项目）
@@ -686,6 +803,7 @@ design_thinking:
 **详细说明**: 参见 [workflows/shared/special_scenarios.md](./shared/special_scenarios.md#场景-3-未识别框架)
 
 **快速概览**:
+
 - 列出发现的文件类型
 - 询问用户项目类型
 - 不要臆测，记录到疑问事项
@@ -697,6 +815,7 @@ design_thinking:
 **详细说明**: 参见 [workflows/shared/special_scenarios.md](./shared/special_scenarios.md#场景-5-遗留代码项目)
 
 **快速概览**:
+
 - 在问题报告中标注技术栈过时
 - 建议技术升级路径
 - 继续生成文档，但标注风险
@@ -709,11 +828,11 @@ design_thinking:
 
 ### 故障分类
 
-| 类型 | 处理方式 | 示例 |
-|------|---------|------|
-| 非致命 | 降级继续 | 统计工具不可用 → 用基础命令 |
-| 可降级 | 使用替代方案 | tokei→cloc→fd→find |
-| 致命 | 暂停询问用户 | 无法访问项目目录 |
+| 类型   | 处理方式     | 示例                        |
+| ------ | ------------ | --------------------------- |
+| 非致命 | 降级继续     | 统计工具不可用 → 用基础命令 |
+| 可降级 | 使用替代方案 | tokei→cloc→fd→find          |
+| 致命   | 暂停询问用户 | 无法访问项目目录            |
 
 ### 处理原则
 

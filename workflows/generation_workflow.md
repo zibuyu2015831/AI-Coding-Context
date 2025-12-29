@@ -1365,11 +1365,14 @@ if config.detailLevel not in valid_levels:
 **第 1 优先级: 框架工具**（推荐）
 
 ```bash
-# Python 版本
-python tools/py/project_scanner.py --max-files 2000
+# Python 版本 - 自适应输出（推荐）
+python tools/py/project_scanner.py . --exclude-standard
 
-# Node.js 版本
-node tools/js/project_scanner.js --max-files 2000
+# Node.js 版本 - 自适应输出
+node tools/js/project_scanner.js . --exclude-standard
+
+# 摘要模式（大型项目推荐，更快更省Token）
+python tools/py/project_scanner.py --mode summary --exclude-standard
 ```
 
 **优点**: 结构化输出、统一格式、功能完整  
