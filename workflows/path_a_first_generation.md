@@ -368,7 +368,30 @@ summary:
 ## Step 5: 确定子文档清单（自动）
 
 > 🎯 **目的**: 根据项目类型，自动确定需要生成的子文档  
-> 📚 **必读**: `guides/project_types.md`
+> 📚 **必读**: `core/project_types.md`（索引文档）
+
+### 执行流程
+
+1. **读取索引文档**
+   ```
+   读取 core/project_types.md（索引文档，约200行）
+   ```
+
+2. **使用决策树识别项目类型**
+   - 根据项目特征（package.json、技术栈等）
+   - 使用决策树快速定位项目类型
+
+3. **按需加载对应配置** ⭐ 关键步骤
+   ```
+   # 示例：识别为 Web 前端项目
+   读取 core/project_types/web_frontend.md（约80行）
+   ```
+   
+   **关键**: 只读取对应的1个配置文件，不读取其他12个
+
+4. **根据配置生成子文档清单**
+   - 从配置文件中提取"推荐子文档清单"
+   - 根据项目规模调整（小型/中型/大型）
 
 ### 根据项目类型确定清单
 
@@ -406,7 +429,7 @@ summary:
 | 全栈项目     | 前端 + 后端                       | 前端文档 + 后端文档                           |
 | Monorepo     | workspace 配置                    | 参见特殊场景处理                              |
 
-**详细说明**: 参见 [guides/project_types.md](../guides/project_types.md)
+**详细说明**: 参见 [core/project_types.md](../core/project_types.md) 和 [core/project_types/README.md](../core/project_types/README.md)
 
 ---
 

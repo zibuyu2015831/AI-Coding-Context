@@ -114,6 +114,8 @@ test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_con
 
 ❌ IDE 配置：
   - .vscode/
+  - .kiro
+  - .qoder
   - .idea/
   - *.swp
 ```
@@ -319,7 +321,8 @@ git add ai_coding_context/
 | 项目扫描器   | `tools/js/project_scanner.js`         | Node.js 版本（降级） |
 | Git 变更分析 | `tools/py/git_diff_analyzer.py`       | Python 版本（优先）  |
 | Git 变更分析 | `tools/js/git_diff_analyzer.js`       | Node.js 版本（降级）|
-| 摘要关联检查 | `tools/py/summary_related_checker.py` | 检查文档关联         |
+| 摘要关联检查 | `tools/py/summary_related_checker.py` | 检查文档关联（优先） |
+| 摘要关联检查 | `tools/js/summary_related_checker.js` | 检查文档关联（降级） |
 
 ### 框架边界术语
 
@@ -430,7 +433,8 @@ graph TD
 | ---------------------------------- | ------------------ | ---------------------- |
 | `core/language_rules.md`           | 文档语言确认       | **开始前必读**         |
 | `core/security_rules.md`           | 敏感信息脱敏规范   | **生成文档时必读**     |
-| `core/project_types.md`            | 项目类型识别与处理 | **决策子文档清单必读** |
+| `core/project_types.md`            | 项目类型索引与决策树 | **决策子文档清单必读** |
+| `core/project_types/*.md`          | 项目类型详细配置 | **按需加载对应类型** |
 | `core/update_triggers.md`          | 文档更新触发机制   | **生成完成后必读**     |
 | `reference/SUMMARY_FORMAT_SPEC.md` | 文档摘要规范       | **生成任意文档时必读** |
 
