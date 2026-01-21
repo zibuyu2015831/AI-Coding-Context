@@ -1,8 +1,68 @@
 # 文档更新触发机制
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  
-> **版本**: v2.2  
-> **最后更新**: 2025-11-27
+> **版本**: v2.3  
+> **最后更新**: 2025-12-11
+
+---
+
+## 🏗️ 三层架构
+
+文档更新检测采用三层架构设计:
+
+```
+Layer 3: Commit-Guided (智能层) ← V3.0新增
+  ↓ 基于
+Layer 2: Update Triggers (规则层) ← 本文档
+  ↓ 依赖
+Layer 1: Git Diff (检测层) ← Git原生能力
+```
+
+### 层级说明
+
+**Layer 1: Git Diff (检测层)**
+
+- **职责**: 检测代码变更
+- **能力**: 识别哪些文件发生了变化
+- **局限**: 无法理解变更意图
+
+**Layer 2: Update Triggers (规则层)**
+
+- **职责**: 定义更新规则和优先级
+- **能力**: 基于文件类型和变更范围判断是否需要更新文档
+- **局限**: 需要人工解释变更内容
+
+**Layer 3: Commit-Guided (智能层)** 🆕
+
+- **职责**: 自动化文档更新流程
+- **能力**: 解析结构化 commit 信息(WHAT/WHY/HOW),自动识别受影响文档
+- **优势**: 无需人工解释,直接从 commit 提取意图
+
+### 协作模式
+
+**有结构化 commit 时**:
+
+```
+Commit-Guided 解析WHAT/WHY/HOW
+  ↓
+自动映射到 P0/P1/P2 级别
+  ↓
+精准定位受影响文档
+  ↓
+生成更新草稿
+```
+
+**无结构化 commit 时**:
+
+```
+降级到 Update Triggers 传统检测
+  ↓
+基于 Git Diff + 文件类型判断
+  ↓
+提示用户补充变更信息
+```
+
+**详细说明**: 参见 [workflows/commit_guided_update.md](../workflows/commit_guided_update.md)
 
 ---
 
@@ -11,6 +71,69 @@
 **何时应该更新 AI 文档?**
 
 当项目代码发生变化后,并非所有变更都需要更新文档。本规范定义了明确的触发条件。
+
+---
+
+## 🚀 Commit-Guided 自动触发 (V3.0 新增)
+
+### 触发条件
+
+当检测到以下类型的 commit 时,自动触发文档更新流程:
+
+1. **结构化 Commit**: 包含 `prompt:` / `ai:` / `doc:` 前缀
+2. **用户明确请求**: "基于最近的 commit 更新文档"
+3. **Merge Commit**: 合并后扫描 source branch 的结构化提交
+
+### 自动优先级映射
+
+Commit-Guided 会自动将 commit 信息映射到 P0/P1/P2 级别:
+
+```yaml
+WHAT 分析:
+  "新增" + "核心模块" → P0
+  "修改" + "API" → P0
+  "重构" + "无功能变更" → P2
+
+WHY 分析:
+  包含需求编号(如PRD-xxx) → P0
+  包含"架构决策" → P0
+  包含"优化" → P1
+
+HOW 分析:
+  涉及数据库schema → P0
+  涉及API端点 → P0
+  仅代码重构 → P2
+```
+
+### 自动识别受影响文档
+
+**策略 1: 基于 related_files**
+
+检查文档摘要中的 `related_files` 字段,匹配代码变更文件
+
+**策略 2: 基于 HOW 分析**
+
+解析 HOW 中提到的模块/文件,推断需要更新的文档
+
+**策略 3: 基于传统规则**
+
+降级到本文档定义的 P0/P1/P2 规则
+
+### 降级策略
+
+**场景 1: 非结构化 Commit**
+
+- 基于 Git Diff 分析影响范围
+- 使用本文档的传统规则判断优先级
+- 提示用户补充变更意图
+
+**场景 2: 混合 Commit**
+
+- 聚合所有 commit 信息
+- 优先使用结构化信息
+- 传统 commit 作为补充
+
+**详细说明**: 参见 [workflows/commit_guided_update.md](../workflows/commit_guided_update.md)
 
 ---
 

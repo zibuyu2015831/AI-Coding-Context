@@ -115,7 +115,22 @@
 | 数据库设计师 | [database_designer_examples.md](./database_designer_examples.md)       | ✅ 已完成 |
 | API 设计师   | [api_designer_examples.md](./api_designer_examples.md)                 | ✅ 已完成 |
 
-### Language Specific 角色示例
+### Base 角色示例
+
+| 角色       | 示例文档                                                         | 状态        |
+| ---------- | ---------------------------------------------------------------- | ----------- |
+| 前端工程师 | [frontend_engineer_examples.md](./frontend_engineer_examples.md) | ✅ _已存在_ |
+| 后端工程师 | [backend_engineer_examples.md](./backend_engineer_examples.md)   | ✅ 已完成   |
+
+### Language Expert 角色示例
+
+| 角色            | 示例文档                                                         | 状态      |
+| --------------- | ---------------------------------------------------------------- | --------- |
+| Java 专家       | [java_expert_examples.md](./java_expert_examples.md)             | ✅ 已完成 |
+| Python 专家     | [python_expert_examples.md](./python_expert_examples.md)         | ✅ 已完成 |
+| TypeScript 专家 | [typescript_expert_examples.md](./typescript_expert_examples.md) | ✅ 已完成 |
+
+### 其他 Language Specific 角色示例
 
 | 角色             | 示例文档                                                           | 状态      |
 | ---------------- | ------------------------------------------------------------------ | --------- |
@@ -193,6 +208,10 @@
 - ✅ api_designer_examples.md
 - ✅ vue3_expert_examples.md
 - ✅ vue3_state_manager_examples.md
+- ✅ backend_engineer_examples.md
+- ✅ java_expert_examples.md
+- ✅ python_expert_examples.md
+- ✅ typescript_expert_examples.md
 
 ---
 

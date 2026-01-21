@@ -12,7 +12,7 @@
 
 ---
 
-## 步骤 0: 环境预检 (v2.1 新增)
+## 步骤 0: 环境预检
 
 ### 0.1 检测统计工具
 
@@ -60,6 +60,151 @@ AI 自动选择流程:
 2. 其次使用 cloc(如果可用)
 3. 再次使用 fd + wc(如果可用)
 4. 最后降级到基础命令
+
+---
+
+## 步骤 0.5: 框架边界确定 ⭐
+
+> **执行时机**: 环境预检完成后，项目检测之前  
+> **重要性**: P0 - 必须执行  
+> **目的**: 确定框架位置，避免将框架文件纳入项目分析
+
+### 为什么需要？
+
+**AI Coding Context (AICC)** 是一个辅助工具框架，**不是用户的业务代码**。  
+如果在项目检测时包含框架文件，会导致：
+
+- ❌ 项目统计数据不准确（文件数、代码行数虚高）
+- ❌ 生成的文档中包含框架自身的文件
+- ❌ 文档内容污染，混淆工具与目标
+
+### 框架识别方法
+
+**识别标志**: 包含 `AI_ENTRY_POINT.md` 的目录即为框架根目录
+
+**常见位置**:
+
+- `ai_coding_context/`（最常见）
+- `.ai/`（点开头目录）
+- `docs/ai_context/`（文档子目录）
+- 用户自定义的其他位置
+
+**检测命令**:
+
+```bash
+# Windows PowerShell
+Test-Path ai_coding_context/AI_ENTRY_POINT.md
+
+# Linux/Mac
+test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_context/" || echo "未检测到标准位置"
+```
+
+### 执行步骤
+
+#### 1. 搜索框架位置
+
+**方法 1**: 检查常见位置
+
+```bash
+# 依次检查
+test -f ai_coding_context/AI_ENTRY_POINT.md
+test -f .ai/AI_ENTRY_POINT.md
+test -f docs/ai_context/AI_ENTRY_POINT.md
+```
+
+**方法 2**: 遍历根目录查找
+
+```bash
+# Linux/Mac
+find . -maxdepth 2 -name "AI_ENTRY_POINT.md" 2>/dev/null
+
+# Windows PowerShell
+Get-ChildItem -Recurse -Depth 2 -Filter "AI_ENTRY_POINT.md" -ErrorAction SilentlyContinue
+```
+
+#### 2. 确认框架位置
+
+**输出示例**:
+
+```markdown
+✅ 框架边界确认
+
+**框架位置**: `ai_coding_context/`  
+**识别方式**: 检测到 AI_ENTRY_POINT.md  
+**排除策略**: 在所有扫描命令中使用 `--exclude-standard` 或手动排除
+```
+
+#### 3. 记录到分析方案
+
+在后续生成的 `generation_plan.md` 中记录：
+
+```markdown
+## 框架边界确认
+
+- 框架位置: `ai_coding_context/`
+- 排除目录: `ai_coding_context/`, `node_modules/`, `.git/`
+- 确认方式: 自动检测到 AI_ENTRY_POINT.md
+```
+
+### 特殊场景处理
+
+#### 场景 1: 未检测到框架
+
+**可能原因**:
+
+- 框架在项目根目录之外（共享框架）
+- 框架被重命名为非标准名称
+
+**处理方式**:
+
+```markdown
+⚠️ 未检测到框架位置
+
+**检查结果**:
+
+- 未在常见位置找到 AI_ENTRY_POINT.md
+- 可能原因: 框架在项目外部或被重命名
+
+**处理**:
+
+- 继续执行项目检测
+- 在扫描时使用 `--exclude-standard` 自动检测并排除
+```
+
+#### 场景 2: 检测到多个框架位置
+
+**可能原因**:
+
+- 用户复制了框架
+- 存在多个版本的框架
+
+**处理方式**:
+
+```markdown
+⚠️ 检测到多个框架位置
+
+**发现的位置**:
+
+- ai_coding_context/AI_ENTRY_POINT.md
+- .ai/AI_ENTRY_POINT.md
+
+**处理**:
+
+- 排除所有检测到的框架目录
+- 在方案中记录此情况
+- 建议用户清理冗余框架
+```
+
+### 验证清单
+
+在继续执行项目检测之前，确认：
+
+- [ ] 已尝试检测框架位置
+- [ ] 已记录框架位置（如果检测到）
+- [ ] 已准备好在扫描命令中排除框架目录
+- [ ] 如有疑问，已标记为待确认事项
+
+**完成此步骤后，方可继续步骤 1（项目检测）**
 
 ---
 
@@ -125,7 +270,7 @@ ls package.json 2>/dev/null && echo "Node.js项目"
 Test-Path package.json
 ```
 
-### 1.5 多语言项目主语言判断 (v2.3 新增)
+### 1.5 多语言项目主语言判断
 
 **适用场景**: 项目包含多种编程语言时
 
@@ -340,19 +485,18 @@ C. 混合项目（分别处理）
   - 排除目录: [列出实际排除的目录]
 ```
 
-````
-
 ---
 
-## 🔧 常见问题处理 (v2.3新增)
+## 🔧 常见问题处理
 
-### 问题1: 统计工具不可用
+### 问题 1: 统计工具不可用
 
 **错误场景**:
+
 ```bash
 $ tokei
 bash: tokei: command not found
-````
+```
 
 **处理方案**: 自动降级
 

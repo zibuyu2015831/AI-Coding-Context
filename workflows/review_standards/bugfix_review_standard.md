@@ -32,7 +32,26 @@
 - [ ] 是否有单元测试？
 - [ ] 是否有验收标准？
 
+### 6. Commit 质量 (权重: 5%) 🆕
+
+- [ ] Commit message 是否清晰说明根因和修复方式？
+- [ ] WHY 是否包含根因分析？
+- [ ] HOW 是否说明了影响范围和测试方法？
+- [ ] 是否关联了 Issue 编号？
+
+### 7. Git 安全规范 (权重: 5%) 🆕
+
+- [ ] 是否在 feature/bugfix 分支修复？
+- [ ] 是否避免在保护分支直接 commit？
+- [ ] 是否避免使用危险的历史重写命令？
+- [ ] Hotfix 是否有明确标记和审批？
+
 ## 合格标准
 
 - **合格线**: ≥ 75 分 (Bug 修复要求更严格)
 - **优秀线**: ≥ 90 分
+
+## 参考
+
+- Commit 质量评分: `tools/py/commit_quality_scorer.py`
+- Git 安全检查: `workflows/git_safety_workflow.md`

@@ -5,9 +5,9 @@
 ID: runtime.design_facilitator
 名称: 设计引导者
 类型: runtime
-版本: v1.0
+版本: v3.0
 创建: 2025-12-02
-更新: 2025-12-02
+更新: 2025-12-18
 来源: 框架内置
 改造状态: 已通用化
 语言支持: 通用
@@ -274,7 +274,77 @@ _执行者: Facilitator_
 - **任务**: 输出结构化决策方案,无缝交接给 Plan Generator。
 - **输出**: 完整的决策文档 (见"输出要求"章节)。
 
+#### Commit 指导 🆕
+
+在最终决策输出中,应包含**建议的 Commit 策略**,帮助开发者规范提交:
+
+**输出内容**:
+
+1. **Commit 拆分建议**: 根据任务复杂度,建议拆分为几个独立 commit
+2. **每个 Commit 的模板**: 提供符合 `prompt:` 格式的 WHAT/WHY/HOW 模板
+3. **提交顺序**: 说明 commit 的先后顺序和依赖关系
+
+**示例输出**:
+
+````markdown
+## Commit 指导
+
+**建议 Commit 策略**: 分 3 个 commit 提交
+
+### Commit 1 - 数据模型
+
+```bash
+prompt(feature): User模型新增积分字段
+
+WHAT: 在User模型添加points字段,支持积分记录
+WHY: 对应需求PRD-2024-156第1阶段,建立积分数据基础
+HOW:
+- 新增points字段(Integer, default=0)
+- 生成migration文件
+- 单元测试覆盖积分初始化和累加
+```
+````
+
+### Commit 2 - API 实现
+
+```bash
+prompt(feature): 实现积分API端点
+
+WHAT: 新增/api/points端点,支持积分查询和扣减
+WHY: 对应需求PRD-2024-156第2阶段,提供积分操作接口
+HOW:
+- GET /api/points/:userId 查询积分
+- POST /api/points/deduct 扣减积分(使用乐观锁)
+- 集成测试覆盖并发扣减场景
+```
+
+### Commit 3 - 文档更新
+
+```bash
+prompt(doc): 更新积分系统文档
+
+WHAT: 更新API文档和数据库Schema文档
+WHY: 保持文档与代码同步
+HOW:
+- api_layer.md新增积分API章节
+- database_schema.md更新User表结构
+```
+
+**提交顺序**: 1 → 2 → 3 (数据模型 → 业务逻辑 → 文档)
+
+```
+
+**关键原则**:
+
+- 每个 commit 应独立可测试和回滚
+- WHAT 应清晰描述单一职责
+- WHY 应关联业务需求或技术决策
+- HOW 应说明关键实现细节和风险点
+
+**参考**: 详见 `workflows/commit_guided_update.md`
+
 ---
 
-**模板版本**: v1.0  
-**最后更新**: 2025-12-02
+**模板版本**: v1.1
+**最后更新**: 2025-12-11
+```

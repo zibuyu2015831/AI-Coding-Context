@@ -5,9 +5,9 @@
 ID: language_specific.base.frontend_engineer
 名称: 前端工程师 (基础)
 类型: language_specific
-版本: v1.0
+版本: v3.0
 创建: 2025-11-29
-更新: 2025-11-29
+更新: 2025-12-18
 来源: 通用前端最佳实践
 改造状态: 原创基础角色
 语言支持: HTML, CSS, JavaScript, TypeScript

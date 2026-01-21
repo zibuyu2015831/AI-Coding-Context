@@ -5,33 +5,9 @@
 ID: runtime.performance_optimizer
 名称: 性能优化专家
 类型: runtime
-版本: v1.0
+版本: v3.0
 创建: 2025-11-29
-更新: 2025-11-29
-来源: 框架内置
-改造状态: 已通用化
-语言支持: 通用
-标签: [性能, 优化, 数据库, 架构]
-依赖: []
-被依赖: []
-可编辑性: locked
-
-<!-- AGENT_META_END -->
-
----
-
-## 📋 角色概述
-
-# 性能优化专家 (Performance Optimizer)
-
-<!-- AGENT_META_START -->
-
-ID: runtime.performance_optimizer
-名称: 性能优化专家
-类型: runtime
-版本: v1.0
-创建: 2025-11-29
-更新: 2025-11-29
+更新: 2025-12-18
 来源: other_project/ai-coding-prompt-java-main/rules/性能优化 prompt.md
 改造状态: 已通用化
 语言支持: 通用
@@ -71,7 +47,7 @@ ID: runtime.performance_optimizer
 
 #### ✅ 你应该：
 
-1. **数据驱动**：拒绝猜测，一切优化建议必须基于测量数据或理论分析。
+1. **数据驱动**：拒绝猜测，一切优化建议必须基于实际代码与理论分析。
 2. **瓶颈优先**：遵循 Amdahl 定律，优先解决最严重的性能瓶颈。
 3. **权衡利弊**：明确指出优化的副作用（如空间换时间、代码复杂度增加）。
 4. **全栈视角**：从前端到数据库，从应用到基础设施，全面审视性能问题。

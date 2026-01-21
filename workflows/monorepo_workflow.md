@@ -383,6 +383,253 @@ C. 仅为特定子项目生成（部分生成）
 
 ---
 
+## 🔄 Commit-Guided 跨 Package 影响分析 (V3.0 新增)
+
+### 概述
+
+在 Monorepo 场景下,一个 commit 可能影响多个 package。Commit-Guided 文档更新机制需要能够:
+
+1. 识别 commit 影响了哪些 package
+2. 自动更新所有受影响 package 的文档
+3. 在 HOW 字段中明确标注 Affected Packages
+
+### HOW 字段的 Affected Packages 格式
+
+**标准格式**:
+
+```bash
+git commit -m "prompt(feature): 新增用户积分系统" \
+  -m "WHAT: 实现积分累积和兑换功能
+WHY: 提升用户活跃度,对应需求PRD-2024-156
+HOW:
+- Affected Packages: @workspace/web-app, @workspace/shared-utils
+- User模型新增points字段 (shared-utils)
+- API端点/api/points (web-app)
+- 使用乐观锁避免并发问题"
+```
+
+**关键要素**:
+
+- **Affected Packages**: 必须在 HOW 的第一行明确列出
+- **格式**: 使用 package 的完整名称,逗号分隔
+- **详细说明**: 在后续行中说明每个 package 的具体变更
+
+### commit_parser 的跨 Package 支持
+
+**解析 Affected Packages**:
+
+```bash
+# 解析commit并提取Affected Packages
+python tools/py/commit_parser.py --commit abc123 --extract-packages
+```
+
+**输出示例**:
+
+```json
+{
+  "commit_id": "abc123",
+  "type": "prompt:feature",
+  "what": "新增用户积分系统",
+  "why": "提升用户活跃度,对应需求PRD-2024-156",
+  "how": "...",
+  "affected_packages": ["@workspace/web-app", "@workspace/shared-utils"],
+  "package_changes": {
+    "@workspace/shared-utils": "User模型新增points字段",
+    "@workspace/web-app": "API端点/api/points"
+  }
+}
+```
+
+### 自动识别受影响的文档
+
+**策略 1: 基于 Affected Packages**
+
+```bash
+# 识别需要更新的文档
+python tools/py/commit_parser.py --commit abc123 | \
+python tools/py/summary_related_checker.py --from-stdin --monorepo-mode
+```
+
+**输出示例**:
+
+```json
+{
+  "affected_documents": [
+    {
+      "package": "@workspace/web-app",
+      "file": "packages/web-app/dev_docs/api_layer.md",
+      "priority": "P0",
+      "reason": "commit abc123 新增了积分API"
+    },
+    {
+      "package": "@workspace/shared-utils",
+      "file": "packages/shared-utils/dev_docs/data_models.md",
+      "priority": "P0",
+      "reason": "commit abc123 修改了User模型"
+    }
+  ]
+}
+```
+
+**策略 2: 基于代码 diff 自动推断**
+
+如果 commit 没有明确标注 Affected Packages,工具会基于 diff 自动推断:
+
+```bash
+# 自动推断受影响的package
+python tools/py/git_diff_analyzer.py --commit abc123 --detect-packages
+```
+
+**输出示例**:
+
+```json
+{
+  "changed_files": [
+    "packages/web-app/src/api/points.ts",
+    "packages/shared-utils/src/models/user.ts"
+  ],
+  "inferred_packages": ["@workspace/web-app", "@workspace/shared-utils"],
+  "confidence": 0.95
+}
+```
+
+### 跨 Package 文档更新流程
+
+**完整示例**:
+
+```markdown
+📝 检测到跨 Package 变更
+
+**Commit**: abc123 - prompt(feature): 新增用户积分系统
+
+**Affected Packages**: 2 个
+
+1. @workspace/web-app
+2. @workspace/shared-utils
+
+**受影响的文档**:
+
+### @workspace/web-app
+
+- packages/web-app/dev_docs/api_layer.md (P0)
+  - 新增积分 API 章节
+
+### @workspace/shared-utils
+
+- packages/shared-utils/dev_docs/data_models.md (P0)
+  - 更新 User 模型定义
+
+**更新策略**:
+
+选项 1: 自动生成所有受影响文档的更新草稿 (推荐)
+选项 2: 逐个 package 手动更新
+选项 3: 仅更新指定 package
+
+请选择: 1 / 2 / 3-[package 名]
+```
+
+### 依赖关系分析
+
+**检测 Package 间依赖**:
+
+```bash
+# 分析package依赖关系
+python tools/py/monorepo_analyzer.py --detect-dependencies
+```
+
+**输出示例**:
+
+```json
+{
+  "dependencies": {
+    "@workspace/web-app": ["@workspace/shared-utils", "@workspace/api-client"],
+    "@workspace/mobile-app": ["@workspace/shared-utils"],
+    "@workspace/shared-utils": []
+  },
+  "dependency_graph": "..."
+}
+```
+
+**影响传播分析**:
+
+当修改 `@workspace/shared-utils` 时,自动识别依赖它的 package:
+
+```markdown
+⚠️ 检测到修改了共享 package: @workspace/shared-utils
+
+**依赖此 package 的项目**:
+
+- @workspace/web-app
+- @workspace/mobile-app
+
+**建议**:
+
+1. 更新 shared-utils 的文档
+2. 检查 web-app 和 mobile-app 是否需要更新文档
+3. 如果是 breaking change,更新所有依赖项的文档
+```
+
+### 最佳实践
+
+**1. 始终标注 Affected Packages**
+
+```bash
+# ✅ 推荐
+git commit -m "prompt(feature): 新增积分系统" \
+  -m "WHAT: ...
+WHY: ...
+HOW:
+- Affected Packages: @workspace/web-app, @workspace/shared-utils
+- ..."
+
+# ❌ 不推荐(需要工具自动推断)
+git commit -m "prompt(feature): 新增积分系统" \
+  -m "WHAT: ...
+WHY: ...
+HOW: User模型新增points字段,API端点/api/points"
+```
+
+**2. 明确每个 Package 的变更**
+
+```bash
+HOW:
+- Affected Packages: @workspace/web-app, @workspace/shared-utils
+- @workspace/shared-utils: User模型新增points字段,迁移文件0015_add_points.py
+- @workspace/web-app: API端点/api/points,使用乐观锁
+```
+
+**3. Breaking Changes 特殊标注**
+
+```bash
+git commit -m "prompt(refactor): 重构User模型 [BREAKING]" \
+  -m "WHAT: User模型重构,移除deprecated字段
+WHY: 清理技术债,统一数据模型
+HOW:
+- Affected Packages: @workspace/shared-utils, @workspace/web-app, @workspace/mobile-app
+- Breaking Change: 移除User.old_field字段
+- Migration: 参见migration_guide.md"
+```
+
+### 工具支持
+
+**Monorepo 专用工具**:
+
+```bash
+# 1. 检测Monorepo结构
+python tools/py/monorepo_analyzer.py --detect
+
+# 2. 分析package依赖
+python tools/py/monorepo_analyzer.py --detect-dependencies
+
+# 3. 跨package commit分析
+python tools/py/commit_parser.py --commit abc123 --monorepo-mode
+
+# 4. 批量更新多个package的文档
+python tools/py/doc_updater.py --packages "web-app,shared-utils" --commit abc123
+```
+
+---
+
 ## ⚠️ 注意事项
 
 ### 必须做的 ✅

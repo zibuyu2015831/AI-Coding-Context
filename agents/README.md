@@ -1,6 +1,6 @@
 # AI 角色库 (AI Agent Library)
 
-**版本**: v1.0  
+**版本**: v3.0  
 **创建**: 2025-11-29  
 **状态**: 🚧 建设中
 
@@ -72,6 +72,25 @@ ai_agents/
 | -------------------------------------- | ---------------- | ----------------------- | --------- |
 | `language_specific.vue3_expert`        | Vue 3 专家       | Vue 3 + Composition API | ✅ 已完成 |
 | `language_specific.vue3_state_manager` | Vue 3 状态管理师 | Vue 3 + Pinia           | ✅ 已完成 |
+
+### Base 角色（基础职能）
+
+通用基础职能角色：
+
+| 角色 ID                                    | 中文名称   | 职责                 | 状态      |
+| ------------------------------------------ | ---------- | -------------------- | --------- |
+| `language_specific.base.frontend_engineer` | 前端工程师 | Web 前端界面开发     | ✅ 已完成 |
+| `language_specific.base.backend_engineer`  | 后端工程师 | 服务端逻辑与接口开发 | ✅ 已完成 |
+
+### Language Expert (语言专家)
+
+通用编程语言专家角色：
+
+| 角色 ID                               | 中文名称        | 技术栈                  | 状态      |
+| ------------------------------------- | --------------- | ----------------------- | --------- |
+| `language_specific.java.expert`       | Java 专家       | Java SE/EE, Spring Boot | ✅ 已完成 |
+| `language_specific.python.expert`     | Python 专家     | Python, Django/FastAPI  | ✅ 已完成 |
+| `language_specific.typescript.expert` | TypeScript 专家 | TS 类型系统, 工程化配置 | ✅ 已完成 |
 
 ---
 

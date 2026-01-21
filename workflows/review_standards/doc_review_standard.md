@@ -32,7 +32,19 @@
 - [ ] 风格是否与现有文档保持一致？
 - [ ] 是否更新了所有相关联的文档？
 
+### 6. Commit 质量 (权重: 10%) 🆕
+
+- [ ] Commit message 是否清晰说明文档更新内容？
+- [ ] WHAT 是否说明更新了哪些文档？
+- [ ] WHY 是否说明文档更新的触发原因（代码变更/需求变更）？
+- [ ] 是否使用 prompt(doc): 前缀？
+
 ## 合格标准
 
 - **合格线**: ≥ 75 分
 - **优秀线**: ≥ 90 分
+
+## 参考
+
+- Commit 质量评分: `tools/py/commit_quality_scorer.py`
+- Commit 引导更新: `workflows/commit_guided_update.md`

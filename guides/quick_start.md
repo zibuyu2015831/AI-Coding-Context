@@ -119,7 +119,7 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 
 请严格按照审核通过的方案生成完整文档：
 
-1. 生成主文档 dev_docs/AI_Coding_Context.md
+1. 生成主文档 ai_coding_context.md
 2. 生成高优先级子文档（3个）
 3. 创建 plans/ 和 knowledge/ 目录
 4. 确保所有数据来自方案中标注的实际代码

@@ -1,496 +1,138 @@
-# 项目类型适配指南
+---
+title: 项目类型索引与决策树
+summary: 提供13种项目类型的快速决策树和索引，支持按需加载对应的详细配置文档。包括Web前端、后端API、全栈、CLI工具、库/SDK、脚本、移动应用、桌面应用、Serverless、容器化、数据科学、微服务架构、AI/LLM应用。
+keywords: project-types | index | decision-tree | on-demand-loading
+scope: 项目类型识别与按需加载
+related_files: core/project_types/*.md | AI_ENTRY_POINT.md | workflows/path_a_first_generation.md
+dependencies: 无
+verified_at: 2026-01-21
+---
 
-> **用途**: 指导如何为不同类型的项目生成合适的文档体系  
-> **版本**: v1.0  
-> **最后更新**: 2025-11-27
+# 项目类型索引与决策树
+
+> **用途**: 快速识别项目类型并按需加载对应的详细配置  
+> **版本**: v3.0  
+> **最后更新**: 2026-01-21
 
 ---
 
 ## 📋 概述
 
-本指南覆盖 11 种项目类型，支持 25+主流框架，每种类型都提供：
+本框架支持 **13 种项目类型**，每种类型都有独立的详细配置文档。
 
-- 推荐的子文档清单
-- 特殊关注点
-- AI 分析重点
-- 代码模式示例
+### 🎯 使用流程
 
----
-
-## 🌐 Web 前端项目
-
-### 适用框架
-
-Vue.js / React / Angular / Svelte / Solid.js
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称                  | 用途                            |
-| ------ | ------------------------- | ------------------------------- |
-| 🔴 高  | `api_layer.md`            | API 调用规范                    |
-| 🔴 高  | `state_management.md`     | 状态管理（Pinia/Redux/Zustand） |
-| 🔴 高  | `routing_guide.md`        | 路由与权限                      |
-| 🟡 中  | `component_guide.md`      | 组件开发规范                    |
-| 🟡 中  | `styling_guide.md`        | CSS/样式方案                    |
-| 🟡 中  | `form_validation.md`      | 表单验证                        |
-| 🟢 低  | `internationalization.md` | 国际化方案                      |
-
-### 特殊关注点
-
-- UI 组件库使用（Element Plus/Ant Design/MUI 等）
-- CSS 方案（Tailwind/UnoCSS/CSS Modules）
-- 构建工具配置（Vite/Webpack/Rollup）
-- SEO 优化策略（如使用 SSR）
-
-### 核心代码模式
-
-```typescript
-// API调用模式
-import { api } from '@/api'
-const { data, loading, error } = await api.get('/endpoint')
-
-// 组件开发模式
-<script setup lang="ts">
-// Props, Emits, State, Methods
-</script>
-
-// 状态管理模式
-const store = useStore()
-const { state, actions } = storeToRefs(store)
-```
+1. **使用决策树** → 快速识别项目类型
+2. **按需加载** → 只读取对应的1个配置文档（节省70% Token）
+3. **生成文档** → 根据配置生成子文档清单
 
 ---
 
-## 🔧 后端 API 项目
+## 🗂️ 项目类型列表
 
-### 适用框架
+### 前端与全栈
 
-**Node.js**: Express / Fastify / NestJS / Koa  
-**Python**: Flask / FastAPI / Django  
-**Java**: Spring Boot / Quarkus  
-**Go**: Gin / Echo / Fiber  
-**Ruby**: Rails / Sinatra  
-**PHP**: Laravel / Symfony  
-**.NET**: ASP.NET Core  
-**Rust**: Actix-web / Rocket
+- [Web 前端项目](./project_types/web_frontend.md) - Vue.js / React / Angular / Svelte
+- [全栈项目](./project_types/fullstack.md) - Next.js / Nuxt / Remix / SvelteKit
+- [移动应用项目](./project_types/mobile_app.md) - React Native / Flutter / 原生开发
+- [桌面应用项目](./project_types/desktop_app.md) - Electron / Tauri / Qt
 
-### 推荐子文档清单
+### 后端与服务
 
-| 优先级 | 文档名称                      | 用途                 |
-| ------ | ----------------------------- | -------------------- |
-| 🔴 高  | `api_design.md`               | RESTful/GraphQL 设计 |
-| 🔴 高  | `database_schema.md`          | 数据库模型与关系     |
-| 🔴 高  | `authentication.md`           | 认证与授权           |
-| 🟡 中  | `middleware_guide.md`         | 中间件使用           |
-| 🟡 中  | `error_handling.md`           | 错误处理与日志       |
-| 🟡 中  | `testing_guide.md`            | 单元/集成测试        |
-| 🟢 低  | `performance_optimization.md` | 性能优化策略         |
+- [后端 API 项目](./project_types/backend_api.md) - Express / FastAPI / Spring Boot / Gin
+- [微服务架构](./project_types/microservices.md) - 分布式服务架构（新增）
+- [Serverless 项目](./project_types/serverless.md) - AWS Lambda / Cloud Functions
+- [容器化项目](./project_types/containerized.md) - Docker / Kubernetes
 
-### 特殊关注点
+### 工具与库
 
-- ORM/ODM 使用
-  - Node.js: Prisma / TypeORM / Mongoose / Sequelize
-  - Python: SQLAlchemy / Django ORM / Tortoise ORM
-  - Java: Hibernate / JPA / MyBatis
-  - Ruby: ActiveRecord
-  - PHP: Eloquent / Doctrine
-- 数据验证
-  - Node.js: Zod / Joi / class-validator
-  - Python: Pydantic / Marshmallow
-  - Java: Bean Validation
-  - Go: validator
-- 缓存策略（Redis/Memcached）
-- 消息队列（RabbitMQ/Kafka/NATS）
-- 日志系统（Winston/Pino/structlog/Logback）
+- [CLI 工具项目](./project_types/cli_tool.md) - 命令行工具
+- [库/SDK 项目](./project_types/library_sdk.md) - npm 包 / PyPI 包
+- [脚本项目](./project_types/script.md) - Python 脚本 / Shell 脚本
 
-### 核心代码模式
+### 数据与 AI
 
-```typescript
-// 路由定义
-router.post('/users', authenticate, validate(schema), userController.create)
-
-// 数据库模型
-const User = prisma.defineModel({...})
-
-// 中间件
-const authMiddleware = async (req, res, next) => {...}
-```
+- [数据科学项目](./project_types/data_science.md) - Jupyter / 机器学习
+- [AI/LLM 应用](./project_types/ai_llm_app.md) - RAG / Prompt 工程（新增）
 
 ---
 
-## 📜 脚本项目（新增）
-
-### 适用场景
-
-Python 脚本 / Shell 脚本 / 数据处理 / 自动化任务
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称            | 用途         |
-| ------ | ------------------- | ------------ |
-| 🔴 高  | `script_usage.md`   | 脚本使用说明 |
-| 🔴 高  | `configuration.md`  | 配置文件说明 |
-| 🟡 中  | `data_flow.md`      | 数据流程图   |
-| 🟡 中  | `error_handling.md` | 异常处理机制 |
-| 🟢 低  | `scheduling.md`     | 定时任务配置 |
-
-### 特殊关注点
-
-- 环境依赖（Python 虚拟环境/系统依赖）
-- 配置管理（环境变量/配置文件）
-- 日志输出（位置/格式/轮转）
-- 错误恢复机制
-- 定时任务设置（cron/schedule）
-
-### 主文档特殊章节
-
-````markdown
-## 🚀 快速开始
-
-### 环境准备
-
-```bash
-# Python项目
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Shell脚本
-chmod +x script.sh
-```
-````
-
-### 运行示例
-
-```bash
-# 基本运行
-python main.py --config config.yaml
-
-# 定时运行
-0 2 * * * /path/to/script.py
-```
-
-## 📁 关键文件说明
-
-- `config.yaml` - 配置文件
-- `requirements.txt` - Python 依赖
-- `logs/` - 日志目录
-- `data/` - 数据目录
-
-````
-
----
-
-## 🔨 CLI工具项目（新增）
-
-### 适用场景
-命令行工具 / 开发者工具 / 运维工具
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `cli_usage.md` | 命令使用手册 |
-| 🔴 高 | `installation.md` | 安装与配置 |
-| 🟡 中 | `plugin_system.md` | 插件系统（如有） |
-| 🟡 中 | `configuration.md` | 配置文件说明 |
-| 🟢 低 | `contributing.md` | 贡献指南 |
-
-### 特殊关注点
-- 命令结构（commander/yargs/click/cobra）
-- 参数验证
-- 交互式提示（inquirer/questionary）
-- 输出格式（表格/JSON/进度条）
-- 错误提示友好性
-- 自动补全支持
-
-### 核心代码模式
-```typescript
-// 命令定义
-program
-  .command('init')
-  .option('-t, --template <type>')
-  .action(async (options) => {
-    // 实现
-  })
-
-// 交互式输入
-const answers = await inquirer.prompt([...])
-
-// 友好输出
-console.log(chalk.green('✓ Success!'))
-spinner.start('Processing...')
-````
-
----
-
-## 📦 库/SDK 项目（新增）
-
-### 适用场景
-
-npm 包 / PyPI 包 / Go module / Rust crate
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称             | 用途         |
-| ------ | -------------------- | ------------ |
-| 🔴 高  | `api_reference.md`   | API 文档     |
-| 🔴 高  | `getting_started.md` | 快速开始     |
-| 🔴 高  | `examples.md`        | 使用示例     |
-| 🟡 中  | `migration_guide.md` | 版本迁移指南 |
-| 🟡 中  | `contributing.md`    | 贡献指南     |
-| 🟢 低  | `changelog.md`       | 变更日志     |
-
-### 特殊关注点
-
-- API 设计一致性
-- 向后兼容性
-- 类型定义（TypeScript 声明文件）
-- 打包配置（UMD/ESM/CJS）
-- 版本管理策略（semver）
-- 文档自动生成（JSDoc/typedoc/Sphinx）
-
-### 主文档特殊章节
-
-````markdown
-## 📦 安装
-
-```bash
-npm install package-name
-# 或
-pip install package-name
-```
-````
-
-## 🚀 快速开始
-
-```typescript
-import { feature } from "package-name";
-
-const result = feature({ option: value });
-```
-
-## 📖 API 文档
-
-详见 [API Reference](./api_reference.md)
-
-## 🔄 版本兼容
-
-| 版本 | Node.js | TypeScript |
-| ---- | ------- | ---------- |
-| 2.x  | >=14    | >=4.5      |
-| 1.x  | >=12    | >=4.0      |
-
----
-
-## 🎲 全栈项目
-
-### 适用框架
-
-Next.js / Nuxt / Remix / SvelteKit / Astro / Qwik
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `architecture_overview.md` | 前后端架构 |
-| 🔴 高 | `api_layer.md` | API层（前端） |
-| 🔴 高 | `data_fetching.md` | 数据获取策略 |
-| 🟡 中 | `database_schema.md` | 数据库设计 |
-| 🟡 中 | `deployment_guide.md` | 部署流程 |
-| 🟡 中 | `testing_guide.md` | E2E测试 |
-
-### 特殊关注点
-- SSR/SSG/ISR策略
-- API Routes设计
-- 数据获取模式（getServerSideProps等）
-- 认证流程（NextAuth等）
-- Monorepo管理（Turborepo/Nx）
-
----
-
-## 📲 移动应用项目
-
-### 适用框架
-
-React Native / Flutter / Ionic / NativeScript
-**原生**: SwiftUI (iOS) / Jetpack Compose (Android)
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `platform_specific.md` | 平台特定代码 |
-| 🔴 高 | `navigation.md` | 导航结构 |
-| 🔴 高 | `native_modules.md` | 原生模块 |
-| 🟡 中 | `state_management.md` | 状态管理 |
-| 🟡 中 | `build_release.md` | 构建与发布 |
-| 🟡 中 | `testing_guide.md` | 测试策略 |
-
-### 特殊关注点
-- 原生依赖管理（CocoaPods/Gradle）
-- 热更新方案（CodePush）
-- 性能优化（列表渲染/图片优化）
-- 平台差异处理
-- 打包签名配置
-
----
-
-## 🖥️ 桌面应用项目
-
-### 适用框架
-Electron / Tauri / Qt
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `architecture.md` | 主进程/渲染进程 |
-| 🔴 高 | `ipc_communication.md` | 进程间通信 |
-| 🟡 中 | `native_integration.md` | 系统集成 |
-| 🟡 中 | `auto_update.md` | 自动更新机制 |
-| 🟡 中 | `packaging.md` | 打包与分发 |
-
----
-
-## ☁️ Serverless项目（新增）
-
-### 适用平台
-AWS Lambda / Azure Functions / Google Cloud Functions / Vercel/Netlify Functions
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `function_structure.md` | 函数组织结构 |
-| 🔴 高 | `deployment.md` | 部署配置 |
-| 🟡 中 | `environment_vars.md` | 环境变量管理 |
-| 🟡 中 | `cold_start_optimization.md` | 冷启动优化 |
-| 🟡 中 | `monitoring.md` | 监控与日志 |
-
-### 特殊关注点
-- 函数触发器配置
-- 权限设置（IAM/RBAC）
-- 资源限制（内存/超时）
-- 冷启动优化
-- 成本优化策略
-
----
-
-## 🐳 容器化项目
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `dockerfile_guide.md` | Dockerfile说明 |
-| 🔴 高 | `docker_compose.md` | 本地开发环境 |
-| 🟡 中 | `kubernetes.md` | K8s部署（如适用） |
-| 🟡 中 | `ci_cd.md` | CI/CD流程 |
-
----
-
-## 📊 数据科学项目（新增）
-
-### 适用场景
-
-Jupyter Notebook / 数据分析 / 机器学习 / 深度学习
-
-**常用框架**:
-- **数据处理**: Pandas / NumPy / Polars
-- **机器学习**: Scikit-learn / XGBoost / LightGBM
-- **深度学习**: TensorFlow / PyTorch / JAX
-- **可视化**: Matplotlib / Seaborn / Plotly
-
-### 推荐子文档清单
-
-| 优先级 | 文档名称 | 用途 |
-|-------|---------|------|
-| 🔴 高 | `data_pipeline.md` | 数据处理流程 |
-| 🔴 高 | `model_documentation.md` | 模型文档 |
-| 🟡 中 | `experiments.md` | 实验记录 |
-| 🟡 中 | `environment_setup.md` | 环境配置 |
-| 🟢 低 | `visualization.md` | 可视化说明 |
-
-### 特殊关注点
-- 数据来源与格式（CSV/Parquet/HDF5）
-- 特征工程说明
-- 模型参数调优（网格搜索/贝叶斯优化）
-- 实验结果记录（MLflow/Weights & Biases）
-- Notebook组织结构
-- 依赖管理（conda/poetry/pip-tools）
-- GPU环境配置（CUDA/cuDNN）
-- 模型版本管理
-- 数据版本控制（DVC）
-
----
-
-## 🔄 选择指南
-
-### 快速决策树
+## 🔀 快速决策树
 
 ```mermaid
 graph TD
-    A[项目类型?] --> B{用户界面?}
-    B -->|是| C{运行环境?}
-    C -->|浏览器| D[Web前端]
-    C -->|移动设备| E[移动应用]
-    C -->|桌面| F[桌面应用]
-
-    B -->|否| G{提供API?}
-    G -->|是| H[后端API]
-    G -->|否| I{用途?}
-
-    I -->|工具| J[CLI工具]
-    I -->|库| K[库/SDK]
-    I -->|分析| L[数据科学]
-    I -->|自动化| M[脚本项目]
-````
-
-### 混合项目
-
-如果项目包含多个类型（如全栈+移动端），建议：
-
-1. 在主文档中说明架构组成
-2. 为每个部分创建独立的子文档集
-3. 建立清晰的模块划分
-
----
-
-## 📝 使用建议
-
-1. **先确定项目类型** - 使用决策树
-2. **选择对应的文档清单** - 从高优先级开始
-3. **根据项目特点调整** - 增删文档
-4. **保持文档同步** - 代码变更时更新
-
----
-
-## 🎯 总结
-
-不同项目类型有不同的关注点，但核心原则相同：
-
-- ✅ 基于实际代码生成
-- ✅ 提供清晰的使用指南
-- ✅ 包含实用的代码示例
-- ✅ 保持文档新鲜度
+    Start[开始识别项目类型] --> HasUI{是否有用户界面?}
+    
+    HasUI -->|是| UIType{运行环境?}
+    UIType -->|浏览器| WebCheck{是否包含后端?}
+    WebCheck -->|是| Fullstack[全栈项目]
+    WebCheck -->|否| Frontend[Web前端项目]
+    UIType -->|移动设备| Mobile[移动应用项目]
+    UIType -->|桌面系统| Desktop[桌面应用项目]
+    
+    HasUI -->|否| BackendCheck{是否提供API?}
+    BackendCheck -->|是| ServiceType{架构类型?}
+    ServiceType -->|单体应用| Backend[后端API项目]
+    ServiceType -->|分布式服务| Microservices[微服务架构]
+    ServiceType -->|函数计算| Serverless[Serverless项目]
+    
+    BackendCheck -->|否| Purpose{主要用途?}
+    Purpose -->|命令行工具| CLI[CLI工具项目]
+    Purpose -->|可复用库| Library[库/SDK项目]
+    Purpose -->|数据分析/ML| DataScience[数据科学项目]
+    Purpose -->|AI应用| AILLM[AI/LLM应用]
+    Purpose -->|自动化任务| Script[脚本项目]
+    Purpose -->|容器部署| Container[容器化项目]
+    
+    style Fullstack fill:#e1f5ff
+    style Frontend fill:#e1f5ff
+    style Mobile fill:#e1f5ff
+    style Desktop fill:#e1f5ff
+    style Backend fill:#fff4e6
+    style Microservices fill:#fff4e6
+    style Serverless fill:#fff4e6
+    style CLI fill:#f3e5f5
+    style Library fill:#f3e5f5
+    style DataScience fill:#e8f5e9
+    style AILLM fill:#e8f5e9
+    style Script fill:#fce4ec
+    style Container fill:#fff3e0
+```
 
 ---
 
-## 🔀 混合项目类型处理规范 (v2.2 新增)
+## 🎯 项目规模考量
 
-> **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)
+根据项目规模调整子文档清单：
+
+### 小型项目（< 10 个文件）
+- 只生成 🔴 高优先级文档
+- 简化架构说明
+- 合并相关主题
+
+### 中型项目（10-50 个文件）
+- 生成 🔴 高 + 🟡 中优先级文档
+- 完整的架构说明
+- 独立的模块文档
+
+### 大型项目（> 50 个文件）
+- 生成所有优先级文档
+- 详细的架构图
+- 模块化的文档结构
+- 考虑 Monorepo 结构
+
+---
+
+## 🔄 混合项目类型处理规范
 
 ### 定义澄清
 
 **平级混合** (❌ 不支持):
-
 - 前端和后端代码混在同一目录层级
-- 例如: 根目录同时有 `package.json` 和 `requirements.txt`,且代码未分离
+- 例如: 根目录同时有 `package.json` 和 `requirements.txt`，且代码未分离
 - 无明确的目录分离
 
 **分层混合** (✅ 支持):
-
 - 代码按模块/功能清晰分层
 - 例如: Monorepo 结构 (`packages/frontend`, `packages/backend`)
 - 有明确的目录分离
@@ -502,13 +144,13 @@ graph TD
     A[检测到多种项目类型特征] --> B{代码是否在不同目录?}
     B -->|是| C{是Monorepo结构?}
     B -->|否| D[平级混合 - 不支持]
-
+    
     C -->|是| E[分层混合 - 支持]
     C -->|否| F{各部分独立可分?}
-
+    
     F -->|是| G[建议: 分别生成文档]
     F -->|否| D
-
+    
     E --> H[参考AI_ENTRY_POINT场景2]
     G --> I[让用户选择主要部分]
     D --> J[提示用户重构或选择]
@@ -525,33 +167,31 @@ graph TD
 
 - 前端特征: package.json
 - 后端特征: requirements.txt
-- 位置: 都在根目录,代码未分离
+- 位置: 都在根目录，代码未分离
 
 🛑 **框架限制**: 本框架不支持平级混合项目类型。
 
 💡 **建议**:
 
 1. **重构项目结构** (推荐):
-```
-
-project/
-├── frontend/ # 前端代码
-│ └── package.json
-├── backend/ # 后端代码
-│ └── requirements.txt
-└── README.md
-
-```
-重构后可为每个部分分别生成文档。
+   ```
+   project/
+   ├── frontend/        # 前端代码
+   │   └── package.json
+   ├── backend/         # 后端代码
+   │   └── requirements.txt
+   └── README.md
+   ```
+   重构后可为每个部分分别生成文档。
 
 2. **选择主要部分**:
-如果一部分是主要的,另一部分是辅助的,
-请告诉我您希望为哪部分生成文档?
+   如果一部分是主要的，另一部分是辅助的，
+   请告诉我您希望为哪部分生成文档?
 
 请确认您希望采用哪种方式?
 ```
 
-**暂停执行,等待用户选择**
+**暂停执行，等待用户选择**
 
 #### 如检测到分层混合(Monorepo)
 
@@ -561,13 +201,12 @@ project/
 ✅ 检测到分层混合(Monorepo)结构
 
 📦 子项目检测:
-
 - packages/frontend (Vue 3)
 - packages/backend (Node.js + Express)
 - packages/shared (TypeScript 工具库)
 
 💡 **建议策略**: 全局文档策略
-理由: 可以在主文档中说明整体架构,
+理由: 可以在主文档中说明整体架构，
 在子目录中添加各自的详细说明。
 
 是否采用此策略? (是/否/选择其他)
@@ -577,5 +216,98 @@ project/
 
 ---
 
-**版本**: v2.2  
-**路径**: `core/project_types.md`
+## ⚠️ 常见错误与避免
+
+### 错误 1: 一次性加载所有项目类型配置
+
+❌ **错误做法**:
+```
+读取 core/project_types.md（包含所有13种类型的详细配置）
+```
+
+✅ **正确做法**:
+```
+1. 读取 core/project_types.md（索引文档，约200行）
+2. 使用决策树识别项目类型
+3. 只读取对应的1个配置文档（如 core/project_types/web_frontend.md）
+```
+
+### 错误 2: 忽略项目规模
+
+❌ **错误做法**: 为小型脚本项目生成完整的企业级文档清单
+
+✅ **正确做法**: 根据项目规模调整文档清单（参考"项目规模考量"章节）
+
+### 错误 3: 混淆项目类型
+
+❌ **错误做法**: 将 Next.js 项目识别为"Web 前端项目"
+
+✅ **正确做法**: Next.js 是"全栈项目"，包含前后端逻辑
+
+---
+
+## 📝 AI 使用指南
+
+### Step 1: 读取索引文档
+
+```
+读取 core/project_types.md（本文档）
+```
+
+### Step 2: 识别项目类型
+
+使用决策树或检查项目特征：
+
+- **package.json** + **pages/** → 可能是全栈项目（Next.js/Nuxt）
+- **package.json** + **src/components/** → 可能是 Web 前端
+- **requirements.txt** + **app.py** → 可能是后端 API（Flask/FastAPI）
+- **Cargo.toml** → 可能是 Rust 项目（CLI/后端/库）
+
+### Step 3: 按需加载配置
+
+```
+# 示例：识别为 Web 前端项目
+读取 core/project_types/web_frontend.md
+```
+
+**关键**: 只读取1个配置文档，不读取其他12个
+
+### Step 4: 生成子文档清单
+
+从配置文档中提取"推荐子文档清单"，根据项目规模调整
+
+---
+
+## 🚫 不支持的项目类型
+
+以下项目类型暂不支持，建议选择最接近的类型：
+
+- **游戏开发** → 建议选择"桌面应用"或"移动应用"
+- **嵌入式系统** → 建议选择"脚本项目"或自定义
+- **区块链/智能合约** → 建议选择"后端 API"
+- **浏览器扩展** → 建议选择"Web 前端"
+
+---
+
+## 📚 版本兼容性
+
+本索引文档符合框架 **V3.0** 规范：
+
+- ✅ YAML Frontmatter 格式
+- ✅ 按需加载机制
+- ✅ 统一的文档结构
+- ✅ 清晰的决策树
+
+---
+
+## 🔗 相关文档
+
+- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - 框架入口文档
+- [workflows/path_a_first_generation.md](../workflows/path_a_first_generation.md) - 首次生成工作流
+- [project_types/README.md](./project_types/README.md) - 项目类型配置索引
+
+---
+
+**版本**: v3.0  
+**路径**: `core/project_types.md`  
+**最后更新**: 2026-01-21

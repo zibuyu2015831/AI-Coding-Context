@@ -11,7 +11,6 @@ lastUpdated: 2025-12-01
 
 # V3.0 功能开关
 enableMutualReview: false
-dangerousCommandGuard: moderate
 enforceDesignThinking: false
 enableADR: false
 aiCapabilityTier: auto
@@ -21,14 +20,14 @@ preferredRoles: []
 verboseMode: false
 defaultHealthCheckMode: standard
 
-# 工具库配置 (V3.0 新增)
+# 工具库配置
 tools:
   preferredRuntime: python # 优先使用的运行时 (python|nodejs)
   autoFallback: true # 工具失败时自动降级
   timeoutSeconds: 10 # 工具超时时间(秒)
   maxFileScan: 5000 # 最大扫描文件数
 
-# 设计思维引导配置 (V3.0 新增)
+# 设计思维引导配置
 design_thinking:
   auto_trigger_threshold: 60 # 自动触发阈值 (0-100, 复杂度评分)
   default_mode: standard # 默认引导模式 (standard|deep|quick)
@@ -36,11 +35,36 @@ design_thinking:
     include_security_expert: false # 是否默认包含安全专家
     include_performance_expert: false # 是否默认包含性能专家
   skip_trivial_tasks: true # 是否跳过简单任务 (如 Fix typo)
+
+# Git 安全规范配置
+git_safety:
+  mode: standard # 安全模式 (strict|standard|permissive)
+  protected_branches: ["main", "master", "production"] # 保护分支列表
+  require_branch_naming: true # 是否要求分支命名规范
+  warn_on_large_commit: true # 单commit超过500行时警告
+  enable_pre_commit_hook: false # 是否启用 pre-commit hook
+
+# Commit-Guided Documentation 配置
+commit_guided_documentation:
+  enabled: true # 是否启用 Commit-Guided 功能
+  commit_format:
+    prefix_aliases: ["prompt", "ai", "doc"] # 触发前缀别名
+    require_what: true # 是否要求 WHAT 字段
+    require_why: true # 是否要求 WHY 字段
+    require_how: true # 是否要求 HOW 字段
+  token_optimization:
+    time_window_days: 7 # 默认分析最近N天commit
+    max_commits_per_batch: 50 # 单批次最多分析commit数
+    enable_aggregation: true # 启用同类commit聚合
+    skip_doc_only_commits: true # 跳过纯文档commit
+  auto_detect_updates: true # 自动检测文档更新需求
+  auto_generate_draft: true # 自动生成更新草稿
+  require_user_confirmation: true # 需要用户确认
 ---
 
 # 框架配置说明
 
-> 📝 本文档记录您的个性化配置
+> 📝 本文档记录用户的个性化配置
 >
 > **配置方式**: 修改上方 YAML frontmatter 中的值
 > **生效时机**: 下次运行框架时自动应用
@@ -85,43 +109,6 @@ documentLanguage: en-US # 切换到英文
 
 - ✅ 启用: 方案质量更高,发现更多问题,但生成时间 +20%
 - ❌ 禁用: 生成更快,但可能遗漏问题
-
----
-
-## 🛡️ 危险指令拦截
-
-**YAML 字段**: `dangerousCommandGuard`  
-**当前值**: `moderate`  
-**对应优化点**: 002-危险指令拦截
-
-**说明**: 防止 AI 执行可能导致数据丢失的危险命令
-
-**可选值**:
-
-- `strict` - 严格模式
-  - **适用**: 生产环境、重要项目
-  - **拦截**: 文件删除、数据库删除、系统级操作
-  - **行为**: 拦截并拒绝执行
-- `moderate` - 适中模式(默认)
-  - **适用**: 开发环境
-  - **拦截**: 数据库删除、系统级操作
-  - **警告**: 文件删除
-- `permissive` - 宽松模式
-  - **适用**: 个人学习项目
-  - **行为**: 仅警告,不拦截
-
-**使用场景**:
-
-```yaml
-# 生产环境
-dangerousCommandGuard: strict
-
-# 开发环境
-dangerousCommandGuard: moderate
-
-# 个人学习项目
-dangerousCommandGuard: permissive
-```
 
 ---
 
@@ -310,7 +297,6 @@ preferredRoles:
 ```yaml
 documentLanguage: zh-CN
 enableMutualReview: false # 快速开发
-dangerousCommandGuard: permissive # 宽松保护
 enforceDesignThinking: false # 不强制
 aiCapabilityTier: auto
 ```
@@ -320,7 +306,6 @@ aiCapabilityTier: auto
 ```yaml
 documentLanguage: zh-CN
 enableMutualReview: false
-dangerousCommandGuard: moderate # 适度保护(默认)
 enforceDesignThinking: false
 aiCapabilityTier: auto
 ```
@@ -329,7 +314,6 @@ aiCapabilityTier: auto
 
 ```yaml
 enableMutualReview: true # 保证质量
-dangerousCommandGuard: strict # 严格保护
 enforceDesignThinking: true # 强制设计思考
 enableADR: true # 记录架构决策
 aiCapabilityTier: advanced # 使用高级 AI
@@ -401,6 +385,310 @@ tools:
 - 小型项目: `1000`
 - 中型项目: `5000`(默认)
 - 大型项目: `10000`(需配合优化策略)
+
+---
+
+## 🛡️ Git 安全规范配置 🆕
+
+**YAML 字段**: `git_safety` (对象)  
+**当前值**: 见 frontmatter  
+**对应优化点**: 018-Commit-Guided Documentation
+
+**说明**: 配置 AI 操作 Git 的安全规范,防止误操作保护分支或执行危险命令
+
+### `mode`
+
+**类型**: `string`  
+**默认值**: `standard`  
+**可选值**: `strict` | `standard` | `permissive`
+
+**说明**: Git 安全模式
+
+- `strict` - 严格模式
+
+  - **适用**: 生产环境、多人协作项目
+  - **行为**: Strict 规则不可覆盖,Standard 规则默认阻止
+  - **示例**: 绝对禁止 force push、merge,保护分支零容忍
+
+- `standard` - 标准模式(默认)
+
+  - **适用**: 日常开发
+  - **行为**: Strict 规则不可覆盖,Standard 规则可明确授权后放行
+  - **示例**: 禁止危险操作,但允许在 feature 分支正常开发
+
+- `permissive` - 宽松模式
+  - **适用**: 个人学习项目
+  - **行为**: 仅警告,不阻止
+
+**示例**:
+
+```yaml
+# 生产环境
+git_safety:
+  mode: strict
+
+# 开发环境
+git_safety:
+  mode: standard # 默认
+
+# 个人项目
+git_safety:
+  mode: permissive
+```
+
+### `protected_branches`
+
+**类型**: `array`  
+**默认值**: `["main", "master", "production"]`
+
+**说明**: 保护分支列表,AI 绝对不能在这些分支直接操作
+
+**示例**:
+
+```yaml
+git_safety:
+  protected_branches:
+    - main
+    - master
+    - production
+    - release/* # 支持通配符
+    - hotfix/*
+```
+
+### `require_branch_naming`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否要求分支命名符合规范
+
+- `true` - 要求 feature/xxx, bugfix/xxx, refactor/xxx 格式
+- `false` - 不限制分支命名
+
+### `warn_on_large_commit`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 单个 commit 超过 500 行时是否警告
+
+- `true` - 警告并建议拆分 commit
+- `false` - 不检查 commit 大小
+
+### `enable_pre_commit_hook`
+
+**类型**: `boolean`  
+**默认值**: `false`
+
+**说明**: 是否启用 pre-commit hook 进行本地拦截
+
+- `true` - 安装 hook,在 commit 前检查格式和安全性
+- `false` - 不安装 hook(默认)
+
+**安装方式**:
+
+```bash
+python tools/py/install_hooks.py
+```
+
+---
+
+## 📝 Commit-Guided Documentation 配置 🆕
+
+**YAML 字段**: `commit_guided_documentation` (对象)  
+**当前值**: 见 frontmatter  
+**对应优化点**: 018-Commit-Guided Documentation
+
+**说明**: 配置基于 Commit 信息的自动化文档更新功能
+
+### `enabled`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否启用 Commit-Guided 功能
+
+- `true` - 启用,AI 会自动解析 commit 并推荐文档更新
+- `false` - 禁用,回退到传统的手动解释变更方式
+
+### `commit_format` (对象)
+
+#### `prefix_aliases`
+
+**类型**: `array`  
+**默认值**: `["prompt", "ai", "doc"]`
+
+**说明**: 触发 Commit-Guided 的前缀别名,任一前缀即可触发
+
+**示例**:
+
+```yaml
+commit_guided_documentation:
+  commit_format:
+    prefix_aliases: ["prompt", "ai", "智能"] # 支持中文前缀
+```
+
+**Commit 示例**:
+
+```bash
+# 方式1
+git commit -m "prompt(feature): 新增用户积分系统"
+
+# 方式2
+git commit -m "ai(feature): 新增用户积分系统"
+
+# 方式3
+git commit -m "智能(feature): 新增用户积分系统"
+```
+
+#### `require_what` / `require_why` / `require_how`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否要求 commit message 包含 WHAT/WHY/HOW 字段
+
+- `true` - 要求完整的三段式结构
+- `false` - 不强制,允许部分字段缺失
+
+### `token_optimization` (对象)
+
+#### `time_window_days`
+
+**类型**: `number`  
+**默认值**: `7`
+
+**说明**: 默认分析最近 N 天的 commit
+
+**调优建议**:
+
+- 快速迭代项目: `1-3` 天
+- 正常项目: `7` 天(默认)
+- 长周期项目: `30` 天
+
+```yaml
+commit_guided_documentation:
+  token_optimization:
+    time_window_days: 3 # 只分析最近3天
+```
+
+#### `max_commits_per_batch`
+
+**类型**: `number`  
+**默认值**: `50`
+
+**说明**: 单批次最多分析的 commit 数量,防止 token 消耗过大
+
+#### `enable_aggregation`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否启用同类 commit 聚合
+
+- `true` - 聚合同类变更,减少 token 消耗 85%+
+- `false` - 逐个分析,token 消耗较大
+
+#### `skip_doc_only_commits`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否跳过纯文档 commit(避免循环更新)
+
+- `true` - 跳过 `prompt(doc):` 类型的 commit
+- `false` - 分析所有 commit
+
+### `auto_detect_updates`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否自动检测文档更新需求
+
+- `true` - AI 自动分析 commit 并推荐需要更新的文档
+- `false` - 需要用户手动触发
+
+### `auto_generate_draft`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否自动生成文档更新草稿
+
+- `true` - 自动生成草稿供用户确认
+- `false` - 仅提示需要更新,不生成草稿
+
+### `require_user_confirmation`
+
+**类型**: `boolean`  
+**默认值**: `true`
+
+**说明**: 是否需要用户确认后才执行文档更新
+
+- `true` - 需要用户确认(推荐)
+- `false` - 自动执行更新(风险较高)
+
+---
+
+## 💡 配置组合建议 🆕
+
+### 个人学习项目
+
+```yaml
+git_safety:
+  mode: permissive
+  enable_pre_commit_hook: false
+
+commit_guided_documentation:
+  enabled: true
+  commit_format:
+    require_what: false # 不强制完整格式
+    require_why: false
+    require_how: false
+  token_optimization:
+    time_window_days: 3
+```
+
+### 团队协作项目
+
+```yaml
+git_safety:
+  mode: standard # 标准保护
+  protected_branches: ["main", "master", "develop"]
+  require_branch_naming: true
+  enable_pre_commit_hook: true # 启用 hook
+
+commit_guided_documentation:
+  enabled: true
+  commit_format:
+    require_what: true # 要求完整格式
+    require_why: true
+    require_how: true
+  require_user_confirmation: true
+```
+
+### 生产环境项目
+
+```yaml
+git_safety:
+  mode: strict # 严格保护
+  protected_branches: ["main", "master", "production", "release/*"]
+  require_branch_naming: true
+  warn_on_large_commit: true
+  enable_pre_commit_hook: true
+
+commit_guided_documentation:
+  enabled: true
+  commit_format:
+    require_what: true
+    require_why: true
+    require_how: true
+  token_optimization:
+    time_window_days: 7
+    enable_aggregation: true
+  require_user_confirmation: true
+```
 
 ---
 

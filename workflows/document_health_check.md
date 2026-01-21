@@ -400,6 +400,148 @@ total_deduct = min(total_deduct, 5)
 
 ---
 
+#### E. Commit-Guided 模式检测（最多-15 分）🆕 (V3.0)
+
+检测项目是否启用 Commit-Guided 文档更新模式,以及未同步的 commit 数量
+
+| 检测项                                | 扣分   | 说明                            |
+| ------------------------------------- | ------ | ------------------------------- |
+| 未启用 Commit-Guided                  | 0 分   | 传统模式,不扣分                 |
+| 有未同步的结构化 commit (1-5 个)      | -5 分  | 少量 commit 未同步到文档        |
+| 有未同步的结构化 commit (6-10 个)     | -10 分 | 中等数量 commit 未同步          |
+| 有未同步的结构化 commit (\u003e10 个) | -15 分 | 大量 commit 未同步,文档严重滞后 |
+
+**检测方法**:
+
+```bash
+# 1. 检测是否有结构化commit
+python tools/py/commit_parser.py --since "文档生成日期" --count-only
+
+# 2. 分析未同步的commit
+python tools/py/commit_parser.py --since "文档生成日期" --format summary
+```
+
+**输出示例**:
+
+```json
+{
+  "total_commits": 25,
+  "structured_commits": 8,
+  "traditional_commits": 17,
+  "unsynced_structured_commits": [
+    {
+      "commit_id": "abc123",
+      "type": "prompt:feature",
+      "what": "新增用户积分系统",
+      "date": "2025-12-10"
+    },
+    {
+      "commit_id": "def456",
+      "type": "prompt:refactor",
+      "what": "重构API层",
+      "date": "2025-12-09"
+    }
+  ]
+}
+```
+
+**扣分计算**:
+
+```python
+# 获取文档生成日期
+doc_date = extract_doc_date("dev_docs/AI_Coding_Context.md")
+
+# 分析未同步的结构化commit
+result = commit_parser.get_commits(since=doc_date)
+unsynced_count = len(result['structured_commits'])
+
+if unsynced_count == 0:
+    score_deduct = 0
+elif unsynced_count <= 5:
+    score_deduct = 5
+elif unsynced_count <= 10:
+    score_deduct = 10
+else:
+    score_deduct = 15  # 上限15分
+```
+
+**健康度报告中的显示**:
+
+```markdown
+## 📊 Commit-Guided 模式检测 🆕
+
+- 模式状态: ✅ 已启用
+- 文档生成后的 commit 数: 25 个
+  - 结构化 commit: 8 个
+  - 传统 commit: 17 个
+- 未同步的结构化 commit: 8 个
+- 扣分: -10 分
+
+### 未同步的 Commit 清单
+
+1. [abc123] prompt(feature): 新增用户积分系统 (2025-12-10)
+2. [def456] prompt(refactor): 重构 API 层 (2025-12-09)
+3. [ghi789] prompt(fix): 修复支付 bug (2025-12-08)
+   ...
+
+💡 建议: 执行 Commit-Guided 自动更新,同步这 8 个结构化 commit
+```
+
+**自动化检测能力** 🆕:
+
+当启用 Commit-Guided 模式时,健康度检查可以:
+
+1. **精准识别受影响文档**
+
+   ```bash
+   # 基于commit信息自动识别需要更新的文档
+   python tools/py/commit_parser.py --since "文档生成日期" | \
+   python tools/py/summary_related_checker.py --from-stdin
+   ```
+
+2. **自动生成更新清单**
+
+   ```markdown
+   ## 📋 基于 Commit 的更新建议
+
+   ### 必须更新（P0）
+
+   1. dev_docs/api_layer.md
+
+      - 原因: commit abc123 新增了积分 API
+      - 相关 commit: [abc123] prompt(feature): 新增用户积分系统
+
+   2. dev_docs/database_schema.md
+      - 原因: commit abc123 修改了 User 模型
+      - 相关 commit: [abc123] prompt(feature): 新增用户积分系统
+   ```
+
+3. **提供一键更新选项**
+
+   ```markdown
+   💡 快速操作:
+
+   选项 1: 基于这 8 个 commit 自动生成文档更新草稿 (推荐)
+   选项 2: 执行传统的增量更新流程
+   选项 3: 重新生成文档
+
+   请选择: 1 / 2 / 3
+   ```
+
+**为什么重要**:
+
+- ✅ **减少人工解释**: 直接从 commit 提取变更意图
+- ✅ **提升准确性**: 基于明确的 WHAT/WHY/HOW 信息
+- ✅ **节省时间**: 自动化程度更高,从 27 分钟降低到 5 分钟
+
+**注意事项**:
+
+- 如果项目未启用 Commit-Guided 模式,此项不扣分
+- 只统计结构化 commit (prompt:/ai:/doc: 前缀),传统 commit 不计入
+- 可以通过配置 `commit_guided_documentation.enabled` 启用/禁用此检测
+
+---
+
 ### 健康度等级划分
 
 | 分数范围  | 等级    | 评价             | 建议操作                   |
