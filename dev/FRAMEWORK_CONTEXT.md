@@ -5,24 +5,24 @@ keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
 related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | quality/README.md | reference/design_decisions.md | reference/SUMMARY_FORMAT_SPEC.md
 dependencies: reference/SUMMARY_FORMAT_SPEC.md | reference/design_decisions.md
-verified_at: 2025-12-04
+verified_at: 2026-04-06
 ---
 
 **当前框架版本**: V2.3  
-**开发中的版本**: V3.0（基础设施阶段）
+**开发中的版本**: V3.0（P0 核心功能已完成）
 
-**V3.0 已完成模块（基础设施）**：
+**V3.0 已完成模块（基础设施与 P0 核心）**：
 
 - ✅ 001-AI 角色库（agents/）
 - ✅ 003-设计思维引导
-- ✅ 012-强制文档摘要机制（SUMMARY*FORMAT_SPEC + summary*\* 工具）
+- ✅ 012-强制文档摘要机制（SUMMARY_FORMAT_SPEC + summary_* 工具）
 - ✅ 013-AI 互审机制
 - ✅ 016-配置管理系统（config/）
 - ✅ 017-实用脚本工具库（tools/）
+- ✅ 018-Commit-Guided Documentation（workflows/commit_guided_update.md）
 
 **剩余关键能力（规划中）**：
 
-- P0：危险指令拦截系统
 - P1：ADR 系统、复杂度仪表盘、自动审查报告
 - P2：学习曲线追踪、AI 能力分级、文档自修复、跨项目知识复用
 
@@ -241,14 +241,21 @@ graph TD
 - 将 AI 从"代码生成器"转变为"思考伙伴"
 - 返工率降低 50%
 
+#### 功能 12: Commit-Guided Documentation (V3.0) ⭐
+
+- 基于结构化 Commit 信息的自动化文档更新系统
+- 整合 Git 安全规范 (git_safety_workflow)
+- 形成"设计 → 实施 → 验证"完整闭环
+- 显著降低主分支污染风险，提升更新准确率
+
 ### 2.3 V2.3 的限制（为什么需要 V3.0）
 
 #### 限制 1: 被动防护
 
 ```
 V2.3: 规范写在文档里，AI遵守
-问题: 人类危险指令仍可绕过
-V3.0: 主动拦截危险指令
+问题: 流程缺乏强制性，且无法识别隐性变更
+V3.0: 基于 Commit 驱动的自动化更新与 Git 安全规范（P0 已完成）
 ```
 
 #### 限制 2: 单一 AI 视角
@@ -256,7 +263,7 @@ V3.0: 主动拦截危险指令
 ```
 V2.3: AI生成 → 人工审核
 问题: 单一AI可能有盲点
-V3.0: AI生成 → AI审查 → 人工审核
+V3.0: AI生成 → AI审查 → 人工审核（P0 已完成）
 ```
 
 #### 限制 3: 缺少设计引导
@@ -264,7 +271,7 @@ V3.0: AI生成 → AI审查 → 人工审核
 ```
 V2.3: 方案驱动，但不引导思考
 问题: 用户可能跳过深度思考
-V3.0: 5 Why + 多方案对比 + 边界定义
+V3.0: 5 Why + 多方案对比 + 边界定义（P0 已完成）
 ```
 
 #### 限制 4: 复杂度不可见
@@ -272,7 +279,7 @@ V3.0: 5 Why + 多方案对比 + 边界定义
 ```
 V2.3: 文档记录复杂度
 问题: 无实时监控
-V3.0: 复杂度仪表盘 + 实时告警
+V3.0: 复杂度仪表盘 + 实时告警（P1 规划中）
 ```
 
 #### 限制 5: 架构演进不可追溯
@@ -280,7 +287,7 @@ V3.0: 复杂度仪表盘 + 实时告警
 ```
 V2.3: 没有系统化架构决策记录
 问题: "未知的未知"
-V3.0: ADR系统 + 演进历史
+V3.0: ADR系统 + 演进历史（P1 规划中）
 ```
 
 ---
@@ -296,12 +303,14 @@ ai_coding_context/
 ├── AI_ENTRY_POINT.md         # AI 入口（AI 读这个）
 ├── README.md                 # 对人类的框架介绍（取代早期 INTRODUCTION.md）
 ├── core/                     # 核心规范（语言/安全/项目类型/更新触发）
+├── docs/                     # 🆕 通用文档库
 ├── dev/                      # 框架开发与版本规划文档
 │   ├── FRAMEWORK_CONTEXT.md  # 本文档，全局上下文
 │   └── V3.0/                 # V3.0 规划与进度
 ├── config/                   # 配置管理系统（user_config + CONFIG_TEMPLATE）
 ├── tools/                    # 实用脚本工具库（project_scanner, content_searcher, summary_* 等）
 ├── agents/                   # AI 角色库（runtime/development/language_specific/workflows 等）
+├── workflows/                # 🆕 核心工作流（生成/检查/互审/Git 安全等）
 ├── quality/                  # 文档质量保证体系（标准、审查工作流、contexts 模板）
 ├── guides/                   # 使用与适配指南
 ├── templates/                # 各类文档模板
@@ -668,16 +677,17 @@ project_root/
 
 ### V3.0 (开发中) - 战略式编程增强
 
-- **当前阶段**: 核心功能开发 (2025-11 ~ 2026-Q1)
-- **已完成** (6/17):
+- **当前阶段**: 核心 P0 功能完成，进入 P1/P2 阶段 (2025-12-18 ~ 2026-Q2)
+- **已完成** (7/17):
   - ✅ 001-AI 角色库 (2025-11-29)
+  - ✅ 017-实用脚本工具库 (2025-12-01)
+  - ✅ 016-配置管理系统 (2025-12-02)
+  - ✅ 013-AI 互审机制 (2025-12-02)
   - ✅ 003-设计思维引导 (2025-12-03)
   - ✅ 012-强制文档摘要 (2025-12-03)
-  - ✅ 013-AI 互审机制 (2025-12-02)
-  - ✅ 016-配置管理系统 (2025-12-02)
-  - ✅ 017-实用脚本工具库 (2025-12-01)
-- **进行中**: 11 个优化点待讨论确认
-- **剩余 P0 功能**: 危险指令拦截
+  - ✅ 018-Commit-Guided Documentation (2025-12-18)
+- **进行中**: P1/P2 优化点讨论与开发
+- **已归档**: 002-危险指令拦截系统
 - **P1 功能**: ADR 系统、复杂度仪表盘、自动审查报告
 - **P2 功能**: 学习曲线追踪、AI 能力分级、文档自修复、跨项目知识复用
 
@@ -699,7 +709,6 @@ project_root/
 ### 开发文档
 
 - [dev/FRAMEWORK_CONTEXT.md](./FRAMEWORK_CONTEXT.md) - 本文档（全局上下文）
-- [dev/VERSION_HISTORY.md](./VERSION_HISTORY.md) - 详细版本历史
 - [dev/V3.0/](./V3.0/) - V3.0 规划与进度
 
 ### 参考文档
