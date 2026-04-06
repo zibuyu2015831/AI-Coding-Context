@@ -391,7 +391,7 @@ AI_RULES.md 包含:
 - 模板引用
 - 技术细节
 
-**INTRODUCTION.md**:
+**README.md**:
 
 - 框架价值说明
 - 快速开始指南
@@ -414,7 +414,7 @@ AI_RULES.md 包含:
 ```
 root/
 ├── AI_ENTRY_POINT.md  # AI执行入口
-├── INTRODUCTION.md     # 人类学习入口
+├── README.md          # 人类学习入口
 ├── core/              # 核心规范(必读)
 ├── workflows/         # 流程文档(详细说明)
 ├── guides/            # 指导说明(参考)

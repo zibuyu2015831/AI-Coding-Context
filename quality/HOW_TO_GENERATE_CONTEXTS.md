@@ -89,7 +89,7 @@ doc_content = read_file(new_doc_path)  # 读取文档内容
 **命名规则**:
 
 ```
-入口文档: AI_ENTRY_POINT.md, INTRODUCTION.md
+入口文档: AI_ENTRY_POINT.md, README.md
 核心规范: core_{filename}.md
 工作流: workflows_{filename}.md
 指导文档: guides_{filename}.md
@@ -269,7 +269,7 @@ save_file(save_path, generated_context)
 | 序号 | 文档类型 | 文件路径               | 上下文文件名           | 状态      |
 | ---- | -------- | ---------------------- | ---------------------- | --------- |
 | 1    | 入口     | AI_ENTRY_POINT.md      | AI_ENTRY_POINT.md      | ⚪ 待生成 |
-| 2    | 入口     | INTRODUCTION.md        | INTRODUCTION.md        | ⚪ 待生成 |
+| 2    | 入口     | README.md        | README.md        | ⚪ 待生成 |
 | 3    | 核心     | core/language_rules.md | core_language_rules.md | ⚪ 待生成 |
 | ...  | ...      | ...                    | ...                    | ...       |
 ```
@@ -410,7 +410,7 @@ save_file(save_path, generated_context)
 
 **同类文档** (相同类型的):
 
-- [INTRODUCTION.md](../../INTRODUCTION.md) - 人类版本的入门指南
+- [README.md](../../README.md) - 人类版本的入门指南
 
 ---
 
@@ -680,7 +680,7 @@ git commit -m "feat: 生成批次X的审查上下文（文档类型Y）"
 ### 批次 1: 入口文档
 
 - [ ] AI_ENTRY_POINT.md
-- [ ] INTRODUCTION.md
+- [ ] README.md
 
 ### 批次 2: 核心规范
 

@@ -492,7 +492,7 @@ python tools/py/summary_validator.py --check-all dev_docs/
 ✅ 必须包含摘要:
   # 框架核心文档
   - README.md
-  - INTRODUCTION.md
+  - README.md
   - CONTRIBUTING.md
   - AI_ENTRY_POINT.md
 
@@ -682,7 +682,7 @@ python tools/py/summary_validator.py --check-all dev_docs/
 
 - [ ] 为框架核心文档添加摘要
   - [ ] README.md
-  - [ ] INTRODUCTION.md
+  - [ ] README.md
   - [ ] AI_ENTRY_POINT.md
 - [ ] 为部分 workflows 添加摘要示例
 - [ ] 验证摘要格式正确性

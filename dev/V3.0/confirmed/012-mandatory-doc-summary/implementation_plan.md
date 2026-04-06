@@ -84,7 +84,7 @@
 
 4. **框架核心文档**（示范）
    - `README.md` - 添加摘要
-   - `INTRODUCTION.md` - 添加摘要
+   - `README.md` - 添加摘要
    - `AI_ENTRY_POINT.md` - 添加摘要
 
 ---
@@ -246,7 +246,7 @@
 
 - [ ] 为框架核心文档添加摘要
   - [ ] `README.md`
-  - [ ] `INTRODUCTION.md`
+  - [ ] `README.md`
   - [ ] `AI_ENTRY_POINT.md`
   - [ ] `CONTRIBUTING.md`
 - [ ] 为部分 workflows 添加摘要（2-3 个示例）

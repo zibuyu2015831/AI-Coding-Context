@@ -89,7 +89,7 @@
 ### 入口文档
 
 - [ ] [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) → [审查上下文](./contexts/AI_ENTRY_POINT.md)
-- [ ] [INTRODUCTION.md](../INTRODUCTION.md) → [审查上下文](./contexts/INTRODUCTION.md)
+- [ ] [README.md](../README.md) → [审查上下文](./contexts/README.md)
 
 ### 核心规范文档 (core/)
 

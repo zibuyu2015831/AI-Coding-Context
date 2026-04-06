@@ -18,7 +18,7 @@
 
 **优先级建议**:
 
-1. P0: 入口文档（AI_ENTRY_POINT.md, INTRODUCTION.md）
+1. P0: 入口文档（AI_ENTRY_POINT.md, README.md）
 2. P1: 核心规范文档（core/\*.md）
 3. P2: 工作流文档（workflows/\*.md）
 4. P3: 指导文档（guides/\*.md）
