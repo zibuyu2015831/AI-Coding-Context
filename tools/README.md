@@ -35,6 +35,7 @@ tools/
 | `commit_quality_scorer`   | Commit 质量评分        | 5 维度评分，生成改进建议                        |
 | `commit_aggregator`       | Commit 聚合            | 同类 commit 聚合，Token 优化（减少 85%+）       |
 | `commit_template_cli`     | Commit 模板            | 交互式生成结构化 commit message                 |
+| `commit_integrity_validator` | Commit 诚信验证        | 对比提议信息与物理变更，输出诚信分 (0-100)      |
 | `install_hooks`           | Git Hooks 安装         | 安装/卸载 pre-commit hook，支持备份恢复         |
 
 ## 🚀 使用指南

@@ -1,7 +1,7 @@
 # Git 安全工作流
 
-> **版本**: v1.0  
-> **创建日期**: 2025-12-11  
+> **版本**: v1.1  
+> **更新日期**: 2026-04-07  
 > **用途**: 定义 AI 操作 Git 的安全规范和推荐工作流
 
 ---
@@ -123,13 +123,14 @@ git checkout -b feature/user-points-system
 #### 2. 提交代码
 
 ```bash
-# ⚠️ 需审核commit message
+# ⚠️ 需进行诚信审计并审核 commit message
 git commit -m "prompt(feature): 新增用户积分系统" \
   -m "WHAT: ..."
 ```
 
 **检查项**:
 
+- [ ] **诚信审计**: 运行 `commit_integrity_validator.py` 确保意图与物理变更匹配
 - [ ] Commit message 格式规范
 - [ ] 当前分支不是保护分支
 - [ ] Commit 粒度合理 (单次 commit <500 行)
@@ -143,13 +144,15 @@ git commit -m "prompt(feature): 新增用户积分系统" \
 文件: src/models/user.py, src/api/points.py
 变更: +135 行, -2 行
 
+🔍 **Commit 诚信审计**:
+得分: 95 [EXCELLENT] ✅
+意图与物理变更完美匹配。
+
 Commit message:
 prompt(feature): 新增用户积分系统
 WHAT: 实现积分累积和兑换功能
 WHY: 提升用户活跃度
 HOW: User 模型新增 points 字段,API 端点/api/points
-
-质量评分: 85/100 ✅
 
 是否提交? (Y/n/e)
 ```
@@ -306,80 +309,31 @@ git checkout -b feature/user-points-system
 # Step 2: AI开发代码
 # ... 编码 ...
 
-# Step 3: AI使用Commit-as-Prompt提交
+# Step 3: AI使用Commit-as-Prompt提交并执行诚信审计
 git add src/models/user.py src/api/points.py
-git commit -m "prompt(feature): 新增用户积分系统" \
-  -m "WHAT: 实现积分累积和兑换功能
-WHY: 提升用户活跃度,对应需求PRD-2024-156
-HOW: User模型新增points字段,API端点/api/points,使用乐观锁避免并发问题"
-✅ Git安全检查通过: feature分支,允许commit
+# AI 内部调用: python tools/py/commit_integrity_validator.py --message "..."
+AI: "🔍 Commit 诚信审计分数: 95/100 [EXCELLENT]
+     拟提交: prompt(feature): 新增用户积分系统
+     WHAT: 实现积分累积和兑换功能
+     WHY: 提升用户活跃度
+     HOW: User模型新增points字段,API端点/api/points
+     是否执行提交? (Y/n)"
 
 # Step 4: AI推送到feature分支
 git push origin feature/user-points-system
 ✅ Git安全检查通过: feature分支,允许push
 
-# Step 5: AI自动检测文档更新需求
-AI: "📝 检测到以下文档需要更新:
+# Step 5: AI自动启动 Path C (增量文档更新)
+AI: "✅ Commit 成功: abc123
+     🚀 正在启动 Path C: 增量文档更新检测...
+     检测到以下文档需要更新:
      - dev_docs/api_layer.md
      - dev_docs/database_schema.md
-     生成更新草稿? (Y/n)"
+     是否生成更新草稿? (Y/n)"
 
 # Step 6: AI提示用户创建PR
 AI: "代码已推送到 feature/user-points-system
      请在GitHub/GitLab创建PR并合并到dev"
-
-# ========== 用户操作部分 ==========
-
-# Step 7: 用户在GitHub/GitLab创建PR
-# (Web界面操作)
-
-# Step 8: 用户或团队进行Code Review
-# (Web界面操作)
-
-# Step 9: 用户手动合并PR
-# (Web界面操作,点击"Merge"按钮)
-# ⚠️ 必须由用户自己执行,AI绝不可代替
-
-# Step 10: 用户删除feature分支(可选)
-git branch -d feature/user-points-system
-git push origin --delete feature/user-points-system
-```
-
----
-
-### Hotfix Workflow (紧急修复)
-
-**场景**: 生产环境紧急 bug 修复
-
-**流程**:
-
-```
-main → hotfix/xxx (AI开发) → PR → main + dev
-```
-
-**示例**:
-
-```bash
-# Step 1: 从main创建hotfix分支
-git checkout main
-git pull origin main
-git checkout -b hotfix/fix-payment-bug
-✅ Git安全检查通过: hotfix分支允许从main创建
-
-# Step 2: AI修复bug
-# ... 修复代码 ...
-
-# Step 3: AI提交
-git commit -m "prompt(hotfix): 修复支付金额计算错误" \
-  -m "WHAT: 修复支付金额四舍五入导致的精度丢失
-WHY: 生产环境发现部分订单金额不准确,影响财务对账
-HOW: 使用Decimal类型替代float,保留2位小数"
-
-# Step 4: AI推送
-git push origin hotfix/fix-payment-bug
-
-# Step 5: 用户创建PR,合并到main和dev
-# (必须由用户手动操作)
 ```
 
 ---
@@ -394,53 +348,19 @@ git push origin hotfix/fix-payment-bug
 2. 验证 Git 命令是否安全
 3. 建议符合规范的分支名
 
+### tools/py/commit_integrity_validator.py
+
+**功能**:
+
+1. 对比拟提交信息与实际代码变更
+2. 识别“漏报”或“虚报”的文件
+3. 输出诚信评分和修正建议
+
 **使用方式**:
 
 ```bash
-# 检查当前分支
-python tools/py/git_safety.py --check-branch
-
-# 验证Git命令
-python tools/py/git_safety.py --validate-command "git push origin main"
-
-# 建议分支名
-python tools/py/git_safety.py --suggest-branch-name "用户积分系统"
-```
-
-**输出示例**:
-
-```json
-{
-  "command": "git push origin main",
-  "safety_level": "RED",
-  "allowed": false,
-  "reason": "禁止推送到保护分支main",
-  "suggestion": "请创建feature分支: git checkout -b feature/user-points"
-}
-```
-
-### 集成到 AI 工作流
-
-**在执行 Git 操作前自动检查**:
-
-```python
-# AI内部逻辑(伪代码)
-def execute_git_command(command):
-    # 1. 安全检查
-    result = git_safety.validate_command(command)
-
-    if result['safety_level'] == 'RED':
-        # 绝对禁止
-        return f"⛔ 操作被拒绝: {result['reason']}"
-
-    elif result['safety_level'] == 'YELLOW':
-        # 需要用户确认
-        user_confirm = ask_user(f"⚠️ {result['reason']}\n是否继续? (Y/n)")
-        if not user_confirm:
-            return "操作已取消"
-
-    # 2. 执行命令
-    return subprocess.run(command, shell=True)
+# 执行诚信审计
+python tools/py/commit_integrity_validator.py --message "[COMMIT_MESSAGE]"
 ```
 
 ---
@@ -451,47 +371,20 @@ def execute_git_command(command):
 
 **位置**: `templates/AI_RULES_TEMPLATE.md`
 
-**内容**:
+**内容**: 包含 `Commit-Intent-Consistency` (意图一致性) 检查规范。
 
-```markdown
-## Git 操作安全规范
+### Layer 2: 自动化审计工具 (自查)
 
-### 绝对禁止 (RED ZONE)
-
-- ⛔ 在 main/master/production 分支 commit 或 push
-- ⛔ 执行 git reset --hard
-- ⛔ 执行 git push --force
-- ⛔ 执行 git merge (除了 git merge --abort)
-
-### 推荐工作流
-
-1. 从 dev 创建 feature 分支
-2. 在 feature 分支开发和提交
-3. 推送到远程 feature 分支
-4. 提示用户创建 PR
-5. 用户手动合并 PR
-```
-
-### Layer 2: git_safety.py (工具检查)
-
-**自动拦截**:
-
-```bash
-# AI尝试执行危险命令
-git push --force origin main
-
-# 工具自动拦截
-⛔ 操作被拒绝: 禁止强制推送到保护分支
-建议: 请创建feature分支并通过PR合并
-```
+- **`git_safety.py`**: 拦截危险命令和保护分支操作。
+- **`commit_integrity_validator.py`**: 确保提交意图与物理变更一致。
 
 ### Layer 3: 013 互审机制 (二次验证)
 
 **Reviewer 审查维度**:
 
 - ✅ Git 操作是否安全?
+- ✅ Commit 诚信评分是否达标?
 - ✅ 是否遵循推荐工作流?
-- ✅ Commit 质量是否达标?
 
 ### Layer 4: Pre-commit Hook (可选本地拦截)
 
@@ -506,17 +399,6 @@ python tools/py/install_hooks.py
 1. 检测当前分支是否为保护分支
 2. 验证 commit message 格式
 3. 检查 commit 大小 (>500 行警告)
-
-**示例**:
-
-```bash
-# 用户在main分支尝试commit
-git commit -m "fix bug"
-
-# Hook拦截
-⛔ 错误: 禁止在保护分支main上commit
-建议: git checkout -b feature/fix-xxx
-```
 
 ---
 
@@ -542,67 +424,6 @@ git commit -m "fix bug"
 3. 推送并创建PR
 ```
 
-### 错误 2: 尝试强制推送
-
-**场景**:
-
-```bash
-git push --force origin feature/xxx
-```
-
-**拦截**:
-
-```
-⛔ 操作被拒绝: 禁止使用--force推送
-
-原因: 强制推送会覆盖远程历史,可能导致团队成员代码丢失
-
-建议:
-1. 如果需要修改commit,使用git commit --amend
-2. 如果分支分叉,使用git pull --rebase
-3. 如果确实需要强制推送,请用户手动执行
-```
-
-### 错误 3: 尝试 merge
-
-**场景**:
-
-```bash
-git merge dev
-```
-
-**拦截**:
-
-```
-⛔ 操作被拒绝: AI不能执行merge操作
-
-原因: 合并代码是关键决策点,必须由用户手动执行
-
-建议:
-1. 推送代码到feature分支
-2. 在GitHub/GitLab创建PR
-3. 用户审核后手动合并
-```
-
-### 错误 4: 分支命名不规范
-
-**场景**:
-
-```bash
-git checkout -b my-feature
-```
-
-**警告**:
-
-```
-⚠️ 分支命名不符合规范
-
-当前: my-feature
-建议: feature/my-feature
-
-是否使用建议的分支名? (Y/n)
-```
-
 ---
 
 ## 📊 安全审计
@@ -619,22 +440,6 @@ git checkout -b my-feature
   "user_confirmed": true,
   "result": "success"
 }
-```
-
-### 定期审计
-
-**检查项**:
-
-- [ ] 是否有 AI 直接操作保护分支的记录
-- [ ] 是否有强制推送的记录
-- [ ] 是否有 merge 操作的记录
-- [ ] 分支命名规范遵守率
-
-**工具**:
-
-```bash
-# 审计最近30天的Git操作
-python tools/py/git_audit.py --since "30 days ago"
 ```
 
 ---
@@ -655,7 +460,8 @@ python tools/py/git_audit.py --since "30 days ago"
 执行 Git 操作前检查:
 
 - [ ] 当前分支不是保护分支
-- [ ] 没有使用--force 参数
+- [ ] **诚信审计**: Commit 信息准确反映了代码变更
+- [ ] 没有使用 --force 参数
 - [ ] 没有执行 merge 操作
 - [ ] 分支命名符合规范
 - [ ] Commit message 格式规范
@@ -668,33 +474,18 @@ python tools/py/git_audit.py --since "30 days ago"
 # 检查当前分支
 python tools/py/git_safety.py --check-branch
 
-# 验证命令
+# 验证 Git 命令
 python tools/py/git_safety.py --validate-command "git push origin main"
+
+# 诚信审计 (NEW)
+python tools/py/commit_integrity_validator.py --message "..."
 
 # 建议分支名
 python tools/py/git_safety.py --suggest-branch-name "用户积分系统"
-
-# 安装Pre-commit Hook
-python tools/py/install_hooks.py
-
-# 审计Git操作
-python tools/py/git_audit.py --since "30 days ago"
-```
-
-### 决策流程
-
-```
-准备执行Git操作
-  ↓
-检查安全级别
-  ↓
-RED → 拒绝执行,提示建议
-YELLOW → 请求用户确认
-GREEN → 直接执行
 ```
 
 ---
 
-**版本**: v1.0  
-**最后更新**: 2025-12-11  
+**版本**: v1.1  
+**最后更新**: 2026-04-07  
 **路径**: `workflows/git_safety_workflow.md`

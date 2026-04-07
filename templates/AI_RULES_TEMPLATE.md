@@ -319,44 +319,58 @@ review_metadata:
 - `git checkout [branch]` - 切换到非保护分支
 - `git merge --abort`, `git rebase --abort` - 中止操作
 
-### 4. 推荐 Git 工作流
+### 4. 推荐 Git 工作流 (AI 驱动型)
 
-**标准流程**:
+**核心原则**: AI 负责编码与提议，用户负责审核与决策，Git 历史记录必须是高质量的知识资产。
 
-```
-main/master (保护) → dev → feature/xxx (AI开发) → PR (用户合并) → dev → main
-```
+#### 🛠️ AI 自动提议 Commit 规范 (必需)
 
-**职责分工**:
+当您（AI）完成代码修改并准备提议 Commit 时，必须执行以下步骤：
 
-- **AI 可以**: 创建 feature 分支、开发代码、提交和推送到 feature 分支
-- **用户必须**: 合并 PR、解决冲突、发布 tag、操作保护分支
+1.  **物理核对 (Physical Audit)**：运行 `git status` 和 `git diff`，确保提议的文件列表与物理变更完全一致。
+2.  **诚信审计 (Integrity Check)**：核对 `HOW` 字段是否覆盖了所有物理变更的文件；核对 `WHAT/WHY` 是否涵盖了本次会话的所有设计目标。
+3.  **冲突警示 (Conflict Warning)**：如果物理变更包含了一些“顺手改动”但未在 WHY 中体现，必须在提议中显式标注：`[SIDE EFFECT]: 顺手修复了 xxx`。
+4.  **知识沉淀提示**：如果 HOW 中包含重大架构决策（如：引入新库、改变并发模式、数据库迁移），必须提示用户：“检测到架构变更，建议同步生成 ADR 或更新知识库。”
 
-**完整示例**:
+#### 🔄 闭环执行流程
+
+1.  **代码完成**：AI 停止编码，执行物理核对。
+2.  **展示提议**：AI 展示 `prompt:` 格式的 Commit 草稿，并附带 **[诚信自评分数]**。
+3.  **用户 Y**：执行 `git commit`。
+4.  **自动联动 (Path C)**：Commit 成功后，AI 必须立即主动调用 `commit_analyst` 角色，展示受影响文档的更新草稿，实现“代码-文档同步”。
+
+#### 完整示例
 
 ```bash
-# Step 1: AI创建feature分支(需确认)
-git checkout dev
-git pull origin dev
-git checkout -b feature/user-points-system
-✅ 分支名符合规范,是否创建? (Y/n)
+# Step 1: AI物理核对并提议 (自动执行)
+AI: "我已完成代码修改。
+     物理核对: 3个文件已修改 [status ✅]
+     诚信审计: 意图与代码完全匹配 [Integrity: 98/100]
 
-# Step 2: AI开发和提交(需审核commit message)
-git add src/models/user.py src/api/points.py
-git commit -m "prompt(feature): 新增用户积分系统
-WHAT: 实现积分累积和兑换功能
-WHY: 提升用户活跃度
-HOW: User模型新增points字段,API端点/api/points"
-✅ Commit message质量评分: 85/100,是否提交? (Y/n)
+     拟提交 Commit:
+     prompt(feature): 实现用户高级会员订阅体系
+     WHAT: 引入会员订阅功能，涵盖数据库扩展、API开发及权限拦截。
+     WHY: 响应业务需求 #2024-08，提升营收。
+     HOW: 
+     - 修改 src/models/user.py (新增 is_premium 字段)
+     - 新增 src/api/subscription.py (订阅接口)
+     - 修改 middleware/auth.py (权限拦截逻辑)
 
-# Step 3: AI推送(需确认)
-git push origin feature/user-points-system
-✅ 推送到feature分支,是否执行? (Y/n)
+     是否执行提交? (Y/n)"
 
-# Step 4: AI提示用户创建PR
-"代码已推送到 feature/user-points-system
-请在GitHub/GitLab创建PR并合并到dev"
+# Step 2: 用户确认
+用户: "Y"
 
+# Step 3: AI执行提交并立即触发文档更新 (自动执行)
+AI: "✅ Commit 成功: abc123
+     🚀 正在启动 Path C: 增量文档更新检测...
+
+     检测到以下文档需要同步更新:
+     - dev_docs/api_layer.md (P0)
+     - dev_docs/database_schema.md (P0)
+
+     是否生成更新草稿? (Y/n)"
+```
 # Step 5-7: 用户手动操作
 # (在Web界面创建PR、审核、合并)
 ```
