@@ -24,12 +24,12 @@ from typing import List, Dict, Set
 
 def parse_how_files(message: str) -> Set[str]:
     """
-    从 Commit Message 的 HOW 字段中提取提到的文件路径 (生产级解析器 v2)
+    从 Commit Message 的 HOW 字段中提取提到的文件路径 (生产级解析器 v3)
     
     解析逻辑:
     1. 提取 HOW: 之后的所有文本
-    2. 使用更保守且精准的正则匹配完整路径
-    3. 清理路径周边的干扰字符
+    2. 忽略括号 (...) 中的内容，防止误将描述文字识别为路径
+    3. 使用更精准的正则匹配完整路径
     """
     how_section = ""
     # 查找 HOW: 之后的所有内容, 直到下一个大写关键字 (如 WHY, WHAT) 或结束
@@ -37,20 +37,23 @@ def parse_how_files(message: str) -> Set[str]:
     if how_match:
         how_section = how_match.group(1)
     
+    # 核心优化：移除所有括号及其内容，防止误读描述 (如 "Node.js", "AI")
+    clean_how = re.sub(r'\(.*?\)', '', how_section)
+    
     # 路径匹配正则: 匹配包含斜杠的文件名, 或者带常见扩展名的文件名
-    # 支持: src/main.py, ./docs/api.md, .gitignore, package.json
+    # 使用 \b 单词边界防止匹配到类似 v1.4 的版本号
     patterns = [
-        r'[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]+', # 标准路径或带扩展名文件
-        r'\.[a-zA-Z0-9_\-]+'                # 隐藏文件如 .gitignore
+        r'\b[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]{1,10}\b', # 标准路径或带扩展名文件
+        r'\.[a-zA-Z0-9_\-]+\b'                        # 隐藏文件如 .gitignore
     ]
     
     found_paths = set()
     for pattern in patterns:
-        matches = re.findall(pattern, how_section)
+        matches = re.findall(pattern, clean_how)
         for m in matches:
             # 清理标点
-            p = m.strip('.,:;()[]{} "\'')
-            # 统一处理 ./ 前缀 (移除它以便与 git diff 结果对齐)
+            p = m.strip('.,:; "\'')
+            # 统一处理 ./ 前缀
             if p.startswith('./'):
                 p = p[2:]
             if p:

@@ -28,7 +28,7 @@ function getGitDiffFiles(staged = true) {
 }
 
 /**
- * 从 Commit Message 的 HOW 字段中提取提到的文件路径
+ * 从 Commit Message 的 HOW 字段中提取提到的文件路径 (生产级解析器 v3)
  */
 function parseHowFiles(message) {
     let howSection = "";
@@ -38,19 +38,23 @@ function parseHowFiles(message) {
         howSection = howMatch[1];
     }
 
+    // 核心优化：移除所有括号及其内容，防止误读描述 (如 "Node.js", "AI")
+    const cleanHow = howSection.replace(/\(.*?\)/g, '');
+
     const foundPaths = new Set();
     // 路径匹配正则: 匹配包含斜杠的文件名, 或者带常见扩展名的文件名
+    // 使用词边界 \b 
     const patterns = [
-        /[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]+/g, // 标准路径或带扩展名文件
-        /\.[a-zA-Z0-9_\-]+/g                // 隐藏文件如 .gitignore
+        /\b[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]{1,10}\b/g, // 标准路径或带扩展名文件
+        /\.[a-zA-Z0-9_\-]+\b/g                        // 隐藏文件如 .gitignore
     ];
 
     patterns.forEach(pattern => {
-        const matches = howSection.match(pattern);
+        const matches = cleanHow.match(pattern);
         if (matches) {
             matches.forEach(m => {
                 // 清理标点
-                let p = m.replace(/[.,:;()\[\]{} "']+$/, '').replace(/^[.,:;()\[\]{} "']+/, '');
+                let p = m.replace(/[.,:; "']+$/, '').replace(/^[.,:; "']+/, '');
                 // 统一处理 ./ 前缀
                 if (p.startsWith('./')) {
                     p = p.substring(2);
