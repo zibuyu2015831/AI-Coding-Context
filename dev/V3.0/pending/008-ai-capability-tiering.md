@@ -151,6 +151,7 @@ def handle_model_override(user_input, suggested_model):
 - 学习用户模式
 - 模型性能监控
 - 自动调整策略
+- 与 014-文档阅读习惯引导集成：根据任务复杂度推荐模型
 
 #### 风险与缓解
 - 质量下降风险：需要建立反馈机制
