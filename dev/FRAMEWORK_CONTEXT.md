@@ -20,6 +20,7 @@ verified_at: 2026-04-06
 - ✅ 016-配置管理系统（config/）
 - ✅ 017-实用脚本工具库（tools/）
 - ✅ 018-Commit-Guided Documentation（workflows/commit_guided_update.md）
+- ✅ 019-系统化文档审核框架（templates/review/ + workflows/generation_workflow.md）
 
 **剩余关键能力（规划中）**：
 
@@ -349,10 +350,16 @@ project_root/
 │   │   ├── features/              # 功能方案
 │   │   └── bugs/                  # Bug 修复方案
 │   │
-│   └── knowledge/                 # 知识库
-│       ├── troubleshooting/       # 问题解决
-│       ├── patterns/              # 架构模式
-│       └── performance/           # 性能优化
+│   ├── knowledge/                 # 知识库
+│   │   ├── troubleshooting/       # 问题解决
+│   │   ├── patterns/              # 架构模式
+│   │   └── performance/           # 性能优化
+│   │
+│   └── review/                    # 🆕 系统化文档审核体系 (V3.0)
+│       ├── sys_review_plan.md     # 审核规程（执行流程 + Prompt 模板）
+│       ├── sys_review_principles.md # 审核原则（双目标、红线、验收标准）
+│       ├── REVIEW_LOG.md          # 全局进度总索引
+│       └── rounds/                # 审核轮次归档（每轮一个子目录）
 │
 └── AI_RULES.md                    # AI 规则（用于 IDE 集成）
 ```
@@ -678,7 +685,7 @@ project_root/
 ### V3.0 (开发中) - 战略式编程增强
 
 - **当前阶段**: 核心 P0 功能完成，进入 P1/P2 阶段 (2025-12-18 ~ 2026-Q2)
-- **已完成** (7/17):
+- **已完成** (8/17):
   - ✅ 001-AI 角色库 (2025-11-29)
   - ✅ 017-实用脚本工具库 (2025-12-01)
   - ✅ 016-配置管理系统 (2025-12-02)
@@ -686,6 +693,7 @@ project_root/
   - ✅ 003-设计思维引导 (2025-12-03)
   - ✅ 012-强制文档摘要 (2025-12-03)
   - ✅ 018-Commit-Guided Documentation (2025-12-18)
+  - ✅ 019-系统化文档审核框架 (2026-04-11)
 - **进行中**: P1/P2 优化点讨论与开发
 - **已归档**: 002-危险指令拦截系统
 - **P1 功能**: ADR 系统、复杂度仪表盘、自动审查报告

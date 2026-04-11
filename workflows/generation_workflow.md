@@ -609,7 +609,54 @@ README.md 包含：
 
 ---
 
-### 步骤 2.5: 为所有文档添加摘要 ⭐ (V3.0) `[MUST]`
+### 步骤 2.5: 创建 review/ 目录 ⭐ (V3.0) `[MUST]`
+
+**目的**: 为项目建立系统化文档审核体系，生成项目专属的审核规程和原则文档，确保文档体系可以周期性被审核和维护。
+
+**AI 指令模板**:
+
+```
+请创建 dev_docs/review/ 目录结构，包括：
+
+1. dev_docs/review/sys_review_plan.md
+   基于 templates/review/review_plan_TEMPLATE.md 生成，需根据项目实际情况微调：
+   - 将所有 {PROJECT_NAME} 替换为实际项目名
+   - 在 §2.1 的"目标文档分层"表中，填入项目实际的各层级文档（L1/L2/L3）
+   - 在 §4.2 的"事件触发"表中，根据项目实际技术栈补充项目专属触发条件
+     （例如：修改 docker-compose.yaml → 触发部署文档重审；修改 routers/ → 触发 API 文档重审）
+   - 将 Prompt 模板中的 {PROJECT_NAME} 替换为实际项目名
+   - 将 {GENERATION_DATE} 替换为今日日期
+
+2. dev_docs/review/sys_review_principles.md
+   基于 templates/review/review_principles_TEMPLATE.md 生成，需根据项目实际情况微调：
+   - 将所有 {PROJECT_NAME} 替换为实际项目名
+   - 在 §3.1 中将 {L1_DOCS}/{L2_DOCS}/{L3_DOCS} 替换为实际文档的具体占位说明
+   - 将 {SRC_DIR} 替换为项目实际的源码目录（如 src/、Services/、app/ 等）
+   - 将 {PASS_THRESHOLD} 替换为建议的验收通过率（通常为 "N-1/N" 格式，如 12/13）
+   - 将 {GENERATION_DATE} 替换为今日日期
+
+3. dev_docs/review/REVIEW_LOG.md
+   初始化为空白总索引，Frontmatter 的 verified_at 设为今日日期
+
+4. dev_docs/review/rounds/.gitkeep
+   占位文件，确保 rounds/ 目录被 git 追踪
+```
+
+**微调原则**：
+- 文档列表（L1/L2/L3）必须基于项目实际生成的子文档，不得使用占位符
+- 事件触发表中的"修改的文件/目录"必须对应项目实际存在的路径
+- Prompt 模板中项目名必须真实填写，使 AI 在执行审核时能准确理解上下文
+
+**质量检查**:
+- [ ] `sys_review_plan.md` 中不存在未替换的 `{变量}` 占位符
+- [ ] `sys_review_principles.md` 中不存在未替换的 `{变量}` 占位符
+- [ ] 文档分层表中 L1/L2/L3 文档与实际生成的子文档一一对应
+- [ ] 事件触发表中引用的文件路径在项目中实际存在
+- [ ] `REVIEW_LOG.md` 已初始化且格式正确
+
+---
+
+### 步骤 2.6: 为所有文档添加摘要 ⭐ (V3.0) `[MUST]`
 
 **目的**: 为生成的所有文档添加标准化 YAML Frontmatter 摘要，支持快速判断相关性和自动更新检测
 
@@ -734,9 +781,11 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 - [ ] `plans/` 目录创建完成
 - [ ] `knowledge/` 目录创建完成
+- [ ] `review/` 目录创建完成（含 sys_review_plan.md、sys_review_principles.md、REVIEW_LOG.md、rounds/.gitkeep）
 - [ ] README 文件齐全
 
 ---
+
 
 ### 步骤 3.2: AI 自测
 
@@ -998,6 +1047,7 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 # 阶段4: 创建目录结构
 创建 dev_docs/plans/ 目录（含README和子目录）
 创建 dev_docs/knowledge/ 目录（含README和子目录）
+创建 dev_docs/review/ 目录（含 sys_review_plan.md、sys_review_principles.md、REVIEW_LOG.md、rounds/.gitkeep）
 
 # 阶段5: 质量检查
 进行AI自测（5个场景）
