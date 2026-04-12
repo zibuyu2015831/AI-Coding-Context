@@ -19,7 +19,8 @@
 
 - **总计**: 17 个
 - **已完成**: 8 个 (001, 003, 004, 012, 013, 016, 017, 018)
-- **待讨论** (pending/): 9 个
+- **整合到已完成** (005+006): 1 个
+- **待讨论** (pending/): 8 个
 - **已归档** (archived/): 1 个 (002)
 
 ### 优先级分布
@@ -74,12 +75,15 @@
 - **产物**: `dev_docs/complexity/`, `tools/complexity_scanner.py`, `tools/report_generator.py`
 - **详细信息**: [005-complexity-dashboard.md](./confirmed/005-complexity-dashboard.md/005-complexity-dashboard.md)
 
+#### 6. 自动化审查报告（整合到005）[006]
+- **状态**: 🟢 审核通过 (2026-04-12)
+- **整合方案**: 扩展 005 工具链，新增代码审查功能
+- **预估工作量**: 2 天
+- **详细信息**: [006-auto-review-report.md](./confirmed/006-auto-review-report.md/006-auto-review-report.md)
+
 ---
 
 ## 📁 待讨论的优化点 (pending/)
-
-#### 6. 自动化审查报告
-- [006-auto-review-report.md](./pending/006-auto-review-report.md)
 
 #### 11. 文档谬误修复工作流
 - [011-doc-error-fix-workflow.md](./pending/011-doc-error-fix-workflow.md)
@@ -107,8 +111,8 @@
 
 ### 阶段 3: P1 功能开发 (当前阶段)
 - ✅ ADR 系统
-- 🔄 复杂度仪表盘 (进行中)
-- [ ] 自动化审查报告
+- ✅ 复杂度仪表盘
+- 🟢 自动化审查报告（已整合到005，待开发）
 - [ ] 质量保证体系深度集成
 
 ### 阶段 4: P2 功能开发 (计划中)
