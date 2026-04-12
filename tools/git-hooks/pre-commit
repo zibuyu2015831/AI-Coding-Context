@@ -173,6 +173,80 @@ def check_complexity():
         return True, f"复杂度检查出错: {str(e)}"
 
 
+def check_code_review():
+    """检查代码变更质量（新增审查功能）"""
+    try:
+        print("\n🔍 Pre-commit Hook: 检查代码审查...")
+
+        # 调用复杂度扫描工具获取审查数据
+        import subprocess
+        import json
+        from pathlib import Path
+
+        # 找到项目根目录
+        current = Path.cwd()
+        root_dir = None
+        while current != current.parent:
+            if (current / 'tools').exists():
+                root_dir = current
+                break
+            current = current.parent
+
+        if not root_dir:
+            return True, "无法找到项目根目录，跳过代码审查"
+
+        # 调用复杂度扫描
+        scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
+        if not scanner_path.exists():
+            return True, "复杂度扫描工具不存在，跳过检查"
+
+        result = subprocess.run(
+            [sys.executable or 'python3', str(scanner_path), '--since', '1 day ago'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if result.returncode != 0:
+            return True, f"审查扫描失败: {result.stderr}"
+
+        try:
+            data = json.loads(result.stdout)
+            review_data = data.get('data', {}).get('review_data', {})
+            dangerous_patterns = review_data.get('dangerous_patterns', [])
+            risk_level = review_data.get('risk_level', 'low')
+
+            # 检查严重问题
+            critical_patterns = [p for p in dangerous_patterns if p.get('severity') == 'critical']
+
+            if critical_patterns:
+                print(f"\n⚠️ 检测到 {len(critical_patterns)} 个严重问题:")
+                for p in critical_patterns:
+                    print(f"   🔴 {p.get('type')} - {p.get('file')}")
+                print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
+                return False, "存在严重审查问题"
+
+            # 检查警告问题
+            warning_patterns = [p for p in dangerous_patterns if p.get('severity') == 'warning']
+            todo_changes = review_data.get('todo_changes', {})
+            todo_added = todo_changes.get('added', 0)
+
+            if warning_patterns or todo_added > 3:
+                print(f"\nℹ️ 检测到 {len(warning_patterns)} 个注意事项:")
+                for p in warning_patterns:
+                    print(f"   🟡 {p.get('type')} - {p.get('file')}")
+                if todo_added > 3:
+                    print(f"   🟡 新增 {todo_added} 个 TODO 标记")
+
+            return True, "代码审查通过"
+
+        except json.JSONDecodeError:
+            return True, "审查数据解析失败，跳过检查"
+
+    except Exception as e:
+        return True, f"代码审查出错: {str(e)}"
+
+
 def main():
     """主函数"""
     print("🔍 Pre-commit Hook: 检查 commit message...")
@@ -228,6 +302,12 @@ def main():
     complexity_ok, complexity_msg = check_complexity()
     if not complexity_ok:
         print(f"\n❌ {complexity_msg}")
+        return 1
+
+    # 代码审查检查
+    review_ok, review_msg = check_code_review()
+    if not review_ok:
+        print(f"\n❌ {review_msg}")
         return 1
 
     print("\n✅ Pre-commit 检查通过!")

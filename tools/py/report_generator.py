@@ -61,7 +61,7 @@ def load_data(data_path):
         return None
 
 
-def generate_markdown_report(data, report_date=None):
+def generate_markdown_report(data, report_date=None, include_review=True):
     """生成 Markdown 报告"""
     if report_date is None:
         report_date = datetime.now().strftime('%Y-%m-%d')
@@ -72,6 +72,7 @@ def generate_markdown_report(data, report_date=None):
     code_quality = complexity_data.get('code_quality', {})
     architecture = complexity_data.get('architecture', {})
     risk_assessment = complexity_data.get('risk_assessment', {})
+    review_data = complexity_data.get('review_data', {})
 
     # 风险等级颜色映射
     def risk_color(level):
@@ -198,6 +199,56 @@ graph TD
 
     if not has_suggestions:
         report += "🟢 当前状态良好，建议保持！\n"
+
+    # 添加代码审查章节
+    if include_review and review_data:
+        report += f"""
+---
+
+## 📋 代码审查
+
+### 📝 变更概述
+
+| 指标 | 数值 | 状态 |
+|------|------|------|
+| 变更文件数 | {review_data.get('changes', {}).get('changed_files', 0)} | {risk_color('low' if review_data.get('changes', {}).get('changed_files', 0) < 5 else 'medium')} |
+| 新增代码行数 | {review_data.get('changes', {}).get('added_lines', 0)} | {risk_color('low' if review_data.get('changes', {}).get('added_lines', 0) < 200 else 'medium' if review_data.get('changes', {}).get('added_lines', 0) < 500 else 'high')} |
+| 核心文件变更 | {review_data.get('changes', {}).get('core_files_changed', 0)} | {risk_color('medium' if review_data.get('changes', {}).get('core_files_changed', 0) > 0 else 'low')} |
+
+### 🚨 发现的问题
+
+"""
+        # 显示危险模式
+        dangerous_patterns = review_data.get('dangerous_patterns', [])
+        if dangerous_patterns:
+            for pattern in dangerous_patterns:
+                severity_color = {
+                    'critical': '🔴',
+                    'warning': '🟡',
+                    'low': '🟢'
+                }.get(pattern.get('severity'), '🟢')
+
+                report += f"""
+{severity_color} **{pattern.get('type', 'unknown')}**
+- 文件: {pattern.get('file', 'unknown')}
+- 说明: {pattern.get('function', pattern.get('lines_changed', '未知'))}
+"""
+
+        # 显示 TODO 变化
+        todo_changes = review_data.get('todo_changes', {})
+        if todo_changes.get('added', 0) > 0:
+            report += f"""
+🟡 **新增 TODO 标记**
+- 数量: {todo_changes.get('added', 0)} 个
+- 建议: 及时处理新增的待办事项
+"""
+
+        # 显示审查风险级别
+        review_risk_level = review_data.get('risk_level', 'low')
+        report += f"""
+### 🎯 审查风险
+**级别**: {risk_color(review_risk_level)} {review_risk_level}
+"""
 
     # 添加 Mermaid 图表
     report += f"""

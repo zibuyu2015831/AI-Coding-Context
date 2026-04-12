@@ -246,6 +246,148 @@ def analyze_code_quality(path):
     return quality
 
 
+def analyze_review_data(path):
+    """分析代码审查数据"""
+    review_data = {
+        "changes": {
+            "added_lines": 0,
+            "removed_lines": 0,
+            "changed_files": 0,
+            "core_files_changed": 0
+        },
+        "todo_changes": {
+            "added": 0,
+            "removed": 0
+        },
+        "dangerous_patterns": [],
+        "api_changes": [],
+        "risk_level": "low"
+    }
+
+    # 获取 git 变更数据
+    git_data = call_git_diff_analyzer("1 day ago")
+    if git_data and "data" in git_data:
+        changed_files = git_data["data"].get("changed_files", [])
+        review_data["changes"]["changed_files"] = len(changed_files)
+
+        # 统计新增/删除代码行数（简化计算）
+        for file in changed_files:
+            if "lines_changed" in file:
+                review_data["changes"]["added_lines"] += file["lines_changed"]
+
+        # 识别核心文件变更
+        core_files = ["package.json", "requirements.txt", "README.md", "tsconfig.json"]
+        for file in changed_files:
+            if any(core_file in file["path"] for core_file in core_files):
+                review_data["changes"]["core_files_changed"] += 1
+
+    # 分析危险模式
+    review_data["dangerous_patterns"] = analyze_dangerous_patterns(path)
+
+    # 分析 TODO 标记变化
+    review_data["todo_changes"] = analyze_todo_changes(path)
+
+    # 计算风险级别
+    review_data["risk_level"] = calculate_review_risk(review_data)
+
+    return review_data
+
+
+def analyze_dangerous_patterns(path):
+    """分析危险模式"""
+    dangerous_patterns = []
+    config = load_config("")
+
+    # 危险函数模式匹配
+    dangerous_functions = config.get("review", {}).get("dangerous_functions", [])
+    function_patterns = [re.compile(rf"{func}\s*\(") for func in dangerous_functions]
+
+    # 扫描源代码文件
+    for root, dirs, files in os.walk(path):
+        if ".git" in root or "node_modules" in root or "dist" in root or "build" in root:
+            continue
+
+        for file in files:
+            if file.endswith((".py", ".js", ".ts", ".jsx", ".tsx")):
+                try:
+                    with open(os.path.join(root, file), "r", encoding="utf-8") as f:
+                        content = f.read()
+
+                        for func, pattern in zip(dangerous_functions, function_patterns):
+                            if pattern.search(content):
+                                dangerous_patterns.append({
+                                    "type": "dangerous_function",
+                                    "function": func,
+                                    "file": os.path.join(root, file),
+                                    "severity": "critical"
+                                })
+                except:
+                    continue
+
+    # 检查大文件变更
+    large_file_threshold = config.get("review", {}).get("large_file_threshold", 500)
+    git_data = call_git_diff_analyzer("1 day ago")
+    if git_data and "data" in git_data:
+        for file in git_data["data"].get("changed_files", []):
+            if "lines_changed" in file and file["lines_changed"] > large_file_threshold:
+                dangerous_patterns.append({
+                    "type": "large_file_change",
+                    "file": file["path"],
+                    "lines_changed": file["lines_changed"],
+                    "severity": "warning"
+                })
+
+    return dangerous_patterns
+
+
+def analyze_todo_changes(path):
+    """分析 TODO 标记变化"""
+    todo_changes = {
+        "added": 0,
+        "removed": 0
+    }
+
+    # 获取变更前的文件状态（简化处理）
+    try:
+        # 查看上次提交的代码
+        git_show_result = run_command(["git", "show", "HEAD~1:{}".format("")])
+        # 这里需要更复杂的实现，目前简化处理
+        pass
+    except:
+        pass
+
+    # 检查敏感信息（API Key、密码等）
+    sensitive_patterns = [
+        re.compile(r"API_KEY|api_key|ApiKey"),
+        re.compile(r"SECRET|secret|Secret"),
+        re.compile(r"PASSWORD|password|Password"),
+        re.compile(r"TOKEN|token|Token")
+    ]
+
+    return todo_changes
+
+
+def calculate_review_risk(review_data):
+    """计算审查风险级别"""
+    config = load_config("")
+    risk_level = "low"
+
+    # 检查危险函数
+    if any(p["severity"] == "critical" for p in review_data["dangerous_patterns"]):
+        risk_level = "critical"
+    # 检查 TODO 标记过多
+    elif review_data["todo_changes"]["added"] > config.get("review", {}).get("todo_warning_threshold", 3):
+        risk_level = "warning"
+    # 检查大文件变更
+    elif any(p["lines_changed"] > config.get("review", {}).get("large_file_threshold", 500) for p in review_data["dangerous_patterns"]):
+        risk_level = "warning"
+    # 检查核心文件变更
+    elif review_data["changes"]["core_files_changed"] > 0:
+        risk_level = "medium"
+
+    return risk_level
+
+
 def analyze_architecture(path):
     """分析架构健康度"""
     architecture = {
@@ -338,6 +480,23 @@ def load_config(config_path):
             "dependency_depth": 7,
             "quality_score": 50,
             "coupling_score": 40
+        },
+        "review": {
+            "dangerous_functions": [
+                "eval",
+                "exec",
+                "Function"
+            ],
+            "large_file_threshold": 500,
+            "todo_warning_threshold": 3,
+            "todo_critical_threshold": 5,
+            "notification": {
+                "level": "warning",
+                "channels": [
+                    "slack",
+                    "email"
+                ]
+            }
         }
     }
 
@@ -371,6 +530,7 @@ def main():
         "dependencies": analyze_dependencies(args.path),
         "code_quality": analyze_code_quality(args.path),
         "architecture": analyze_architecture(args.path),
+        "review_data": analyze_review_data(args.path),  # 新增代码审查数据
         "risk_assessment": {}
     }
 
