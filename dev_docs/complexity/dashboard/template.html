@@ -401,6 +401,99 @@
             </div>
         </div>
 
+        <div class="chart-section">
+            <h2>📋 代码审查结果</h2>
+            {{#if data.review_data}}
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>变更文件数</h3>
+                        <div class="stat-value {{reviewDataChangedFilesRisk}}">{{data.review_data.changes.changed_files}}</div>
+                        <div class="risk-indicators">
+                            {{#each reviewDataChangedFilesRisks}}
+                                <span class="risk-tag {{this.level}}">{{this.message}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>新增代码行数</h3>
+                        <div class="stat-value {{reviewDataAddedLinesRisk}}">{{data.review_data.changes.added_lines}}</div>
+                        <div class="risk-indicators">
+                            {{#each reviewDataAddedLinesRisks}}
+                                <span class="risk-tag {{this.level}}">{{this.message}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>核心文件变更</h3>
+                        <div class="stat-value {{reviewDataCoreFilesRisk}}">{{data.review_data.changes.core_files_changed}}</div>
+                        <div class="risk-indicators">
+                            {{#each reviewDataCoreFilesRisks}}
+                                <span class="risk-tag {{this.level}}">{{this.message}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>审查风险级别</h3>
+                        <div class="stat-value {{reviewDataRiskLevel}}">{{data.review_data.risk_level}}</div>
+                        <div class="risk-indicators">
+                            {{#each reviewDataRisks}}
+                                <span class="risk-tag {{this.level}}">{{this.message}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                {{#if data.review_data.dangerous_patterns}}
+                    <div class="chart-section">
+                        <h3>🚨 发现的问题</h3>
+                        <div class="mermaid">
+                            graph TD
+                                A[问题类型] --> B[危险函数: {{#filter data.review_data.dangerous_patterns 'severity' 'critical'}}{{length}}{{/filter}}个]
+                                A --> C[大文件变更: {{#filter data.review_data.dangerous_patterns 'severity' 'warning'}}{{length}}{{/filter}}个]
+                                style B fill:#ef4444
+                                style C fill:#f59e0b
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>文件</th>
+                                    <th>说明</th>
+                                    <th>严重度</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each data.review_data.dangerous_patterns}}
+                                    <tr>
+                                        <td>{{this.type}}</td>
+                                        <td>{{this.file}}</td>
+                                        <td>{{this.function or this.lines_changed}}</td>
+                                        <td>{{this.severity}}</td>
+                                    </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{/if}}
+
+                {{#if data.review_data.todo_changes.added}}
+                    <div class="chart-section">
+                        <h3>📝 TODO 标记变化</h3>
+                        <div class="stat-value {{reviewDataTodoChangesRisk}}">新增 {{data.review_data.todo_changes.added}} 个</div>
+                        {{#if data.review_data.todo_changes.removed}}
+                            <div class="stat-value good">删除 {{data.review_data.todo_changes.removed}} 个</div>
+                        {{/if}}
+                    </div>
+                {{/if}}
+
+            {{else}}
+                <div class="stat-card">
+                    <h3>代码审查</h3>
+                    <div class="stat-value good">未找到代码审查数据</div>
+                </div>
+            {{/if}}
+        </div>
+
         <div class="button-group">
             <a href="#" class="btn" onclick="location.reload()">🔄 刷新数据</a>
             <a href="reports/" class="btn">📄 查看报告</a>

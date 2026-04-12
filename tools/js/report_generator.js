@@ -62,7 +62,7 @@ function riskColor(level) {
 }
 
 // 生成 Markdown 报告
-function generateMarkdownReport(data, reportDate = null) {
+function generateMarkdownReport(data, reportDate = null, includeReview = true) {
     if (!reportDate) {
         reportDate = new Date().toISOString().split('T')[0];
     }
@@ -73,6 +73,7 @@ function generateMarkdownReport(data, reportDate = null) {
     const codeQuality = complexityData.code_quality || {};
     const architecture = complexityData.architecture || {};
     const riskAssessment = complexityData.risk_assessment || {};
+    const reviewData = complexityData.review_data || {};
 
     let report = `# 📊 项目复杂度报告
 
@@ -195,6 +196,60 @@ graph TD
 
     if (!hasSuggestions) {
         report += '🟢 当前状态良好，建议保持！\n';
+    }
+
+    // 添加代码审查章节
+    if (includeReview && Object.keys(reviewData).length > 0) {
+        report += `
+---
+
+## 📋 代码审查
+
+### 📝 变更概述
+
+| 指标 | 数值 | 状态 |
+|------|------|------|
+| 变更文件数 | ${reviewData.changes?.changed_files || 0} | ${riskColor((reviewData.changes?.changed_files || 0) < 5 ? 'low' : 'medium')} |
+| 新增代码行数 | ${reviewData.changes?.added_lines || 0} | ${riskColor((reviewData.changes?.added_lines || 0) < 200 ? 'low' : ((reviewData.changes?.added_lines || 0) < 500 ? 'medium' : 'high'))} |
+| 核心文件变更 | ${reviewData.changes?.core_files_changed || 0} | ${riskColor((reviewData.changes?.core_files_changed || 0) > 0 ? 'medium' : 'low')} |
+
+### 🚨 发现的问题
+
+`;
+        // 显示危险模式
+        const dangerousPatterns = reviewData.dangerous_patterns || [];
+        if (dangerousPatterns.length > 0) {
+            for (const pattern of dangerousPatterns) {
+                const severityColor = {
+                    'critical': '🔴',
+                    'warning': '🟡',
+                    'low': '🟢'
+                }[pattern.severity] || '🟢';
+
+                report += `
+${severityColor} **${pattern.type || 'unknown'}**
+- 文件: ${pattern.file || 'unknown'}
+- 说明: ${pattern.function || pattern.lines_changed || '未知'}
+`;
+            }
+        }
+
+        // 显示 TODO 变化
+        const todoChanges = reviewData.todo_changes || {};
+        if ((todoChanges.added || 0) > 0) {
+            report += `
+🟡 **新增 TODO 标记**
+- 数量: ${todoChanges.added || 0} 个
+- 建议: 及时处理新增的待办事项
+`;
+        }
+
+        // 显示审查风险级别
+        const reviewRiskLevel = reviewData.risk_level || 'low';
+        report += `
+### 🎯 审查风险
+**级别**: ${riskColor(reviewRiskLevel)} ${reviewRiskLevel}
+`;
     }
 
     // 添加 Mermaid 图表

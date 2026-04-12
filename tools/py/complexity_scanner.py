@@ -347,22 +347,21 @@ def analyze_todo_changes(path):
         "removed": 0
     }
 
-    # 获取变更前的文件状态（简化处理）
+    # 获取git diff分析TODO变化
     try:
-        # 查看上次提交的代码
-        git_show_result = run_command(["git", "show", "HEAD~1:{}".format("")])
-        # 这里需要更复杂的实现，目前简化处理
-        pass
+        # 获取上次提交和当前的diff
+        git_diff = run_command(["git", "diff", "HEAD~1", "HEAD"])
+        if git_diff:
+            # 解析diff中的TODO变化
+            todo_pattern = re.compile(r"[+-].*?(TODO|todo|Todo)")
+            lines = git_diff.split('\n')
+            for line in lines:
+                if line.startswith('+') and todo_pattern.search(line):
+                    todo_changes["added"] += 1
+                elif line.startswith('-') and todo_pattern.search(line):
+                    todo_changes["removed"] += 1
     except:
         pass
-
-    # 检查敏感信息（API Key、密码等）
-    sensitive_patterns = [
-        re.compile(r"API_KEY|api_key|ApiKey"),
-        re.compile(r"SECRET|secret|Secret"),
-        re.compile(r"PASSWORD|password|Password"),
-        re.compile(r"TOKEN|token|Token")
-    ]
 
     return todo_changes
 
@@ -458,8 +457,9 @@ def calculate_risk_assessment(data, config):
 
 
 def load_config(config_path):
-    """加载配置文件（使用硬编码默认值）"""
-    return {
+    """加载配置文件"""
+    # 默认配置
+    default_config = {
         "warning_threshold": {
             "daily_growth": 5,
             "file_count": 150,
@@ -499,6 +499,29 @@ def load_config(config_path):
             }
         }
     }
+
+    # 尝试从配置文件加载
+    if config_path and os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                # 使用简单的YAML解析
+                parsed_config = parse_yaml(content)
+                if parsed_config:
+                    # 合并配置（用户配置覆盖默认配置）
+                    def merge_configs(default, user):
+                        result = default.copy()
+                        for key, value in user.items():
+                            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                                result[key] = merge_configs(result[key], value)
+                            else:
+                                result[key] = value
+                        return result
+                    return merge_configs(default_config, parsed_config)
+        except Exception as e:
+            print(f"Warning: 无法加载配置文件 {config_path}, 使用默认配置: {e}")
+
+    return default_config
 
 
 def main():

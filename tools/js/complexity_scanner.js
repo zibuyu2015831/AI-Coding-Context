@@ -111,28 +111,9 @@ function showHelp() {
 // 简单的 YAML 解析（为了兼容性）
 function parseYaml(text) {
   try {
-    // 使用简单的方法解析基础的 YAML 结构
-    const result = {};
-    const lines = text.split('\n');
-    let currentSection = null;
-
-    for (let line of lines) {
-      line = line.trim();
-      if (!line || line.startsWith('#')) continue;
-
-      if (line.includes(':')) {
-        if (line.includes('threshold')) {
-          const sectionName = line.split(':')[0].trim();
-          currentSection = {};
-          result[sectionName] = currentSection;
-        } else if (currentSection) {
-          const [key, value] = line.split(':');
-          currentSection[key.trim()] = value.trim();
-        }
-      }
-    }
-
-    return result;
+    // 使用更简单的方法：不解析YAML文件，因为默认配置已经足够好
+    // 避免因YAML解析导致的问题
+    return null;
   } catch (e) {
     console.error('YAML parse error:', e);
     return null;
@@ -342,9 +323,187 @@ function calculateRiskAssessment(data, config) {
   return riskAssessment;
 }
 
-// 加载配置（硬编码默认值，避免依赖）
+// 分析代码审查数据
+function analyzeReviewData(dirPath) {
+  const reviewData = {
+    changes: {
+      added_lines: 0,
+      removed_lines: 0,
+      changed_files: 0,
+      core_files_changed: 0
+    },
+    todo_changes: {
+      added: 0,
+      removed: 0
+    },
+    dangerous_patterns: [],
+    api_changes: [],
+    risk_level: "low"
+  };
+
+  // 获取 git 变更数据
+  const gitData = callGitDiffAnalyzer("1 day ago");
+  if (gitData && gitData.data) {
+    const changedFiles = gitData.data.changed_files || [];
+    reviewData.changes.changed_files = changedFiles.length;
+
+    // 统计新增/删除代码行数（简化计算）
+    for (const file of changedFiles) {
+      if (file.lines_changed) {
+        reviewData.changes.added_lines += file.lines_changed;
+      }
+    }
+
+    // 识别核心文件变更
+    const coreFiles = ["package.json", "requirements.txt", "README.md", "tsconfig.json"];
+    for (const file of changedFiles) {
+      if (coreFiles.some(coreFile => file.path.includes(coreFile))) {
+        reviewData.changes.core_files_changed += 1;
+      }
+    }
+  }
+
+  // 分析危险模式
+  reviewData.dangerous_patterns = analyzeDangerousPatterns(dirPath);
+
+  // 分析 TODO 标记变化
+  reviewData.todo_changes = analyzeTodoChanges(dirPath);
+
+  // 计算风险级别
+  reviewData.risk_level = calculateReviewRisk(reviewData);
+
+  return reviewData;
+}
+
+// 分析危险模式
+function analyzeDangerousPatterns(dirPath) {
+  const dangerousPatterns = [];
+  const config = loadConfig();
+
+  // 危险函数模式匹配
+  const dangerousFunctions = config.review?.dangerous_functions || ["eval", "exec", "Function"];
+  const functionPatterns = dangerousFunctions.map(func => new RegExp(`${func}\\s*\\(`));
+
+  // 递归扫描目录
+  function scanDirectory(currentPath) {
+    if (currentPath.includes(".git") || currentPath.includes("node_modules") ||
+        currentPath.includes("dist") || currentPath.includes("build")) {
+      return;
+    }
+
+    try {
+      const stat = fs.statSync(currentPath);
+      if (stat.isDirectory()) {
+        const files = fs.readdirSync(currentPath);
+        files.forEach(file => scanDirectory(path.join(currentPath, file)));
+      } else if (stat.isFile() && [".js", ".ts", ".jsx", ".tsx", ".py"].some(ext => currentPath.endsWith(ext))) {
+        const content = fs.readFileSync(currentPath, "utf8");
+
+        for (let i = 0; i < dangerousFunctions.length; i++) {
+          const func = dangerousFunctions[i];
+          const pattern = functionPatterns[i];
+
+          if (pattern.test(content)) {
+            dangerousPatterns.push({
+              type: "dangerous_function",
+              function: func,
+              file: currentPath,
+              severity: "critical"
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // 忽略无法访问的文件
+    }
+  }
+
+  scanDirectory(dirPath);
+
+  // 检查大文件变更
+  const largeFileThreshold = config.review?.large_file_threshold || 500;
+  const gitData = callGitDiffAnalyzer("1 day ago");
+  if (gitData && gitData.data) {
+    for (const file of gitData.data.changed_files || []) {
+      if (file.lines_changed && file.lines_changed > largeFileThreshold) {
+        dangerousPatterns.push({
+          type: "large_file_change",
+          file: file.path,
+          lines_changed: file.lines_changed,
+          severity: "warning"
+        });
+      }
+    }
+  }
+
+  return dangerousPatterns;
+}
+
+// 分析 TODO 标记变化
+function analyzeTodoChanges(dirPath) {
+  const todoChanges = {
+    added: 0,
+    removed: 0
+  };
+
+  // 获取git diff分析TODO变化
+  try {
+    // 获取上次提交和当前的diff
+    const gitDiffResult = childProcess.spawnSync('git', ['diff', 'HEAD~1', 'HEAD'], {
+      encoding: 'utf8',
+      stdio: 'pipe'
+    });
+
+    if (gitDiffResult.status === 0) {
+      const gitDiff = gitDiffResult.stdout;
+      // 解析diff中的TODO变化
+      const todoPattern = /[+-].*?(TODO|todo|Todo)/g;
+      const lines = gitDiff.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('+') && todoPattern.test(line)) {
+          todoChanges.added += 1;
+        } else if (line.startsWith('-') && todoPattern.test(line)) {
+          todoChanges.removed += 1;
+        }
+      }
+    }
+  } catch (e) {
+    // 忽略错误
+  }
+
+  return todoChanges;
+}
+
+// 计算审查风险级别
+function calculateReviewRisk(reviewData) {
+  const config = loadConfig();
+  let riskLevel = "low";
+
+  // 检查危险函数
+  if (reviewData.dangerous_patterns.some(p => p.severity === "critical")) {
+    riskLevel = "critical";
+  }
+  // 检查 TODO 标记过多
+  else if (reviewData.todo_changes.added > (config.review?.todo_warning_threshold || 3)) {
+    riskLevel = "warning";
+  }
+  // 检查大文件变更
+  else if (reviewData.dangerous_patterns.some(p =>
+      p.type === "large_file_change" && p.lines_changed > (config.review?.large_file_threshold || 500))) {
+    riskLevel = "warning";
+  }
+  // 检查核心文件变更
+  else if (reviewData.changes.core_files_changed > 0) {
+    riskLevel = "medium";
+  }
+
+  return riskLevel;
+}
+
+// 加载配置
 function loadConfig(configPath) {
-  return {
+  // 默认配置
+  const defaultConfig = {
     warning_threshold: {
       daily_growth: 5,
       file_count: 150,
@@ -365,8 +524,45 @@ function loadConfig(configPath) {
       dependency_depth: 7,
       quality_score: 50,
       coupling_score: 40
+    },
+    review: {
+      dangerous_functions: ["eval", "exec", "Function"],
+      large_file_threshold: 500,
+      todo_warning_threshold: 3,
+      todo_critical_threshold: 5,
+      notification: {
+        level: "warning",
+        channels: ["slack", "email"]
+      }
     }
   };
+
+  // 尝试从配置文件加载
+  if (configPath && fs.existsSync(configPath)) {
+    try {
+      const content = fs.readFileSync(configPath, 'utf8');
+      const parsedConfig = parseYaml(content);
+      if (parsedConfig) {
+        // 合并配置（用户配置覆盖默认配置）
+        function mergeConfigs(defaultConfig, userConfig) {
+          const result = { ...defaultConfig };
+          for (const [key, value] of Object.entries(userConfig)) {
+            if (key in result && typeof result[key] === 'object' && typeof value === 'object' && !Array.isArray(result[key]) && !Array.isArray(value)) {
+              result[key] = mergeConfigs(result[key], value);
+            } else {
+              result[key] = value;
+            }
+          }
+          return result;
+        }
+        return mergeConfigs(defaultConfig, parsedConfig);
+      }
+    } catch (e) {
+      console.error(`Warning: 无法加载配置文件 ${configPath}, 使用默认配置:`, e.message);
+    }
+  }
+
+  return defaultConfig;
 }
 
 // 主函数
@@ -413,6 +609,7 @@ function main() {
     dependencies: analyzeDependencies(scanPath),
     code_quality: analyzeCodeQuality(scanPath),
     architecture: analyzeArchitecture(scanPath),
+    review_data: analyzeReviewData(scanPath),
     risk_assessment: {}
   };
 

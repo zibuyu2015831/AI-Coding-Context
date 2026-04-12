@@ -107,33 +107,27 @@ def check_git_safety():
         return True, f"Git 安全检查失败: {str(e)}"
 
 
-def check_complexity():
-    """检查复杂度增量"""
+def find_project_root():
+    """找到项目根目录"""
+    current = Path.cwd()
+    while current != current.parent:
+        if (current / 'tools').exists():
+            return current
+        current = current.parent
+    return None
+
+
+def run_complexity_scanner():
+    """运行复杂度扫描工具"""
+    root_dir = find_project_root()
+    if not root_dir:
+        return None
+
+    scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
+    if not scanner_path.exists():
+        return None
+
     try:
-        print("\n🔍 Pre-commit Hook: 检查复杂度增量...")
-
-        # 调用复杂度扫描工具
-        import subprocess
-        import json
-        from pathlib import Path
-
-        # 找到项目根目录
-        current = Path.cwd()
-        root_dir = None
-        while current != current.parent:
-            if (current / 'tools').exists():
-                root_dir = current
-                break
-            current = current.parent
-
-        if not root_dir:
-            return True, "无法找到项目根目录，跳过复杂度检查"
-
-        # 调用复杂度扫描
-        scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
-        if not scanner_path.exists():
-            return True, "复杂度扫描工具不存在，跳过检查"
-
         result = subprocess.run(
             [sys.executable or 'python3', str(scanner_path), '--since', '1 day ago'],
             capture_output=True,
@@ -141,33 +135,45 @@ def check_complexity():
             timeout=10
         )
 
-        if result.returncode != 0:
-            return True, f"复杂度扫描失败: {result.stderr}"
+        if result.returncode == 0:
+            try:
+                return json.loads(result.stdout)
+            except json.JSONDecodeError:
+                pass
+    except Exception as e:
+        print(f"Scanner error: {e}")
 
-        try:
-            data = json.loads(result.stdout)
-            risk_assessment = data.get('data', {}).get('risk_assessment', {})
-            risks = risk_assessment.get('risks', [])
+    return None
 
-            high_risks = [r for r in risks if r.get('level') == 'high']
 
-            if high_risks:
-                print(f"\n⚠️ 检测到 {len(high_risks)} 个高风险项:")
-                for r in high_risks:
-                    print(f"   - {r.get('message')}")
-                print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
-                return False, "存在高风险复杂度问题"
+def check_complexity():
+    """检查复杂度增量"""
+    try:
+        print("\n🔍 Pre-commit Hook: 检查复杂度增量...")
 
-            if risks:
-                print(f"\nℹ️ 检测到 {len(risks)} 个注意事项:")
-                for r in risks:
-                    level_color = '🟢' if r.get('level') == 'low' else '🟡'
-                    print(f"   {level_color} {r.get('message')}")
+        data = run_complexity_scanner()
+        if not data:
+            return True, "无法运行复杂度扫描工具，跳过检查"
 
-            return True, "复杂度检查通过"
+        risk_assessment = data.get('data', {}).get('risk_assessment', {})
+        risks = risk_assessment.get('risks', [])
 
-        except json.JSONDecodeError:
-            return True, "复杂度数据解析失败，跳过检查"
+        high_risks = [r for r in risks if r.get('level') == 'high']
+
+        if high_risks:
+            print(f"\n⚠️ 检测到 {len(high_risks)} 个高风险项:")
+            for r in high_risks:
+                print(f"   - {r.get('message')}")
+            print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
+            return False, "存在高风险复杂度问题"
+
+        if risks:
+            print(f"\nℹ️ 检测到 {len(risks)} 个注意事项:")
+            for r in risks:
+                level_color = '🟢' if r.get('level') == 'low' else '🟡'
+                print(f"   {level_color} {r.get('message')}")
+
+        return True, "复杂度检查通过"
 
     except Exception as e:
         return True, f"复杂度检查出错: {str(e)}"
@@ -178,70 +184,37 @@ def check_code_review():
     try:
         print("\n🔍 Pre-commit Hook: 检查代码审查...")
 
-        # 调用复杂度扫描工具获取审查数据
-        import subprocess
-        import json
-        from pathlib import Path
+        data = run_complexity_scanner()
+        if not data:
+            return True, "无法运行代码审查工具，跳过检查"
 
-        # 找到项目根目录
-        current = Path.cwd()
-        root_dir = None
-        while current != current.parent:
-            if (current / 'tools').exists():
-                root_dir = current
-                break
-            current = current.parent
+        review_data = data.get('data', {}).get('review_data', {})
+        dangerous_patterns = review_data.get('dangerous_patterns', [])
+        risk_level = review_data.get('risk_level', 'low')
 
-        if not root_dir:
-            return True, "无法找到项目根目录，跳过代码审查"
+        # 检查严重问题
+        critical_patterns = [p for p in dangerous_patterns if p.get('severity') == 'critical']
 
-        # 调用复杂度扫描
-        scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
-        if not scanner_path.exists():
-            return True, "复杂度扫描工具不存在，跳过检查"
+        if critical_patterns:
+            print(f"\n⚠️ 检测到 {len(critical_patterns)} 个严重问题:")
+            for p in critical_patterns:
+                print(f"   🔴 {p.get('type')} - {p.get('file')}")
+            print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
+            return False, "存在严重审查问题"
 
-        result = subprocess.run(
-            [sys.executable or 'python3', str(scanner_path), '--since', '1 day ago'],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
+        # 检查警告问题
+        warning_patterns = [p for p in dangerous_patterns if p.get('severity') == 'warning']
+        todo_changes = review_data.get('todo_changes', {})
+        todo_added = todo_changes.get('added', 0)
 
-        if result.returncode != 0:
-            return True, f"审查扫描失败: {result.stderr}"
+        if warning_patterns or todo_added > 3:
+            print(f"\nℹ️ 检测到 {len(warning_patterns)} 个注意事项:")
+            for p in warning_patterns:
+                print(f"   🟡 {p.get('type')} - {p.get('file')}")
+            if todo_added > 3:
+                print(f"   🟡 新增 {todo_added} 个 TODO 标记")
 
-        try:
-            data = json.loads(result.stdout)
-            review_data = data.get('data', {}).get('review_data', {})
-            dangerous_patterns = review_data.get('dangerous_patterns', [])
-            risk_level = review_data.get('risk_level', 'low')
-
-            # 检查严重问题
-            critical_patterns = [p for p in dangerous_patterns if p.get('severity') == 'critical']
-
-            if critical_patterns:
-                print(f"\n⚠️ 检测到 {len(critical_patterns)} 个严重问题:")
-                for p in critical_patterns:
-                    print(f"   🔴 {p.get('type')} - {p.get('file')}")
-                print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
-                return False, "存在严重审查问题"
-
-            # 检查警告问题
-            warning_patterns = [p for p in dangerous_patterns if p.get('severity') == 'warning']
-            todo_changes = review_data.get('todo_changes', {})
-            todo_added = todo_changes.get('added', 0)
-
-            if warning_patterns or todo_added > 3:
-                print(f"\nℹ️ 检测到 {len(warning_patterns)} 个注意事项:")
-                for p in warning_patterns:
-                    print(f"   🟡 {p.get('type')} - {p.get('file')}")
-                if todo_added > 3:
-                    print(f"   🟡 新增 {todo_added} 个 TODO 标记")
-
-            return True, "代码审查通过"
-
-        except json.JSONDecodeError:
-            return True, "审查数据解析失败，跳过检查"
+        return True, "代码审查通过"
 
     except Exception as e:
         return True, f"代码审查出错: {str(e)}"

@@ -100,5 +100,27 @@ architecture_analysis:
     - src/utils
     - src/components
 
+# 代码审查配置
+review:
+  # 危险函数列表
+  dangerous_functions:
+    - eval
+    - exec
+    - Function
+
+  # 大文件阈值
+  large_file_threshold: 500
+
+  # TODO 警告阈值
+  todo_warning_threshold: 3
+  todo_critical_threshold: 5
+
+  # 通知配置
+  notification:
+    level: warning
+    channels:
+      - slack
+      - email
+
 version: 1.0.0
 updated: 2026-04-12
