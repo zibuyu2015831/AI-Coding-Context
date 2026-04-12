@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Post-commit Hook for AI Coding Context Framework
+用于在 commit 后自动生成复杂度报告
+
+功能:
+1. 自动扫描项目复杂度
+2. 生成 Markdown 报告
+3. 可选生成 HTML 仪表盘
+4. 支持通知功能
+
+使用方式:
+  python tools/py/install_hooks.py  # 自动安装
+  或手动复制到 .git/hooks/post-commit
+"""
+
+import sys
+import os
+from pathlib import Path
+from datetime import datetime
+
+# 添加 tools/py 到路径
+TOOLS_DIR = Path(__file__).parent.parent / 'py'
+sys.path.insert(0, str(TOOLS_DIR))
+
+
+def generate_complexity_report():
+    """生成复杂度报告"""
+    try:
+        import subprocess
+        import json
+
+        # 找到项目根目录
+        current = Path.cwd()
+        root_dir = None
+        while current != current.parent:
+            if (current / 'tools').exists():
+                root_dir = current
+                break
+            current = current.parent
+
+        if not root_dir:
+            print("⚠️ 无法找到项目根目录，跳过报告生成")
+            return
+
+        print("📊 Post-commit Hook: 生成复杂度报告...")
+
+        # 创建输出目录
+        report_dir = root_dir / 'dev_docs' / 'complexity'
+        data_dir = report_dir / 'data'
+        reports_dir = report_dir / 'reports'
+
+        data_dir.mkdir(parents=True, exist_ok=True)
+        reports_dir.mkdir(parents=True, exist_ok=True)
+
+        # 生成数据文件
+        date_str = datetime.now().strftime('%Y-%m-%d')
+        data_file = data_dir / f'{date_str}.json'
+        scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
+
+        if not scanner_path.exists():
+            print("⚠️ 复杂度扫描工具不存在，跳过报告生成")
+            return
+
+        # 扫描复杂度
+        result = subprocess.run(
+            [sys.executable or 'python3', str(scanner_path), '--since', '1 day ago', '--output', str(data_file)],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+
+        if result.returncode != 0:
+            print(f"⚠️ 复杂度扫描失败: {result.stderr}")
+            return
+
+        print(f"✅ 复杂度数据已保存到: {data_file}")
+
+        # 生成 Markdown 报告
+        report_file = reports_dir / f'{date_str}.md'
+        generator_path = root_dir / 'tools' / 'py' / 'report_generator.py'
+
+        if generator_path.exists():
+            result = subprocess.run(
+                [sys.executable or 'python3', str(generator_path), '--data', str(data_file), '--output', str(report_file), '--format', 'markdown'],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode == 0:
+                print(f"✅ Markdown 报告已保存到: {report_file}")
+            else:
+                print(f"⚠️ Markdown 报告生成失败: {result.stderr}")
+
+        # 生成 HTML 仪表盘（可选）
+        dashboard_file = report_dir / 'dashboard' / 'dashboard.html'
+        template_file = report_dir / 'dashboard' / 'template.html'
+
+        if template_file.exists() and generator_path.exists():
+            dashboard_dir = dashboard_file.parent
+            dashboard_dir.mkdir(parents=True, exist_ok=True)
+
+            result = subprocess.run(
+                [sys.executable or 'python3', str(generator_path), '--data', str(data_file), '--output', str(dashboard_file), '--format', 'html', '--template', str(template_file)],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode == 0:
+                print(f"✅ HTML 仪表盘已保存到: {dashboard_file}")
+            else:
+                print(f"⚠️ HTML 仪表盘生成失败: {result.stderr}")
+
+    except Exception as e:
+        print(f"⚠️ 报告生成出错: {str(e)}")
+
+
+def main():
+    """主函数"""
+    generate_complexity_report()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

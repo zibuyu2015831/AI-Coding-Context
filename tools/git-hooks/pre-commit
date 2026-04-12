@@ -107,16 +107,82 @@ def check_git_safety():
         return True, f"Git 安全检查失败: {str(e)}"
 
 
+def check_complexity():
+    """检查复杂度增量"""
+    try:
+        print("\n🔍 Pre-commit Hook: 检查复杂度增量...")
+
+        # 调用复杂度扫描工具
+        import subprocess
+        import json
+        from pathlib import Path
+
+        # 找到项目根目录
+        current = Path.cwd()
+        root_dir = None
+        while current != current.parent:
+            if (current / 'tools').exists():
+                root_dir = current
+                break
+            current = current.parent
+
+        if not root_dir:
+            return True, "无法找到项目根目录，跳过复杂度检查"
+
+        # 调用复杂度扫描
+        scanner_path = root_dir / 'tools' / 'py' / 'complexity_scanner.py'
+        if not scanner_path.exists():
+            return True, "复杂度扫描工具不存在，跳过检查"
+
+        result = subprocess.run(
+            [sys.executable or 'python3', str(scanner_path), '--since', '1 day ago'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if result.returncode != 0:
+            return True, f"复杂度扫描失败: {result.stderr}"
+
+        try:
+            data = json.loads(result.stdout)
+            risk_assessment = data.get('data', {}).get('risk_assessment', {})
+            risks = risk_assessment.get('risks', [])
+
+            high_risks = [r for r in risks if r.get('level') == 'high']
+
+            if high_risks:
+                print(f"\n⚠️ 检测到 {len(high_risks)} 个高风险项:")
+                for r in high_risks:
+                    print(f"   - {r.get('message')}")
+                print("\n💡 建议先处理这些问题再提交，或使用: git commit --no-verify 跳过")
+                return False, "存在高风险复杂度问题"
+
+            if risks:
+                print(f"\nℹ️ 检测到 {len(risks)} 个注意事项:")
+                for r in risks:
+                    level_color = '🟢' if r.get('level') == 'low' else '🟡'
+                    print(f"   {level_color} {r.get('message')}")
+
+            return True, "复杂度检查通过"
+
+        except json.JSONDecodeError:
+            return True, "复杂度数据解析失败，跳过检查"
+
+    except Exception as e:
+        return True, f"复杂度检查出错: {str(e)}"
+
+
 def main():
     """主函数"""
     print("🔍 Pre-commit Hook: 检查 commit message...")
-    
+
     # 获取 commit message
     message = get_commit_message()
     if not message:
         print("❌ 无法读取 commit message")
         return 1
-    
+
     # 检查格式
     format_ok, format_msg = check_commit_format(message)
     if not format_ok:
@@ -134,7 +200,7 @@ def main():
         return 1
     elif "建议" in format_msg:
         print(f"\n⚠️ {format_msg}")
-    
+
     # Git 安全检查
     safety_ok, safety_msg = check_git_safety()
     if not safety_ok:
@@ -145,7 +211,7 @@ def main():
         return 1
     elif "建议" in safety_msg or "⚠️" in safety_msg:
         print(f"\n{safety_msg}")
-    
+
     # 质量评分(如果工具可用)
     try:
         score, breakdown = score_commit_message(message)
@@ -157,7 +223,13 @@ def main():
             print(f"\n✅ Commit 质量评分: {score}/100 (优秀!)")
     except:
         pass  # 工具不可用时跳过评分
-    
+
+    # 复杂度检查
+    complexity_ok, complexity_msg = check_complexity()
+    if not complexity_ok:
+        print(f"\n❌ {complexity_msg}")
+        return 1
+
     print("\n✅ Pre-commit 检查通过!")
     return 0
 

@@ -34,63 +34,83 @@ def find_git_root():
     return None
 
 
-def install_pre_commit_hook(git_root):
-    """安装 pre-commit hook"""
+def install_hook(git_root, hook_name):
+    """安装指定的 hook"""
     hooks_dir = git_root / '.git' / 'hooks'
     hooks_dir.mkdir(parents=True, exist_ok=True)
-    
-    source_hook = git_root / 'tools' / 'git-hooks' / 'pre-commit'
-    target_hook = hooks_dir / 'pre-commit'
-    
+
+    source_hook = git_root / 'tools' / 'git-hooks' / hook_name
+    target_hook = hooks_dir / hook_name
+
     if not source_hook.exists():
         print(f"❌ 源文件不存在: {source_hook}")
         return False
-    
+
     # 检查是否已存在
     if target_hook.exists():
         response = input(f"⚠️ {target_hook} 已存在,是否覆盖? (y/N): ")
         if response.lower() != 'y':
-            print("❌ 取消安装")
+            print(f"❌ 取消安装 {hook_name}")
             return False
-        
+
         # 备份现有 hook
         backup = target_hook.with_suffix('.backup')
         shutil.copy2(target_hook, backup)
         print(f"📦 已备份现有 hook 到: {backup}")
-    
+
     # 复制文件
     shutil.copy2(source_hook, target_hook)
-    
+
     # 设置执行权限 (Unix/Linux/macOS)
     if os.name != 'nt':  # 非 Windows
         target_hook.chmod(target_hook.stat().st_mode | stat.S_IEXEC)
-    
-    print(f"✅ Pre-commit hook 已安装到: {target_hook}")
+
+    print(f"✅ {hook_name} 已安装到: {target_hook}")
     return True
 
 
-def uninstall_pre_commit_hook(git_root):
-    """卸载 pre-commit hook"""
-    target_hook = git_root / '.git' / 'hooks' / 'pre-commit'
-    
+def install_pre_commit_hook(git_root):
+    """安装 pre-commit hook"""
+    return install_hook(git_root, 'pre-commit')
+
+
+def install_post_commit_hook(git_root):
+    """安装 post-commit hook"""
+    return install_hook(git_root, 'post-commit')
+
+
+def uninstall_hook(git_root, hook_name):
+    """卸载指定的 hook"""
+    target_hook = git_root / '.git' / 'hooks' / hook_name
+
     if not target_hook.exists():
-        print("ℹ️ Pre-commit hook 未安装")
+        print(f"ℹ️ {hook_name} 未安装")
         return True
-    
+
     # 检查是否有备份
     backup = target_hook.with_suffix('.backup')
     if backup.exists():
-        response = input("📦 发现备份文件,是否恢复? (y/N): ")
+        response = input(f"📦 发现 {hook_name} 备份文件,是否恢复? (y/N): ")
         if response.lower() == 'y':
             shutil.copy2(backup, target_hook)
             backup.unlink()
             print(f"✅ 已恢复备份: {target_hook}")
             return True
-    
+
     # 删除 hook
     target_hook.unlink()
-    print(f"✅ Pre-commit hook 已卸载: {target_hook}")
+    print(f"✅ {hook_name} 已卸载: {target_hook}")
     return True
+
+
+def uninstall_pre_commit_hook(git_root):
+    """卸载 pre-commit hook"""
+    return uninstall_hook(git_root, 'pre-commit')
+
+
+def uninstall_post_commit_hook(git_root):
+    """卸载 post-commit hook"""
+    return uninstall_hook(git_root, 'post-commit')
 
 
 def show_usage():
@@ -105,17 +125,27 @@ def show_usage():
   • 在 commit 前检查 message 格式
   • 验证 Git 安全规范
   • 提供质量评分和改进建议
+  • 安装 post-commit hook 自动生成复杂度报告
 
 使用方式:
-  python tools/py/install_hooks.py           # 安装
-  python tools/py/install_hooks.py --uninstall  # 卸载
+  python tools/py/install_hooks.py              # 安装所有 hooks
+  python tools/py/install_hooks.py --pre-commit  # 仅安装 pre-commit
+  python tools/py/install_hooks.py --post-commit # 仅安装 post-commit
+  python tools/py/install_hooks.py --uninstall   # 卸载所有 hooks
 
-Hook 功能:
+Pre-commit Hook 功能:
   ✓ Commit message 格式检查
   ✓ WHAT/WHY/HOW 字段验证
   ✓ 保护分支检测
   ✓ 分支命名规范检查
   ✓ Commit 质量评分
+  ✓ 复杂度增量检查 (拦截高风险变更)
+
+Post-commit Hook 功能:
+  ✓ 自动扫描项目复杂度
+  ✓ 生成 Markdown 报告
+  ✓ 生成 HTML 仪表盘
+  ✓ 数据保存到 dev_docs/complexity/
 
 跳过 Hook:
   git commit --no-verify  # 紧急情况下跳过检查
@@ -127,30 +157,44 @@ def main():
     # 解析参数
     uninstall = '--uninstall' in sys.argv or '-u' in sys.argv
     show_help = '--help' in sys.argv or '-h' in sys.argv
-    
+    install_pre = '--pre-commit' in sys.argv
+    install_post = '--post-commit' in sys.argv
+
     if show_help:
         show_usage()
         return 0
-    
+
     # 查找 Git 仓库
     git_root = find_git_root()
     if not git_root:
         print("❌ 错误: 未找到 Git 仓库")
         print("   请在 Git 仓库根目录或子目录中运行此脚本")
         return 1
-    
+
     print(f"📂 Git 仓库: {git_root}")
-    
+
     # 执行安装或卸载
+    success = True
+
     if uninstall:
-        success = uninstall_pre_commit_hook(git_root)
+        print("🛠️ 卸载所有 hooks...")
+        success = uninstall_pre_commit_hook(git_root) and uninstall_post_commit_hook(git_root)
     else:
-        success = install_pre_commit_hook(git_root)
-    
+        # 确定要安装的 hooks
+        install_all = not (install_pre or install_post)
+
+        if install_all or install_pre:
+            print("🛠️ 安装 pre-commit hook...")
+            success = success and install_pre_commit_hook(git_root)
+
+        if (install_all or install_post) and success:
+            print("\n🛠️ 安装 post-commit hook...")
+            success = success and install_post_commit_hook(git_root)
+
     if success:
         if not uninstall:
             print("\n💡 提示:")
-            print("   • Hook 已激活,下次 commit 时自动检查")
+            print("   • Hook 已激活,下次 commit 时自动检查和报告")
             print("   • 紧急情况可使用: git commit --no-verify")
             print("   • 卸载 hook: python tools/py/install_hooks.py --uninstall")
         return 0

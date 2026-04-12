@@ -39,6 +39,9 @@ tools/
 | `install_hooks`           | Git Hooks 安装         | 安装/卸载 pre-commit hook，支持备份恢复         |
 | `why_tool`                | 架构探针检索 (ADR)     | 根据隐性 `@architecture` 注解或源码全局检索对应技术决策理由 |
 | `aac_validator`           | 架构即代码验证 (AaC)   | 本地提取并校验代码层面是否违背了最新活跃决策文档 (ADR) 的预埋断言 |
+| `complexity_scanner`      | 复杂度扫描器 (005) ⭐  | 扫描项目复杂度，监控代码规模、依赖关系、代码质量和架构健康度，支持风险评估 |
+| `report_generator`        | 报告生成器 (005) ⭐    | 将复杂度数据转换为 Markdown 报告和 HTML 可视化仪表盘，支持自定义模板 |
+| `notifier`                | 复杂度通知工具 (005)   | 发送复杂度报告通知，支持 Slack 和 Email 通知，支持不同风险级别 |
 
 ## 🚀 使用指南
 

@@ -69,13 +69,14 @@
 - **产物**: `dev_docs/architecture/`
 - **详细信息**: [004-adr-system.md](./confirmed/004-adr-system.md/004-adr-system.md)
 
+#### 5. 复杂度实时仪表盘 [005]
+- **状态**: 🟢 审核通过 (2026-04-12)
+- **产物**: `dev_docs/complexity/`, `tools/complexity_scanner.py`, `tools/report_generator.py`
+- **详细信息**: [005-complexity-dashboard.md](./confirmed/005-complexity-dashboard.md/005-complexity-dashboard.md)
+
 ---
 
 ## 📁 待讨论的优化点 (pending/)
-
-
-#### 5. 复杂度实时仪表盘
-- [005-complexity-dashboard.md](./pending/005-complexity-dashboard.md)
 
 #### 6. 自动化审查报告
 - [006-auto-review-report.md](./pending/006-auto-review-report.md)
@@ -106,7 +107,7 @@
 
 ### 阶段 3: P1 功能开发 (当前阶段)
 - ✅ ADR 系统
-- [ ] 复杂度仪表盘
+- 🔄 复杂度仪表盘 (进行中)
 - [ ] 自动化审查报告
 - [ ] 质量保证体系深度集成
 

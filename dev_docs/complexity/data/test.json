@@ -1,0 +1,42 @@
+{
+  "data": {
+    "code_size": {
+      "new_lines": 0,
+      "total_lines": 20000,
+      "files": 0,
+      "growth_percentage": 0
+    },
+    "dependencies": {
+      "new": 0,
+      "duplicate": 0,
+      "depth": 0
+    },
+    "code_quality": {
+      "todo_count": 24,
+      "fixme_count": 20,
+      "duplicate_code": 0,
+      "quality_score": 0
+    },
+    "architecture": {
+      "core_files_changed": 0,
+      "coupling_score": 0,
+      "domain_boundary_score": 7
+    },
+    "risk_assessment": {
+      "overall_score": 70.0,
+      "risks": [
+        {
+          "level": "high",
+          "indicator": "code_quality",
+          "message": "代码质量评分低 (0, 建议 >70)"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "elapsed_seconds": 0.15,
+    "timeout_threshold": 10,
+    "version": "1.0.0",
+    "git_available": true
+  }
+}

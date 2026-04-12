@@ -7,6 +7,60 @@
 
 ---
 
+## [1.4.5] - 2026-04-12
+
+### Added
+
+- **新增 `notifier.py` & `.js`** - 复杂度通知工具 (005 优化点)
+  - 支持发送 Slack 通知（不同风险级别）
+  - 支持发送 Email 通知（每日报告和严重警告）
+  - 支持通知模板自定义
+  - 零依赖设计，仅使用标准库
+  - 支持 Python 和 Node.js 双语言实现
+
+### Changed
+
+- **修改 `tools/git-hooks/pre-commit`** - 添加复杂度增量检查
+  - 在 commit 前自动扫描复杂度
+  - 拦截高风险变更，阻止提交
+  - 提供友好的风险提示和跳过选项
+- **新增 `tools/git-hooks/post-commit`** - 自动生成复杂度报告
+  - 在 commit 后自动扫描项目复杂度
+  - 生成 Markdown 报告保存到 dev_docs/complexity/reports/
+  - 可选生成 HTML 仪表盘
+  - 数据文件保存到 dev_docs/complexity/data/
+- **修改 `tools/py/install_hooks.py`** - 支持 post-commit hook 管理
+  - 新增 --pre-commit 选项：仅安装 pre-commit hook
+  - 新增 --post-commit 选项：仅安装 post-commit hook
+  - 默认同时安装两个 hooks
+  - 支持同时卸载两个 hooks
+  - 更新使用说明文档
+
+## [1.4.4] - 2026-04-12
+
+### Added
+
+- **新增 `report_generator.py` & `.js`** - 报告生成工具 (005 优化点) ⭐
+  - 读取 complexity_scanner.py 输出的 JSON 数据
+  - 生成格式化的 Markdown 报告
+  - 基于模板生成 HTML 可视化仪表盘
+  - 支持自定义 HTML 模板
+  - 集成 Mermaid 图表可视化
+  - 提供风险分析和行动建议
+  - 支持 Python 和 Node.js 双语言实现
+
+## [1.4.3] - 2026-04-12
+
+### Added
+
+- **新增 `complexity_scanner.py` & `.js`** - 复杂度扫描工具 (005 优化点) ⭐
+  - 调用 `git_diff_analyzer.py` 和 `git_inspector.py` 分析代码变更
+  - 支持 Python 和 Node.js 双语言实现
+  - 分析代码规模、依赖关系、代码质量和架构健康度
+  - 计算复杂度评分和风险评估
+  - 输出标准化 JSON 格式数据
+  - 支持配置文件加载和自定义阈值设置
+
 ## [1.4.2] - 2026-04-12
 
 ### Added
