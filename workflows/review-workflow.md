@@ -161,6 +161,16 @@ def should_auto_fix(plan, review):
 
 **参考**: 详见 workflows/git_safety_workflow.md 和 	emplates/AI_RULES_TEMPLATE.md 的 Git 安全规范章节
 
+### 5.3 ADR (架构决策记录) 符合性审查
+
+审查者必须在此环节扮演“架构警察”角色，阻断任何战术式侵蚀：
+
+- **强制要求**: 在代码审查前，先通过 Why-Tool 或人工获取受影响域的当前 Active ADR（`dev_docs/architecture/decisions/*.md`）。
+- **审查断言**: 当前的实现、引入的新库、采用的逻辑是否与现存的最新 ADR 产生冲突？
+- **判定规则**:
+  - ⛔ 发现与现存 Active ADR 具体 `constraints` 断言违背 -> 强制驳回，标记为 P0，并在报告中清晰列明背离点。
+  - ⚠️ 隐性绕开 ADR 中指定的解决思路但未直接冲突 -> 提示用户评估并请求补充解释。
+
 ---
 
 **版本**: 1.1  

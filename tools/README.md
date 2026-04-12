@@ -37,6 +37,8 @@ tools/
 | `commit_template_cli`     | Commit 模板            | 交互式生成结构化 commit message                 |
 | `commit_integrity_validator` | Commit 诚信验证        | 对比提议信息与物理变更，输出诚信分 (0-100)      |
 | `install_hooks`           | Git Hooks 安装         | 安装/卸载 pre-commit hook，支持备份恢复         |
+| `why_tool`                | 架构探针检索 (ADR)     | 根据隐性 `@architecture` 注解或源码全局检索对应技术决策理由 |
+| `aac_validator`           | 架构即代码验证 (AaC)   | 本地提取并校验代码层面是否违背了最新活跃决策文档 (ADR) 的预埋断言 |
 
 ## 🚀 使用指南
 

@@ -7,6 +7,21 @@
 
 ---
 
+## [1.4.2] - 2026-04-12
+
+### Added
+
+- **新增 `why_tool.py` & `.js`** - 架构探针检索 (ADR)
+  - 通过 L1 注解优先检索：扫描代码注解（如 `@architecture ADR-XXX:` 或 `@reason`）精准定位决策。
+  - 通过内容关键字跨文件语义检索：对 Active 的 ADR 标题、摘要与正文进行命中打分，并返回 Top 3 推荐。
+  - 支持 Python 及 Node.js 双模兼容脚本架构。
+- **新增 `aac_validator.py` & `.js`** - 架构即代码静态验证 (AaC)
+  - 无依赖运行，从 Markdown 中截取 YAML 约束 (`constraints`)。
+  - 提供了对 `regex_check` 和简单 `dependency_check` 的扫描拦截动作，并可过滤 `forbidden_in` 保护域限制。
+  - 支持单文件和整库目录的架构防线扫描。
+
+---
+
 ## [1.4.1] - 2026-04-07
 
 ### Added

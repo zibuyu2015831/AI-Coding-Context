@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"优化 V3.0 待讨论优化点文档:*)"
+    ]
+  }
+}

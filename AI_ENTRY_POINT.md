@@ -154,6 +154,7 @@ test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_con
   - dev_docs/AI_Coding_Context.md（主文档）
   - dev_docs/*.md（生成的子文档）
   - dev_docs/knowledge/（知识库）
+  - dev_docs/architecture/（架构决策记录与准则 ADR）
   - AI_RULES.md
 ```
 
@@ -325,6 +326,8 @@ git add ai_coding_context/
 | 摘要生成/提取  | `tools/py/summary_extractor.py`       | 提取标准化摘要 (优先) |
 | 摘要关联检查   | `tools/py/summary_related_checker.py` | 检查文档依赖关联     |
 | 摘要索引生成   | `tools/py/summary_index_generator.py` | 维护文档索引关系     |
+| 架构探针检索   | `tools/py/why_tool.py`                | 检索与提取 ADR 架构上下文 |
+| 架构断言验证   | `tools/py/aac_validator.py`           | 验证代码是否违背 ADR 断言 |
 
 
 ### 框架边界术语
