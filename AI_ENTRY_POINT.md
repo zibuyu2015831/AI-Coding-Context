@@ -1,9 +1,9 @@
 # AI Coding Context - Entry Point
 
-> **AI 专用入口文档**  
-> **用途**: AI 读取此文件即可理解整个框架，自主决策生成流程  
+> **AI 专用入口文档**
+> **用途**: AI 读取此文件即可理解整个框架，自主决策生成流程
 > **版本**: v3.0
-> **最后更新**: 2026-04-06
+> **最后更新**: 2026-04-13
 
 ---
 
@@ -328,6 +328,11 @@ git add ai_coding_context/
 | 摘要索引生成   | `tools/py/summary_index_generator.py` | 维护文档索引关系     |
 | 架构探针检索   | `tools/py/why_tool.py`                | 检索与提取 ADR 架构上下文 |
 | 架构断言验证   | `tools/py/aac_validator.py`           | 验证代码是否违背 ADR 断言 |
+| 文档依赖追踪   | `tools/py/doc_dependency_tracer.py`   | 检测文档关联关系（011 优化点）|
+| Git 修复管理   | `tools/py/manage_fix_with_git.py`     | 管理 Git 分支和修复提交（011 优化点）|
+| 修复历史管理   | `tools/py/fix_history_manager.py`     | 记录和查询修复历史（011 优化点）|
+| 语义关联检测   | `tools/py/semantic_related_detector.py` | 检测语义关联文档（011 优化点）|
+| 批量修复管理   | `tools/py/batch_fix_manager.py`       | 批量文档修复（011 优化点）|
 
 
 ### 框架边界术语
@@ -456,6 +461,7 @@ graph TD
 | `workflows/path_d_specific_tasks.md`     | 路径 D: 特定任务     | **路由到路径 D 时立即读取** |
 | `workflows/commit_guided_update.md`      | Commit 驱动更新流程  | **路径 C 必读 (V3.0)**      |
 | `workflows/git_safety_workflow.md`       | Git 操作安全流程     | **执行 Git 修改前必读 (V3.0)**|
+| `workflows/doc_error_fix_workflow.md`    | 文档谬误修复工作流   | **报告文档谬误时必读 (V3.0)**|
 
 ### 共享资源文档 (`workflows/shared/`)
 

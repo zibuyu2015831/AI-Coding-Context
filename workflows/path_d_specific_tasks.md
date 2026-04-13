@@ -596,6 +596,33 @@ graph TD
 
 ---
 
+### @doc-error - 文档谬误修复
+
+**用途**: 处理用户报告的文档谬误
+
+**执行逻辑**:
+```
+检测到 @doc-error 或用户报告文档错误 → 执行文档谬误修复工作流（011 优化点）
+```
+
+**详细说明**: 参见 [workflows/doc_error_fix_workflow.md](./doc_error_fix_workflow.md)
+
+**使用示例**:
+```markdown
+@doc-error
+
+我发现了文档谬误：
+
+**文档路径**: dev_docs/api_layer.md
+**错误位置**: "API 调用"章节，第 45 行
+**错误内容**: 使用了 `getUserInfo()`
+**正确内容**: 应该是 `fetchUserProfile()`
+**代码依据**: src/api/user.ts:L23
+**严重程度**: P0
+```
+
+---
+
 ## 🛠️ 故障处理
 
 **详细说明**: 参见 [workflows/shared/failure_handling.md](./shared/failure_handling.md)

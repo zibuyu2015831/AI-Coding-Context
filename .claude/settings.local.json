@@ -6,7 +6,15 @@
       "Bash(python tools/py/complexity_scanner.py --path . --since \"1 day ago\")",
       "Bash(python3 tools/py/complexity_scanner.py --path . --since \"1 day ago\")",
       "Bash(python3:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(grep -n 'def main' tools/py/*.py)",
+      "Bash(python:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(for file:*)",
+      "Bash(do node:*)",
+      "Bash(done)",
+      "Bash(npm run:*)"
     ]
   }
 }

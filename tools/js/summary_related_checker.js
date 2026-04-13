@@ -29,15 +29,17 @@
  *     --timeout SECONDS        超时时间,默认10秒
  * 
  * 版本信息:
- *     Version: 1.0.0
+ *     Version: 1.1.0
  *     Created: 2025-12-03
+ *     Updated: 2026-04-13
  *     Purpose: Support 012-Mandatory Document Summary mechanism
+ *     Added: --dependencies and --keywords strategy support
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const DEFAULT_TIMEOUT = 10;
 const DEFAULT_DOC_DIR = "dev_docs";
 
@@ -97,11 +99,11 @@ function extractRelatedFiles(filePath) {
     try {
         const content = fs.readFileSync(filePath, 'utf-8');
         const summary = extractFrontmatter(content);
-        
+
         if (!summary || !summary.related_files) {
             return null;
         }
-        
+
         const related = summary.related_files;
         if (Array.isArray(related)) {
             // 过滤掉'无'等占位符
@@ -109,9 +111,67 @@ function extractRelatedFiles(filePath) {
         } else if (typeof related === 'string' && related !== '无') {
             return [related];
         }
-        
+
         return null;
-        
+
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * 从文档提取dependencies字段
+ */
+function extractDependencies(filePath) {
+    try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const summary = extractFrontmatter(content);
+
+        if (!summary || !summary.dependencies) {
+            return null;
+        }
+
+        const dependencies = summary.dependencies;
+        if (Array.isArray(dependencies)) {
+            return dependencies.filter(f => f && f !== '无');
+        } else if (typeof dependencies === 'string' && dependencies !== '无') {
+            if (dependencies.includes('|')) {
+                return dependencies.split('|').map(f => f.trim()).filter(f => f);
+            }
+            return [dependencies];
+        }
+
+        return null;
+
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * 从文档提取keywords字段
+ */
+function extractKeywords(filePath) {
+    try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const summary = extractFrontmatter(content);
+
+        if (!summary || !summary.keywords) {
+            return null;
+        }
+
+        const keywords = summary.keywords;
+        if (Array.isArray(keywords)) {
+            return keywords.filter(f => f && f !== '无');
+        } else if (typeof keywords === 'string' && keywords !== '无') {
+            if (keywords.includes('|')) {
+                return keywords.split('|').map(f => f.trim()).filter(f => f);
+            }
+            return [keywords];
+        }
+
+        return null;
+
     } catch (e) {
         return null;
     }
@@ -154,50 +214,165 @@ function normalizePath(pathStr) {
 /**
  * 检查哪些文档受变更文件影响
  */
-function checkAffectedDocs(changedFiles, docDir, recursive = false) {
+function checkAffectedDocs(changedFiles, docDir, recursive = false, strategy = "related_files", minOverlap = 1) {
     // 标准化变更文件路径
     const changedFilesNormalized = changedFiles.map(f => normalizePath(f));
-    
+
     // 查找所有文档
     const mdFiles = findMarkdownFiles(docDir, recursive);
-    
+
     const affectedDocs = [];
-    
-    for (const mdFile of mdFiles) {
-        const relatedFiles = extractRelatedFiles(mdFile);
-        
-        if (!relatedFiles) {
-            continue;
-        }
-        
-        // 检查是否有匹配的文件
-        const matchedFiles = [];
-        for (const related of relatedFiles) {
-            const relatedNormalized = normalizePath(related);
-            for (const changed of changedFilesNormalized) {
-                // 支持部分路径匹配
-                if (relatedNormalized.includes(changed) || changed.includes(relatedNormalized)) {
-                    matchedFiles.push(related);
-                    break;
+
+    if (strategy === "related_files" || strategy === "all") {
+        // 使用 related_files 字段检测（默认策略）
+        for (const mdFile of mdFiles) {
+            const relatedFiles = extractRelatedFiles(mdFile);
+
+            if (!relatedFiles) {
+                continue;
+            }
+
+            // 检查是否有匹配的文件
+            const matchedFiles = [];
+            for (const related of relatedFiles) {
+                const relatedNormalized = normalizePath(related);
+                for (const changed of changedFilesNormalized) {
+                    // 支持部分路径匹配
+                    if (relatedNormalized.includes(changed) || changed.includes(relatedNormalized)) {
+                        matchedFiles.push(related);
+                        break;
+                    }
+                }
+            }
+
+            if (matchedFiles.length > 0) {
+                // 检查是否已存在该文档的记录
+                const existing = affectedDocs.find(d => d.file === mdFile);
+                if (existing) {
+                    existing.matched_files = [...new Set([...existing.matched_files, ...matchedFiles])];
+                    existing.all_related_files = relatedFiles;
+                } else {
+                    affectedDocs.push({
+                        file: mdFile,
+                        matched_files: matchedFiles,
+                        all_related_files: relatedFiles,
+                        suggestion: "建议更新此文档,因为关联文件已变更"
+                    });
                 }
             }
         }
-        
-        if (matchedFiles.length > 0) {
-            affectedDocs.push({
-                file: mdFile,
-                matched_files: matchedFiles,
-                all_related_files: relatedFiles,
-                suggestion: "建议更新此文档,因为关联文件已变更"
-            });
+    }
+
+    if (strategy === "dependencies" || strategy === "all") {
+        // 使用 dependencies 字段检测
+        for (const mdFile of mdFiles) {
+            const dependencies = extractDependencies(mdFile);
+
+            if (!dependencies) {
+                continue;
+            }
+
+            for (const dep of dependencies) {
+                for (const changed of changedFilesNormalized) {
+                    if (dep.includes(changed) || changed.includes(dep)) {
+                        // 检查是否已存在该文档的记录
+                        const existing = affectedDocs.find(d => d.file === mdFile);
+                        if (existing) {
+                            if (!existing.dependencies) {
+                                existing.dependencies = [];
+                            }
+                            if (!existing.dependencies.includes(dep)) {
+                                existing.dependencies.push(dep);
+                            }
+                        } else {
+                            affectedDocs.push({
+                                file: mdFile,
+                                matched_files: dependencies,
+                                dependencies: dependencies,
+                                suggestion: "建议更新此文档,因为依赖文件已变更"
+                            });
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
-    
+
+    if (strategy === "keywords" || strategy === "all") {
+        // 使用 keywords 字段检测语义关联
+        for (const mdFile of mdFiles) {
+            const keywords = extractKeywords(mdFile);
+
+            if (!keywords) {
+                continue;
+            }
+
+            // 从变更文件名中提取词汇进行匹配
+            const changeTerms = new Set();
+            for (const file of changedFilesNormalized) {
+                // 从路径中提取有意义的词汇
+                const filename = path.basename(file);
+                const name = path.parse(filename).name;
+                const terms = name.split('_');
+                terms.forEach(t => changeTerms.add(t));
+
+                // 从路径中提取目录名
+                const dirname = path.dirname(file);
+                const dirTerms = dirname.split(path.sep);
+                dirTerms.forEach(t => t && changeTerms.add(t));
+            }
+
+            // 计算关键词匹配
+            const matchedKeywords = [];
+            for (const keyword of keywords) {
+                for (const term of changeTerms) {
+                    if (term && term.length > 2 && keyword.toLowerCase().includes(term.toLowerCase())) {
+                        matchedKeywords.push(keyword);
+                    }
+                }
+            }
+
+            if (matchedKeywords.length >= minOverlap) {
+                // 检查是否已存在该文档的记录
+                const existing = affectedDocs.find(d => d.file === mdFile);
+                if (existing) {
+                    if (!existing.keywords) {
+                        existing.keywords = [];
+                    }
+                    for (const kw of matchedKeywords) {
+                        if (!existing.keywords.includes(kw)) {
+                            existing.keywords.push(kw);
+                        }
+                    }
+                } else {
+                    affectedDocs.push({
+                        file: mdFile,
+                        matched_keywords: matchedKeywords,
+                        keywords: keywords,
+                        suggestion: `建议更新此文档,因为语义关键词匹配 (${matchedKeywords.length}个匹配)`
+                    });
+                }
+            }
+        }
+    }
+
+    // 去重 - 确保同一文档不会多次添加
+    const uniqueDocs = [];
+    const seen = new Set();
+    for (const doc of affectedDocs) {
+        if (!seen.has(doc.file)) {
+            seen.add(doc.file);
+            uniqueDocs.push(doc);
+        }
+    }
+
     return {
-        affected_docs: affectedDocs,
+        affected_docs: uniqueDocs,
         total_docs_scanned: mdFiles.length,
-        total_affected: affectedDocs.length,
-        changed_files: changedFiles
+        total_affected: uniqueDocs.length,
+        changed_files: changedFiles,
+        strategy: strategy
     };
 }
 
@@ -229,22 +404,26 @@ function parseGitDiffOutput(jsonStr) {
 
 function main() {
     const startTime = Date.now();
-    
+
     const args = process.argv.slice(2);
     const options = {
         changedFiles: null,
         fromStdin: false,
         docDir: DEFAULT_DOC_DIR,
         recursive: false,
+        strategy: "related_files",
+        minOverlap: 1,
         timeout: DEFAULT_TIMEOUT
     };
-    
+
     for (let i = 0; i < args.length; i++) {
         switch (args[i]) {
             case '--changed-files': options.changedFiles = args[++i]; break;
             case '--from-stdin': options.fromStdin = true; break;
             case '--doc-dir': options.docDir = args[++i]; break;
             case '--recursive': options.recursive = true; break;
+            case '--strategy': options.strategy = args[++i]; break;
+            case '--min-overlap': options.minOverlap = parseInt(args[++i]); break;
             case '--timeout': options.timeout = parseInt(args[++i]); break;
         }
     }
@@ -314,7 +493,13 @@ function main() {
                 result.error = `Document directory not found: ${options.docDir}`;
             } else {
                 // 执行检查
-                const checkResult = checkAffectedDocs(changedFiles, options.docDir, options.recursive);
+                const checkResult = checkAffectedDocs(
+                    changedFiles,
+                    options.docDir,
+                    options.recursive,
+                    options.strategy,
+                    options.minOverlap
+                );
                 result.data = checkResult;
             }
         }

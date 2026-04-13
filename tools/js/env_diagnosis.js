@@ -48,16 +48,37 @@ const os = require('os');
 
 function checkPythonVersion() {
     try {
-        const stdout = execSync("python --version", { encoding: 'utf8' }).trim();
-        return stdout;
+        const stdout = execSync("python --version 2>/dev/null", { encoding: 'utf8' }).trim();
+        if (stdout) return stdout;
     } catch (e) {
-        try {
-             const stdout = execSync("python3 --version", { encoding: 'utf8' }).trim();
-             return stdout;
-        } catch (e2) {
-            return null;
-        }
+        // continue
     }
+
+    try {
+        const stdout = execSync("python3 --version 2>/dev/null", { encoding: 'utf8' }).trim();
+        if (stdout) return stdout;
+    } catch (e2) {
+        // continue
+    }
+    return null;
+}
+
+function checkPythonCommand() {
+    /**检查可用的 Python 命令*/
+    try {
+        execSync("python --version 2>/dev/null", { encoding: 'utf8', stdio: 'pipe' });
+        return "python";
+    } catch (e) {
+        // continue
+    }
+
+    try {
+        execSync("python3 --version 2>/dev/null", { encoding: 'utf8', stdio: 'pipe' });
+        return "python3";
+    } catch (e2) {
+        // continue
+    }
+    return null;
 }
 
 function main() {
@@ -65,11 +86,13 @@ function main() {
     
     const nodeVersion = process.version;
     const pythonVersion = checkPythonVersion();
+    const pythonCommand = checkPythonCommand();
     const osInfo = `${os.type()} ${os.release()}`;
-    
+
     const status = {
         python: {
             version: pythonVersion,
+            command: pythonCommand || "python3", // 推荐使用的命令
             ok: false
         },
         node: {

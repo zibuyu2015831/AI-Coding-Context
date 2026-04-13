@@ -60,11 +60,18 @@ cp .aicc/config.sample.yaml .aicc/config.yaml
 
 #### 1.2 命令行模式（使用工具）
 ```bash
-# 报告单个文档错误（Python 版本）
-python tools/py/ai_doc_fix.py report --doc "dev_docs/api_layer.md" --location "API 调用章节" --error "getUserInfo()" --correct "fetchUserProfile()" --severity "P0"
+# 1. 检测关联文档
+python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md" --strategy all
 
-# 报告单个文档错误（Node.js 版本）
-node tools/js/ai_doc_fix.js report --doc "dev_docs/api_layer.md" --location "API 调用章节" --error "getUserInfo()" --correct "fetchUserProfile()" --severity "P0"
+# 2. 生成修复方案
+python tools/py/batch_fix_manager.py --generate --pattern "getUserInfo()" --replacement "fetchUserProfile()"
+
+# 3. 执行修复
+python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
+
+# 4. 管理 Git 修复过程
+python tools/py/manage_fix_with_git.py --start --branch-name "doc-fix-api-function"
+python tools/py/manage_fix_with_git.py --commit --message "fix: 修复 API 函数名错误 getUserInfo() → fetchUserProfile()"
 ```
 
 ---
@@ -125,19 +132,19 @@ AI 会自动分析影响范围：
 #### 3.1 手动执行
 ```bash
 # 执行修复（Python 版本）
-python tools/py/ai_doc_fix.py apply --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
+python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 
 # 执行修复（Node.js 版本）
-node tools/js/ai_doc_fix.js apply --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
+node tools/js/batch_fix_manager.js --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 ```
 
 #### 3.2 自动执行（快速修复模式）
 ```bash
 # 自动执行低风险修复（P2/P3）（Python 版本）
-python tools/py/ai_doc_fix.py apply --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --auto
+python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --auto
 
 # 自动执行低风险修复（P2/P3）（Node.js 版本）
-node tools/js/ai_doc_fix.js apply --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --auto
+node tools/js/batch_fix_manager.js --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --auto
 ```
 
 ---
@@ -147,25 +154,25 @@ node tools/js/ai_doc_fix.js apply --plan "dev_docs/_analysis/doc_fix_plan_202604
 #### 4.1 查看修复历史
 ```bash
 # 查看所有修复历史（Python 版本）
-python tools/py/ai_doc_fix.py history
+python tools/py/fix_history_manager.py --query
 
 # 查看所有修复历史（Node.js 版本）
-node tools/js/ai_doc_fix.js history
+node tools/js/fix_history_manager.js --query
 
 # 查看特定修复的详细信息（Python 版本）
-python tools/py/ai_doc_fix.py history --commit "a1b2c3d"
+python tools/py/fix_history_manager.py --query --commit "a1b2c3d"
 
 # 查看特定修复的详细信息（Node.js 版本）
-node tools/js/ai_doc_fix.js history --commit "a1b2c3d"
+node tools/js/fix_history_manager.js --query --commit "a1b2c3d"
 ```
 
 #### 4.2 回滚修复
 ```bash
 # 回滚到修复前状态（Python 版本）
-python tools/py/ai_doc_fix.py rollback --commit "a1b2c3d"
+python tools/py/manage_fix_with_git.py --rollback --commit-hash "a1b2c3d"
 
 # 回滚到修复前状态（Node.js 版本）
-node tools/js/ai_doc_fix.js rollback --commit "a1b2c3d"
+node tools/js/manage_fix_with_git.js --rollback --commit-hash "a1b2c3d"
 ```
 
 ---
@@ -177,19 +184,23 @@ node tools/js/ai_doc_fix.js rollback --commit "a1b2c3d"
 #### 1.1 全局术语统一
 ```bash
 # 批量修复术语不一致（Python 版本）
-python tools/py/ai_doc_fix.py batch --pattern "用户 ID" --replacement "userId" --severity "P1"
+python tools/py/batch_fix_manager.py --generate --pattern "用户 ID" --replacement "userId"
+python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 
 # 批量修复术语不一致（Node.js 版本）
-node tools/js/ai_doc_fix.js batch --pattern "用户 ID" --replacement "userId" --severity "P1"
+node tools/js/batch_fix_manager.js --generate --pattern "用户 ID" --replacement "userId"
+node tools/js/batch_fix_manager.js --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 ```
 
 #### 1.2 修复方案预览
 ```bash
 # 预览批量修复效果（Python 版本）
-python tools/py/ai_doc_fix.py batch --pattern "用户 ID" --replacement "userId" --preview
+python tools/py/batch_fix_manager.py --generate --pattern "用户 ID" --replacement "userId"
+python tools/py/batch_fix_manager.py --preview --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 
 # 预览批量修复效果（Node.js 版本）
-node tools/js/ai_doc_fix.js batch --pattern "用户 ID" --replacement "userId" --preview
+node tools/js/batch_fix_manager.js --generate --pattern "用户 ID" --replacement "userId"
+node tools/js/batch_fix_manager.js --preview --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"
 ```
 
 ---
@@ -243,69 +254,60 @@ graph TD
 
 ## 🛠️ 工具和命令
 
-### 主要命令
+### 主要工具命令
 
-#### 1. 报告错误
+#### 1. 文档依赖追踪器
 ```bash
-# Python 版本
-python tools/py/ai_doc_fix.py report --doc <文档路径> --location <位置描述> --error <错误内容> --correct <正确内容> --severity <严重等级>
+# 检测关联文档（Python 版本）
+python tools/py/doc_dependency_tracer.py --doc <文档路径> --strategy {dependencies|keywords|fulltext|all}
 
-# Node.js 版本
-node tools/js/ai_doc_fix.js report --doc <文档路径> --location <位置描述> --error <错误内容> --correct <正确内容> --severity <严重等级>
+# 检测关联文档（Node.js 版本）
+node tools/js/doc_dependency_tracer.js --doc <文档路径> --strategy {dependencies|keywords|fulltext|all}
 ```
 
-#### 2. 检测关联文档
+#### 2. Git 修复管理器
 ```bash
-# Python 版本
-python tools/py/ai_doc_fix.py detect --doc <文档路径> --strategy <dependencies|keywords|fulltext>
+# 检查 Git 状态（Python 版本）
+python tools/py/manage_fix_with_git.py --check-status
 
-# Node.js 版本
-node tools/js/ai_doc_fix.js detect --doc <文档路径> --strategy <dependencies|keywords|fulltext>
+# 创建修复分支（Python 版本）
+python tools/py/manage_fix_with_git.py --start --branch-name "doc-fix-<描述>"
+
+# 提交修复（Python 版本）
+python tools/py/manage_fix_with_git.py --commit --message "fix: <修复描述>"
+
+# 回滚修复（Python 版本）
+python tools/py/manage_fix_with_git.py --rollback --commit-hash <提交哈希>
 ```
 
-#### 3. 生成修复方案
+#### 3. 批量修复管理器
 ```bash
-# Python 版本
-python tools/py/ai_doc_fix.py plan --doc <文档路径> --errors <错误列表>
+# 生成修复方案（Python 版本）
+python tools/py/batch_fix_manager.py --generate --pattern <错误内容> --replacement <正确内容>
 
-# Node.js 版本
-node tools/js/ai_doc_fix.js plan --doc <文档路径> --errors <错误列表>
+# 执行修复（Python 版本）
+python tools/py/batch_fix_manager.py --execute --plan <修复方案路径> --auto
+
+# 预览修复效果（Python 版本）
+python tools/py/batch_fix_manager.py --preview --plan <修复方案路径>
 ```
 
-#### 4. 执行修复
+#### 4. 修复历史管理器
 ```bash
-# Python 版本
-python tools/py/ai_doc_fix.py apply --plan <修复方案路径> --auto
+# 记录修复历史（Python 版本）
+python tools/py/fix_history_manager.py --record --commit <提交哈希> --target-docs <文档列表>
 
-# Node.js 版本
-node tools/js/ai_doc_fix.js apply --plan <修复方案路径> --auto
+# 查询修复历史（Python 版本）
+python tools/py/fix_history_manager.py --query --commit <提交哈希>
+
+# 查询统计信息（Python 版本）
+python tools/py/fix_history_manager.py --stats
 ```
 
-#### 5. 查看修复历史
+#### 5. 语义关联检测器
 ```bash
-# Python 版本
-python tools/py/ai_doc_fix.py history --commit <提交哈希>
-
-# Node.js 版本
-node tools/js/ai_doc_fix.js history --commit <提交哈希>
-```
-
-#### 6. 回滚修复
-```bash
-# Python 版本
-python tools/py/ai_doc_fix.py rollback --commit <提交哈希>
-
-# Node.js 版本
-node tools/js/ai_doc_fix.js rollback --commit <提交哈希>
-```
-
-#### 7. 批量修复
-```bash
-# Python 版本
-python tools/py/ai_doc_fix.py batch --pattern <查找模式> --replacement <替换内容> --severity <严重等级> --preview
-
-# Node.js 版本
-node tools/js/ai_doc_fix.js batch --pattern <查找模式> --replacement <替换内容> --severity <严重等级> --preview
+# 检测语义关联文档（Python 版本）
+python tools/py/semantic_related_detector.py --doc <文档路径> --min-overlap 2
 ```
 
 ### 高级选项

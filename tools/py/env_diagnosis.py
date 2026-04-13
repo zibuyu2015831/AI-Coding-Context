@@ -58,18 +58,40 @@ def check_node_version():
         pass
     return None
 
+def check_python_command():
+    """检查可用的 Python 命令"""
+    try:
+        # 尝试 python 命令
+        result = subprocess.run(["python", "--version"], capture_output=True, text=True)
+        if result.returncode == 0:
+            return "python"
+    except FileNotFoundError:
+        pass
+
+    try:
+        # 尝试 python3 命令
+        result = subprocess.run(["python3", "--version"], capture_output=True, text=True)
+        if result.returncode == 0:
+            return "python3"
+    except FileNotFoundError:
+        pass
+
+    return None
+
 def main():
     start_time = time.time()
-    
+
     python_version = sys.version.split()[0]
     node_version = check_node_version()
-    
+    python_command = check_python_command()
+
     os_info = f"{platform.system()} {platform.release()}"
-    
+
     status = {
         "python": {
             "version": python_version,
             "path": sys.executable,
+            "command": python_command or "python3",  # 推荐使用的命令
             "ok": sys.version_info >= (3, 6)
         },
         "node": {

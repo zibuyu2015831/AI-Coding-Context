@@ -1,7 +1,8 @@
 # 增量更新流程
 
-> **版本**: v2.3  
-> **创建日期**: 2025-11-28  
+> **版本**: v3.0
+> **创建日期**: 2025-11-28
+> **最后更新**: 2026-04-13
 > **用途**: 指导如何对已生成的文档体系进行增量更新
 
 ---
@@ -644,7 +645,44 @@ GET /api/v2/users/:id
 
 ---
 
-### 场景 5: 依赖包升级
+### 场景 5: 文档谬误修复
+
+**示例**: 修复文档中的 API 函数名错误
+
+**步骤**:
+
+1. 验证谬误的真实性
+2. 分析影响范围（关联文档检测）
+3. 生成修复方案
+4. 执行批量修复
+5. 验证修复结果
+
+**工具链**:
+
+```bash
+# 1. 验证谬误
+python tools/py/file_reader.py --file "dev_docs/api_layer.md" --limit 20
+
+# 2. 检测关联文档
+python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md" --strategy all
+
+# 3. 生成修复方案
+python tools/py/batch_fix_manager.py --generate --pattern "getUserInfo" --replacement "fetchUserProfile"
+
+# 4. 执行修复
+python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --auto
+
+# 5. 验证修复
+python tools/py/file_reader.py --file "dev_docs/api_layer.md" --offset 42 --limit 10
+```
+
+**更新文档**:
+
+- 所有受影响的关联文档都会被自动修复
+
+---
+
+### 场景 6: 依赖包升级
 
 **示例**: FastAPI 0.95 → 0.104
 

@@ -22,7 +22,7 @@ tools/
 | `file_reader`             | 安全读取文件内容       | 读取大文件、处理编码、检测二进制文件            |
 | `content_searcher`        | 高效搜索内容 (类 grep) | 查找代码引用、TODO、特定字符串                  |
 | `file_finder`             | 查找文件 (类 find)     | 根据文件名模式查找文件                          |
-| `env_diagnosis`           | 环境诊断               | 检查 Python/Node.js 版本及可用性                |
+| `env_diagnosis`           | 环境诊断 ⭐            | 检查 Python/Node.js 版本及可用性，自动检测可用命令（python/python3） |
 | `git_inspector`           | Git 信息检查           | 获取当前分支、变更状态                          |
 | `timestamp_analyzer`      | 文件时间戳采集         | 供 AI 分析文档健康度，判断文档是否过期          |
 | `git_diff_analyzer`       | Git 差异分析           | 供 AI 判断哪些文档需要更新                      |
@@ -42,6 +42,11 @@ tools/
 | `complexity_scanner`      | 复杂度扫描器 (005) ⭐  | 扫描项目复杂度，监控代码规模、依赖关系、代码质量和架构健康度，支持风险评估 |
 | `report_generator`        | 报告生成器 (005) ⭐    | 将复杂度数据转换为 Markdown 报告和 HTML 可视化仪表盘，支持自定义模板 |
 | `notifier`                | 复杂度通知工具 (005)   | 发送复杂度报告通知，支持 Slack 和 Email 通知，支持不同风险级别 |
+| `doc_dependency_tracer`   | 文档依赖追踪器 (011)   | 基于 dependencies 和 keywords 字段检测关联文档，支持双向关联和语义匹配 |
+| `manage_fix_with_git`     | Git 修复管理器 (011)   | 管理 Git 修复流程，包括分支创建、自动提交、回滚机制和修复历史记录 |
+| `fix_history_manager`     | 修复历史管理器 (011)   | 记录和查询修复历史，支持按提交、文档路径和时间范围查询统计 |
+| `semantic_related_detector` | 语义关联检测器 (011) | 基于 keywords 字段的语义相似度检测，支持词汇重叠度计算和分级匹配 |
+| `batch_fix_manager`       | 批量修复管理器 (011)   | 生成分阶段修复方案，支持预览、确认和安全执行批量修复任务 |
 
 ## 🚀 使用指南
 

@@ -7,6 +7,84 @@
 
 ---
 
+## [1.4.7] - 2026-04-13
+
+### Changed
+
+- **改进 `env_diagnosis.py` & `.js`** - 增强 Python 命令兼容性检测
+  - 新增 `command` 字段：自动检测可用的 Python 命令（python 或 python3）
+  - Node.js 版本：优化错误处理，避免在终端显示 "python: command not found" 错误
+  - 为 AI 提供明确的推荐命令，提升跨环境稳定性
+
+---
+
+## [1.4.6] - 2026-04-13
+
+### Added
+
+- **新增 `doc_dependency_tracer.py` & `.js`** - 文档依赖追踪器 (011 优化点) ⭐
+  - 基于 dependencies 字段的双向关联检测
+  - 基于 keywords 字段的语义关联检测
+  - 全文搜索兜底方案
+  - 支持三种检测策略：dependencies, keywords, fulltext
+  - 支持递归扫描文档目录
+  - 零依赖设计（Node.js 使用 glob 轻量级依赖）
+  - 支持 Python 和 Node.js 双语言实现
+
+- **新增 `manage_fix_with_git.py` & `.js`** - Git 修复管理器 (011 优化点)
+  - Git 工作区状态检查
+  - 修复分支创建和管理
+  - 自动提交和回滚机制
+  - 修复历史查看和提交详情展示
+  - 修复完成后合并到主分支
+  - 支持自定义主分支名称
+  - 零依赖设计，仅使用标准库
+  - 支持 Python 和 Node.js 双语言实现
+
+- **新增 `fix_history_manager.py` & `.js`** - 修复历史管理器 (011 优化点)
+  - 基于 Git 提交信息记录修复历史
+  - 在 _analysis/fix_history/ 目录中存储修复元数据
+  - 支持按提交哈希、文档路径查询修复历史
+  - 提供修复统计信息（总记录数、修复文档数、每日统计等）
+  - 支持清理旧的修复历史记录
+  - 支持与 Git 提交同步
+  - 零依赖设计（Node.js 使用 glob 轻量级依赖）
+  - 支持 Python 和 Node.js 双语言实现
+
+- **新增 `semantic_related_detector.py` & `.js`** - 语义关联检测器 (011 优化点)
+  - 基于 keywords 字段的语义关联检测
+  - 关键词重叠度计算
+  - Jaccard 相似度计算
+  - 批量检测支持
+  - 可配置最小重叠度阈值
+  - 零依赖设计（Node.js 使用 glob 轻量级依赖）
+  - 支持 Python 和 Node.js 双语言实现
+
+- **新增 `batch_fix_manager.py` & `.js`** - 批量修复管理器 (011 优化点) ⭐
+  - 分阶段修复方案生成
+  - 风险分级（低/中/高风险）
+  - 修复预览和确认机制
+  - 批次大小控制
+  - 支持分阶段执行
+  - 零依赖设计（Node.js 使用 glob 轻量级依赖）
+  - 支持 Python 和 Node.js 双语言实现
+
+### Changed
+
+- **修改 `summary_related_checker.py` & `.js`** - v1.1.0 升级 (011 优化点)
+  - 新增 `--dependencies` 模式：基于 dependencies 字段检测关联文档
+  - 新增 `--keywords` 模式：基于 keywords 字段检测语义关联文档
+  - 新增 `--strategy` 参数：支持选择检测策略
+  - 新增 `--min-overlap` 参数：配置关键词最小重叠度
+  - 保持向后兼容，默认仍使用 `related_files` 模式
+
+### Fixed
+
+- **修复 `doc_dependency_tracer.js` 语法错误** - 修复多处缺少闭合花括号的问题
+- **为所有 011 优化点 Node.js 工具添加 --help 支持** - 统一 CLI 用户体验
+
+---
+
 ## [1.4.5] - 2026-04-12
 
 ### Added

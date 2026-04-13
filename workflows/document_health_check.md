@@ -1,7 +1,8 @@
 # 文档健康度检查流程
 
-> **版本**: v2.3  
-> **创建日期**: 2025-11-28  
+> **版本**: v3.0
+> **创建日期**: 2025-11-28
+> **最后更新**: 2026-04-13
 > **用途**: 评估现有文档的健康度，决定是否需要更新
 
 ---
@@ -397,6 +398,94 @@ total_deduct = min(total_deduct, 5)
 - 如果文档是 V3.0 之前生成的，缺少摘要是正常的，不应扣分
 - 可以通过检查文档生成日期来判断是否应该有摘要
 - 建议在更新文档时同步添加摘要
+
+---
+
+#### E. 文档谬误检测（最多-10 分）🆕 (V3.0)
+
+检测文档中是否存在与代码不一致的内容，如 API 函数名错误、代码示例错误等
+
+| 检测项                                | 扣分   | 说明                            |
+| ------------------------------------- | ------ | ------------------------------- |
+| 发现 P0 级谬误（API 函数名错误）      | -10 分 | 严重错误，必须修复              |
+| 发现 P1 级谬误（概念解释错误）        | -5 分  | 重要错误，建议修复              |
+| 发现 P2/P3 级谬误（格式/拼写错误）    | -2 分  | 轻微错误，可选修复              |
+
+**检查方法**:
+
+```bash
+# 1. 自动检测文档谬误
+python tools/py/complexity_scanner.py --path . --check-doc-errors
+
+# 2. 检测 API 文档与代码一致性
+python tools/py/batch_fix_manager.py --generate --pattern "getUserInfo" --replacement "fetchUserProfile" --preview
+
+# 3. 检测语义关联文档的一致性
+python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md" --strategy all
+```
+
+**输出示例**:
+
+```json
+{
+  "doc_errors_found": 3,
+  "errors": [
+    {
+      "doc_path": "dev_docs/api_layer.md",
+      "line": 45,
+      "error_type": "API函数名错误",
+      "severity": "P0",
+      "code_reference": "src/api/user.ts:L23",
+      "suggested_fix": "将 getUserInfo() 替换为 fetchUserProfile()"
+    },
+    {
+      "doc_path": "dev_docs/user_profile.md",
+      "line": 28,
+      "error_type": "代码示例错误",
+      "severity": "P1",
+      "code_reference": "src/components/UserProfile.tsx:L15",
+      "suggested_fix": "更新导入语句"
+    }
+  ]
+}
+```
+
+**自动化修复建议**:
+
+```markdown
+## 📋 文档谬误修复建议
+
+### 🔴 P0 级（必须修复）
+
+1. **dev_docs/api_layer.md** - API 函数名错误
+   - 位置: 第 45 行
+   - 错误: 使用了 `getUserInfo()`
+   - 代码依据: src/api/user.ts:L23 显示实际函数为 `fetchUserProfile()`
+   - 修复命令: `python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md"`
+
+### 🟡 P1 级（建议修复）
+
+2. **dev_docs/user_profile.md** - 代码示例错误
+   - 位置: 第 28 行
+   - 错误: 导入语句过时
+   - 代码依据: src/components/UserProfile.tsx:L15
+   - 修复命令: `python tools/py/batch_fix_manager.py --execute --plan "dev_docs/_analysis/doc_fix_plan_20260413.md" --stage 2`
+
+**预计修复时间**: 15-30 分钟
+**修复风险**: 低（使用 Git 分支管理，可回滚）
+```
+
+**为什么重要**:
+
+- ✅ **确保一致性**: 避免文档与代码不一致导致的开发错误
+- ✅ **提升开发效率**: 开发者可以信任文档内容
+- ✅ **自动化修复**: 工具链支持批量检测和修复
+
+**注意事项**:
+
+- 谬误检测需要与代码进行对比，需要项目有可运行的代码
+- 检测结果可能存在误报，建议人工验证后再执行修复
+- 支持分阶段修复，高风险谬误需要单独确认
 
 ---
 
@@ -1312,8 +1401,10 @@ E. 保持现有文档
 - [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md#场景4-文档健康度检查) - 智能工作流分流
 - [incremental_update_workflow.md](./incremental_update_workflow.md) - 增量更新流程
 - [core/update_triggers.md](../core/update_triggers.md) - 文档更新触发机制
+- [workflows/doc_error_fix_workflow.md](./doc_error_fix_workflow.md) - 文档谬误修复工作流（011 优化点）⭐
 
 ---
 
-**版本**: v2.3  
+**版本**: v3.0
+**最后更新**: 2026-04-13
 **路径**: `workflows/document_health_check.md`
