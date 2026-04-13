@@ -51,7 +51,11 @@ knowledge-evolution-system/
 ├── 🔷 接入层（Ingestion Layer）
 │   ├── 知识提交接口
 │   ├── 预处理模块
-│   └── 格式验证器
+│   ├── 格式验证器
+│   └── 知识库初始化模块（新增）
+│       ├── 结构验证器
+│       ├── 内容完整性检查
+│       └── 元数据生成器
 │
 ├── 🔷 分析层（Analysis Layer）
 │   ├── 内容语义分析
@@ -73,6 +77,77 @@ knowledge-evolution-system/
     ├── 使用数据分析
     ├── 反馈收集系统
     └── 框架健康检查
+```
+
+---
+
+#### 1.1 知识库初始化模块（新增）
+
+```javascript
+// 知识库初始化器
+class KnowledgeRepositoryInitializer {
+  async initializeLocalKnowledgeAsShared(): Promise<InitResult> {
+    const initResult = {
+      success: false,
+      issues: [],
+      warnings: [],
+      suggestions: []
+    };
+
+    // 1. 检查并验证本地知识结构
+    const structureCheck = await this.checkStructure();
+    if (!structureCheck.valid) {
+      initResult.issues.push(...structureCheck.issues);
+      return initResult;
+    }
+
+    // 2. 执行内容完整性检查
+    const contentCheck = await this.checkContentIntegrity();
+    initResult.warnings.push(...contentCheck.warnings);
+    initResult.suggestions.push(...contentCheck.suggestions);
+
+    // 3. 生成缺失的元数据
+    const metadataResult = await this.generateMetadata();
+    if (!metadataResult.success) {
+      initResult.issues.push(...metadataResult.issues);
+      return initResult;
+    }
+
+    // 4. 配置 Git 仓库
+    const gitConfig = await this.setupGitRepository();
+    if (!gitConfig.success) {
+      initResult.issues.push(...gitConfig.issues);
+      return initResult;
+    }
+
+    initResult.success = true;
+    return initResult;
+  }
+
+  async checkStructure(): Promise<StructureCheckResult> {
+    // 验证目录结构是否符合标准
+    // 检查所有知识条目是否包含必要字段
+    // 验证代码示例和链接是否有效
+  }
+
+  async checkContentIntegrity(): Promise<ContentCheckResult> {
+    // 执行自动质量检查
+    // 检查知识内容的完整性
+    // 识别需要优化的条目
+  }
+
+  async generateMetadata(): Promise<MetadataGenerationResult> {
+    // 为缺失元数据的知识条目自动生成
+    // 提供标签建议
+    // 补充创建时间和贡献者信息
+  }
+
+  async setupGitRepository(): Promise<GitSetupResult> {
+    // 初始化 Git 仓库
+    // 配置 .gitignore 文件
+    // 第一次提交
+  }
+}
 ```
 
 ### 2. 核心模块设计

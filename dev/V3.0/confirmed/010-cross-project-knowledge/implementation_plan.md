@@ -171,6 +171,8 @@ class KnowledgeConfigManager:
 - 实现 `update-shared` 命令
 - 实现 `strategy` 命令
 - 实现 `enable-shared` 和 `disable-shared` 命令
+- 实现 `init` 命令（初始化共享知识库）
+- 实现 `publish` 命令（发布到云端仓库）
 
 #### 任务 3.2：用户交互
 - 开发配置向导

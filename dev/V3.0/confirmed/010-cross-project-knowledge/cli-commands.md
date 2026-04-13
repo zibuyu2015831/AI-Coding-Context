@@ -260,7 +260,66 @@ python tools/py/knowledge_cli.py config --help
 
 ## 🔧 高级功能
 
-### 1. 知识库迁移工具
+### 1. 知识库初始化与发布
+
+#### 命令：`init`（待实现）
+
+**功能**: 初始化本地 knowledge 目录为共享知识库，创建标准结构和配置文件
+
+**使用方法**:
+```bash
+# Node.js 版本（待实现）
+node tools/js/knowledge_cli.js init --as-shared
+
+# Python 版本（待实现）
+python tools/py/knowledge_cli.py init --as-shared
+```
+
+**详细参数**:
+- `--as-shared`: 标记为共享知识库（必填）
+- `--force`: 强制初始化，覆盖现有配置
+- `--template <name>`: 使用特定模板初始化（可选，默认使用标准模板）
+- `--dry-run`: 模拟初始化过程，不实际执行
+
+**初始化流程**:
+1. 检查本地 knowledge 目录结构是否符合标准
+2. 创建 .aicc/ 配置目录和元数据文件
+3. 初始化 Git 仓库（git init）
+4. 配置标准的 .gitignore 文件
+5. 验证并修复目录结构问题
+
+---
+
+#### 命令：`publish`（待实现）
+
+**功能**: 将本地共享知识库发布到云端 Git 仓库
+
+**使用方法**:
+```bash
+# Node.js 版本（待实现）
+node tools/js/knowledge_cli.js publish --remote https://github.com/your-org/shared-knowledge.git --branch main
+
+# Python 版本（待实现）
+python tools/py/knowledge_cli.py publish --remote https://github.com/your-org/shared-knowledge.git --branch main
+```
+
+**详细参数**:
+- `--remote <url>`: 远程仓库地址（必填）
+- `--branch <name>`: 分支名称（可选，默认 main）
+- `--message <msg>`: 提交信息（可选）
+- `--force`: 强制推送，覆盖远程仓库
+- `--dry-run`: 模拟发布过程，不实际执行
+
+**发布流程**:
+1. 检查本地仓库状态，确保所有更改已提交
+2. 添加远程仓库地址（git remote add）
+3. 首次发布时设置 upstream 分支（git push -u）
+4. 后续发布使用增量更新（git push）
+5. 验证远程仓库内容与本地一致
+
+---
+
+### 2. 知识库迁移工具
 
 #### 命令：`migrate`（待实现）
 
@@ -352,6 +411,34 @@ node tools/js/knowledge_cli.js update-shared
 # 查看更新结果
 node tools/js/knowledge_cli.js status
 ```
+
+### 场景 4：将本地项目知识转化为共享知识库
+
+```bash
+# 1. 确保在已使用 AICC 框架的项目中
+cd your-project
+
+# 2. 查看当前状态
+node tools/js/knowledge_cli.js status
+
+# 3. 初始化本地 knowledge 为共享知识库
+node tools/js/knowledge_cli.js init --as-shared
+
+# 4. 验证初始化结果
+node tools/js/knowledge_cli.js status
+
+# 5. 发布到云端仓库（假设已创建空仓库）
+node tools/js/knowledge_cli.js publish --remote https://github.com/your-org/shared-knowledge.git --branch main
+
+# 6. 验证发布成功
+node tools/js/knowledge_cli.js status
+
+# 7. 团队成员可以通过 config 命令使用该知识库
+node tools/js/knowledge_cli.js config --shared https://github.com/your-org/shared-knowledge.git
+```
+
+**场景说明**:
+- 项目 A 拥有丰富的知识积累，想分享给项目 B 使用。项目 B 可以直接 config 共享知识库，复用项目 A 的知识。
 
 ---
 
