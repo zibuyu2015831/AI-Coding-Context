@@ -246,7 +246,7 @@ def analyze_code_quality(path):
     return quality
 
 
-def analyze_review_data(path):
+def analyze_review_data(path, git_data):
     """分析代码审查数据"""
     review_data = {
         "changes": {
@@ -265,7 +265,6 @@ def analyze_review_data(path):
     }
 
     # 获取 git 变更数据
-    git_data = call_git_diff_analyzer("1 day ago")
     if git_data and "data" in git_data:
         changed_files = git_data["data"].get("changed_files", [])
         review_data["changes"]["changed_files"] = len(changed_files)
@@ -282,7 +281,7 @@ def analyze_review_data(path):
                 review_data["changes"]["core_files_changed"] += 1
 
     # 分析危险模式
-    review_data["dangerous_patterns"] = analyze_dangerous_patterns(path)
+    review_data["dangerous_patterns"] = analyze_dangerous_patterns(path, git_data)
 
     # 分析 TODO 标记变化
     review_data["todo_changes"] = analyze_todo_changes(path)
@@ -293,7 +292,7 @@ def analyze_review_data(path):
     return review_data
 
 
-def analyze_dangerous_patterns(path):
+def analyze_dangerous_patterns(path, git_data):
     """分析危险模式"""
     dangerous_patterns = []
     config = load_config("")
@@ -326,7 +325,6 @@ def analyze_dangerous_patterns(path):
 
     # 检查大文件变更
     large_file_threshold = config.get("review", {}).get("large_file_threshold", 500)
-    git_data = call_git_diff_analyzer("1 day ago")
     if git_data and "data" in git_data:
         for file in git_data["data"].get("changed_files", []):
             if "lines_changed" in file and file["lines_changed"] > large_file_threshold:
@@ -387,7 +385,7 @@ def calculate_review_risk(review_data):
     return risk_level
 
 
-def analyze_architecture(path):
+def analyze_architecture(path, git_data):
     """分析架构健康度"""
     architecture = {
         "core_files_changed": 0,
@@ -395,10 +393,8 @@ def analyze_architecture(path):
         "domain_boundary_score": 7
     }
 
-    # 简单的架构分析（MVP 版本）
     core_files = ["package.json", "requirements.txt", "README.md", "tsconfig.json"]
 
-    git_data = call_git_diff_analyzer("1 day ago")
     if git_data and "data" in git_data and "changed_files" in git_data["data"]:
         for file in git_data["data"]["changed_files"]:
             if any(core_file in file["path"] for core_file in core_files):
@@ -552,8 +548,8 @@ def main():
         },
         "dependencies": analyze_dependencies(args.path),
         "code_quality": analyze_code_quality(args.path),
-        "architecture": analyze_architecture(args.path),
-        "review_data": analyze_review_data(args.path),  # 新增代码审查数据
+        "architecture": analyze_architecture(args.path, git_diff_data),
+        "review_data": analyze_review_data(args.path, git_diff_data),  # 新增代码审查数据
         "risk_assessment": {}
     }
 

@@ -146,12 +146,11 @@ def run_complexity_scanner():
     return None
 
 
-def check_complexity():
+def check_complexity(data):
     """检查复杂度增量"""
     try:
         print("\n🔍 Pre-commit Hook: 检查复杂度增量...")
 
-        data = run_complexity_scanner()
         if not data:
             return True, "无法运行复杂度扫描工具，跳过检查"
 
@@ -179,12 +178,11 @@ def check_complexity():
         return True, f"复杂度检查出错: {str(e)}"
 
 
-def check_code_review():
+def check_code_review(data):
     """检查代码变更质量（新增审查功能）"""
     try:
         print("\n🔍 Pre-commit Hook: 检查代码审查...")
 
-        data = run_complexity_scanner()
         if not data:
             return True, "无法运行代码审查工具，跳过检查"
 
@@ -271,14 +269,17 @@ def main():
     except:
         pass  # 工具不可用时跳过评分
 
+    # 统一运行一次扫描器获取数据
+    scanner_data = run_complexity_scanner()
+
     # 复杂度检查
-    complexity_ok, complexity_msg = check_complexity()
+    complexity_ok, complexity_msg = check_complexity(scanner_data)
     if not complexity_ok:
         print(f"\n❌ {complexity_msg}")
         return 1
 
     # 代码审查检查
-    review_ok, review_msg = check_code_review()
+    review_ok, review_msg = check_code_review(scanner_data)
     if not review_ok:
         print(f"\n❌ {review_msg}")
         return 1

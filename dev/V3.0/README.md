@@ -3,7 +3,7 @@
 **版本号**: V3.0  
 **规划日期**: 2025-11-29  
 **当前状态**: 🟢 P0 核心已完成，推进 P1/P2
-**最后更新**: 2026-04-12
+**最后更新**: 2026-04-13
 
 ---
 
@@ -18,9 +18,8 @@
 ### 统计
 
 - **总计**: 17 个
-- **已完成**: 8 个 (001, 003, 004, 012, 013, 016, 017, 018)
-- **整合到已完成** (005+006): 1 个 (功能已整合到005中)
-- **待讨论** (pending/): 8 个
+- **已完成**: 10 个 (001, 003, 004, 005, 006, 012, 013, 016, 017, 018)
+- **待讨论** (pending/): 7 个
 - **已归档** (archived/): 1 个 (002)
 
 ### 优先级分布
@@ -71,7 +70,7 @@
 - **详细信息**: [004-adr-system.md](./confirmed/004-adr-system.md/004-adr-system.md)
 
 #### 5. 复杂度实时仪表盘 [005]
-- **状态**: 🟢 审核通过 (2026-04-12)
+- **状态**: ✅ 已完成 (2026-04-13)
 - **产物**: `dev_docs/complexity/`, `tools/complexity_scanner.py`, `tools/report_generator.py`
 - **详细信息**: [005-complexity-dashboard.md](./confirmed/005-complexity-dashboard.md/005-complexity-dashboard.md)
 
@@ -81,12 +80,15 @@
 - **实际工作量**: 1 天（快速实施）
 - **详细信息**: [006-auto-review-report.md](./confirmed/006-auto-review-report.md/006-auto-review-report.md)
 
+#### 11. 文档谬误修复工作流 [011]
+- **状态**: 🟢 已确认 (2026-04-13)
+- **核心功能**: 基于 Git 的修复流程管理、关联文档自动检测、批量修复支持
+- **预估工作量**: 2.5 天
+- **详细信息**: [011-doc-error-fix-workflow.md](./confirmed/011-doc-error-fix-workflow/011-doc-error-fix-workflow.md)
+
 ---
 
 ## 📁 待讨论的优化点 (pending/)
-
-#### 11. 文档谬误修复工作流
-- [011-doc-error-fix-workflow.md](./pending/011-doc-error-fix-workflow.md)
 
 #### 14. 文档阅读习惯引导
 - [014-doc-reading-habit-guide.md](./pending/014-doc-reading-habit-guide.md)
@@ -123,4 +125,4 @@
 
 ---
 
-**最后更新**: 2026-04-12
+**最后更新**: 2026-04-13

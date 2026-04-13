@@ -247,7 +247,7 @@ function analyzeCodeQuality(dirPath) {
 }
 
 // 分析架构健康度
-function analyzeArchitecture(dirPath) {
+function analyzeArchitecture(dirPath, gitDiffData) {
   const architecture = {
     core_files_changed: 0,
     coupling_score: 0,
@@ -255,7 +255,6 @@ function analyzeArchitecture(dirPath) {
   };
 
   const coreFiles = ['package.json', 'requirements.txt', 'README.md', 'tsconfig.json'];
-  const gitDiffData = callGitDiffAnalyzer('1 day ago');
 
   if (gitDiffData && gitDiffData.data && gitDiffData.data.changed_files) {
     gitDiffData.data.changed_files.forEach(file => {
@@ -324,7 +323,7 @@ function calculateRiskAssessment(data, config) {
 }
 
 // 分析代码审查数据
-function analyzeReviewData(dirPath) {
+function analyzeReviewData(dirPath, gitData) {
   const reviewData = {
     changes: {
       added_lines: 0,
@@ -342,7 +341,6 @@ function analyzeReviewData(dirPath) {
   };
 
   // 获取 git 变更数据
-  const gitData = callGitDiffAnalyzer("1 day ago");
   if (gitData && gitData.data) {
     const changedFiles = gitData.data.changed_files || [];
     reviewData.changes.changed_files = changedFiles.length;
@@ -364,7 +362,7 @@ function analyzeReviewData(dirPath) {
   }
 
   // 分析危险模式
-  reviewData.dangerous_patterns = analyzeDangerousPatterns(dirPath);
+  reviewData.dangerous_patterns = analyzeDangerousPatterns(dirPath, gitData);
 
   // 分析 TODO 标记变化
   reviewData.todo_changes = analyzeTodoChanges(dirPath);
@@ -376,7 +374,7 @@ function analyzeReviewData(dirPath) {
 }
 
 // 分析危险模式
-function analyzeDangerousPatterns(dirPath) {
+function analyzeDangerousPatterns(dirPath, gitData) {
   const dangerousPatterns = [];
   const config = loadConfig();
 
@@ -422,7 +420,6 @@ function analyzeDangerousPatterns(dirPath) {
 
   // 检查大文件变更
   const largeFileThreshold = config.review?.large_file_threshold || 500;
-  const gitData = callGitDiffAnalyzer("1 day ago");
   if (gitData && gitData.data) {
     for (const file of gitData.data.changed_files || []) {
       if (file.lines_changed && file.lines_changed > largeFileThreshold) {
@@ -608,8 +605,8 @@ function main() {
     },
     dependencies: analyzeDependencies(scanPath),
     code_quality: analyzeCodeQuality(scanPath),
-    architecture: analyzeArchitecture(scanPath),
-    review_data: analyzeReviewData(scanPath),
+    architecture: analyzeArchitecture(scanPath, gitDiffData),
+    review_data: analyzeReviewData(scanPath, gitDiffData),
     risk_assessment: {}
   };
 
