@@ -92,6 +92,31 @@
 | **长期维护**   | ❌ 困难                 | ⚠️ 容易过时  | **✅ 自动触发更新**        |
 | **Token 消耗** | 高 (重复解释)           | 中           | **低 (精准上下文)**        |
 
+## 📖 如何使用文档
+
+框架集成了智能文档推荐和理解偏差检测功能，帮助用户更好地阅读和理解文档：
+
+### 🤖 智能文档推荐
+AI 会根据你的任务智能推荐相关文档：
+- 开发新功能时推荐架构文档
+- 做技术选型时推荐设计决策记录
+- 修复复杂 Bug 时推荐 troubleshooting 文档
+
+### ⚠️ 理解偏差检测
+当 AI 检测到你对项目理解出现偏差时，会主动提醒：
+- 术语使用与文档定义不一致
+- 方案违反架构原则
+- 问题在文档中已有明确答案
+
+### ⚙️ 配置控制
+你可以在 `config/user_config.md` 中配置这些功能：
+- `enableDocReadingGuide` - 全局开关
+- `doc_reading_guide.recommendation` - 智能推荐开关
+- `doc_reading_guide.recommendation_frequency` - 推荐频率
+- `doc_reading_guide.deviation_detect` - 偏差检测开关
+
+---
+
 ## 🚀 快速开始（3 步）
 
 1. 完整阅读 `README.md（即本文档）` 了解框架

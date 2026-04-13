@@ -360,6 +360,7 @@ git add ai_coding_context/
 3. **问题发现** - 分析时记录问题和疑问，不确定时标注
 4. **分层文档** - 主文档（索引）→ 子文档（详细）→ 知识库（经验）
 5. **进度可控** - 建立进度表，大型项目分批执行，支持断点生成
+6. **文档驱动** - 鼓励用户阅读文档，提供智能推荐和理解偏差检测
 
 ---
 
@@ -491,6 +492,8 @@ graph TD
 | `agents/runtime/commit_analyst.md`| Commit 深度分析器 | **增量更新流程必读**   |
 | `agents/runtime/design_facilitator.md`| 设计思维引导者 | **首次生成 Step 5.5 必读** |
 | `agents/runtime/summary_generator.md`| 文档摘要生成专家 | **生成任意文档后必读** |
+| `agents/runtime/document_recommender.md`| 文档推荐专家 | **执行任务时智能推荐文档** |
+| `agents/runtime/understanding_guardian.md`| 理解偏差检测专家 | **检测用户理解偏差并提醒** |
 | `agents/runtime/*.md`           | 其他运行时角色   | 自动审查/测试/优化时   |
 | `agents/development/*.md`       | 开发时角色   | 架构设计/数据库设计时  |
 | `agents/language_specific/*.md` | 语言专属角色 | 特定语言开发时         |

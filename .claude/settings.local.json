@@ -14,7 +14,8 @@
       "Bash(for file:*)",
       "Bash(do node:*)",
       "Bash(done)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

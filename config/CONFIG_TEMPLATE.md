@@ -13,6 +13,7 @@ lastUpdated: 2025-12-01
 enableMutualReview: false
 enforceDesignThinking: false
 enableADR: false
+enableDocReadingGuide: true
 aiCapabilityTier: auto
 preferredRoles: []
 
@@ -43,6 +44,12 @@ git_safety:
   require_branch_naming: true # 是否要求分支命名规范
   warn_on_large_commit: true # 单commit超过500行时警告
   enable_pre_commit_hook: false # 是否启用 pre-commit hook
+
+# 文档阅读引导配置
+doc_reading_guide:
+  recommendation: true    # 智能文档推荐
+  recommendation_frequency: normal  # 推荐频率 (always|normal|rare|never)
+  deviation_detect: true  # 理解偏差检测
 
 # Commit-Guided Documentation 配置
 commit_guided_documentation:
@@ -688,6 +695,86 @@ commit_guided_documentation:
     time_window_days: 7
     enable_aggregation: true
   require_user_confirmation: true
+```
+
+## 📖 文档阅读引导配置 🆕
+
+**YAML 字段**: `enableDocReadingGuide` (全局开关) + `doc_reading_guide` (详细配置)
+**当前值**: `true` (全局) + 见 frontmatter (详细)
+**对应优化点**: 014-文档阅读习惯引导
+
+**说明**: 控制 AI 是否主动推荐文档和检测理解偏差
+
+### 全局开关 (`enableDocReadingGuide`)
+
+**可选值**:
+
+- `true` - 启用（推荐）
+  - 适用: 新项目、团队协作
+  - 效果: AI 会根据任务推荐文档，检测理解偏差
+- `false` - 禁用
+  - 适用: 快速原型、临时项目
+  - 效果: AI 直接处理需求，不推荐或检测
+
+### 详细配置 (`doc_reading_guide`)
+
+#### `recommendation`
+
+**类型**: `boolean`
+**默认值**: `true`
+
+**说明**: 是否启用智能文档推荐
+
+- `true` - AI 会根据用户任务推荐相关文档
+- `false` - 不推荐文档，但保留偏差检测
+
+#### `recommendation_frequency`
+
+**类型**: `string`
+**默认值**: `normal`
+
+**说明**: 推荐频率控制
+
+**可选值**:
+- `always` - 每次任务都推荐
+- `normal` - 正常频率（默认），每会话最多 3 次
+- `rare` - 稀有频率，只在重大任务时推荐
+- `never` - 等同于 `recommendation: false`
+
+#### `deviation_detect`
+
+**类型**: `boolean`
+**默认值**: `true`
+
+**说明**: 是否启用理解偏差检测
+
+- `true` - AI 会检测用户理解偏差并温和提醒
+- `false` - 不检测偏差，但保留文档推荐
+
+---
+
+### 配置组合建议
+
+#### 严格模式（推荐用于重要项目）
+```yaml
+enableDocReadingGuide: true
+doc_reading_guide:
+  recommendation: true
+  recommendation_frequency: normal
+  deviation_detect: true
+```
+
+#### 快速模式（跳过推荐，只保留检测）
+```yaml
+enableDocReadingGuide: true
+doc_reading_guide:
+  recommendation: false
+  deviation_detect: true
+```
+
+#### 极简模式（完全关闭）
+```yaml
+enableDocReadingGuide: false
 ```
 
 ---
