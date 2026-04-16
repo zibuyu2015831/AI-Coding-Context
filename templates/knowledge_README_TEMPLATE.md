@@ -106,6 +106,24 @@ verified_at: [YYYY-MM-DD 格式日期]
 
 ```
 
+## 🌐 跨项目知识复用 ⭐ (V3.0)
+
+本项目支持通过 AICC 共享知识库复用团队积累的架构模式和最佳实践。
+
+### 如何使用共享知识？
+
+1. **配置共享库**: 运行 `python tools/py/knowledge_cli.py config --shared [REPO_URL]`
+2. **在文档中引用**: 使用以下语法，AICC 会在生成文档时自动注入内容：
+   ```markdown
+   :::knowledge-ref type:name :::
+   ```
+3. **手动同步**: 运行 `python tools/py/knowledge_cli.py update-shared` 获取最新知识。
+
+### 如何贡献知识到团队？
+
+1. **初始化库**: 运行 `python tools/py/knowledge_cli.py init --as-shared`
+2. **发布知识**: 运行 `python tools/py/knowledge_cli.py publish --remote [REPO_URL]`
+
 ---
 
 ## 📚 知识库索引

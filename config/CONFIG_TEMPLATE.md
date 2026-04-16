@@ -14,6 +14,7 @@ enableMutualReview: false
 enforceDesignThinking: false
 enableADR: false
 enableDocReadingGuide: true
+enableKnowledgeReuse: true
 aiCapabilityTier: auto
 preferredRoles: []
 
@@ -27,6 +28,15 @@ tools:
   autoFallback: true # 工具失败时自动降级
   timeoutSeconds: 10 # 工具超时时间(秒)
   maxFileScan: 5000 # 最大扫描文件数
+
+# 知识库复用配置 (010)
+knowledge_reuse:
+  enabled: true # 是否启用知识库复用
+  shared_repo_url: "" # 共享知识库 Git 仓库地址
+  shared_repo_branch: "main" # 共享知识库分支
+  match_strategy: "local-first" # 匹配策略 (local-first|shared-first|hybrid)
+  match_threshold: 0.6 # 匹配相似度阈值 (0-1)
+  auto_update: true # 是否自动更新共享知识库
 
 # 设计思维引导配置
 design_thinking:
@@ -776,6 +786,59 @@ doc_reading_guide:
 ```yaml
 enableDocReadingGuide: false
 ```
+
+---
+
+## 📚 跨项目知识复用配置 🆕
+
+**YAML 字段**: `enableKnowledgeReuse` (全局开关) + `knowledge_reuse` (详细配置)
+**当前值**: `true` (全局) + 见 frontmatter (详细)
+**对应优化点**: 010-跨项目知识复用
+
+**说明**: 控制 AI 是否在不同项目间复用架构模式、最佳实践和解决方案。
+
+### 全局开关 (`enableKnowledgeReuse`)
+
+**可选值**:
+
+- `true` - 启用（推荐）
+  - 自动从共享知识库匹配内容。
+  - 支持 `:::knowledge-ref:::` 语法。
+- `false` - 禁用
+  - 仅使用项目本地知识。
+
+### 详细配置 (`knowledge_reuse`)
+
+#### `shared_repo_url`
+
+**类型**: `string`
+**说明**: 共享知识库的 Git 仓库地址。
+
+#### `match_strategy`
+
+**类型**: `string`
+**默认值**: `local-first`
+
+**说明**: 知识匹配和合并策略。
+
+**可选值**:
+- `local-first` - 本地优先：本地知识优先，共享知识作为补充。
+- `shared-first` - 共享优先：共享知识优先，确保遵循团队标准。
+- `hybrid` - 混合模式：根据相似度自动选择最佳匹配。
+
+#### `match_threshold`
+
+**类型**: `number` (0-1)
+**默认值**: `0.6`
+
+**说明**: 知识匹配的相似度阈值。
+
+#### `auto_update`
+
+**类型**: `boolean`
+**默认值**: `true`
+
+**说明**: 是否在生成文档时自动尝试更新共享知识库。
 
 ---
 
