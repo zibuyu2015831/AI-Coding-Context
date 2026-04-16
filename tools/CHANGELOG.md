@@ -7,6 +7,28 @@
 
 ---
 
+## [1.5.0] - 2026-04-16
+
+### Added
+
+- **新增 `knowledge_cli.py` & `.js`** - 知识库管理工具 (010 优化点) ⭐
+  - 支持知识库的初始化 (`init`)、配置 (`config`)、启用/禁用 (`enable/disable`)。
+  - 支持从远程 Git 仓库同步更新 (`update-shared`)。
+  - 支持将本地知识库发布到云端 (`publish`)。
+  - 自动管理 `.gitignore` 以排除缓存目录。
+  - 零依赖设计，仅使用标准库。
+  - 支持 Python 和 Node.js 双语言实现。
+
+- **新增 `knowledge_matcher.py` & `.js`** - 知识匹配解析引擎 (010 优化点) ⭐
+  - 解析并替换文档中的 `:::knowledge-ref type:name :::` 语法。
+  - 支持多种匹配策略：`local-first`, `shared-first`, `hybrid`。
+  - 自动提取内容并移除 Frontmatter。
+  - 递归搜索本地和共享知识库目录。
+  - 零依赖设计，仅使用标准库。
+  - 支持 Python 和 Node.js 双语言实现。
+
+---
+
 ## [1.4.7] - 2026-04-13
 
 ### Changed

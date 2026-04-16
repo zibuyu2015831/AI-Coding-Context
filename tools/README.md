@@ -42,6 +42,8 @@ tools/
 | `complexity_scanner`      | 复杂度扫描器 (005) ⭐  | 扫描项目复杂度，监控代码规模、依赖关系、代码质量和架构健康度，支持风险评估 |
 | `report_generator`        | 报告生成器 (005) ⭐    | 将复杂度数据转换为 Markdown 报告和 HTML 可视化仪表盘，支持自定义模板 |
 | `notifier`                | 复杂度通知工具 (005)   | 发送复杂度报告通知，支持 Slack 和 Email 通知，支持不同风险级别 |
+| `knowledge_cli`           | 知识库管理 (010) ⭐    | 维护与配置共享知识库，支持初始化、同步、发布等完整生命周期管理 |
+| `knowledge_matcher`       | 知识匹配解析 (010) ⭐  | 解析文档中的 :::knowledge-ref::: 语法，自动注入匹配的共享知识内容 |
 | `doc_dependency_tracer`   | 文档依赖追踪器 (011)   | 基于 dependencies 和 keywords 字段检测关联文档，支持双向关联和语义匹配 |
 | `manage_fix_with_git`     | Git 修复管理器 (011)   | 管理 Git 修复流程，包括分支创建、自动提交、回滚机制和修复历史记录 |
 | `fix_history_manager`     | 修复历史管理器 (011)   | 记录和查询修复历史，支持按提交、文档路径和时间范围查询统计 |
