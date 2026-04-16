@@ -328,6 +328,8 @@ git add ai_coding_context/
 | 摘要索引生成   | `tools/py/summary_index_generator.py` | 维护文档索引关系     |
 | 架构探针检索   | `tools/py/why_tool.py`                | 检索与提取 ADR 架构上下文 |
 | 架构断言验证   | `tools/py/aac_validator.py`           | 验证代码是否违背 ADR 断言 |
+| 知识库管理     | `tools/py/knowledge_cli.py`           | 维护与配置共享知识库 (V3.0) |
+| 知识匹配解析   | `tools/py/knowledge_matcher.py`       | 解析文档中的知识引用 (V3.0) |
 | 文档依赖追踪   | `tools/py/doc_dependency_tracer.py`   | 检测文档关联关系（011 优化点）|
 | Git 修复管理   | `tools/py/manage_fix_with_git.py`     | 管理 Git 分支和修复提交（011 优化点）|
 | 修复历史管理   | `tools/py/fix_history_manager.py`     | 记录和查询修复历史（011 优化点）|

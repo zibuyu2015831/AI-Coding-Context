@@ -493,6 +493,23 @@ python tools/py/summary_validator.py --batch-mode --dir dev_docs/ | \
 grep "过期"
 ```
 
+### 步骤 4.6: 知识库维护与同步 ⭐ (V3.0) `[MUST IF 已配置知识库]`
+
+**目的**: 确保共享知识库是最新的，并同步到受影响的文档中。
+
+**操作步骤**:
+
+1. **更新共享知识库**
+   ```bash
+   python tools/py/knowledge_cli.py update-shared
+   ```
+
+2. **重新解析文档引用**
+   对所有更新过的文档运行匹配器，以应用知识库中的最新内容：
+   ```bash
+   python tools/py/knowledge_matcher.py --file [file_path] --inplace
+   ```
+
 ---
 
 ### 步骤 5: 更新进度跟踪
