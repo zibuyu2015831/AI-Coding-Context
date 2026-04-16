@@ -262,16 +262,18 @@ python tools/py/knowledge_cli.py config --help
 
 ### 1. 知识库初始化与发布
 
-#### 命令：`init`（待实现）
+#### 命令：`init`
 
 **功能**: 初始化本地 knowledge 目录为共享知识库，创建标准结构和配置文件
 
+**实现状态**: 🟡 阶段 2 实现
+
 **使用方法**:
 ```bash
-# Node.js 版本（待实现）
+# Node.js 版本
 node tools/js/knowledge_cli.js init --as-shared
 
-# Python 版本（待实现）
+# Python 版本
 python tools/py/knowledge_cli.py init --as-shared
 ```
 
@@ -290,16 +292,18 @@ python tools/py/knowledge_cli.py init --as-shared
 
 ---
 
-#### 命令：`publish`（待实现）
+#### 命令：`publish`
 
 **功能**: 将本地共享知识库发布到云端 Git 仓库
 
+**实现状态**: 🟡 阶段 2 实现
+
 **使用方法**:
 ```bash
-# Node.js 版本（待实现）
+# Node.js 版本
 node tools/js/knowledge_cli.js publish --remote https://github.com/your-org/shared-knowledge.git --branch main
 
-# Python 版本（待实现）
+# Python 版本
 python tools/py/knowledge_cli.py publish --remote https://github.com/your-org/shared-knowledge.git --branch main
 ```
 
@@ -321,17 +325,19 @@ python tools/py/knowledge_cli.py publish --remote https://github.com/your-org/sh
 
 ### 2. 知识库迁移工具
 
-#### 命令：`migrate`（待实现）
+#### 命令：`migrate`
 
 **功能**: 管理知识从本地到共享知识库的迁移
 
+**实现状态**: 🟡 阶段 2 实现
+
 **使用方法**:
 ```bash
-# Node.js 版本（待实现）
+# Node.js 版本
 node tools/js/knowledge_cli.js migrate --list
 node tools/js/knowledge_cli.js migrate --select <id>
 
-# Python 版本（待实现）
+# Python 版本
 python tools/py/knowledge_cli.py migrate --list
 python tools/py/knowledge_cli.py migrate --select <id>
 ```
@@ -345,19 +351,21 @@ python tools/py/knowledge_cli.py migrate --select <id>
 
 ---
 
-### 2. 知识质量评估
+### 3. 知识质量评估
 
-#### 命令：`quality`（待实现）
+#### 命令：`quality`
 
 **功能**: 评估知识库的质量和完整性
 
+**实现状态**: 🟡 阶段 2 实现
+
 **使用方法**:
 ```bash
-# Node.js 版本（待实现）
+# Node.js 版本
 node tools/js/knowledge_cli.js quality --local
 node tools/js/knowledge_cli.js quality --shared
 
-# Python 版本（待实现）
+# Python 版本
 python tools/py/knowledge_cli.py quality --local
 python tools/py/knowledge_cli.py quality --shared
 ```
@@ -607,7 +615,7 @@ node tools/js/knowledge_cli.js config --shared https://github.com/your-org/share
 
 **状态图例**：
 - 🟢 已实现
-- 🟡 待实现
+- 🟡 阶段 2 实现
 - 🔴 已废弃
 
-**最后更新**：2026-04-13
+**最后更新**：2026-04-15
