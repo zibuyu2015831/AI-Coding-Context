@@ -15,7 +15,10 @@
       "Bash(do node:*)",
       "Bash(done)",
       "Bash(npm run:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(1)",
+      "Bash(chmod +x tools/py/doc_dependency_tracer.py)",
+      "Bash(ls -1 agents/workflows/*.md)"
     ]
   }
 }

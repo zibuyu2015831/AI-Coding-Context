@@ -51,7 +51,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
 
 const VERSION = "1.0.0";
 const DEFAULT_ANALYSIS_DIR = "dev_docs/_analysis";
@@ -83,7 +82,10 @@ function recordFixHistory(commitHash, targetDocs, analysisDir = DEFAULT_ANALYSIS
     ensureDirExists(historyDir);
 
     // 检查记录是否已存在
-    const existingFiles = glob.sync(path.join(historyDir, `*${commitHash}*.json`));
+    const existingFiles = fs.readdirSync(historyDir)
+        .filter(f => f.includes(commitHash) && f.endsWith('.json'))
+        .map(f => path.join(historyDir, f));
+    
     if (existingFiles.length > 0) {
         return {
             success: true,
@@ -136,7 +138,9 @@ function queryFixHistory(commitHash = null, docPath = null, analysisDir = DEFAUL
     ensureDirExists(historyDir);
 
     const records = [];
-    const historyFiles = glob.sync(path.join(historyDir, "*.json"));
+    const historyFiles = fs.readdirSync(historyDir)
+        .filter(f => f.endsWith('.json'))
+        .map(f => path.join(historyDir, f));
 
     for (const filePath of historyFiles) {
         try {
@@ -185,7 +189,10 @@ function getFixStats(analysisDir = DEFAULT_ANALYSIS_DIR) {
     const historyDir = getFixHistoryDir(analysisDir);
     ensureDirExists(historyDir);
 
-    const historyFiles = glob.sync(path.join(historyDir, "*.json"));
+    const historyFiles = fs.readdirSync(historyDir)
+        .filter(f => f.endsWith('.json'))
+        .map(f => path.join(historyDir, f));
+
     const totalRecords = historyFiles.length;
     const records = [];
     const docsSet = new Set();
@@ -247,7 +254,10 @@ function cleanupOldRecords(days = 90, analysisDir = DEFAULT_ANALYSIS_DIR) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    const historyFiles = glob.sync(path.join(historyDir, "*.json"));
+    const historyFiles = fs.readdirSync(historyDir)
+        .filter(f => f.endsWith('.json'))
+        .map(f => path.join(historyDir, f));
+
     let deleted = 0;
 
     for (const filePath of historyFiles) {

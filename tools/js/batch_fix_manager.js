@@ -54,7 +54,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
 
 const VERSION = "1.0.0";
 const DEFAULT_TIMEOUT = 60;
@@ -69,8 +68,36 @@ function ensureDirExists(dirPath) {
 }
 
 function findMarkdownFiles(directory, recursive = true) {
-    const pattern = recursive ? path.join(directory, '**', '*.md') : path.join(directory, '*.md');
-    return glob.sync(pattern, { ignore: ['**/.git/**', '**/node_modules/**', '**/__pycache__/**', '**/dist/**', '**/build/**'] });
+    const results = [];
+    const ignoreDirs = ['.git', 'node_modules', '__pycache__', 'dist', 'build'];
+
+    function walk(dir) {
+        try {
+            const files = fs.readdirSync(dir);
+            for (const file of files) {
+                const fullPath = path.join(dir, file);
+                
+                // 检查是否在忽略列表中
+                if (ignoreDirs.some(ignore => file === ignore || fullPath.includes(path.sep + ignore + path.sep))) {
+                    continue;
+                }
+
+                const stat = fs.statSync(fullPath);
+                if (stat.isDirectory() && recursive) {
+                    walk(fullPath);
+                } else if (stat.isFile() && file.endsWith('.md')) {
+                    results.push(fullPath);
+                }
+            }
+        } catch (e) {
+            console.error(`Error walking directory ${dir}:`, e.message);
+        }
+    }
+
+    if (fs.existsSync(directory)) {
+        walk(directory);
+    }
+    return results;
 }
 
 function searchInFile(filePath, pattern, replacement) {

@@ -1,8 +1,8 @@
 # 安全规范 - 敏感信息脱敏
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  
-> **版本**: v2.3  
-> **最后更新**: 2025-11-28
+> **版本**: v3.0  
+> **最后更新**: 2026-04-20
 
 ---
 
@@ -78,6 +78,40 @@
 
 - ❌ 错误: 完整 token
 - ✅ 正确: `eyJ...xyz` 或 `[JWT_TOKEN]`
+
+---
+
+## 🛑 Git 安全规范 (SAFETY RED ZONES)
+
+**AI 在执行 Git 操作时必须严格遵守以下红线,任何违反行为都将触发机械式阻断。**
+
+### 1. 保护分支操作 (Protected Branch Operations)
+- ⛔ **绝对禁止** 在 `main`, `master`, `production`, `release/*` 分支执行 `commit` 或 `push`。
+- ⛔ **绝对禁止** 直接在保护分支上进行任何破坏性变更。
+
+### 2. 危险命令 (Dangerous Commands)
+- ⛔ **绝对禁止** 执行 `git reset --hard` (历史重写)。
+- ⛔ **绝对禁止** 执行 `git push --force` 或 `git push -f` (强推)。
+- ⛔ **绝对禁止** 执行 `git rebase` (变基)。
+
+### 3. 合并操作 (Merge Operations)
+- ⛔ **绝对禁止** 执行 `git merge` (除 `git merge --abort` 外)。
+- 💡 **原则**: 所有代码合并、冲突解决及集成操作必须由**用户手动**执行。
+
+### 4. 分支与标签管理 (Branch & Tag Management)
+- ⛔ **绝对禁止** 执行 `git branch -D` (强制删除本地分支)。
+- ⛔ **绝对禁止** 执行 `git push [remote] :[branch]` (删除远程分支)。
+- ⛔ **绝对禁止** 执行任何 `git tag` 操作(创建、删除、重命名)。
+- ⛔ **绝对禁止** 推送标签 (`git push --tags`)。
+
+---
+
+## ⚠️ 受限操作 (YELLOW ZONE)
+
+**以下操作需要用户明确审核或二次授权**:
+- `git checkout -b [branch-name]`: 需确认分支命名规范。
+- `git commit`: 需根据 ADR 003 审核 WHAT/WHY/HOW 格式。
+- `git push origin [branch-name]`: 需确认推送的目标分支。
 
 ---
 
@@ -531,5 +565,5 @@ API Key validation failed for key sk-1234567890abcdefghijklmn
 
 ---
 
-**版本**: v2.2  
+**版本**: v3.0  
 **路径**: `core/security_rules.md`

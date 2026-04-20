@@ -45,7 +45,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
 
 const VERSION = "1.0.0";
 const DEFAULT_TIMEOUT = 10;
@@ -102,10 +101,37 @@ function parseYamlSimple(yamlStr) {
 
 function findMarkdownFiles(directory, recursive = false) {
     /**
-     * 查找目录下的所有Markdown文件
+     * 查找目录下的所有Markdown文件 (原生实现，零依赖)
      */
-    const pattern = recursive ? path.join(directory, '**', '*.md') : path.join(directory, '*.md');
-    return glob.sync(pattern, { ignore: ['**/.git/**', '**/node_modules/**', '**/__pycache__/**', '**/dist/**', '**/build/**'] });
+    const results = [];
+    const ignoreDirs = ['.git', 'node_modules', '__pycache__', 'dist', 'build'];
+
+    function walk(dir) {
+        try {
+            if (!fs.existsSync(dir)) return;
+            const files = fs.readdirSync(dir);
+            for (const file of files) {
+                const fullPath = path.join(dir, file);
+                
+                // 检查是否在忽略列表中
+                if (ignoreDirs.some(ignore => file === ignore || fullPath.includes(path.sep + ignore + path.sep))) {
+                    continue;
+                }
+
+                const stat = fs.statSync(fullPath);
+                if (stat.isDirectory() && recursive) {
+                    walk(fullPath);
+                } else if (stat.isFile() && file.endsWith('.md')) {
+                    results.push(fullPath);
+                }
+            }
+        } catch (e) {
+            // 忽略读取错误
+        }
+    }
+
+    walk(directory);
+    return results;
 }
 
 function extractKeywords(docPath) {

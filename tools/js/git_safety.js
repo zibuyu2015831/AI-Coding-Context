@@ -21,7 +21,7 @@
 
 const { execSync } = require('child_process');
 
-const DEFAULT_PROTECTED_BRANCHES = ['main', 'master', 'production', 'release', 'develop'];
+const DEFAULT_PROTECTED_BRANCHES = [/^main$/, /^master$/, /^production$/, /^release\/.*$/, /^develop$/];
 
 const DANGEROUS_COMMANDS = [
     /git\s+reset\s+--hard/i,
@@ -29,7 +29,11 @@ const DANGEROUS_COMMANDS = [
     /git\s+push\s+-f\b/i,
     /git\s+rebase/i,
     /git\s+merge\b(?!.*--abort)/i,
-    /git\s+branch\s+-D/i
+    /git\s+branch\s+-D/i,
+    /git\s+tag\b/i,                          // Prohibit Tag ops
+    /git\s+push\s+\w+\s+--tags/i,            // Prohibit Tag pushing
+    /git\s+push\s+\w+\s+:\w+/i,              // Prohibit delete remote branch/tag
+    /git\s+checkout\s+-B/i                   // Force create/reset branch
 ];
 
 const RESTRICTED_COMMANDS = [
@@ -59,7 +63,12 @@ function checkCurrentBranch(protectedBranches = DEFAULT_PROTECTED_BRANCHES) {
         };
     }
     
-    const isProtected = protectedBranches.includes(currentBranch);
+    const isProtected = protectedBranches.some(pattern => {
+        if (pattern instanceof RegExp) return pattern.test(currentBranch);
+        // 如果是字符串,检查是否完全匹配或作为前缀匹配(为了兼容旧逻辑)
+        return pattern === currentBranch;
+    });
+
     
     if (isProtected) {
         return {

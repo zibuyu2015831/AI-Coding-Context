@@ -51,7 +51,9 @@ Commit-Guided 文档更新在以下情况下触发:
 
 ```mermaid
 graph TD
-    A[检测到结构化Commit] --> B[解析WHAT/WHY/HOW]
+    A[检测到结构化Commit] --> S[🛡️ Git安全校验]
+    S -->|通过| B[解析WHAT/WHY/HOW]
+    S -->|RED| X[❌ 机械化阻断]
     B --> C[分析代码diff]
     C --> D[识别受影响文档]
     D --> E[生成更新草稿]
@@ -62,6 +64,23 @@ graph TD
     I --> J[完成]
     H --> J
 ```
+
+#### Step 0: 🛡️ Git 安全校验 (Mandatory)
+
+**必须在任何流程开始前执行,确保 AI 不在非法区域内操作。**
+
+**校验命令**:
+
+```bash
+# 校验当前分支安全性
+node tools/js/git_safety.js --mode check-branch
+```
+
+**阻断规则**:
+- **RED ZONE (P0 阻断)**: 如果返回 `safe: false` 且涉及保护分支或危险命令,AI 必须立即停止任务。
+- **YELLOW ZONE (需授权)**: 如果返回需要授权的操作,AI 必须暂停并等待用户输入 `Y` 确认。
+
+---
 
 #### Step 1: 检测结构化 Commit
 

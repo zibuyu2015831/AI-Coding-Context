@@ -49,8 +49,8 @@
 | 004 | ADR 系统                  | P1     | ANALYSIS §3.3.2                     | 已完成 |
 | 005 | 复杂度仪表盘              | P1     | ANALYSIS §3.1.2                     | 已完成 |
 | 006 | 自动审查报告              | P1     | ANALYSIS §3.2.1 + 现状.md 方法 2    | 已完成 |
-| 007 | 学习曲线追踪              | P2     | REVIEW §3.2.1                       | 待讨论 |
-| 008 | AI 能力分级               | P2     | REVIEW §3.2.2                       | 待讨论 |
+| 007 | 学习曲线追踪              | P2     | REVIEW §3.2.1                       | 已归档 |
+| 008 | AI 能力分级               | P2     | REVIEW §3.2.2                       | 已归档 |
 | 010 | 跨项目知识复用            | P2     | REVIEW §3.2.4                       | 已确认 |
 | 011 | 文档谬误修复工作流        | P1     | 用户洞察 + V2.3 扩展                | 已确认 |
 | 012 | 强制文档摘要机制          | P0     | 用户洞察 + Token 优化需求           | 已完成 |
@@ -67,6 +67,8 @@
 | 002 | 危险指令拦截(含 Git 安全) | P0     | ANALYSIS §3.2.2 + 用户 Git 安全需求 | 已归档 |
 | 015 | 质量保证体系              | P1     | 框架演进需求                        | 已归档（被 019 覆盖） |
 | 009 | 文档自动修复              | P2     | REVIEW §3.2.3                       | 已归档（被 018+011 覆盖） |
+| 007 | 学习曲线追踪              | P2     | REVIEW §3.2.1                       | 已归档 |
+| 008 | AI 能力分级               | P2     | REVIEW §3.2.2                       | 已归档 |
 
 ---
 
@@ -90,12 +92,12 @@ dev/V3.0/
 │   ├── 014-doc-reading-habit-guide/ # 文档阅读习惯引导 (已确认)
 │   ├── 016-unified-config-system/ # 配置管理系统 (已完成)
 │   ├── 017-utility-script-library/ # 实用脚本工具库 (已完成)
-│   └── 018-commit-guided-documentation/ # Commit 驱动更新 (已完成)
+│   └── 003-commit-guided-documentation/ # Commit 驱动更新 (已完成)
 ├── pending/                     # 待讨论的优化点
-│   ├── 007-learning-curve-tracking.md
-│   └── 008-ai-capability-tiering.md
 └── archived/                    # 已归档的优化点
     ├── 002-dangerous-command-guard.md
+    ├── 007-learning-curve-tracking.md
+    ├── 008-ai-capability-tiering.md
     ├── 009-doc-auto-repair.md
     └── 015-quality-assurance-system.md
 ```

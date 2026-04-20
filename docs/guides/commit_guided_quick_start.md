@@ -436,7 +436,7 @@ HOW: 增加null检查"
 
 ## 📚 相关文档
 
-- [完整规范](../../dev/V3.0/confirmed/018-commit-guided-documentation/018-commit-guided-documentation.md)
+- [完整规范](../../dev_docs/architecture/decisions/003-commit-guided-documentation.md)
 - [Git 安全工作流](../../workflows/git_safety_workflow.md)
 - [Commit 引导更新工作流](../../workflows/commit_guided_update.md)
 - [工具使用文档](../../tools/README.md)

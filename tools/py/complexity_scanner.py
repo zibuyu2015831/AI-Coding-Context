@@ -82,32 +82,62 @@ import time
 import argparse
 # yaml 解析（简单实现，避免依赖）
 def parse_yaml(text):
-    """简单的 YAML 解析，只支持单层结构"""
+    """简单的 YAML 解析 (V3.0 优化, 支持嵌套和列表)"""
     try:
-        result = {}
         lines = text.split('\n')
+        root = {}
+        stack = [{"indent": -1, "node": root}]
 
-        for line in lines:
-            line = line.strip()
-            if not line or line.startswith('#'):
+        def parse_value(v):
+            v = v.strip()
+            if '#' in v:
+                v = v.split('#')[0].strip()
+            if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
+                return v[1:-1]
+            if v.lower() == 'true': return True
+            if v.lower() == 'false': return False
+            try:
+                if '.' in v: return float(v)
+                return int(v)
+            except ValueError:
+                return v
+
+        for i, line in enumerate(lines):
+            trimmed = line.strip()
+            if not trimmed or trimmed.startswith('#'):
                 continue
 
-            if ':' in line and not line.endswith(':'):
-                key, value = line.split(':', 1)
-                key = key.strip()
-                value = value.strip()
+            indent = len(line) - len(line.lstrip())
+            while len(stack) > 1 and indent <= stack[-1]["indent"]:
+                stack.pop()
 
-                # 尝试解析数值
-                if value.isdigit():
-                    result[key] = int(value)
-                elif value.replace('.', '', 1).isdigit():
-                    result[key] = float(value)
-                elif value.lower() in ['true', 'false']:
-                    result[key] = value.lower() == 'true'
+            current = stack[-1]["node"]
+
+            if trimmed.startswith('- '):
+                if isinstance(current, list):
+                    current.append(parse_value(trimmed[2:]))
+            elif ':' in trimmed:
+                parts = trimmed.split(':', 1)
+                key = parts[0].strip()
+                value = parts[1].strip() if len(parts) > 1 else ""
+
+                if not value or value.startswith('#'):
+                    # 检查下一行是否是列表项
+                    is_list = False
+                    for j in range(i + 1, len(lines)):
+                        next_trimmed = lines[j].strip()
+                        if next_trimmed and not next_trimmed.startswith('#'):
+                            if next_trimmed.startswith('- '):
+                                is_list = True
+                            break
+                    
+                    new_node = [] if is_list else {}
+                    current[key] = new_node
+                    stack.append({"indent": indent, "node": new_node})
                 else:
-                    result[key] = value
-
-        return result
+                    current[key] = parse_value(value)
+        
+        return root
     except Exception as e:
         print(f"YAML parse error: {e}")
         return None
@@ -220,28 +250,63 @@ def analyze_code_quality(path):
 
     todo_pattern = re.compile(r"TODO|todo|Todo")
     fixme_pattern = re.compile(r"FIXME|fixme|Fixme")
+    
+    # Markdown 特征模式
+    md_header_pattern = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+    md_summary_pattern = re.compile(r"^---\s*\n.*?\n---\s*\n", re.DOTALL | re.MULTILINE)
+
+    md_files_count = 0
+    md_total_score = 0
 
     # 扫描常见源代码目录
-    src_dirs = ["src", "lib", "app", "components"]
-
     for root, dirs, files in os.walk(path):
         # 排除不需要扫描的目录
         if ".git" in root or "node_modules" in root or "dist" in root or "build" in root:
             continue
 
-        # 只检查源代码文件
         for file in files:
+            file_path = os.path.join(root, file)
+            # 检查源代码文件
             if file.endswith((".py", ".js", ".ts", ".jsx", ".tsx")):
                 try:
-                    with open(os.path.join(root, file), "r", encoding="utf-8") as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
                         quality["todo_count"] += len(todo_pattern.findall(content))
                         quality["fixme_count"] += len(fixme_pattern.findall(content))
                 except:
                     continue
+            # 检查 Markdown 文件 (V3.0 优化)
+            elif file.endswith(".md"):
+                md_files_count += 1
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        file_score = 0
+                        # 1. 检查是否有 Frontmatter (摘要) - 40分
+                        if md_summary_pattern.search(content):
+                            file_score += 40
+                        # 2. 检查层级结构 (Headers) - 30分
+                        headers = len(md_header_pattern.findall(content))
+                        if headers >= 3: file_score += 30
+                        elif headers >= 1: file_score += 15
+                        # 3. 检查文档厚度 - 30分
+                        if len(content.strip()) > 200: file_score += 30
+                        elif len(content.strip()) > 50: file_score += 15
+                        
+                        md_total_score += file_score
+                except:
+                    continue
 
-    # 简单的质量评分计算
-    quality["quality_score"] = max(0, min(100, 100 - quality["todo_count"] * 2 - quality["fixme_count"] * 3))
+    # 计算质量评分
+    code_quality_base = max(0, 100 - quality["todo_count"] * 2 - quality["fixme_count"] * 3)
+    
+    if md_files_count > 0:
+        md_avg_score = md_total_score / md_files_count
+        # 综合评分：代码质量占 60%，文档质量占 40%
+        final_score = code_quality_base * 0.6 + md_avg_score * 0.4
+        quality["quality_score"] = max(0, min(100, int(final_score)))
+    else:
+        quality["quality_score"] = code_quality_base
 
     return quality
 

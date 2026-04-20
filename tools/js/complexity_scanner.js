@@ -108,16 +108,64 @@ function showHelp() {
 `);
 }
 
-// 简单的 YAML 解析（为了兼容性）
+// 简单的 YAML 解析（为了兼容性，零依赖实现）
 function parseYaml(text) {
-  try {
-    // 使用更简单的方法：不解析YAML文件，因为默认配置已经足够好
-    // 避免因YAML解析导致的问题
-    return null;
-  } catch (e) {
-    console.error('YAML parse error:', e);
-    return null;
+  const lines = text.split('\n');
+  const root = {};
+  const stack = [{ indent: -1, node: root }];
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+
+    const indent = line.search(/\S/);
+    while (stack.length > 1 && indent <= stack[stack.length - 1].indent) {
+      stack.pop();
+    }
+
+    const current = stack[stack.length - 1].node;
+
+    if (trimmed.startsWith('- ')) {
+      if (Array.isArray(current)) {
+        current.push(parseValue(trimmed.substring(2)));
+      }
+    } else if (trimmed.includes(':')) {
+      const [key, ...rest] = trimmed.split(':');
+      const value = rest.join(':').trim();
+
+      if (value === '' || value.startsWith('#')) {
+        // 检查下一行是否是列表
+        let isList = false;
+        for (let i = index + 1; i < lines.length; i++) {
+          const next = lines[i].trim();
+          if (next && !next.startsWith('#')) {
+            if (next.startsWith('- ')) isList = true;
+            break;
+          }
+        }
+        const newNode = isList ? [] : {};
+        current[key.trim()] = newNode;
+        stack.push({ indent, node: newNode });
+      } else {
+        current[key.trim()] = parseValue(value);
+      }
+    }
+  });
+
+  function parseValue(v) {
+    v = v.trim();
+    // 处理注释
+    if (v.includes('#')) {
+      v = v.split('#')[0].trim();
+    }
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) return v.slice(1, -1);
+    if (v === 'true') return true;
+    if (v === 'false') return false;
+    if (v !== '' && !isNaN(v)) return Number(v);
+    return v;
   }
+
+  return root;
 }
 
 // 调用子进程执行其他工具
@@ -212,6 +260,11 @@ function analyzeCodeQuality(dirPath) {
 
   const todoPattern = /TODO|todo|Todo/g;
   const fixmePattern = /FIXME|fixme|Fixme/g;
+  const mdHeaderPattern = /^#{1,6}\s+/gm;
+  const mdSummaryPattern = /^---\s*\n.*?\n---\s*\n/gs;
+
+  let mdFilesCount = 0;
+  let mdTotalScore = 0;
 
   // 递归扫描目录
   function scanDirectory(currentPath) {
@@ -225,13 +278,35 @@ function analyzeCodeQuality(dirPath) {
       if (stat.isDirectory()) {
         const files = fs.readdirSync(currentPath);
         files.forEach(file => scanDirectory(path.join(currentPath, file)));
-      } else if (stat.isFile() && ['.js', '.ts', '.jsx', '.tsx', '.py'].some(ext => currentPath.endsWith(ext))) {
-        const content = fs.readFileSync(currentPath, 'utf8');
-        const todos = (content.match(todoPattern) || []).length;
-        const fixmes = (content.match(fixmePattern) || []).length;
-
-        quality.todo_count += todos;
-        quality.fixme_count += fixmes;
+      } else if (stat.isFile()) {
+        // 源代码文件
+        if (['.js', '.ts', '.jsx', '.tsx', '.py'].some(ext => currentPath.endsWith(ext))) {
+          const content = fs.readFileSync(currentPath, 'utf8');
+          quality.todo_count += (content.match(todoPattern) || []).length;
+          quality.fixme_count += (content.match(fixmePattern) || []).length;
+        } 
+        // Markdown 文件 (V3.0 优化)
+        else if (currentPath.endsWith('.md')) {
+          mdFilesCount++;
+          const content = fs.readFileSync(currentPath, 'utf8');
+          let fileScore = 0;
+          
+          // 1. 检查是否有 Frontmatter (摘要) - 40分
+          if (mdSummaryPattern.test(content)) {
+            fileScore += 40;
+          }
+          
+          // 2. 检查层级结构 (Headers) - 30分
+          const headers = (content.match(mdHeaderPattern) || []).length;
+          if (headers >= 3) fileScore += 30;
+          else if (headers >= 1) fileScore += 15;
+          
+          // 3. 检查文档厚度 - 30分
+          if (content.trim().length > 200) fileScore += 30;
+          else if (content.trim().length > 50) fileScore += 15;
+          
+          mdTotalScore += fileScore;
+        }
       }
     } catch (e) {
       // 忽略无法访问的文件
@@ -240,8 +315,17 @@ function analyzeCodeQuality(dirPath) {
 
   scanDirectory(dirPath);
 
-  // 简单的质量评分计算
-  quality.quality_score = Math.max(0, Math.min(100, 100 - quality.todo_count * 2 - quality.fixme_count * 3));
+  // 计算质量评分
+  const codeQualityBase = Math.max(0, 100 - quality.todo_count * 2 - quality.fixme_count * 3);
+  
+  if (mdFilesCount > 0) {
+    const mdAvgScore = mdTotalScore / mdFilesCount;
+    // 综合评分：代码质量占 60%，文档质量占 40%
+    const finalScore = codeQualityBase * 0.6 + mdAvgScore * 0.4;
+    quality.quality_score = Math.max(0, Math.min(100, Math.round(finalScore)));
+  } else {
+    quality.quality_score = codeQualityBase;
+  }
 
   return quality;
 }
