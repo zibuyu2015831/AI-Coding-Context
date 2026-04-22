@@ -146,11 +146,11 @@ function detectFrameworkDir(rootDir, scriptFile = null) {
     if (scriptFile) {
         try {
             const scriptPath = path.resolve(scriptFile);
-            const scriptDir = path.dirname(scriptPath);
-            const toolsDir = path.dirname(scriptDir);
-            const frameworkDir = toolsDir;
+            const scriptDir = path.dirname(scriptPath); // tools/js
+            const toolsDir = path.dirname(scriptDir);   // tools
+            const frameworkDir = path.dirname(toolsDir); // framework_root
             
-            if (frameworkDir.startsWith(rootDir)) {
+            if (frameworkDir.startsWith(rootDir) || rootDir === frameworkDir) {
                 return path.relative(rootDir, frameworkDir).replace(/\\/g, '/');
             }
         } catch (e) {

@@ -140,7 +140,7 @@ function fallbackSearch(query, rootPath, includes, excludes, isRegex, timeout) {
             const name = entry;
             
             // Handle excludes
-            if (excludes && excludes.some(exc => matchGlob(name, exc) || matchGlob(relPath, exc))) continue;
+            if (excludes && excludes.length > 0 && excludes.some(exc => matchGlob(name, exc) || (relPath && matchGlob(relPath, exc)))) continue;
             
             let stat;
             try {
@@ -151,7 +151,7 @@ function fallbackSearch(query, rootPath, includes, excludes, isRegex, timeout) {
                 walk(fullPath);
             } else {
                 // Handle includes
-                if (includes && !includes.some(inc => matchGlob(name, inc) || matchGlob(relPath, inc))) continue;
+                if (includes && includes.length > 0 && !includes.some(inc => matchGlob(name, inc) || (relPath && matchGlob(relPath, inc)))) continue;
                 
                 try {
                     const content = fs.readFileSync(fullPath, 'utf8');

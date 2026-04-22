@@ -14,6 +14,21 @@ Commit 聚合工具 - 批量聚合和Token优化
     --since DATE            聚合指定日期之后的commit
     --optimize-token        启用Token优化
 
+输出格式：
+    JSON 格式：
+    {
+      "summaries": [
+        {
+          "type": "feature",
+          "count": 5,
+          "changes": ["添加用户登录", "添加注册功能"]
+        }
+      ],
+      "original_tokens": 1500,
+      "optimized_tokens": 300,
+      "reduction_percent": 80.0
+    }
+
 版本信息：
     版本：1.0.0
     更新日期：2025-12-11

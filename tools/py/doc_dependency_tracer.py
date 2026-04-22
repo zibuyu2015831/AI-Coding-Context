@@ -13,6 +13,39 @@
     # 分析单个文档的依赖关系
     python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md"
 
+    # 分析多个文档
+    python tools/py/doc_dependency_tracer.py --docs "doc1.md,doc2.md"
+
+    # 指定文档目录和输出格式
+    python tools/py/doc_dependency_tracer.py --doc-dir docs/ --format json
+
+参数说明:
+    --doc PATH          要分析的文档路径
+    --docs LIST         逗号分隔的多个文档路径
+    --doc-dir PATH      文档目录 (默认: dev_docs)
+    --strategy STRATEGY 检测策略: dependencies, keywords, fulltext (默认: dependencies)
+    --format FORMAT     输出格式: text, json (默认: text)
+    --min-overlap N     最小关键词重叠数 (默认: 1)
+
+输出格式:
+    text 格式：
+    - 文档依赖关系图谱
+    - 正向依赖列表 (本文档依赖的其他文档)
+    - 反向依赖列表 (依赖本文档的其他文档)
+    - 影响范围评估
+
+    json 格式：
+    {
+      "doc_path": "path/to/doc.md",
+      "dependencies": {
+        "forward": [...],
+        "reverse": [...]
+      },
+      "strategy": "dependencies",
+      "impact_score": 0.85,
+      "suggestions": [...]
+    }
+
 版本信息:
     Version: 1.0.0
     Created: 2026-04-20

@@ -10,6 +10,36 @@ AICC 知识匹配与引用解析工具
 使用方法：
     python tools/py/knowledge_matcher.py --ref "pattern:mvc-architecture"
 
+参数说明：
+    --ref TEXT          解析特定的引用键 (格式: type:name, 例如: pattern:mvc)
+    --file PATH         解析并处理整个 Markdown 文件
+    --inplace           原地修改文件 (与 --file 一起使用)
+    --strategy STRATEGY 匹配策略: local-first, shared-first, hybrid (默认: 配置中的策略)
+
+输出格式：
+    文本输出，当使用 --ref 时输出匹配的知识内容，
+    当使用 --file 时输出解析后的完整文档内容
+
+使用示例：
+    # 示例 1: 查找特定知识条目
+    python tools/py/knowledge_matcher.py --ref "pattern:mvc-architecture"
+
+    # 示例 2: 解析文档中的知识引用
+    python tools/py/knowledge_matcher.py --file docs/guide.md
+
+    # 示例 3: 原地修改文件
+    python tools/py/knowledge_matcher.py --file docs/guide.md --inplace
+
+    # 示例 4: 使用指定策略
+    python tools/py/knowledge_matcher.py --ref "framework:react" --strategy shared-first
+
+知识引用语法：
+    在 Markdown 文档中使用以下语法引用知识：
+
+    :::knowledge-ref pattern:mvc-architecture :::
+
+    其中 pattern 是知识类型，mvc-architecture 是知识条目名称
+
 版本信息：
     版本：1.0.0
     更新日期：2026-04-16
@@ -58,12 +88,12 @@ class KnowledgeMatcher:
         parts = ref_key.split(':')
         if len(parts) != 2:
             return None
-            
+
         k_type, k_name = parts
-        
+
         # 转换类型到可能的目录
         # 简单实现：在所有子目录下搜索 k_name.md
-        
+
         search_paths = []
         if self.strategy == "local-first":
             search_paths = [self.local_path]
@@ -81,13 +111,13 @@ class KnowledgeMatcher:
         for base_path in search_paths:
             if not os.path.exists(base_path):
                 continue
-                
+
             # 递归搜索 base_path 下的 k_name.md
             for root, dirs, files in os.walk(base_path):
                 # 排除 .git
                 if ".git" in dirs:
                     dirs.remove(".git")
-                    
+
                 target_file = f"{k_name}.md"
                 if target_file in files:
                     file_path = os.path.join(root, target_file)
@@ -104,7 +134,7 @@ class KnowledgeMatcher:
         语法: :::knowledge-ref [key] :::
         """
         pattern = r':::knowledge-ref\s+([^\s:]+:[^\s:]+)\s*:::'
-        
+
         def replacer(match):
             ref_key = match.group(1)
             knowledge_content = self.find_knowledge(ref_key)
@@ -114,7 +144,7 @@ class KnowledgeMatcher:
                     parts = re.split(r'---', knowledge_content, maxsplit=2)
                     if len(parts) >= 3:
                         knowledge_content = parts[2].strip()
-                
+
                 return f"\n<!-- START KNOWLEDGE-REF: {ref_key} -->\n{knowledge_content}\n<!-- END KNOWLEDGE-REF: {ref_key} -->\n"
             else:
                 return f"<!-- UNRESOLVED KNOWLEDGE-REF: {ref_key} -->"
@@ -127,10 +157,10 @@ def main():
     parser.add_argument("--ref", help="解析特定的引用键 (e.g., pattern:mvc)")
     parser.add_argument("--file", help="解析并处理整个 Markdown 文件")
     parser.add_argument("--inplace", action="store_true", help="原地修改文件")
-    
+
     args = parser.parse_args()
     matcher = KnowledgeMatcher()
-    
+
     if args.ref:
         result = matcher.find_knowledge(args.ref)
         if result:
@@ -142,12 +172,12 @@ def main():
         if not os.path.exists(args.file):
             print(f"找不到文件: {args.file}", file=sys.stderr)
             sys.exit(1)
-            
+
         with open(args.file, 'r', encoding='utf-8') as f:
             content = f.read()
-            
+
         resolved = matcher.resolve_document(content)
-        
+
         if args.inplace:
             with open(args.file, 'w', encoding='utf-8') as f:
                 f.write(resolved)

@@ -19,18 +19,35 @@
 
 const { execSync } = require('child_process');
 
-function getCommits(maxCount) {
+function getCommits(maxCount, since = null) {
     try {
-        const output = execSync(
-            `git log --max-count=${maxCount} --pretty=format:%H|%s`,
-            { encoding: 'utf8' }
-        );
+        let cmd = `git log --max-count=${maxCount} --pretty=format:"%H|%an|%ad|%s" --date=iso`;
+        if (since) {
+            cmd += ` --since="${since}"`;
+        }
+        
+        const output = execSync(cmd, { encoding: 'utf8' });
         
         return output.split('\n')
             .filter(line => line)
             .map(line => {
-                const [hash, subject] = line.split('|');
-                return { hash, what: subject, type: 'unknown' };
+                const [hash, author, date, subject] = line.split('|');
+                // 模拟简单的类型解析，实际应调用 commit_parser 或匹配其逻辑
+                let type = 'other';
+                if (subject.toLowerCase().startsWith('feat')) type = 'feature';
+                else if (subject.toLowerCase().startsWith('fix')) type = 'fix';
+                else if (subject.toLowerCase().startsWith('docs')) type = 'docs';
+                else if (subject.toLowerCase().startsWith('refactor')) type = 'refactor';
+                
+                return { 
+                    hash, 
+                    author,
+                    date,
+                    what: subject, 
+                    type: type,
+                    why: '', // 简化版，不解析 body
+                    how: []  // 简化版
+                };
             });
     } catch {
         return [];
@@ -38,7 +55,7 @@ function getCommits(maxCount) {
 }
 
 function optimizeTokens(commits) {
-    const originalTokens = commits.reduce((sum, c) => sum + (c.what || '').length, 0);
+    const originalTokens = commits.reduce((sum, c) => sum + (c.what || '').length + (c.why || '').length, 0);
     
     const byType = {};
     commits.forEach(c => {
@@ -75,14 +92,16 @@ function main() {
     
     const args = process.argv.slice(2);
     let maxCount = 50;
+    let since = null;
     let optimizeToken = false;
     
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--max-count') maxCount = parseInt(args[i + 1]);
-        if (args[i] === '--optimize-token') optimizeToken = true;
+        if (args[i] === '--max-count') maxCount = parseInt(args[++i]);
+        else if (args[i] === '--since') since = args[++i];
+        else if (args[i] === '--optimize-token') optimizeToken = true;
     }
     
-    const commits = getCommits(maxCount);
+    const commits = getCommits(maxCount, since);
     const resultData = optimizeToken ? optimizeTokens(commits) : { commits };
     
     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(4);

@@ -1,17 +1,77 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Git Hooks 安装脚本
+Git Hooks 安装脚本 (Git Hooks Installer)
 
-功能:
-1. 自动检测 Git 仓库
-2. 安装 pre-commit hook
-3. 设置正确的执行权限
-4. 提供卸载选项
+功能说明:
+1. 自动检测 Git 仓库根目录
+2. 安装 pre-commit hook (提交前检查)
+3. 安装 post-commit hook (提交后生成复杂度报告)
+4. 设置正确的执行权限
+5. 提供卸载选项和备份恢复机制
 
-使用方式:
-  python tools/py/install_hooks.py          # 安装 hooks
-  python tools/py/install_hooks.py --uninstall  # 卸载 hooks
+使用方法:
+    # 安装所有 hooks
+    python tools/py/install_hooks.py
+
+    # 仅安装 pre-commit hook
+    python tools/py/install_hooks.py --pre-commit
+
+    # 仅安装 post-commit hook
+    python tools/py/install_hooks.py --post-commit
+
+    # 卸载所有 hooks
+    python tools/py/install_hooks.py --uninstall
+
+    # 显示帮助信息
+    python tools/py/install_hooks.py --help
+
+参数说明:
+    --pre-commit    仅安装 pre-commit hook
+    --post-commit   仅安装 post-commit hook
+    --uninstall, -u 卸载所有 hooks (支持备份恢复)
+    --help, -h      显示详细使用说明
+
+输出格式:
+    文本输出，包含以下信息:
+    - Git 仓库路径
+    - 安装/卸载操作结果
+    - 备份文件路径 (如适用)
+    - 错误提示和解决方案
+
+使用示例:
+    # 示例 1: 首次安装 hooks
+    python tools/py/install_hooks.py
+
+    # 示例 2: 重新安装 pre-commit hook
+    python tools/py/install_hooks.py --pre-commit
+
+    # 示例 3: 卸载 hooks 并恢复备份
+    python tools/py/install_hooks.py --uninstall
+    # 然后根据提示选择是否恢复备份
+
+Hook 功能说明:
+
+pre-commit Hook:
+    - Commit message 格式检查
+    - WHAT/WHY/HOW 字段验证
+    - 保护分支检测
+    - 分支命名规范检查
+    - Commit 质量评分
+    - 复杂度增量检查 (拦截高风险变更)
+
+post-commit Hook:
+    - 自动扫描项目复杂度
+    - 生成 Markdown 报告到 dev_docs/complexity/reports/
+    - 可选生成 HTML 仪表盘
+    - 数据文件保存到 dev_docs/complexity/data/
+
+跳过 Hook (紧急情况):
+    git commit --no-verify  # 跳过所有 pre-commit 检查
+
+版本信息:
+    版本: 1.0.0
+    更新日期: 2026-04-12
 """
 
 import os
@@ -24,13 +84,13 @@ from pathlib import Path
 def find_git_root():
     """查找 Git 仓库根目录"""
     current = Path.cwd()
-    
+
     while current != current.parent:
         git_dir = current / '.git'
         if git_dir.exists():
             return current
         current = current.parent
-    
+
     return None
 
 

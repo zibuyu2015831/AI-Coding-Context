@@ -22,6 +22,34 @@
     # 查看修复历史
     python tools/py/doc_fix_executor.py --history
 
+参数说明:
+    --plan PATH         修复方案 JSON 文件路径（必需）
+    --dry-run           预览模式，不实际应用更改
+    --rollback HASH     回滚到指定提交哈希
+    --history           查看修复历史
+    --output-format     输出格式：json, markdown（默认：json）
+
+输出格式:
+    JSON 格式：
+    {
+      "success": true,
+      "plan_id": "fix_plan_20260420_001",
+      "steps": [...],
+      "changes_applied": 3,
+      "errors": [],
+      "metadata": {
+        "timestamp": "2026-04-20T10:00:00",
+        "dry_run": false
+      }
+    }
+
+    Markdown 格式：
+    # 文档修复执行报告
+    **计划 ID**: fix_plan_20260420_001
+    **执行模式**: 实际执行
+    **执行结果**: 成功
+    **应用更改数**: 3
+
 版本信息:
     Version: 1.0.0
     Created: 2026-04-20

@@ -18,6 +18,30 @@
     # 同步远程知识库
     python tools/py/knowledge_repo_manager.py --sync --remote-url https://github.com/org/shared-knowledge.git
 
+参数说明:
+    --init                  初始化知识库仓库
+    --sync                  同步远程知识库
+    --generate-index        生成知识库索引
+    --path PATH             知识库路径（默认: .knowledge）
+    --remote-url URL        远程仓库 URL
+    --branch NAME           分支名称（默认: main）
+
+输出格式:
+    JSON 格式：
+    {
+      "success": true|false,
+      "action": "init|sync|generate_index",
+      "path": "/path/to/knowledge",
+      "categories": [...],
+      "metadata": {...}
+    }
+
+    失败时：
+    {
+      "success": false,
+      "error": "错误描述"
+    }
+
 版本信息:
     Version: 1.0.0
     Created: 2026-04-20

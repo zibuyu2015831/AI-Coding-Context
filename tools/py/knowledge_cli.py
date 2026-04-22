@@ -2,7 +2,7 @@
 """
 AICC 知识库管理 CLI 工具 (Python 版本)
 
-功能说明：
+功能说明:
 - status: 查看知识库状态
 - config: 配置共享知识库
 - enable-shared: 启用共享知识库
@@ -12,9 +12,74 @@ AICC 知识库管理 CLI 工具 (Python 版本)
 - init: 初始化本地知识库为共享知识库
 - publish: 发布本地共享知识库到云端
 
-版本信息：
-    版本：1.0.0
-    更新日期：2026-04-16
+使用方法:
+    # 查看知识库状态
+    python tools/py/knowledge_cli.py status
+
+    # 配置共享知识库
+    python tools/py/knowledge_cli.py config --shared https://github.com/org/shared-knowledge.git
+
+    # 启用/禁用共享知识库
+    python tools/py/knowledge_cli.py enable-shared
+    python tools/py/knowledge_cli.py disable-shared
+
+    # 更新共享知识库
+    python tools/py/knowledge_cli.py update-shared [--force]
+
+    # 设置匹配策略
+    python tools/py/knowledge_cli.py strategy --mode [local-first|shared-first|hybrid]
+
+    # 初始化本地知识库为共享仓库
+    python tools/py/knowledge_cli.py init --as-shared [--force]
+
+    # 发布本地知识库到云端
+    python tools/py/knowledge_cli.py publish --remote https://github.com/org/shared-knowledge.git
+
+参数说明:
+    status              查看知识库配置和同步状态
+    config              配置共享知识库
+      --shared URL      共享知识库 Git 地址
+      --branch NAME     分支名称 (默认: main)
+      --depth N         克隆深度 (可选)
+      --force           强制重新配置
+    enable-shared       启用共享知识库
+    disable-shared      禁用共享知识库
+    update-shared       从远程更新共享知识库
+      --force           强制更新，忽略本地变更
+    strategy            设置知识匹配策略
+      --mode STRATEGY   策略模式: local-first, shared-first, hybrid
+    init                初始化本地知识库为共享仓库
+      --as-shared       标记为共享知识库 (必需)
+      --force           强制重新初始化
+    publish             发布本地知识库到云端
+      --remote URL      远程仓库地址
+      --branch NAME     分支名称 (默认: main)
+      --force           强制推送
+
+输出格式:
+    文本输出，包含以下信息:
+    - 知识库状态 (本地/共享/启用/禁用)
+    - 仓库地址和分支信息
+    - 最近更新时间
+    - 匹配策略配置
+    - 操作结果 (成功/失败)
+
+使用示例:
+    # 示例 1: 配置并启用共享知识库
+    python tools/py/knowledge_cli.py config --shared https://github.com/org/knowledge.git
+    python tools/py/knowledge_cli.py enable-shared
+    python tools/py/knowledge_cli.py update-shared
+
+    # 示例 2: 初始化项目知识库
+    python tools/py/knowledge_cli.py init --as-shared
+    python tools/py/knowledge_cli.py publish --remote https://github.com/org/my-knowledge.git
+
+    # 示例 3: 切换匹配策略
+    python tools/py/knowledge_cli.py strategy --mode shared-first
+
+版本信息:
+    版本: 1.0.0
+    更新日期: 2026-04-16
 """
 
 import os
@@ -125,7 +190,7 @@ class GitRepository:
             else:
                 print_info("正在同步共享知识库...")
                 res = run_command(["git", "pull", "origin", self.branch], cwd=self.cache_path)
-            
+
             if res.returncode != 0:
                 print_error(f"更新失败: {res.stderr}")
                 return False
@@ -134,11 +199,11 @@ class GitRepository:
             print_info(f"正在克隆共享知识库到 {self.cache_path}...")
             if not os.path.exists(os.path.dirname(self.cache_path)):
                 os.makedirs(os.path.dirname(self.cache_path))
-            
+
             cmd = ["git", "clone", self.repo_url, self.cache_path, "--branch", self.branch]
             if depth:
                 cmd.extend(["--depth", str(depth)])
-            
+
             res = run_command(cmd)
             if res.returncode != 0:
                 print_error(f"克隆失败: {res.stderr}")
@@ -154,7 +219,7 @@ class KnowledgeCLI:
         local_path = self.config["knowledge"].get("local_path", DEFAULT_LOCAL_PATH)
         local_exists = os.path.exists(local_path)
         print(f"  本地知识库: {'✅' if local_exists else '❌'} {local_path}")
-        
+
         shared = self.config["knowledge"]["shared"]
         if shared["repo_url"]:
             enabled = shared.get("enabled", False)
@@ -164,7 +229,7 @@ class KnowledgeCLI:
             print(f"    最近更新: {shared.get('last_updated', '从不')}")
         else:
             print("  共享知识库: ❌ 未配置")
-            
+
         print(f"  匹配策略: {self.config['knowledge'].get('match_strategy', 'local-first')}")
         print("")
 
@@ -172,7 +237,7 @@ class KnowledgeCLI:
         self.config["knowledge"]["shared"]["repo_url"] = repo_url
         self.config["knowledge"]["shared"]["branch"] = branch
         self.config["knowledge"]["shared"]["enabled"] = True
-        
+
         repo = GitRepository(repo_url, SHARED_KNOWLEDGE_DIR, branch)
         if repo.clone_or_update(force=force, depth=depth):
             self.config["knowledge"]["shared"]["last_updated"] = datetime.datetime.now().isoformat()
@@ -200,7 +265,7 @@ class KnowledgeCLI:
         if not shared["repo_url"]:
             print_error("未配置共享知识库。")
             return
-            
+
         repo = GitRepository(shared["repo_url"], SHARED_KNOWLEDGE_DIR, shared["branch"])
         if repo.clone_or_update(force=force):
             self.config["knowledge"]["shared"]["last_updated"] = datetime.datetime.now().isoformat()
@@ -223,19 +288,19 @@ class KnowledgeCLI:
         if not os.path.exists(local_path):
             os.makedirs(local_path)
             print_info(f"已创建目录: {local_path}")
-            
+
         # 标准结构
         subdirs = ["fundamentals", "languages", "frameworks", "platforms", "databases", "case-studies"]
         for sd in subdirs:
             path = os.path.join(local_path, sd)
             if not os.path.exists(path):
                 os.makedirs(path)
-                
+
         # .aicc 目录在 local_path 下用于元数据
         meta_dir = os.path.join(local_path, ".aicc")
         if not os.path.exists(meta_dir):
             os.makedirs(meta_dir)
-            
+
         meta_file = os.path.join(meta_dir, "metadata.json")
         if not os.path.exists(meta_file) or force:
             metadata = {
@@ -247,12 +312,12 @@ class KnowledgeCLI:
             }
             with open(meta_file, 'w', encoding='utf-8') as f:
                 json.dump(metadata, f, indent=2, ensure_ascii=False)
-        
+
         # git init
         if not os.path.exists(os.path.join(local_path, ".git")):
             run_command(["git", "init"], cwd=local_path)
             print_info("已在本地知识库目录初始化 Git 仓库")
-            
+
         print_success(f"本地知识库已初始化为共享知识库标准结构: {local_path}")
 
     def publish(self, remote_url: str, branch: str = 'main', force: bool = False):
@@ -260,14 +325,14 @@ class KnowledgeCLI:
         if not os.path.exists(os.path.join(local_path, ".git")):
             print_error("本地知识库未初始化为 Git 仓库，请先运行 init 命令。")
             return
-            
+
         # 检查是否有提交
         res = run_command(["git", "status", "--porcelain"], cwd=local_path)
         if res.stdout.strip():
             print_warning("检测到未提交的变更，正在自动提交...")
             run_command(["git", "add", "."], cwd=local_path)
             run_command(["git", "commit", "-m", "chore: sync knowledge repository"], cwd=local_path)
-            
+
         # 检查远程
         res = run_command(["git", "remote", "get-url", "origin"], cwd=local_path)
         if res.returncode != 0:
@@ -276,14 +341,14 @@ class KnowledgeCLI:
             old_url = res.stdout.strip()
             if old_url != remote_url:
                 run_command(["git", "remote", "set-url", "origin", remote_url], cwd=local_path)
-                
+
         # 推送
         print_info(f"正在发布到 {remote_url} [{branch}]...")
         cmd = ["git", "push", "-u", "origin", branch]
         if force:
             cmd.append("-f")
         res = run_command(cmd, cwd=local_path)
-        
+
         if res.returncode == 0:
             print_success("知识库发布成功！")
         else:

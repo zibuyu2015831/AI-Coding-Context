@@ -11,6 +11,29 @@ Commit 诚信验证工具 - 对比 Commit Message 与物理代码变更的一致
 使用方法：
     python tools/py/commit_integrity_validator.py --message "COMMIT_MESSAGE" [--staged]
 
+参数说明：
+    --message TEXT      要验证的 Commit Message（必需）
+    --staged            检查已暂存(staged)的变更（默认）
+    --unstaged          检查未暂存(unstaged)的变更
+    --format FORMAT     输出格式：text, json（默认：text）
+
+输出格式：
+    text 格式：
+    - Commit 诚信审计报告
+    - 得分：[分数] [状态]
+    - 匹配文件数：N
+    - 建议列表（如有）
+
+    json 格式：
+    {
+      "score": 85,
+      "status": "EXCELLENT",
+      "matched_count": 3,
+      "under_reported": [...],
+      "over_reported": [...],
+      "suggestions": [...]
+    }
+
 版本信息：
     版本：1.0.0
     更新日期：2026-04-07
