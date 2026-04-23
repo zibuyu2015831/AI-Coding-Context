@@ -1,5 +1,5 @@
 {
-  "dependencies": {
-    "glob": "^13.0.6"
-  }
+  "name": "ai-coding-context",
+  "version": "3.0.0",
+  "description": "AI Coding Context Framework"
 }

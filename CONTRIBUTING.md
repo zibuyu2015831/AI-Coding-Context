@@ -35,7 +35,8 @@ ai_documentation_framework/
 ├── tools/          # 实用工具（添加新脚本）
 ├── guides/         # 指导文档（添加新指南）
 ├── templates/      # 文档模板（添加新模板）
-└── reference/      # 参考规范（记录设计决策）
+├── config/         # 配置管理（添加新配置项）
+└── agents/         # 角色库（添加新角色）
 ```
 
 ---
@@ -419,7 +420,7 @@ verified_at: [YYYY-MM-DD]
 ---
 ```
 
-详见: `reference/SUMMARY_FORMAT_SPEC.md`
+详见: `core/SUMMARY_FORMAT_SPEC.md`
 
 ---
 
@@ -900,7 +901,7 @@ lastUpdated: 2025-12-02
 
 如果新配置项对应某个优化点,在优化点文档中说明配置项。
 
-**文件**: `dev/V3.0/confirmed/XXX-优化点/XXX-优化点.md`
+**文件**: `(详见开发分支中的 dev/V3.0/ 目录)`
 
 **操作**: 添加配置项章节
 
@@ -929,7 +930,7 @@ lastUpdated: 2025-12-02
 
 ### 步骤 7: 更新变更日志(可选)
 
-**文件**: `dev/VERSION_HISTORY.md` 或相应版本的变更日志
+**文件**: `(详见开发分支中的变更日志)`
 
 **操作**: 记录新增配置项
 
@@ -1150,7 +1151,7 @@ Closes #42
 
 - [README.md](../README.md) - 框架概览
 - [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - AI 入口文档
-- [reference/design_decisions.md](../reference/design_decisions.md) - 设计决策记录
+- [core/design_decisions.md](../core/design_decisions.md) - 设计决策记录
 
 ---
 

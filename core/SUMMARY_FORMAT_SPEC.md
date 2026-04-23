@@ -313,7 +313,7 @@ summary: 提供从文档中提取 YAML Frontmatter 摘要的命令行工具，�
 keywords: 工具 | 摘要提取 | Python | Node.js | CLI
 scope: 框架工具库 (tools/)
 related_files: tools/py/summary_extractor.py | tools/js/summary_extractor.js
-dependencies: reference/SUMMARY_FORMAT_SPEC.md | tools/README.md
+dependencies: core/SUMMARY_FORMAT_SPEC.md | tools/README.md
 verified_at: 2025-12-03
 ---
 ```
@@ -392,7 +392,7 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 ## 📚 相关文档
 
-- [示例集合](./examples/summary_examples/) - 5 种文档类型的完整示例
+- [示例集合](../guides/examples/summary_examples/) - 5 种文档类型的完整示例
 - [工具使用指南](../tools/README.md) - 摘要相关工具说明
 - [文档生成工作流](../workflows/generation_workflow.md) - 如何生成摘要
 

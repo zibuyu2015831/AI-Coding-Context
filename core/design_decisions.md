@@ -419,7 +419,8 @@ root/
 ├── workflows/         # 流程文档(详细说明)
 ├── guides/            # 指导说明(参考)
 ├── templates/         # 模板文件(复用)
-└── reference/         # 设计文档(深入)
+├── config/            # 配置管理(选项)
+└── agents/            # 角色库(专业辅助)
 ```
 
 ### 为什么这样设计?
@@ -483,14 +484,12 @@ root/
 - [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - AI 执行入口文档
 - [README.md](../README.md) - 框架使用指南
 - [框架规范](./framework_spec.md) - 完整技术规范
-- [FRAMEWORK_CONTEXT.md](../dev/FRAMEWORK_CONTEXT.md) - 框架背景知识
 
 ### V3.0 相关优化点
 
 本文档中提到的设计理念在 V3.0 中的具体实现:
 
-- [012-mandatory-doc-summary.md](../dev/V3.0/pending/012-mandatory-doc-summary.md) - 强制文档摘要机制
-- [014-doc-reading-habit-guide.md](../dev/V3.0/pending/014-doc-reading-habit-guide.md) - 文档阅读习惯引导
+(设计记录详见框架开发分支中的 dev/V3.0/ 目录)
 
 ---
 

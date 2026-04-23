@@ -13,7 +13,7 @@ summary: 提供从 Markdown 文档中提取 YAML Frontmatter 摘要的命令行�
 keywords: 工具 | CLI | 摘要提取 | Python | Node.js | YAML | JSON
 scope: 框架工具库 (tools/)
 related_files: tools/py/summary_extractor.py | tools/js/summary_extractor.js
-dependencies: reference/SUMMARY_FORMAT_SPEC.md | tools/README.md | tools/CHANGELOG.md
+dependencies: core/SUMMARY_FORMAT_SPEC.md | tools/README.md | tools/CHANGELOG.md
 verified_at: 2025-12-03
 ---
 
@@ -224,7 +224,7 @@ python tools/py/summary_extractor.py --files-from-stdin
 
 ### dependencies
 
-- **值**: `reference/SUMMARY_FORMAT_SPEC.md | tools/README.md | tools/CHANGELOG.md`
+- **值**: `core/SUMMARY_FORMAT_SPEC.md | tools/README.md | tools/CHANGELOG.md`
 - **说明**:
   - 摘要格式规范（工具处理的数据格式）
   - 工具库总体说明
@@ -305,7 +305,7 @@ summary: 扫描项目代码结构、依赖关系和复杂度指标，支持自�
 keywords: 工具 | 项目分析 | 代码扫描 | 依赖分析 | 复杂度 | 配置
 scope: 框架工具库 (tools/)
 related_files: tools/py/project_analyzer.py | tools/js/project_analyzer.js | tools/config/analyzer_rules.json
-dependencies: tools/README.md | reference/analysis_metrics.md
+dependencies: tools/README.md | core/analysis_metrics.md
 verified_at: 2025-12-03
 ---
 ```
@@ -319,7 +319,7 @@ summary: 提供框架所有工具的总览、开发规范、使用示例和故�
 keywords: 工具 | 工具库 | CLI | 开发规范 | Python | Node.js
 scope: 框架工具库 (tools/)
 related_files: tools/README.md | tools/CHANGELOG.md
-dependencies: reference/tool_development_guide.md
+dependencies: core/tool_development_guide.md
 verified_at: 2025-12-03
 ---
 ```

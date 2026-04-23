@@ -238,42 +238,20 @@ ai_coding_context/
     └── ... (其他模板)
 ```
 
-### 框架开发和维护
-
-需切换到 dev 分支
+### 框架核心组件
 
 ```
 ai_coding_context/
-├── CONTRIBUTING.md             # 🤝 框架扩展指南
-│
-├── dev/                        # 🔧 版本规划和开发文档
-│   ├── FRAMEWORK_CONTEXT.md    # 框架全局上下文
-│   └── V3.0/                   # V3.0版本规划
-│       ├── README.md
-│       ├── PROGRESS.md
-│       ├── pending/            # 待讨论的优化点
-│       └── confirmed/          # 已确认的优化点
-│
-├── quality/                    # ⭐ 质量保证体系（框架开发者工具）
-│   ├── README.md               # 质量保证体系索引
-│   ├── AUDIT_WORKFLOW.md       # 文档审查工作流
-│   ├── HOW_TO_GENERATE_CONTEXTS.md # 批量生成审查上下文指南
-│   ├── standards/              # 质量标准
-│   │   ├── COMMON_STANDARDS.md # 通用质量标准（5大维度）
-│   │   ├── QUALITY_CHECKLIST.md # 快速检查清单
-│   │   └── BY_DOCUMENT_TYPE.md # 按文档类型的专项标准
-│   ├── contexts/               # 审查上下文（每个框架文档一个）
-│   │   └── _template.md        # 审查上下文模板
-│   ├── reports/                # 审查报告归档
-│   └── tools/                  # 审查辅助工具
-│
-└── reference/                  # 📖 参考规范
-    ├── framework_spec.md       # 框架详细规范
-    └── design_decisions.md     # 设计决策说明
+├── AI_ENTRY_POINT.md          # 🤖 AI入口
+├── README.md                   # 👤 人类指南
+├── core/                       # 🔧 核心规范 (必读)
+├── agents/                     # 🤖 AI 角色库
+├── workflows/                  # 📋 流程文档
+├── tools/                      # 🛠️ 实用工具库
+├── guides/                     # 📚 详细指导
+├── config/                     # ⚙️ 配置系统
+└── templates/                  # 📋 文档模板
 ```
-
-> **说明**: `quality/` 目录是供框架开发者使用的质量保证工具，普通用户无需关心。  
-> 如果你对框架的设计和原理感兴趣，可以阅读 `quality/README.md` 了解详情。
 
 🎯 简要文档职责表
 
@@ -283,7 +261,7 @@ ai_coding_context/
 | `README.md`                   | 人类入门，介绍设计和用法  | 开发者阅读      |
 | `guides/*.md`                 | 详细指导和参考            | AI/人类按需查阅 |
 | `templates/*.md`              | 生成模板                  | AI 在生成时使用 |
-| `reference/framework_spec.md` | 完整规范                  | 深入了解时查阅  |
+| `core/framework_spec.md`      | 完整规范                  | 深入了解时查阅  |
 
 ## 🚀 V3.0 核心创新
 
@@ -368,5 +346,5 @@ A: 引入了 AI 角色库、配置系统、工具库，以及主动防御和设�
 
 - `guides/quick_start.md` - 详细的使用步骤
 - `guides/project_types.md` - 了解支持的项目类型
-- `reference/framework_spec.md` - 深入了解框架设计
-- `reference/SUMMARY_FORMAT_SPEC.md` - 文档摘要规范 (V3.0)
+- `core/framework_spec.md` - 深入了解框架设计
+- `core/SUMMARY_FORMAT_SPEC.md` - 文档摘要规范 (V3.0)

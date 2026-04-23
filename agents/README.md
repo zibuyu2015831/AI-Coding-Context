@@ -191,9 +191,6 @@ AI: [加载 code_reviewer 角色并执行审查]
 
 ## 📖 相关文档
 
-- [实施方案](../../dev/V3.0/confirmed/013-ai-agent-library-implementation.md)
-- [需求定义](../../dev/V3.0/pending/013-ai-agent-library.md)
-- [吸收方案](../../AI_AGENT_LIBRARY_ABSORPTION_PLAN.md)
 - [角色模板](./_templates/agent_template.md)
 - [质量检查清单](./_templates/quality_checklist.md)
 - [示例库](./examples/README.md)

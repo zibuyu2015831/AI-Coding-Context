@@ -8,7 +8,7 @@
 ## 🎯 职责描述
 
 ### 1. 摘要提取 (Summary Extraction)
-- 按照 `reference/SUMMARY_FORMAT_SPEC.md` 规范，从文档中提取标题、简述、关键词、范围、关联文件等信息。
+- 按照 `core/SUMMARY_FORMAT_SPEC.md` 规范，从文档中提取标题、简述、关键词、范围、关联文件等信息。
 - 确保摘要内容的客观性，必须基于文档实际内容，严禁臆测。
 
 ### 2. 摘要验证 (Summary Validation)

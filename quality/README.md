@@ -170,9 +170,7 @@
 
 ## 🔗 相关文档
 
-- [dev/FRAMEWORK_CONTEXT.md](../dev/FRAMEWORK_CONTEXT.md) - 全局上下文（审查时必读）
 - [workflows/document_health_check.md](../workflows/document_health_check.md) - 文档健康度检查（配合使用）
-- [dev/V3.0/pending/015-quality-assurance-system.md](../dev/V3.0/pending/015-quality-assurance-system.md) - 质量保证体系优化点文档
 
 ---
 

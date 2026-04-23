@@ -18,7 +18,11 @@
       "Bash(git commit:*)",
       "Bash(1)",
       "Bash(chmod +x tools/py/doc_dependency_tracer.py)",
-      "Bash(ls -1 agents/workflows/*.md)"
+      "Bash(ls -1 agents/workflows/*.md)",
+      "Bash(ls tools/py/*.py)",
+      "Bash(ls tools/js/*.js)",
+      "Bash(ls -la /Users/zibuyu/code/zibuyu/AI-Coding-Context/tools/py/*.py)",
+      "Bash(ls /Users/zibuyu/code/zibuyu/AI-Coding-Context/tools/py/*.py)"
     ]
   }
 }

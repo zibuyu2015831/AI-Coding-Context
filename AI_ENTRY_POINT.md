@@ -81,7 +81,6 @@ test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_con
   - agents/
   - tools/
   - guides/
-  - reference/
   - config/（框架配置，不是项目配置）
 
 ✅ 唯一例外：
@@ -452,7 +451,7 @@ graph TD
 | `core/project_types.md`            | 项目类型索引与决策树 | **决策子文档清单必读** |
 | `core/project_types/*.md`          | 项目类型详细配置 | **按需加载对应类型** |
 | `core/update_triggers.md`          | 文档更新触发机制   | **生成完成后必读**     |
-| `reference/SUMMARY_FORMAT_SPEC.md` | 文档摘要规范       | **生成任意文档时必读** |
+| `core/SUMMARY_FORMAT_SPEC.md` | 文档摘要规范       | **生成任意文档时必读** |
 
 ### 工作流路径文档 (`workflows/`)
 
@@ -535,12 +534,13 @@ graph TD
 | `templates/knowledge_README_TEMPLATE.md`        | Knowledge 目录模板 | 创建 knowledge/时使用   |
 | `templates/PLAN_TEMPLATE.md`                    | 方案文档模板       | 创建功能/Bug 方案时使用 |
 
-### 参考文档 (`reference/`)
+### 核心规范与参考 (`core/`)
 
 | 文件                            | 用途         | AI 何时参考    |
 | ------------------------------- | ------------ | -------------- |
-| `reference/design_decisions.md` | 设计决策说明 | 了解设计理由时 |
-| `reference/framework_spec.md`   | 文档体系规范 | 生成任意文档时 |
+| `core/design_decisions.md`      | 设计决策说明 | 了解设计理由时 |
+| `core/framework_spec.md`        | 文档体系规范 | 生成任意文档时 |
+| `core/SUMMARY_FORMAT_SPEC.md`   | 文档摘要规范 | 格式化文档时   |
 
 ---
 

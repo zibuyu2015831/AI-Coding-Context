@@ -37,7 +37,7 @@ const fs = require('fs');
 const path = require('path');
 
 // ==================== 重要文件优先级系统 ====================
-// 参见 dev/tools_optimization/important_files_reference.md
+// 识别项目类型、语言、规模等特征
 
 const IMPORTANT_FILES = {
     // 优先级 1 (最高)

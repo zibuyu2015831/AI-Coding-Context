@@ -60,7 +60,7 @@ import re
 from collections import deque
 
 # ==================== 重要文件优先级系统 ====================
-# 参见 dev/tools_optimization/important_files_reference.md
+# 识别项目类型、语言、规模等特征
 
 IMPORTANT_FILES = {
     # 优先级 1 (最高)

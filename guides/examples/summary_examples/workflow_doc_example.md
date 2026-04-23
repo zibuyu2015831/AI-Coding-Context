@@ -197,7 +197,7 @@ summary: 详细说明如何使用项目分析工具进行代码扫描、依赖�
 keywords: 工具 | 项目分析 | 代码扫描 | 依赖分析 | 复杂度
 scope: 框架工具库使用
 related_files: tools/py/project_analyzer.py | tools/js/project_analyzer.js
-dependencies: tools/README.md | reference/tool_development_guide.md
+dependencies: tools/README.md | core/tool_development_guide.md
 verified_at: 2025-12-03
 ---
 ```
