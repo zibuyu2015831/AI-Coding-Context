@@ -743,11 +743,11 @@ python tools/py/summary_validator.py --check-all dev_docs/
 
 ## 📚 参考文档
 
-- [016-配置管理系统](./confirmed/016-unified-config-system/016-unified-config-system.md) - YAML 格式参考
-- [017-实用脚本工具库](./confirmed/017-utility-script-library/017-utility-script-library.md) - 工具开发规范
-- [generation_workflow.md](../../workflows/generation_workflow.md) - 文档生成流程
-- [incremental_update_workflow.md](../../workflows/incremental_update_workflow.md) - 增量更新流程
-- [document_health_check.md](../../workflows/document_health_check.md) - 健康度检查
+- [016-配置管理系统](../016-unified-config-system/016-unified-config-system.md) - YAML 格式参考
+- [017-实用脚本工具库](../017-utility-script-library/017-utility-script-library.md) - 工具开发规范
+- [generation_workflow.md](../../../../workflows/generation_workflow.md) - 文档生成流程
+- [incremental_update_workflow.md](../../../../workflows/incremental_update_workflow.md) - 增量更新流程
+- [document_health_check.md](../../../../workflows/document_health_check.md) - 健康度检查
 - [git_diff_analyzer.py](../../tools/py/git_diff_analyzer.py) - Git 差异分析工具
 
 ---

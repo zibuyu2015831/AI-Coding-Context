@@ -1242,8 +1242,8 @@ class MutualReviewCoordinator:
 
 ### 原文出处
 
-- [《AI 编程的现状.md》](../../reference/AI编程的现状.md) - 方法 1: 对抗式编程
-- [《AI_PROGRAMMING_ANALYSIS.md》](../../reference/AI_PROGRAMMING_ANALYSIS.md) - 3.1.1 节
+- [《AI 编程的现状.md》](../../../reference/AI编程的现状.md) - 方法 1: 对抗式编程
+- [《AI_PROGRAMMING_ANALYSIS.md》](../../../reference/AI_PROGRAMMING_ANALYSIS.md) - 3.1.1 节
 
 ### 相关技术
 

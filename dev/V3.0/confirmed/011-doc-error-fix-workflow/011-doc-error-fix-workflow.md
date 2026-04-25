@@ -938,9 +938,9 @@ graph TD
 
 ## 📚 相关文档
 
-- [incremental_update_workflow.md](../../workflows/incremental_update_workflow.md) - 现有增量更新流程
-- [document_health_check.md](../../workflows/document_health_check.md) - 文档健康检查
-- [update_triggers.md](../../core/update_triggers.md) - 更新触发机制
+- [incremental_update_workflow.md](../../../../workflows/incremental_update_workflow.md) - 现有增量更新流程
+- [document_health_check.md](../../../../workflows/document_health_check.md) - 文档健康检查
+- [update_triggers.md](../../../../core/update_triggers.md) - 更新触发机制
 
 ---
 

@@ -271,9 +271,9 @@ cat dev_docs/_analysis/audit_report.md
 
 ### 框架文档
 
-- [workflows/path_a_first_generation.md](../../workflows/path_a_first_generation.md)
-- [workflows/shared/ai_checklist.md](../../workflows/shared/ai_checklist.md)
-- [templates/AI_Coding_Context_TEMPLATE.md](../../templates/AI_Coding_Context_TEMPLATE.md)
+- [workflows/path_a_first_generation.md](../../../workflows/path_a_first_generation.md)
+- [workflows/shared/ai_checklist.md](../../../workflows/shared/ai_checklist.md)
+- [templates/AI_Coding_Context_TEMPLATE.md](../../../templates/AI_Coding_Context_TEMPLATE.md)
 
 ---
 

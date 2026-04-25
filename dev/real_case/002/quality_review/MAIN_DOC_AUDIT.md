@@ -652,7 +652,7 @@ node install_hooks.js
 
 - [COMPREHENSIVE_AUDIT.md](./COMPREHENSIVE_AUDIT.md) - 全面核查报告
 - [DEFECT_ANALYSIS.md](./DEFECT_ANALYSIS.md) - 缺陷分析报告
-- [templates/AI_Coding_Context_TEMPLATE.md](../../templates/AI_Coding_Context_TEMPLATE.md) - 主文档模板
+- [templates/AI_Coding_Context_TEMPLATE.md](../../../../templates/AI_Coding_Context_TEMPLATE.md) - 主文档模板
 
 ---
 

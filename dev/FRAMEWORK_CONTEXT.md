@@ -743,7 +743,7 @@ project_root/
 - [dev/reference/AI_PROGRAMMING_ANALYSIS.md](./reference/AI_PROGRAMMING_ANALYSIS.md) - V3.0 方案分析
 - [reference/design_decisions.md](../reference/design_decisions.md) - 框架设计决策说明
 - [reference/SUMMARY_FORMAT_SPEC.md](../reference/SUMMARY_FORMAT_SPEC.md) - 文档摘要格式规范
-- [quality/README.md](../quality/README.md) - 文档质量保证体系与审查工作流
+- [quality/README.md](./quality/README.md) - 文档质量保证体系与审查工作流
 
 ---
 

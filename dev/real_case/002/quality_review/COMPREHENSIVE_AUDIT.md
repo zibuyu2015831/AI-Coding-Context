@@ -536,8 +536,8 @@ grep -i "ai_rules\|AI_RULES_TEMPLATE" generation_plan.md
 - [DEFECT_ANALYSIS.md](./DEFECT_ANALYSIS.md) - 前两个缺陷的详细分析
 - [QUALITY_ASSESSMENT.md](./QUALITY_ASSESSMENT.md) - 整体质量评估
 - [IMPROVEMENT_ROADMAP.md](./IMPROVEMENT_ROADMAP.md) - 改进路线图
-- [workflows/shared/ai_checklist.md](../../workflows/shared/ai_checklist.md) - 完整检查清单
-- [workflows/path_a_first_generation.md](../../workflows/path_a_first_generation.md) - 完整工作流
+- [workflows/shared/ai_checklist.md](../../../../workflows/shared/ai_checklist.md) - 完整检查清单
+- [workflows/path_a_first_generation.md](../../../../workflows/path_a_first_generation.md) - 完整工作流
 
 ---
 

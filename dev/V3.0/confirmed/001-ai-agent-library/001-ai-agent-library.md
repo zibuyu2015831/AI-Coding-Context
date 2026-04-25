@@ -774,9 +774,9 @@ v1.0 → v1.1 → v1.2 (持续优化)
 
 ## 📚 相关文档
 
-- [001-ai-mutual-review.md](./001-ai-mutual-review.md) - AI 互审机制
-- [011-doc-error-fix-workflow.md](./011-doc-error-fix-workflow.md) - 文档修复工作流
-- [012-mandatory-doc-summary.md](./012-mandatory-doc-summary.md) - 强制文档摘要
+- [013-ai-mutual-review.md](../013-ai-mutual-review/013-ai-mutual-review.md) - AI 互审机制
+- [011-doc-error-fix-workflow.md](../011-doc-error-fix-workflow/011-doc-error-fix-workflow.md) - 文档修复工作流
+- [012-mandatory-doc-summary.md](../012-mandatory-doc-summary/012-mandatory-doc-summary.md) - 强制文档摘要
 
 ---
 
