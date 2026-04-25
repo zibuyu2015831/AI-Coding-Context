@@ -20,21 +20,21 @@ verified_at: 2026-04-25
 | 严重级别 | 数量 |
 |---|---|
 | 严重 | 0 |
-| 主要 | 4 |
-| 次要 | 7 |
-| 建议 | 4 |
-| **合计** | **15**（B0 基线 8 + B1 新增 2 + B2 新增 5；后续批次将追加） |
+| 主要 | 7 |
+| 次要 | 9 |
+| 建议 | 5 |
+| **合计** | **21**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6；后续批次将追加） |
 
 | 视角分布 | 数量 |
 |---|---|
-| 视角 A（用户） | 2 |
-| 视角 B（完整性） | 9 |
+| 视角 A（用户） | 5 |
+| 视角 B（完整性） | 12 |
 | 视角 C（dev 卫生） | 4 |
 
 | 修复状态 | 数量 |
 |---|---|
 | 🟢 已修复（Phase 0 顺手处理） | 4 |
-| 🔴 待修复 | 11 |
+| 🔴 待修复 | 17 |
 
 ---
 
@@ -1051,12 +1051,483 @@ B2 R2 V3.0 一致性核查（B4 自指审查时复审）
 
 ---
 
-## 📈 后续批次将追加的问题段落
+## 问题 ID: AICC-20260425-016
 
-每个批次（B3-B7）执行后将在此追加问题，编号继续：AICC-20260425-016 起。
+- **类型**: 文档问题（命名大小写不一致）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+AI Rules 文件名在 AICC 框架不同位置存在大小写不一致：
+
+- `workflows/path_a_first_generation.md` L752、L756：使用 **`ai_rules.md`**（小写）
+- `AI_ENTRY_POINT.md` L157、术语表 L306：使用 **`AI_RULES.md`**（大写）
+- `templates/AI_RULES_TEMPLATE.md` L541：生成目标 **`dev_docs/AI_RULES.md`**（大写）
+
+剧本 1（首次生成 path_a）的关键收尾步骤"Step 8.4 生成 AI Rules 文件"（path_a L754-L770）让 AI 写入 `ai_rules.md`（小写），但其他所有引用都是 `AI_RULES.md`（大写）。
+
+Linux/macOS 文件系统区分大小写：
+- 若 AI 按 path_a 生成 `ai_rules.md`，后续 IDE 集成（依赖 `AI_RULES.md`）将失败
+- 若 AI 修正为大写，path_a 自身逻辑就跟其他位置错位
+
+### 影响范围
+
+- 剧本 1（首次生成）的最后一步产出格式不确定
+- 用户 IDE 集成链路（AI_RULES.md → IDE rules）会断裂
+- R1（工作流闭环）核心剧本的产物格式不可信
+
+### 主要文件路径
+
+- `workflows/path_a_first_generation.md`
+- `AI_ENTRY_POINT.md`
+- `templates/AI_RULES_TEMPLATE.md`
+
+### 相关文件路径
+
+- `core/framework_spec.md`（应权威约定文件名规范）
+- `guides/ai_rules_maintenance.md`（AI Rules 维护指南）
+
+### 具体位置
+
+- `workflows/path_a_first_generation.md` L752：`6. **AI Rules 文件** \`ai_rules.md\`（根目录）`
+- `workflows/path_a_first_generation.md` L756：`**位置**: 项目根目录 \`ai_rules.md\``
+- `AI_ENTRY_POINT.md` L157：`- AI_RULES.md`（在"分析目标"列表中）
+- `AI_ENTRY_POINT.md` L306-L307：术语表标准写法 `AI_RULES.md`
+- `templates/AI_RULES_TEMPLATE.md` L541：`AI 生成更新后的 rule 到\`dev_docs/AI_RULES.md\``
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 全仓库统一为大写 AI_RULES.md
+grep -rn '\bai_rules\.md\b' --include='*.md' .
+# 修复后预期：返回空（或仅 .gitignore / 历史归档中保留）
+
+# 2. AI_RULES.md 应在所有关键路径被一致引用
+grep -rn 'AI_RULES\.md' --include='*.md' \
+  workflows/ AI_ENTRY_POINT.md templates/AI_RULES_TEMPLATE.md core/ guides/
+# 修复后所有引用大小写一致
+
+# 3. Linux 测试（区分大小写）
+test -f templates/AI_RULES_TEMPLATE.md && echo OK  # 模板大写
+```
+
+### 建议修复方案
+
+- 以 `AI_ENTRY_POINT.md` 术语表 L306 为权威源（`AI_RULES.md` 大写）
+- 修订 `workflows/path_a_first_generation.md` L752、L756 的 `ai_rules.md` → `AI_RULES.md`
+- 全仓库 grep 一次确保无遗漏
+- 长期：在 `core/framework_spec.md` 中明确"文件名大小写规范"章节
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 1）
 
 ---
 
-**版本**：v1.2
+## 问题 ID: AICC-20260425-017
+
+- **类型**: 集成问题（工具实体缺失）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`tools/py/doc_health_checker.py` 与 `tools/js/doc_health_checker.js` 在多处工作流被引用为关键步骤，但**实体均不存在**：
+
+- `workflows/commit_guided_update.md` L372：`python tools/py/doc_health_checker.py --file dev_docs/api_layer.md`（剧本 2 Step 7 验证步骤）
+- `workflows/maintenance_workflow.md` L176：`python tools/py/doc_health_checker.py --check-code-samples`
+- `workflows/maintenance_workflow.md` L179：`node tools/js/doc_health_checker.js --check-code-samples`
+- `workflows/maintenance_workflow.md` L202：`python tools/py/doc_health_checker.py --check-file-paths`
+- `workflows/maintenance_workflow.md` L224：`python tools/py/doc_health_checker.py --check-dependencies`
+- `workflows/maintenance_workflow.md` L420：`python tools/py/doc_health_checker.py --full-check`
+
+`ls tools/py/ tools/js/` 仅有 `doc_dependency_tracer.py/.js` 与 `doc_fix_executor.py/.js`，**无 doc_health_checker**。
+
+剧本 2（commit-guided）的 Step 7 文档验证、维护工作流的 4 大健康检查命令均无可执行实体。
+
+### 影响范围
+
+- 剧本 2（commit-guided）Step 7 验证环节断裂
+- 整个 maintenance 工作流（document health check 路径 B）的核心命令均失效
+- 双脚本对称性（Py/JS）在 V3.0 红线下被违反（声称两端都有，实则两端都无）
+- AI 按文档执行会因 `command not found` 失败
+
+### 主要文件路径
+
+- `tools/py/doc_health_checker.py`（应存在但不存在）
+- `tools/js/doc_health_checker.js`（应存在但不存在）
+
+### 相关文件路径
+
+- `workflows/commit_guided_update.md` L372
+- `workflows/maintenance_workflow.md` L176-L420
+- `workflows/document_health_check.md`（应统一定义健康检查工具职责）
+- `tools/README.md`（工具索引应反映实体状态）
+
+### 具体位置
+
+- 引用方共 6 处（见上文列表）
+- 实体应位于 `tools/py/doc_health_checker.py` 与 `tools/js/doc_health_checker.js`
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 文件应存在
+ls tools/py/doc_health_checker.py tools/js/doc_health_checker.js
+
+# 2. 双脚本应支持文档中调用的所有参数
+python tools/py/doc_health_checker.py --help 2>&1 | grep -E '\-\-file|\-\-check-code-samples|\-\-check-file-paths|\-\-check-dependencies|\-\-full-check'
+# 预期 5 个参数全部命中
+
+# 3. 双脚本零依赖（V3.0 红线）
+grep -nE '^import |^from ' tools/py/doc_health_checker.py | grep -vE 'os|sys|json|re|argparse|pathlib|subprocess|datetime|typing|collections|dataclasses|enum'
+# 预期：空（仅标准库）
+
+grep -nE '^const .* = require' tools/js/doc_health_checker.js | grep -vE "'fs'|'path'|'os'|'crypto'|'child_process'|'util'"
+# 预期：空（仅原生 Node 模块）
+
+# 4. 全仓库引用方均能解析
+grep -rn 'doc_health_checker' workflows/ tools/README.md
+```
+
+### 建议修复方案
+
+- **选项 A（推荐）**：实施 `doc_health_checker.py/.js` 双脚本，覆盖 4 项检查能力（code-samples / file-paths / dependencies / full-check）。等同于 005-复杂度仪表盘 + 011-文档谬误工具链的"文档健康检查"分支。
+- **选项 B**：删除引用，将 4 项检查能力合并到 `complexity_scanner.py` 或拆入现有 `doc_dependency_tracer.py` + `summary_validator.py`，并修订所有引用方
+- 推荐 A：当前 6 处文档引用都假设这是独立工具；修补成本低于重写工作流
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 2）
+
+---
+
+## 问题 ID: AICC-20260425-018
+
+- **类型**: 文档问题（路径假设错误）
+- **严重级别**: 次要
+- **优先级**: 中
+- **归属视角**: B（完整性）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`workflows/doc_error_fix_workflow.md` L488-L491 的测试命令假定仓库根存在 `tests/` 目录，但**实际不存在**：
+
+```bash
+# L488
+python -m pytest tests/ -v -k "doc_error"
+
+# L491
+python -m pytest tests/integration/ -v -k "doc_fix"
+```
+
+仓库实际测试位置：
+
+- `tools/py/tests/`（仅 `test_commit_integrity_validator.py` + `test_git_safety.py`）
+- `tools/js/`（含 `commit_template_cli.test.js` / `install_hooks.test.js` / `integration.test.js`）
+
+无任何 `tests/` 或 `tests/integration/` 在仓库根。AI 按 doc_error_fix L488-L491 的命令执行会得到 `ERROR: file or directory not found: tests/`。
+
+### 影响范围
+
+- 剧本 3（文档谬误修复）的"测试和验证"章节命令不可执行
+- 用户/AI 调试时会困惑"为什么文档说有 tests/"
+- 文档假设与实际测试组织方式脱节
+
+### 主要文件路径
+
+- `workflows/doc_error_fix_workflow.md`
+
+### 相关文件路径
+
+- `tools/py/tests/`（实际位置）
+- `tools/js/`（含 *.test.js）
+
+### 具体位置
+
+- L484-L491 测试和验证章节：
+
+```bash
+# 运行工具测试
+python -m pytest tests/ -v -k "doc_error"
+
+# 集成测试
+python -m pytest tests/integration/ -v -k "doc_fix"
+```
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 修复后命令应能定位实际测试目录
+ls tools/py/tests/ tools/js/*.test.js
+
+# 2. 文档命令应改为指向实际位置
+grep -nE 'pytest tests/|pytest tools/py/tests/' workflows/doc_error_fix_workflow.md
+# 修复后预期仅命中 tools/py/tests/
+
+# 3. AI 按文档执行命令应不报错
+cd /home2/wenbo/Videos/ai-coding-context && python -m pytest tools/py/tests/ -v -k "test_" --collect-only 2>&1 | head -5
+```
+
+### 建议修复方案
+
+- 将 L488 改为：`python -m pytest tools/py/tests/ -v -k "doc_error"`
+- 将 L491 改为：`# 当前无 doc_fix 集成测试；建议补充 tools/py/tests/integration/doc_fix_test.py`
+- 同步审查 doc_error_fix_workflow.md 内是否还有其他类似根级路径假设
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 3）
+
+---
+
+## 问题 ID: AICC-20260425-019
+
+- **类型**: 设计问题（端到端工作流缺失）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 005 复杂度仪表盘
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+剧本 4（复杂度告警 → 决策）**没有任何工作流文档定义端到端流程**：
+
+- ✅ 实体存在：
+  - `tools/py/complexity_scanner.py` + `tools/js/complexity_scanner.js`
+  - `tools/py/report_generator.py` + `tools/js/report_generator.js`
+  - `dev/complexity/config.yaml`（阈值定义：warning / critical / crisis）
+  - `dev/complexity/dashboard/` + `dev/complexity/data/`
+
+- 🔴 流程文档缺失：
+  - `AI_ENTRY_POINT.md` 文件索引中**完全无 complexity_scanner**（不在"实用工具库"段、不在"路由索引"）
+  - `workflows/path_d_specific_tasks.md` 的 `@think` / `@review` 等显式指令清单中**无 @complexity 或类似指令**
+  - 无 `workflows/complexity_alert_workflow.md` 或类似文档定义"扫描 → 阈值判断 → 告警 → 决策建议 → 用户响应"完整闭环
+  - 仅 `tools/README.md` L42 一行简单描述
+
+工具完整但缺触发路径，导致 AI 不知道何时主动调用 complexity_scanner，用户也不清楚如何启用此能力。
+
+### 影响范围
+
+- R1（工作流闭环）维度的 4 大剧本中只有这一个无文档定义
+- 005-复杂度仪表盘虽实体已落地，但用户感知不到 → 实际价值未释放
+- 与 R4（新用户旅程）相关：B5 阶段会再确认"用户能否被引导到这能力"
+
+### 主要文件路径
+
+- `workflows/`（应新增 `complexity_alert_workflow.md`）
+- `AI_ENTRY_POINT.md`（应增加 @complexity 路由）
+- `workflows/path_d_specific_tasks.md`（应增加 @complexity 段落）
+
+### 相关文件路径
+
+- `tools/py/complexity_scanner.py`
+- `tools/py/report_generator.py`
+- `dev/complexity/config.yaml`
+- `dev/V3.0/confirmed/005-complexity-dashboard/`（应有完整设计可参考）
+
+### 具体位置
+
+- `AI_ENTRY_POINT.md` L488-L510 实用工具库 / 路由索引（应增加复杂度入口）
+- `workflows/path_d_specific_tasks.md` L21-L40 显式指令清单（应增加 @complexity）
+
+### 复查方法（验证修复）
+
+```bash
+# 1. AI_ENTRY_POINT 应索引复杂度工具
+grep -nE 'complexity_scanner|@complexity|complexity_alert' AI_ENTRY_POINT.md
+
+# 2. path_d 应有 @complexity 指令章节
+grep -nE '@complexity' workflows/path_d_specific_tasks.md
+# 预期：有专门一节
+
+# 3. 新工作流文档应存在
+ls workflows/complexity_alert_workflow.md
+
+# 4. 端到端剧本可演练
+python tools/py/complexity_scanner.py --since "1 day ago" --output /tmp/c.json && \
+python tools/py/report_generator.py --data /tmp/c.json --output /tmp/c.md
+ls /tmp/c.md  # 应存在
+```
+
+### 建议修复方案
+
+1. 新建 `workflows/complexity_alert_workflow.md`，定义：
+   - 触发条件（@complexity 指令 / commit hook / 周期定时）
+   - 7 步流程：扫描 → 解析 → 阈值判定（参考 dev/complexity/config.yaml）→ 风险归类 → 报告生成 → 用户决策选项 → 执行/记录
+   - 与 005-complexity-dashboard 设计文档对齐
+2. 在 `AI_ENTRY_POINT.md` 文件索引中补充复杂度工具行
+3. 在 `workflows/path_d_specific_tasks.md` 增加 `@complexity` 指令章节
+4. 在 `tools/README.md` 中扩充 complexity_scanner 用法示例与触发场景
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 4）
+
+---
+
+## 问题 ID: AICC-20260425-020
+
+- **类型**: 文档问题（命令参数不存在）
+- **严重级别**: 次要
+- **优先级**: 中
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`workflows/document_health_check.md` L418 给出命令：
+
+```bash
+python tools/py/complexity_scanner.py --path . --check-doc-errors
+```
+
+但 `tools/py/complexity_scanner.py` 实际仅支持 4 个参数：
+
+- `--path PATH`
+- `--output OUTPUT`
+- `--since SINCE`
+- `--config CONFIG`
+
+**`--check-doc-errors` 不存在**。AI 按文档执行此命令会得到 argparse 错误：`unrecognized arguments: --check-doc-errors`。
+
+### 影响范围
+
+- 剧本 4（复杂度告警）与"文档健康检查"路径的衔接失效
+- AI 可能尝试调用并失败，导致用户体验受损
+
+### 主要文件路径
+
+- `workflows/document_health_check.md`
+
+### 相关文件路径
+
+- `tools/py/complexity_scanner.py` L592-L595 argparse 定义处
+- `dev/V3.0/confirmed/005-complexity-dashboard/`（设计文档应说明扩展点）
+
+### 具体位置
+
+- `workflows/document_health_check.md` L418
+
+### 复查方法（验证修复）
+
+```bash
+# 1. complexity_scanner 是否真的支持 --check-doc-errors
+python tools/py/complexity_scanner.py --check-doc-errors --path . 2>&1 | head -5
+# 修复前：unrecognized arguments
+# 修复后选项 A（实现参数）：正常运行
+# 修复后选项 B（删除引用）：文档不再含此命令
+
+# 2. 文档与工具同步
+grep -n 'check-doc-errors' workflows/ tools/py/complexity_scanner.py -r
+# 预期：要么两边都有，要么两边都无
+```
+
+### 建议修复方案
+
+- **选项 A**：在 `complexity_scanner.py` 中实施 `--check-doc-errors` 子命令，支持文档错误扫描
+- **选项 B（推荐）**：从 `document_health_check.md` L418 删除该命令，改为引用 011-文档谬误修复工具链的现有命令（`doc_dependency_tracer.py` + `summary_validator.py`）
+- 选项 B 与 AICC-20260425-017（doc_health_checker 缺失）联合处置：合并健康检查命令到统一工具入口
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 4）
+
+---
+
+## 问题 ID: AICC-20260425-021
+
+- **类型**: 设计问题（默认配置路径假设需明示）
+- **严重级别**: 建议
+- **优先级**: 低
+- **归属视角**: B（完整性）+ C（dev 卫生）
+- **关联任务/ADR**: 与 AICC-20260425-019 关联（同剧本 4）
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`tools/py/complexity_scanner.py` L595 默认配置路径：
+
+```python
+parser.add_argument("--config", default="dev_docs/complexity/config.yaml", ...)
+```
+
+但 AICC 框架自身的复杂度配置位于 `dev/complexity/config.yaml`（dev/，非 dev_docs/）。
+
+`dev_docs/` 是**用户项目运行时**的目录约定（参见 AI_ENTRY_POINT.md L154-L158）；用户复制 AICC 后会在自己项目下产生 `dev_docs/complexity/`。
+
+未明示这一假设会导致：
+
+- 在框架自身仓库直接运行 `python tools/py/complexity_scanner.py`（无 --config 参数）→ 找不到 `dev_docs/complexity/config.yaml` → fallback 行为不明确
+- 如果 AI 在 dogfood（自审）时调用此工具，需手动指定 `--config dev/complexity/config.yaml`
+- 文档未提及此差异
+
+### 影响范围
+
+- AICC 自身使用复杂度仪表盘（dogfood）时需额外参数
+- 用户复制框架后能正常运行（dev_docs/ 由用户项目创建）
+- 仅"框架开发者在 framework 仓库直接跑"场景下有困扰
+
+### 主要文件路径
+
+- `tools/py/complexity_scanner.py`
+- `tools/js/complexity_scanner.js`（应同步检查）
+
+### 相关文件路径
+
+- `dev/complexity/config.yaml`（框架自身位置）
+- `dev_docs/complexity/config.yaml`（用户项目运行时位置，由 default 指向）
+- `tools/README.md`（应说明此差异）
+
+### 具体位置
+
+- `tools/py/complexity_scanner.py` L595：`default="dev_docs/complexity/config.yaml"`
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 在 framework 仓库根直接运行（无 --config）
+python tools/py/complexity_scanner.py --since "1 day ago" 2>&1 | head -10
+# 修复前：可能找不到 dev_docs/complexity/config.yaml
+# 修复后：要么提供清晰错误提示，要么自动 fallback 到 dev/complexity/config.yaml
+
+# 2. 工具的 --help 应明示用户项目 vs 框架自身的差异
+python tools/py/complexity_scanner.py --help | grep -A 2 '\-\-config'
+# 预期：明示路径假设和 fallback 策略
+
+# 3. tools/README.md 应有"在框架自身上运行"说明
+grep -nE 'dogfood|framework self|框架自身|自审' tools/README.md
+```
+
+### 建议修复方案
+
+- **选项 A**：保留 default `dev_docs/complexity/config.yaml`，在 `--help` 与 `tools/README.md` 中明示"框架开发者自审时需指定 `--config dev/complexity/config.yaml`"
+- **选项 B**：增加 fallback 逻辑：先找 `dev_docs/complexity/config.yaml`，找不到则尝试 `dev/complexity/config.yaml`，再找不到则使用工具内置默认
+- 推荐 A（成本低，符合"用户项目优先"的框架定位）
+
+### 审查阶段
+
+B3 R1 工作流端到端闭环（剧本 4，附带观察）
+
+---
+
+## 📈 后续批次将追加的问题段落
+
+每个批次（B4-B7）执行后将在此追加问题，编号继续：AICC-20260425-022 起。
+
+---
+
+**版本**：v1.3
 **创建日期**：2026-04-25
-**最后更新**：2026-04-25（B2 完成；全部 15 项 Issue 补齐影响范围、相关文件、具体位置、复查方法、修复方案六大要素）
+**最后更新**：2026-04-25（B3 完成；新增 016-021，全部含完整六大要素）

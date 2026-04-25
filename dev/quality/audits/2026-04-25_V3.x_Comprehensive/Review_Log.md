@@ -128,17 +128,66 @@ verified_at: 2026-04-25
 
 - B7 修复 PR 时，FRAMEWORK_CONTEXT 是否要作大幅重写还是局部修订？倾向局部修订 + 增加"single source of truth"约定，让 PROGRESS 成为权威源。
 
-### B3 R1 工作流端到端闭环（下一步）
+### B3 R1 工作流端到端闭环（已完成）
 
-**计划**：模拟 4 个核心剧本端到端跑通
-- 剧本 1：新项目首次生成（path_a → generation_workflow → AI_RULES）
-- 剧本 2：commit-guided 文档同步
-- 剧本 3：文档谬误修复（detection → doc_error_fix → 011 ADR 流程）
-- 剧本 4：复杂度告警（complexity_scanner → 报告 → 决策）
+**做了什么**：
 
-**预计**：3-4 小时
+1. 读取 4 大剧本入口工作流：
+   - 剧本 1：`workflows/path_a_first_generation.md`（920 行）
+   - 剧本 2：`workflows/commit_guided_update.md`（782 行）
+   - 剧本 3：`workflows/doc_error_fix_workflow.md`（516 行）
+   - 剧本 4：（无独立文档；通过 complexity_scanner.py + dev/complexity/config.yaml + path_d_specific_tasks.md 间接推演）
+2. 对每个剧本路径上引用的工具/模板/agent/config 实体逐一验证存在性
+3. 抽样验证关键命令的参数真实性（argparse 定义 vs 文档命令）
+4. 检查跨剧本的命名一致性（AI_RULES.md 大小写）
+
+**剧本核查结果**：
+
+| 剧本 | 工作流文档 | 关键工具 | 主要短板 |
+|---|:-:|:-:|---|
+| 1 path_a 首次生成 | ✅ 完整 | project_scanner / summary_validator ✅ | `ai_rules.md` vs `AI_RULES.md` 大小写不一致 |
+| 2 commit-guided | ✅ 完整 | commit_parser / commit_aggregator / git_diff_analyzer ✅ | `doc_health_checker.py/.js` 6 处引用但实体不存在 |
+| 3 doc_error_fix | ✅ 完整 | doc_dependency_tracer / batch_fix_manager / manage_fix_with_git ✅ | L488-491 测试命令假定仓库根有 `tests/`（实际仅 tools/py/tests/） |
+| 4 complexity 告警 | 🔴 缺失 | complexity_scanner / report_generator ✅ | **无端到端工作流文档；AI_ENTRY_POINT 无 @complexity 路由；--check-doc-errors 参数不存在** |
+
+**新增 Issue**（共 6 项）：
+
+- 🔴 AICC-20260425-016（主要）：AI_RULES.md 大小写不一致 — path_a 用小写，AI_ENTRY_POINT/templates 用大写
+- 🔴 AICC-20260425-017（主要）：doc_health_checker.py/.js 在 commit_guided / maintenance 工作流共 6 处被引用但实体缺失
+- 🔴 AICC-20260425-018（次要）：doc_error_fix L488-491 `pytest tests/` 假定仓库根有 tests/，实际不存在
+- 🔴 AICC-20260425-019（主要）：复杂度告警端到端工作流完全缺失；AI_ENTRY_POINT 无入口；@complexity 路由不存在 → R1 维度最大短板
+- 🔴 AICC-20260425-020（次要）：document_health_check.md L418 `complexity_scanner.py --check-doc-errors` 参数实际不存在
+- 🔴 AICC-20260425-021（建议）：complexity_scanner default config 路径 `dev_docs/complexity/config.yaml` 是用户项目运行时假设，dogfood 时需明示
+
+**关键决策**：
+
+- 决策 11：4 个剧本中 3 个工作流文档完整（剧本 1/2/3），仅剧本 4 完全缺失。这与 005-复杂度仪表盘标记"已完成"的进度认知存在偏差 → 005 实体已落地但用户层链路未打通
+- 决策 12：017 doc_health_checker 缺失影响最广（6 处引用），是 R1 维度最严重的实体缺失。建议 B7 报告中作为"已完成功能完整度"的关键瑕疵
+- 决策 13：B3 用"穷尽断点扫描"代替"逐步演练 4 剧本"，更高效暴露问题。剧本 4 单纯演练会因无文档而无从下手，证明 019 是真问题而非演练偏差
+- 决策 14：002 #5 的 dev/V3.0/ 真泄漏在 doc_error_fix L507-509 已记录，不重复开新 Issue
+
+**重大正面发现**：
+
+- 剧本 1/2/3 的核心工具实体均完整 — 配合 B2 的 12 项实体核查 → V3.0 P0/P1 实体落地真实，但**文档与命令参数层存在系统性 drift**
+- 模板 / 双脚本对称性除 doc_health_checker 缺失外整体良好（与 B1 的"模板/工具洁净"结论一致）
+
+**未解疑问**：
+
+- 复杂度告警工作流（剧本 4 缺失项）是 005 的"未完成尾巴"还是"V3.0 未规划项"？应在 B4 自指审查阶段查 005 confirmed 文档原始设计意图判定
+
+### B4 R5 自指审查（下一步）
+
+**计划**：用 v2.0 quality 体系审 quality 体系自身
+- README v2.0 索引覆盖率（应通过）
+- Guidelines v1.2 内部一致性（应通过）
+- 被引用标准存在性（BY_DOCUMENT_TYPE.md 已补，应通过）
+- contexts/ 数量 vs README 标注差距说明
+- sub-agent 名称对齐验证
+- 复审 005 confirmed/ 是否原本规划了"复杂度告警工作流"
+
+**预计**：0.5-1 小时
 
 ---
 
-**版本**：v1.2
-**最后更新**：2026-04-25（B2 完成）
+**版本**：v1.3
+**最后更新**：2026-04-25（B3 完成）
