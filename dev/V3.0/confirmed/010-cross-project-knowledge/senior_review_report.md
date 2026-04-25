@@ -1,10 +1,11 @@
 # 010 - 跨项目知识复用：资深使用者审核报告
 
 **文档类型**: 审核报告与优化建议
-**相关优化点**: 010-cross-project-knowledge.md
+**相关优化点**: [010-cross-project-knowledge.md](./010-cross-project-knowledge.md)
 **审核日期**: 2026-04-13
 **状态**: 🟡 待讨论/待实现
 **审核视角**: 资深使用者（架构师、技术负责人、高级开发工程师）
+**归位历史**: 原存放于 `dev/V3.0/archived/`（命名/位置错误），2026-04-26 由 V3.x Comprehensive Review B1#010 复审后迁入本目录
 
 ---
 
