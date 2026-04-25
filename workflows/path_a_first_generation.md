@@ -361,7 +361,7 @@ summary:
 
 使用 `tools/py/summary_validator.py` 检查摘要完整性。
 
-**详细规范**: 参见 [reference/SUMMARY_FORMAT_SPEC.md](../reference/SUMMARY_FORMAT_SPEC.md)
+**详细规范**: 参见 [reference/SUMMARY_FORMAT_SPEC.md](../core/SUMMARY_FORMAT_SPEC.md)
 
 ---
 

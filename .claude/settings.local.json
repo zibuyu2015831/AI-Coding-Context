@@ -22,7 +22,14 @@
       "Bash(ls tools/py/*.py)",
       "Bash(ls tools/js/*.js)",
       "Bash(ls -la /Users/zibuyu/code/zibuyu/AI-Coding-Context/tools/py/*.py)",
-      "Bash(ls /Users/zibuyu/code/zibuyu/AI-Coding-Context/tools/py/*.py)"
+      "Bash(ls /Users/zibuyu/code/zibuyu/AI-Coding-Context/tools/py/*.py)",
+      "Bash(grep -E \"\\\\.md$\")",
+      "Bash(sed -n '225,235p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)",
+      "Bash(sed -n '408,418p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)",
+      "Bash(sed -n '535,545p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)",
+      "Bash(sed -n '228,232p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)",
+      "Bash(sed -n '410,415p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)",
+      "Bash(sed -n '537,542p' /Users/zibuyu/code/zibuyu/AI-Coding-Context/quality/HOW_TO_GENERATE_CONTEXTS.md)"
     ]
   }
 }

@@ -88,8 +88,8 @@
 
 ### 入口文档
 
-- [ ] [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) → [审查上下文](./contexts/AI_ENTRY_POINT.md)
-- [ ] [README.md](../README.md) → [审查上下文](./contexts/README.md)
+- [ ] [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) → [审查上下文](../AI_ENTRY_POINT.md)
+- [ ] [README.md](../README.md) → [审查上下文](../README.md)
 
 ### 核心规范文档 (core/)
 

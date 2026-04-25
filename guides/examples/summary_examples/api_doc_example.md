@@ -239,5 +239,5 @@ summary: 定义前端 API 调用的统一接口规范，包括请求封装、错
 
 **相关文档**:
 
-- [SUMMARY_FORMAT_SPEC.md](../SUMMARY_FORMAT_SPEC.md) - 完整格式规范
+- [SUMMARY_FORMAT_SPEC.md](../../../core/SUMMARY_FORMAT_SPEC.md) - 完整格式规范
 - [architecture_doc_example.md](./architecture_doc_example.md) - 架构文档示例

@@ -330,5 +330,5 @@ detail_level: detailed
 
 **相关文档**:
 
-- [SUMMARY_FORMAT_SPEC.md](../SUMMARY_FORMAT_SPEC.md) - 完整格式规范
+- [SUMMARY_FORMAT_SPEC.md](../../../core/SUMMARY_FORMAT_SPEC.md) - 完整格式规范
 - [tool_doc_example.md](./tool_doc_example.md) - 工具文档示例

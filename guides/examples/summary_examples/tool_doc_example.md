@@ -397,5 +397,5 @@ keywords: 工作流 | 增量更新 | 文档维护
 
 **相关文档**:
 
-- [SUMMARY_FORMAT_SPEC.md](../SUMMARY_FORMAT_SPEC.md) - 完整格式规范
+- [SUMMARY_FORMAT_SPEC.md](../../../core/SUMMARY_FORMAT_SPEC.md) - 完整格式规范
 - [workflow_doc_example.md](./workflow_doc_example.md) - 工作流文档示例

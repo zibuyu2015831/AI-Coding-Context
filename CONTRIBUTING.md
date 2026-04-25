@@ -631,7 +631,7 @@ cp ../../templates/microservices_architecture_TEMPLATE.md \
 ````markdown
 # 性能规范
 
-> **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  
+> **上级文档**: [AI_ENTRY_POINT.md](AI_ENTRY_POINT.md)  
 > **版本**: v2.3  
 > **最后更新**: 2025-11-28
 
@@ -922,7 +922,7 @@ lastUpdated: 2025-12-02
 
 3. 保存文件,下次运行生效
 
-**相关文档**: [config/CONFIG_TEMPLATE.md](../../config/CONFIG_TEMPLATE.md)
+**相关文档**: [config/CONFIG_TEMPLATE.md](./config/CONFIG_TEMPLATE.md)
 
 ````
 
@@ -1149,9 +1149,9 @@ Closes #42
 
 ## 🔗 相关文档
 
-- [README.md](../README.md) - 框架概览
-- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - AI 入口文档
-- [core/design_decisions.md](../core/design_decisions.md) - 设计决策记录
+- [README.md](README.md) - 框架概览
+- [AI_ENTRY_POINT.md](AI_ENTRY_POINT.md) - AI 入口文档
+- [core/design_decisions.md](core/design_decisions.md) - 设计决策记录
 
 ---
 
@@ -1239,7 +1239,7 @@ Closes #42
 
 ...
 
-- [ ] [new_workflow.md](../workflows/new_workflow.md) → [审查上下文](./contexts/workflows_new_workflow.md)
+- [ ] [new_workflow.md](./workflows/new_workflow.md) → [审查上下文](./contexts/workflows_new_workflow.md)
 ```
 
 **步骤 4: 质量自检**

@@ -201,5 +201,5 @@ scope: 前端应用架构 (src/)
 
 **相关文档**:
 
-- [SUMMARY_FORMAT_SPEC.md](../SUMMARY_FORMAT_SPEC.md) - 完整格式规范
+- [SUMMARY_FORMAT_SPEC.md](../../../core/SUMMARY_FORMAT_SPEC.md) - 完整格式规范
 - [api_doc_example.md](./api_doc_example.md) - API 文档示例

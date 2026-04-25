@@ -785,7 +785,7 @@ python tools/py/file_reader.py --file "dev_docs/api_layer.md" --offset 42 --limi
 
 - [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - 了解完整生成流程
 - [core/update_triggers.md](../core/update_triggers.md) - 何时需要更新文档
-- [guides/ai_rules_maintenance.md](./ai_rules_maintenance.md) - AI Rules 维护指南
+- [guides/ai_rules_maintenance.md](../guides/ai_rules_maintenance.md) - AI Rules 维护指南
 - [workflows/generation_workflow.md](../workflows/generation_workflow.md) - 完整生成流程
 
 ---
