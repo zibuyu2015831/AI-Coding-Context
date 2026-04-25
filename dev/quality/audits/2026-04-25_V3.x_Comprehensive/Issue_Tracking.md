@@ -19,22 +19,22 @@ verified_at: 2026-04-25
 
 | 严重级别 | 数量 |
 |---|---|
-| 严重 | 1 |
+| 严重 | 2 |
 | 主要 | 11 |
 | 次要 | 14 |
-| 建议 | 7 |
-| **合计** | **33**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6 + B4 新增 6 + B5 新增 6；后续批次将追加） |
+| 建议 | 8 |
+| **合计** | **35**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6 + B4 新增 6 + B5 新增 6 + B6 新增 2；后续批次将追加） |
 
 | 视角分布 | 数量 |
 |---|---|
-| 视角 A（用户） | 11 |
-| 视角 B（完整性） | 17 |
-| 视角 C（dev 卫生） | 5 |
+| 视角 A（用户） | 12 |
+| 视角 B（完整性） | 18 |
+| 视角 C（dev 卫生） | 6 |
 
 | 修复状态 | 数量 |
 |---|---|
 | 🟢 已修复（Phase 0 顺手处理） | 4 |
-| 🔴 待修复 | 29 |
+| 🔴 待修复 | 31 |
 
 ---
 
@@ -2450,12 +2450,242 @@ B5 R4 新用户旅程
 
 ---
 
-## 📈 后续批次将追加的问题段落
+## 问题 ID: AICC-20260425-034
 
-每个批次（B6-B7）执行后将在此追加问题，编号继续：AICC-20260425-034 起。
+- **类型**: 设计问题（V3.0 强制规则未自指落地）
+- **严重级别**: 严重
+- **优先级**: 高
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 012-强制文档摘要机制（V3.0 P0 已完成）
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+V3.0-012-强制文档摘要机制声称"已完成"（PROGRESS.md L88 ✅），核心承诺是"所有生成的文档（Artifacts），**必须**在开头包含标准的 YAML Frontmatter 摘要"（path_a L337-L338）。但 B6 批量扫描显示，AICC 框架自身**未自指落地**该规则：
+
+**Public 层 frontmatter 合规率**（138 个 .md 中仅 20 个有 frontmatter）：
+
+| 目录 | 含 frontmatter | 总数 | 合规率 |
+|---|:-:|:-:|:-:|
+| 顶层入口 | 0 | 3 | **0%** ❌ |
+| `core/` | 14 | 21 | 66% |
+| `workflows/` | 1 | 26 | **3%** ❌ |
+| `guides/` | 0 | 15 | **0%** ❌ |
+| `agents/` | 0 | 59 | **0%** ❌ |
+| `config/` | 0 | 3 | **0%** ❌ |
+| `templates/` | 5 | 29 | 17% |
+| **总计** | **20** | **138** | **14%** |
+
+**dev/ 层对照**：
+
+- `dev/V3.0/`: 0 / 60 (**0%**)
+- `dev/quality/`: 5 / 17 (29%)
+
+**最关键的失败点**：
+
+- `AI_ENTRY_POINT.md` ❌（AI 唯一入口，应作为 frontmatter 首例）
+- `README.md` ❌（人类入口）
+- `CONTRIBUTING.md` ❌
+- `core/SUMMARY_FORMAT_SPEC.md` —— **规范本身未自带 frontmatter**
+
+这是 R5（自指一致性）的核心崩塌：**框架强制其他人遵守的规则，自己未遵守**。dogfood 缺失。
+
+### 影响范围
+
+- 012-强制文档摘要的"已完成"声明实际为虚标（实体存在但效果为零）
+- 用户复制框架后，看到框架自身大量文档无 frontmatter，会困惑"这是真的强制吗"
+- 智能文档推荐（014）、自动关联检测（018 commit-guided）依赖 frontmatter，框架自身不可被这些机制使用
+- AI 检索框架文档时无法利用 summary 节省 token —— 与 V3.0 "节省 Token 30-50%"承诺直接冲突
+- 与 AICC-20260425-028 / 029 / 031 等用户旅程问题叠加，构成"框架对自己不严格"的整体印象
+
+### 主要文件路径
+
+- 全部缺 frontmatter 的 138 - 20 = 118 个 .md 文件
+- 关键优先级：
+  - `AI_ENTRY_POINT.md`、`README.md`、`CONTRIBUTING.md`
+  - `core/SUMMARY_FORMAT_SPEC.md`、`core/framework_spec.md` 等 7 个 core/ 缺失
+  - `workflows/path_a-d / commit_guided / git_safety / doc_error_fix` 等 25 个 workflows
+  - `agents/runtime/*.md`、`agents/workflows/*.md` 等 59 个 agents
+  - `guides/*.md` 全部 15 个
+
+### 相关文件路径
+
+- `core/SUMMARY_FORMAT_SPEC.md`（规范源，应以身作则）
+- `tools/py/summary_validator.py`（合规检查工具）
+- `tools/py/summary_extractor.py`（自动提取，可用于批量补全）
+- `dev/V3.0/confirmed/012-mandatory-doc-summary/`（设计文档）
+
+### 具体位置
+
+- 全仓库 .md 文件，按上表分目录分布
+
+### 复查方法（验证修复）
+
+```bash
+# 1. Public 层合规率应 ≥ 95%
+total=0; with_fm=0
+for f in $(find AI_ENTRY_POINT.md README.md CONTRIBUTING.md core/ workflows/ guides/ templates/ agents/ config/ -name '*.md'); do
+  [[ "$f" == *_TEMPLATE* ]] && continue
+  total=$((total+1))
+  head -1 "$f" 2>/dev/null | grep -q '^---$' && with_fm=$((with_fm+1))
+done
+echo "Public 合规率: $(( with_fm * 100 / total ))%"
+# 修复后预期：≥ 95%
+
+# 2. 顶层入口必须 100% 合规
+for f in AI_ENTRY_POINT.md README.md CONTRIBUTING.md core/SUMMARY_FORMAT_SPEC.md; do
+  head -1 "$f" 2>/dev/null | grep -q '^---$' && echo "✅ $f" || echo "❌ $f"
+done
+
+# 3. summary_validator 批量验证
+python tools/py/summary_validator.py --path . --recursive 2>&1 | tail -10
+
+# 4. 各目录合规率
+for dir in core workflows guides templates agents config; do
+  total=$(find $dir -name '*.md' ! -name '*_TEMPLATE*' | wc -l)
+  with_fm=$(for f in $(find $dir -name '*.md' ! -name '*_TEMPLATE*'); do head -1 "$f" 2>/dev/null | grep -q '^---$' && echo 1; done | wc -l)
+  printf "%-15s %3d / %3d (%d%%)\n" "$dir" "$with_fm" "$total" "$(( with_fm * 100 / total ))"
+done
+```
+
+### 建议修复方案
+
+**分阶段批量补全**：
+
+- **P0（紧急，1 周内）**：补全顶层 3 个入口 + core/ 7 个核心规范 + SUMMARY_FORMAT_SPEC（自带示例）= 10 个
+- **P1（短期，2 周内）**：补全 workflows/ 25 个 + guides/ 15 个 = 40 个
+- **P2（中期，1 月内）**：补全 agents/ 59 个 + templates/ 24 个 + config/ 3 个 = 86 个
+
+**自动化方案**：
+
+- 用 `tools/py/summary_extractor.py` 从已有内容提取草稿摘要
+- 人工审校后批量写入
+- 加入 pre-commit hook 阻止无 frontmatter 的新 .md 提交
+
+**长期防御**：
+
+- 在 CI 中加入 `summary_validator` 必须通过的 gate
+- `core/SUMMARY_FORMAT_SPEC.md` 自身必须含示范级 frontmatter
+
+### 审查阶段
+
+B6 批量合规扫描
 
 ---
 
-**版本**：v1.5
+## 问题 ID: AICC-20260425-035
+
+- **类型**: 文档问题（工具头部 docstring 不规范）
+- **严重级别**: 建议
+- **优先级**: 低
+- **归属视角**: C（dev 卫生）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`tools/js/aac_validator.js` 头部缺规范的 docstring 注释。前 10 行结构：
+
+```js
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+// Note: Normally we would use a real yaml parser 'js-yaml' through require,
+// but for zero-dependency standard, we'll do a simple naive text regex parser
+// specifically tuned for the constraints format in ADRs.
+
+function parseArgs() {
+    ...
+```
+
+虽 L4-L6 有内联注释说明"为零依赖红线自实现 yaml parser"（这是 V3.0 设计决策的良好证据），但缺少标准 docstring 块（用法、参数、输出示例等）。
+
+对照：
+
+- `tools/py/*.py` 全部 33 个文件均有完整 docstring（已验证 ✅）
+- `tools/js/*.js` 主脚本 33 个中仅此 1 个缺规范 docstring（合规率 32/33 = 97%）
+
+### 影响范围
+
+- 双脚本对称的"形式对称"满足，但"质量对称"略有偏差
+- aac_validator.js 用户读不到标准化用法说明
+- V3.0 工具规范（"工具脚本头部需有 docstring + 用法说明"，见 quality/README.md tools/ 扫描项 L252）违反 1 处
+
+### 主要文件路径
+
+- `tools/js/aac_validator.js`
+
+### 相关文件路径
+
+- `tools/py/aac_validator.py`（可作为 docstring 模板）
+- `dev/quality/README.md` L246-L253（工具合规扫描项定义）
+
+### 具体位置
+
+- `tools/js/aac_validator.js` L1-L10
+
+### 复查方法（验证修复）
+
+```bash
+# 1. JS 主脚本头部 docstring 100% 合规
+total=0; missing=0
+for f in tools/js/*.js; do
+  [[ "$f" == *.test.js ]] && continue
+  total=$((total+1))
+  if ! head -3 "$f" | grep -qE '^/\*|^//|^/\*\*'; then
+    echo "MISSING: $f"
+    missing=$((missing+1))
+  fi
+done
+echo "JS 主脚本头部 docstring: $(( (total-missing) * 100 / total ))%"
+# 修复后预期：100%
+
+# 2. aac_validator.js 应有完整 JSDoc 头部
+head -20 tools/js/aac_validator.js | grep -cE '^/\*\*|^ \*'
+# 修复后预期：≥ 5（一个完整 JSDoc 块）
+```
+
+### 建议修复方案
+
+- 参考 `tools/py/aac_validator.py` 头部 docstring 内容
+- 在 `tools/js/aac_validator.js` L1（shebang 之后）添加 JSDoc 块：
+
+```js
+#!/usr/bin/env node
+/**
+ * aac_validator.js - 架构断言验证工具（004-ADR 系统）
+ *
+ * 用途：验证代码是否违背 ADR 中声明的架构约束
+ *
+ * 使用：
+ *   node tools/js/aac_validator.js [--path PATH] [--adr ADR_DIR]
+ *
+ * 参数：
+ *   --path PATH   待验证的代码路径
+ *   --adr DIR     ADR 目录（默认 dev/architecture/decisions/）
+ *
+ * 输出：JSON 格式的违规清单
+ *
+ * 零依赖：自实现 YAML 解析（不引入 js-yaml）
+ */
+const fs = require('fs');
+const path = require('path');
+...
+```
+
+### 审查阶段
+
+B6 批量合规扫描
+
+---
+
+## 📈 后续批次将追加的问题段落
+
+B7 执行后将在此追加（如有），编号继续：AICC-20260425-036 起。
+
+---
+
+**版本**：v1.6
 **创建日期**：2026-04-25
-**最后更新**：2026-04-25（B5 完成；新增 028-033，含 1 项严重级别 quick_start.md 结构错乱）
+**最后更新**：2026-04-25（B6 完成；新增 034 严重 + 035 建议；累计 35 项 Issue）
