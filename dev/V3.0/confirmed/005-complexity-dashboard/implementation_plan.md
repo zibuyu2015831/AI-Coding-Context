@@ -106,17 +106,19 @@ dev_docs/complexity/
 
 ---
 
-### Phase 4: 高级功能优化
+### Phase 4: 高级功能优化（设计阶段，未实施）
+
+**状态**：🔜 **未实施** — 设计完整规划，但**不在 005 P1 范围内**。如需推进，应作为独立优化点立项（候选条目登记于 `dev/V3.0/PROGRESS.md` "V3.0+ 后期增益"段）。
 
 **目标**：增强系统功能，提供更深度的复杂度分析。
 
-#### [NEW] `tools/py/architecture_analyzer.py`
+#### [PLANNED] `tools/py/architecture_analyzer.py`（待实施）
 **功能**：
 1. **领域边界分析**：基于目录结构和代码内容识别领域边界
 2. **架构腐化检测**：检测跨领域耦合和架构边界侵蚀
 3. **技术债评估**：综合评分系统，量化技术债严重程度
 
-#### [NEW] `tools/py/trend_analyzer.py`
+#### [PLANNED] `tools/py/trend_analyzer.py`（待实施）
 **功能**：
 1. **历史趋势分析**：对比不同时间段的复杂度变化
 2. **预测模型**：基于历史数据预测未来复杂度增长

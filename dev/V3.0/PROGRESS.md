@@ -310,6 +310,24 @@ P2: 约 8 周 (010 进行中)
 
 ---
 
+### 候选优化点（待立项）
+
+> 来源：B4#026 复审 — 005 implementation_plan.md Phase 4 已完整设计但**未实施**，不属 005 P1 范围。如需推进，应作为独立优化点立项。
+
+- **架构分析工具**（`tools/py/architecture_analyzer.py` + `.js` 镜像）⚪
+  - 设计来源：`dev/V3.0/confirmed/005-complexity-dashboard/implementation_plan.md` Phase 4
+  - 能力：领域边界分析 / 架构腐化检测 / 技术债评估
+  - 候选编号：`020 architecture-analyzer`（未立项）
+
+- **趋势分析工具**（`tools/py/trend_analyzer.py` + `.js` 镜像）⚪
+  - 设计来源：`dev/V3.0/confirmed/005-complexity-dashboard/implementation_plan.md` Phase 4
+  - 能力：历史趋势分析 / 预测模型 / 优化建议
+  - 候选编号：`021 trend-analyzer`（未立项）
+
+**纳入说明**：以上两条为路线图候选，尚未启动；立项时请按 V3.0+ 增益项模式先在 confirmed/ 创建档案再正式登记。
+
+---
+
 ## 🔗 相关链接
 
 - [V3.0 总览](./README.md)

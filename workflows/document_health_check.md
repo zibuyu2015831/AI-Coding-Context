@@ -414,14 +414,14 @@ total_deduct = min(total_deduct, 5)
 **检查方法**:
 
 ```bash
-# 1. 自动检测文档谬误
-python tools/py/complexity_scanner.py --path . --check-doc-errors
+# 1. 自动检测文档谬误（基于 011 文档谬误修复工具链）
+python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md" --strategy all
 
 # 2. 检测 API 文档与代码一致性
 python tools/py/batch_fix_manager.py --generate --pattern "getUserInfo" --replacement "fetchUserProfile" --preview
 
-# 3. 检测语义关联文档的一致性
-python tools/py/doc_dependency_tracer.py --doc "dev_docs/api_layer.md" --strategy all
+# 3. 验证 frontmatter 摘要合规（V3.0-012 强制摘要机制）
+python tools/py/summary_validator.py --file "dev_docs/api_layer.md" --strict
 ```
 
 **输出示例**:

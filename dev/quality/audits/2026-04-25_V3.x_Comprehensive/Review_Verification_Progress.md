@@ -35,7 +35,7 @@ verified_at: 2026-04-26
 | **B1** | 命名一致性 + 路径/边界 | 016, 029, 032, 002, 003, 022, 010 | 7 | ✅ 已完成 |
 | **B2** | 文档漂移 + SSOT | 001, 011, 012, 014, 015, 013, 018, 023 | 8 | ✅ 已完成（复审 + 修复） |
 | **B3** | dogfood 自指 + 合规扫描 | 034, 027, 024, 025, 035, 021 | 6 | ✅ 已完成（复审） |
-| **B4** | 实体缺失 + 工作流闭环 | 017, 020, 026, 019 | 4 | ⏳ 待启动 |
+| **B4** | 实体缺失 + 工作流闭环 | 017, 020, 026, 019 | 4 | ✅ 已完成（复审；019 已由 B3#027 同步关闭） |
 | **B5** | 用户旅程 + 已修复回放 + 卫生 | 028, 030, 031, 033, 004, 005, 006, 007, 008, 009 | 10 | ⏳ 待启动 |
 
 **状态图例**：⏳ 待启动 / 🔵 进行中 / ✅ 已完成
@@ -73,16 +73,16 @@ verified_at: 2026-04-26
 | 014 | 同一文档自相矛盾 | 建议 | B | B2 | ✅ 真实 | ✅ 准确 | ✅ 基本通过（措辞优化） | B2#014 ✅ 已修复 |
 | 015 | 已完成但未登记（019） | 建议 | B+C | B2 | ✅ 真实 | ⚠️ 实体描述错误 | 🔴 重大缺陷已重写 | B2#015 ✅ 已修复 |
 | 016 | AI_RULES.md 大小写不一致 | 主要 | A+B | B1 | ✅ 真实 | ⚠️ 漏报 .kiro/real_case 中 lowercase | 🟡 需补充 | B1#016 ✅ 已修复 |
-| 017 | doc_health_checker 工具实体缺失 | 主要 | A+B | B4 | ⏳ | - | - | - |
+| 017 | doc_health_checker 工具实体缺失 | 主要 | A+B | B4 | ✅ 真实 | ⚠️ 漏报严重（11 处实际 vs 6 处列出） | 🔴 重大缺陷已重写（hybrid orchestrator 模式 + 分阶段 P0/P1/P2） | B4#017 🟢 已修复（双脚本一次到位 P0+P1+P2） |
 | 018 | 路径假设错误 | 次要 | B | B2 | ✅ 真实 | ✅ 准确 | 🟡 需补充（"两层修复"思路） | B2#018 ✅ 已修复 |
-| 019 | 端到端工作流缺失 | 主要 | A+B | B4 | ⏳ | - | - | - |
-| 020 | complexity --check-doc-errors 参数不存在 | 次要 | A+B | B4 | ⏳ | - | - | - |
+| 019 | 端到端工作流缺失 | 主要 | A+B | B4 | ✅ 真实 | ✅ 准确 | 🟡 已闭环登记（B3#027 同步关闭） | B4#019 🟢 已修复（B3 同步） |
+| 020 | complexity --check-doc-errors 参数不存在 | 次要 | A+B | B4 | ✅ 真实 | ✅ 准确 | ✅ 通过（推荐选项 B：替换为 doc_dependency_tracer） | B4#020 🟢 已修复 |
 | 021 | 默认配置路径假设需明示 | 建议 | B+C | B3 | ✅ 真实 | ✅ 准确 | 🟡 需补充（推荐 fallback 选 B 覆盖 A + 双脚本对称） | B3#021 ✅ 已修复 |
 | 022 | 目录命名规范不一致 | 主要 | B+C | B1 | ✅ 真实 | ✅ 准确 | ✅ 通过 | B1#022 ✅ 已修复 |
 | 023 | README 索引覆盖率缺口 | 次要 | B+C | B2 | ✅ 真实 | ⚠️ language_specific 数字 5 实为 6 | 🟡 需补充 | B2#023 ✅ 已修复 |
 | 024 | SOP 过度承诺 | 次要 | B | B3 | ✅ 真实 | ✅ 准确 | ✅ 通过（推荐选项 A，删除 2 项 + 重排序号 + 对齐 README） | B3#024 ✅ 已修复 |
 | 025 | 措辞与策略不一致 | 建议 | B | B3 | ✅ 真实 | ✅ 准确 | ✅ 通过（重写 L44-L58，对齐 v2.0 三级口径） | B3#025 ✅ 已修复 |
-| 026 | architecture_analyzer 工具不存在 | 次要 | B+C | B4 | ⏳ | - | - | - |
+| 026 | architecture_analyzer 工具不存在 | 次要 | B+C | B4 | ✅ 真实 | ⚠️ 漏报 trend_analyzer 同源 + 源路径未对齐 B1#022 | 🔴 重大缺陷已重写（推荐选项 B：文档诚实化 + Phase 4 升级为独立优化点） | B4#026 🟢 已修复（含 PROGRESS 路线图登记） |
 | 027 | 005 walkthrough 未提升至 Public | 建议 | A+B | B3 | ✅ 真实 | ⚠️ 源路径未对齐 B1#022 重命名 | 🟡 需补充（路径对齐 + frontmatter 联动 + 工具索引细化） | B3#027 ✅ 已修复（同步关闭 019） |
 | 028 | quick_start 结构错乱+步骤跳号 | 严重 | A | B5 | ⏳ | - | - | - |
 | 029 | AI_RULES.md 路径多版本不一致 | 主要 | A+B | B1 | ✅ 真实 | ⚠️ 误称权威源 + 错估 majority | 🔴 重大缺陷已重写 | B1#029 ✅ 已修复 |
@@ -203,9 +203,50 @@ verified_at: 2026-04-26
   - **回归通过**：B3 全 6 项目标项全部 PASS（21 双脚本直跑、24/25 措辞与结构、027 三处索引 + frontmatter、034 P0 strict 校验、35 JSDoc 100% 合规）
 
 ### B4（实体缺失 + 工作流闭环）
-- 启动：—
-- 完成：—
-- 关键发现：—
+- 启动：2026-04-26
+- 复审完成：2026-04-26
+- **修复完成：2026-04-26** ✅（4 项 🟢 全闭环 — 019 由 B3#027 同步关闭 + 020/026/017 本批次完成）
+- **关键发现**：
+  1. **017 漏报严重**：Issue 列 6 处引用，实际仓库 **11 处**（含 maintenance_workflow.md L477/L480/L483/L490 的 `--mode quick/standard/deep` 4 处 + generation_workflow.md L1318 通用引用）。修复时易遗漏导致再次"修了一半"。
+  2. **017 重写为 hybrid orchestrator 模式**：原方案 A "实施完整双脚本" ~1200-1600 LOC 新代码成本过高；选项 B"删除引用"破坏 11 处用户感知。重写为薄编排层 + delegate 现有工具（doc_dependency_tracer / summary_validator）+ 仅补差缺能力（代码示例/依赖版本检查），代码量 ~500-600 LOC（原 A 的 1/3），分阶段 P0/P1/P2 推进。
+  3. **019 实质已闭环**：B3#027 创建 workflows/complexity_alert_workflow.md + AI_ENTRY_POINT 索引 + path_d @complexity 已完整覆盖原 019 4 项要求。本批次仅作正式登记，无需重复修复。
+  4. **020 单行替换最简**：L418 phantom 命令替换为指向 011 文档谬误工具链的真实命令（doc_dependency_tracer）。修复后 L418-L424 段从"1 phantom + 2 真"变成"3 真实工具链"。
+  5. **026 漏报 + Phase 4 整体未实施**：Issue 仅指 architecture_analyzer 虚标，实际 005 implementation_plan.md L113-L123 Phase 4 整段（architecture_analyzer + trend_analyzer 共 2 工具）**全部未实施**。trend_analyzer 同样不存在但 Issue 漏报。
+  6. **026 重写为文档诚实化（选项 B 覆盖 A）**：原方案 A "补全双脚本" 实际成本是 2 个独立工具（每个 ~600-1000 LOC × 2 = 总计 2400-4000 LOC），属新优化点工作量。026 应仅修文档：把 walkthrough 的"实施产出"段中相关行移到"Phase 4 待实施"段；把 implementation_plan Phase 4 标题加注"未实施"；建议 PROGRESS.md V3.0+ 段追加 architecture-analyzer / trend-analyzer 候选条目作为路线图。
+  7. **026 源路径过期**：Issue 引用 `005-complexity-dashboard.md/walkthrough.md` 已被 B1#022 重命名为 `005-complexity-dashboard/walkthrough.md`。与 027 同样问题（B1 修复连锁第二例）。
+  8. **横切洞察 1：实施 - 文档 gap 集群**。017 + 020 + 026 + B2#015 共同显示 AICC 在 V3.0 早期 P0/P1 推进时存在"先承诺再实施"模式。建议在 quality 体系中加入"工具实体核查"作为标准 verification 步骤。
+  9. **横切洞察 2：B1#022 重命名连锁第二例**。026 与 027（B3）同样面临"前批次修复使 Issue 描述路径过期"，强化"修复链问题"为系统性发现章节独立专题。
+  10. **横切洞察 3：编排层模式作为框架扩展范式**。017 hybrid orchestrator + delegate 现有工具的模式比"重新实现"成本低 60%+；建议登记到 core/design_decisions.md 作为框架级扩展规范。
+  11. **横切洞察 4：019 闭环验证证明 B3#027 杠杆点价值**。单点修复 027 同时关闭 019、间接强化 023 语境一致性，符合架构师"杠杆点优先"判断。
+
+- **修复优先级与执行顺序**（架构师推荐）：
+  1. **019**（仅状态更新登记）+ **020**（L418 单行替换）+ **026**（3 处文档编辑）：可同批次最简执行
+  2. **017**（实施 doc_health_checker 编排层）：分阶段 P0/P1/P2 推进
+     - P0: 编排层骨架 + `--check-file-paths`（复用）+ `--mode quick` （~200 LOC × 2）
+     - P1: + `--check-code-samples` + `--mode standard` + `--full-check`（累计 ~350 LOC × 2）
+     - P2: + `--check-dependencies` + `--mode deep` + `--file FILE`（完整 ~500 LOC × 2）
+
+- **修复成果汇总**（2026-04-26）：
+  - **019**：状态登记 — Issue_Tracking.md 标 🟢 已修复（B3#027 同步关闭，无重复修复）
+  - **020**：`workflows/document_health_check.md` L418 phantom `--check-doc-errors` 替换为 `doc_dependency_tracer.py --strategy all`；同段 L424 同步替换为 `summary_validator.py --strict`（避免重复）；段落从"1 phantom + 2 真"变为"3 真实工具链"。
+  - **026**：3 处文档诚实化 + PROGRESS 路线图登记
+    - `005-complexity-dashboard/walkthrough.md` L13-L21 重写为"Phase 1-3 已实施 ✅ + Phase 4 待实施 🔜"二级结构
+    - `005-complexity-dashboard/implementation_plan.md` Phase 4 标题加注"（设计阶段，未实施）"+ [NEW] 标记改为 [PLANNED]
+    - `dev/V3.0/PROGRESS.md` V3.0+ 段追加"候选优化点（待立项）"小节：登记 architecture-analyzer (020 候选) + trend-analyzer (021 候选)，作为可见路线图
+  - **017**：hybrid orchestrator 双脚本对称实施（一次到位 P0+P1+P2 全部能力）
+    - 新建 `tools/py/doc_health_checker.py` (~280 LOC) + `tools/js/doc_health_checker.js` (~270 LOC)
+    - 完整 8 参数：`--file` / `--mode quick|standard|deep` / `--check-file-paths` / `--check-code-samples` / `--check-dependencies` / `--full-check` / `--doc-dir` / `--output`
+    - **Hybrid 模式**：subprocess delegate `doc_dependency_tracer.py` + `summary_validator.py`；新增最小检查仅 code_samples（提取代码块 + Python compile / JS Function 构造 / bash 危险命令检测）+ dependencies（package.json + requirements.txt 对照）
+    - **零依赖红线**：py 仅 stdlib（argparse/json/os/re/subprocess/sys/pathlib）；js 仅 fs/path/child_process
+    - **dogfood fallback**（与 B3#021 同源）：dev_docs/ → dev/ → 当前目录三层探测
+    - **AI_ENTRY_POINT.md** 工具表追加 2 行（py + js 镜像）
+    - 11 处引用全部 PASS（commit_guided_update L372 + maintenance_workflow L176/179/202/224/420/477/480/483/490 + generation_workflow L1318）
+
+- **回归通过**：B4 全 4 项目标项全部 PASS：
+  - 020：`grep 'check-doc-errors'` 返回空 ✅
+  - 026：walkthrough + implementation_plan 含"Phase 4 待实施 / 未实施" ✅；PROGRESS V3.0+ 段含 architecture-analyzer + trend-analyzer 2 处 ✅
+  - 017：双脚本存在 + 8 参数解析 + 11 处引用可执行 + 零依赖 ✅
+  - 019：B3#027 已闭环（workflows/complexity_alert_workflow.md 存在 + AI_ENTRY_POINT 索引 5 行 + path_d @complexity 章节）✅
 
 ### B5（用户旅程 + 已修复回放 + 卫生）
 - 启动：—

@@ -1137,7 +1137,7 @@ B3 R1 工作流端到端闭环（剧本 1）
 - **优先级**: 高
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B4 修复 — hybrid orchestrator 双脚本实施：tools/py/doc_health_checker.py + tools/js/doc_health_checker.js；delegate doc_dependency_tracer + summary_validator + 补 code-samples / dependencies 最小检查；零依赖；含 dev_docs→dev fallback；11 处引用全 PASS，2026-04-26）
 
 ### 问题描述
 
@@ -1299,7 +1299,7 @@ B3 R1 工作流端到端闭环（剧本 3）
 - **优先级**: 高
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 005 复杂度仪表盘
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B3#027 同步关闭 — workflows/complexity_alert_workflow.md 已建 + AI_ENTRY_POINT 工具索引 5 行 + path_d @complexity 章节，2026-04-26）
 
 ### 问题描述
 
@@ -1385,7 +1385,7 @@ B3 R1 工作流端到端闭环（剧本 4）
 - **优先级**: 中
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B4 修复 — workflows/document_health_check.md L418 phantom 命令替换为 doc_dependency_tracer + summary_validator 真实命令，2026-04-26）
 
 ### 问题描述
 
@@ -1834,7 +1834,7 @@ B4 R5 自指审查（README 与 contexts 现状对齐）
 - **优先级**: 中
 - **归属视角**: B（完整性）+ C（dev 卫生）
 - **关联任务/ADR**: 005-复杂度仪表盘
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B4 修复 — 文档诚实化：005 walkthrough + implementation_plan 标注 Phase 4 未实施；PROGRESS.md V3.0+ 段追加 architecture-analyzer + trend-analyzer 候选条目作为路线图，2026-04-26）
 
 ### 问题描述
 

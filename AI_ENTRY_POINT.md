@@ -352,6 +352,8 @@ git add ai_coding_context/
 | 复杂度报告     | `tools/py/report_generator.py`        | 渲染复杂度 Markdown / HTML 报告（005 优化点）|
 | 复杂度报告     | `tools/js/report_generator.js`        | Node.js 镜像（005 优化点）|
 | 复杂度通知     | `tools/py/notifier.py`                | Slack / Email 阈值告警（005 优化点）|
+| 文档健康检查   | `tools/py/doc_health_checker.py`      | 文档健康编排：链接 / 代码示例 / 依赖 / frontmatter（B4#017）|
+| 文档健康检查   | `tools/js/doc_health_checker.js`      | Node.js 镜像（B4#017）|
 
 
 ### 框架边界术语

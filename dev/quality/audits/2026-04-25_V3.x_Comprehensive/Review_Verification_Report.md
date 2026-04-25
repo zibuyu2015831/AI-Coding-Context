@@ -888,7 +888,274 @@ echo "JS 主脚本头部 docstring: $(( (total-missing) * 100 / total ))%"
 
 ## 🔹 Batch 4：实体缺失 + 工作流闭环
 
-> 待启动。
+> **批次目标**：核查 doc_health_checker（017）、端到端工作流（019）、--check-doc-errors phantom 参数（020）、architecture_analyzer 虚标（026）的真实性与方案可行性。
+>
+> **完成日期**：2026-04-26
+>
+> **批次结论**：
+> - 4 项 Issue 全部 **真实存在**
+> - 描述完全准确：1 项（020）
+> - 描述有偏差需补充：3 项（017 漏报严重 / 026 漏报 + 路径未对齐 / 019 实质已闭环）
+> - 修复方案处置：✅ 通过 1 项（020） / 🟡 需补充 1 项（019 已闭环登记） / 🔴 重大缺陷需重写 2 项（017 / 026）
+> - **关键洞察**：017 与 026 暴露同一根因 —"文档承诺超前实施"；与 015（已完成未登记）反向 — 这是 R5（自指一致性）的另一面
+> - **集群关系**：017+020+026 共同构成"工具实体缺失集群"；建议合并治理而非单点修复
+
+---
+
+### AICC-20260425-017 — doc_health_checker 工具实体缺失（双脚本均无）
+
+- **真实性**：✅ 真实存在（主要）
+- **描述准确性**：⚠️ **漏报严重** — Issue 列了 6 处引用，**实际仓库共 11 处**：
+  - `workflows/commit_guided_update.md:372` ✅（含 `--file` 参数）
+  - `workflows/maintenance_workflow.md:176, 179, 202, 224, 420` — 5 处（已列）
+  - **`workflows/maintenance_workflow.md:477, 480, 483, 490`** — 4 处 `--mode quick/standard/deep` **未列**
+  - **`workflows/generation_workflow.md:1318`** — 通用引用 **未列**
+- **关键证据**：
+  - `tools/py/doc_health_checker.py` + `tools/js/doc_health_checker.js` 均不存在
+  - 实际命令矩阵（11 处提取）：
+    - `--file FILE`（commit_guided 单文档检查）
+    - `--check-code-samples`（代码示例有效性）
+    - `--check-file-paths`（文件路径准确性）
+    - `--check-dependencies`（依赖版本）
+    - `--full-check`（综合）
+    - `--mode quick`（仅链接 + 摘要）
+    - `--mode standard`（+ 代码示例）
+    - `--mode deep`（+ 依赖 + 架构图）
+  - 现有重叠工具盘点：
+    - `tools/py/doc_dependency_tracer.py` — 已实现链接 / 文件路径追踪
+    - `tools/py/summary_validator.py` — frontmatter 校验
+    - `tools/py/doc_fix_executor.py` + `batch_fix_manager.py` — 修复执行
+    - **空白能力**：代码示例语法有效性、依赖版本对照
+- **方案评估**：🔴 **重大缺陷需重写**
+  - ❌ 原方案选项 A（"实施完整 doc_health_checker 双脚本"）成本过高（每端 ~600-800 LOC × 2 = 1200-1600 LOC 新代码）
+  - ❌ 原方案选项 B（"删除引用，合并到 complexity_scanner 或现有工具"）会破坏 11 处文档语义（用户感知一致性受损）
+  - ⚠️ 原方案漏报 5 处引用 + 4 个 mode 参数 — 修复时易遗漏导致再次"修了一半"
+  - ❌ 都没考虑 V3.0 双脚本对称红线 + 零依赖红线
+- **架构师重写方案**（Hybrid Orchestrator 模式）：
+
+  **核心思路**：实施 `doc_health_checker.py/.js` 作为**薄编排层**（thin orchestrator），不重新实现已存在的能力，而是 delegate 到现有工具 + 仅补差缺能力。
+
+  **能力映射表**（编排层职责）：
+
+  | 检查项 | 实施方式 | 复用 / 新增 |
+  |---|---|---|
+  | `--check-file-paths` | 调用 `doc_dependency_tracer.py --doc <path> --strategy all` | **复用** |
+  | `--check-code-samples` | 提取 \`\`\` 代码块 + 按语言执行 `python -c` / `node -e` 等基础语法检查 | **新增（最小）** ~80 LOC |
+  | `--check-dependencies` | 解析 package.json / requirements.txt + 比对文档中"版本号"提及 | **新增（最小）** ~100 LOC |
+  | `--full-check` | 组合上述三者 | **编排** |
+  | `--mode quick` | 仅 `--check-file-paths` | **编排** |
+  | `--mode standard` | quick + `--check-code-samples` | **编排** |
+  | `--mode deep` | standard + `--check-dependencies` + 调用 `summary_validator.py --dir --strict --recursive` | **编排** |
+  | `--file FILE` | 单文件子集（链接检查 + 代码示例 + frontmatter） | **编排** |
+
+  **代码量预估**：编排层 ~250-300 LOC × 2 (py/js) = ~500-600 LOC（仅原方案 A 的 1/3）
+
+  **零依赖红线**：仅使用 subprocess 调用其他工具脚本 + 标准库 json/argparse；不引入 pyyaml / cheerio / jsdom
+
+  **修复点（双脚本对称）**：
+  1. **新建** `tools/py/doc_health_checker.py`（编排层 + 2 个新增最小检查）
+  2. **新建** `tools/js/doc_health_checker.js`（镜像）
+  3. 头部带规范 docstring（与 035 同标准）
+  4. **登记**：`AI_ENTRY_POINT.md` 工具表追加 2 行；`tools/README.md` 补条目
+  5. **不需要改** 11 处引用（保留原命令格式）— 用户感知零影响
+
+  **实施分阶段**（避免 P0 修复一口吃成胖子）：
+  - **P0**：新建编排层骨架 + `--check-file-paths`（复用） + `--mode quick`（最常用）— 200 LOC × 2
+  - **P1**：补 `--check-code-samples` + `--mode standard` + `--full-check` — 累计 350 LOC × 2
+  - **P2**：补 `--check-dependencies` + `--mode deep` + `--file FILE` — 完整 500 LOC × 2
+
+  **风险与权衡**：
+  - 编排层依赖现有工具的稳定性（doc_dependency_tracer / summary_validator）
+  - `--check-code-samples` 的语法检查粒度有限（仅 Python/Node 基础执行测试）；架构图准确性按 maintenance_workflow.md L237 已注明"人工审查（暂无自动化工具）"，编排层亦不涉及
+  - 与 020 联动：原"--check-doc-errors" 不在 doc_health_checker 范围（020 应单独走删除路线）
+
+  **同步治理（与 020+026 集群）**：见下方"B4 集群修复策略"。
+
+---
+
+### AICC-20260425-019 — 端到端复杂度告警工作流缺失（已由 B3#027 同步关闭）
+
+- **真实性**：✅ 真实存在（修复前）
+- **描述准确性**：✅ 准确
+- **当前状态**：🟢 **已闭环**（B3#027 修复时同步关闭）
+- **关键证据**（实地核查 — 闭环验证全 PASS）：
+  - `workflows/complexity_alert_workflow.md` 已存在（B3 创建，含完整 frontmatter）
+  - `AI_ENTRY_POINT.md` 含 `complexity_scanner` / `complexity_alert` / `@complexity` 索引共 3 处
+  - `workflows/path_d_specific_tasks.md` 含 `@complex` 命中 3 处（任务索引表 + 章节 + fallback 段）
+  - 端到端剧本可演练：`tools/py/complexity_scanner.py + report_generator.py` 双脚本 fallback 后框架仓库根直跑通过（已含 B3#021 fallback 修复）
+- **方案评估**：✅ **通过**（B3#027 实施已覆盖原方案 4 项要求）
+- **架构师补充**：
+  - **无需重复修复**。本批次仅作正式登记。
+  - **同步动作**：将原 Issue 状态从"待修复"改为"🟢 已修复（B3 同步关闭）"
+  - **建议**：原 Issue 可作为"为何 B3#027 是杠杆点"的引用证据 — 一次修复 027 同时关闭 019、补全 023 索引语境
+
+---
+
+### AICC-20260425-020 — `complexity_scanner --check-doc-errors` 参数 phantom
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 完全准确
+- **关键证据**：
+  - `workflows/document_health_check.md:418` 仍含 `python tools/py/complexity_scanner.py --path . --check-doc-errors`
+  - 实测 `python tools/py/complexity_scanner.py --check-doc-errors` 报错 `unrecognized arguments: --check-doc-errors`
+  - L420-L424 同段已含其他**真实可用**的命令（`batch_fix_manager.py`、`doc_dependency_tracer.py`）— 改造空间充足
+- **方案评估**：✅ **通过**（推荐选项 B：删除 + 替换）
+- **架构师补充**（细化原方案）：
+
+  **修复方式**（最小改动 + 不破坏文档结构）：
+
+  把 L418 单行替换为指向 011 文档谬误工具链的等价命令（实际可执行）：
+
+  ```bash
+  # 1. 自动检测文档谬误（基于 011-文档谬误修复工具链）
+  python tools/py/doc_dependency_tracer.py --doc dev_docs/api_layer.md --strategy all
+  ```
+
+  - 保持 L420（batch_fix_manager 已正确）+ L424（doc_dependency_tracer 已正确）
+  - 替换 L418 后整段是"3 步真实工具链"，而非"1 phantom + 2 真"
+  - 与 #017 修复联动：等 017 编排层完成后，可进一步把 L418 升级为 `python tools/py/doc_health_checker.py --file dev_docs/api_layer.md`（与 commit_guided_update.md L372 同款）
+
+  **回归验证**（修复后）：
+  ```bash
+  grep -n 'check-doc-errors' workflows/document_health_check.md tools/py/complexity_scanner.py
+  # 修复后预期：返回空（两边都无）
+  ```
+
+---
+
+### AICC-20260425-026 — `architecture_analyzer.py` 工具虚标（005 walkthrough Phase 4 未实施）
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：⚠️ **偏差** — 漏报且源路径过期：
+  - **漏报**：`tools/py/trend_analyzer.py` **同样不存在**（005 implementation_plan.md L119 [NEW] 标记），与 architecture_analyzer 同属 005 Phase 4 高级功能优化模块。Issue 仅指出 1 项虚标，实际是 Phase 4 整段（2 项）未实施。
+  - **源路径过期**：Issue 引用 `005-complexity-dashboard.md/walkthrough.md` 已被 B1#022 重命名为 `005-complexity-dashboard/walkthrough.md`（去 .md/ 后缀）。与 027 同样问题。
+- **关键证据**：
+  - `tools/py/architecture_analyzer.py` ❌、`tools/js/architecture_analyzer.js` ❌
+  - `tools/py/trend_analyzer.py` ❌（同属 Phase 4，Issue 漏报）
+  - `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md:17` 仍含 `architecture_analyzer.py - 高级架构分析`
+  - `dev/V3.0/confirmed/005-complexity-dashboard/implementation_plan.md:113-123` 标 Phase 4 `[NEW]`：architecture_analyzer + trend_analyzer 两工具
+  - 005 实际完成度：Phases 1-3 ✅；**Phase 4 ❌ 未启动**（不只是部分缺失，是完整未实施）
+- **方案评估**：🔴 **重大缺陷需重写**
+  - ❌ 原方案选项 A（"补全 architecture_analyzer 双脚本"）低估了 Phase 4 工作量 — 包含两个独立工具（architecture_analyzer + trend_analyzer），每个 ~600-1000 LOC × 2 = 总计 2400-4000 LOC 新代码，不是"P1 完结的最后一里"
+  - ❌ 原方案没识别 trend_analyzer 同样虚标
+  - ❌ 缺少"实施 vs 文档诚实化"的成本对比
+  - ⚠️ 005 优化点已在 PROGRESS.md 标 ✅ — 直接补 Phase 4 会让 005 状态语义更复杂（应是 P1 已完成 + Phase 4 待续）
+- **架构师重写方案**（推荐选项 B：文档诚实化 + 升级为独立优化点）：
+
+  **核心判断**：补全 Phase 4 是新优化点（值 1 个独立 V3.0+ 编号），不是 026 修复范围。026 应仅修文档与现状对齐。
+
+  **修复点**（修文档，不补工具）：
+
+  1. **`dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` L13-L18 修订**：
+     - 把 L17 从"实施产出摘要"段移到新增"📋 Phase 4 待实施"段
+     - 明示：架构分析（architecture_analyzer.py）+ 趋势分析（trend_analyzer.py）属设计意图，未在 005 P1 范围内实施
+     - 改写后段落举例：
+       ```
+       ### 2. 🛠️ 支持工具链 (Dual-Engine: Py/JS)
+       - **扫描工具**: complexity_scanner.py & complexity_scanner.js - 基础数据采集 ✅
+       - **报告生成**: report_generator.py - Markdown/HTML 报告生成 ✅
+       - **通知工具**: notifier.py - Slack/Email 通知 ✅
+
+       ### Phase 4 待实施（不在 005 P1 范围）
+       - **架构分析**: architecture_analyzer.py - 高级架构分析（设计完成，待新优化点立项实施）
+       - **趋势分析**: trend_analyzer.py - 历史趋势 + 预测（设计完成，待新优化点立项实施）
+       ```
+
+  2. **`dev/V3.0/confirmed/005-complexity-dashboard/implementation_plan.md` L109-L123**：
+     - 把 Phase 4 段标题改为 "Phase 4: 高级功能优化（设计阶段，未实施）"
+     - 加注：本 Phase 已完整规划但未在 005 P1 范围实施；如需推进，应作为独立优化点立项
+
+  3. **新建立项条目**（不在 026 修复范围，但此处建议）：
+     - 建议在 `dev/V3.0/PROGRESS.md` "V3.0+ 后期增益" 段追加候选条目：
+       - `020 architecture-analyzer.md`（待立项）
+       - `021 trend-analyzer.md`（待立项）
+     - 这是给后续 user/AI 一个清晰的"未来路线图"入口
+
+  4. **不需要改 PROGRESS.md 的 005 状态**：005 P1 范围（Phases 1-3）实际已完成，状态保持 ✅。仅需在描述中加"P1 已完成 / Phase 4 待新优化点立项"说明。
+
+  **优势 vs 选项 A**：
+  - 修复成本：~3 处文档编辑（vs 选项 A 的 2400+ LOC 新代码）
+  - 历史诚实性：承认设计 - 实施 gap 比虚假补全更可信
+  - 路线图清晰：把 Phase 4 提升为可见的"未来优化点候选"，而不是埋没在 005 walkthrough 里
+
+  **回归验证**：
+  ```bash
+  # 1. walkthrough 把 architecture_analyzer 移出"实施产出"段
+  grep -B 2 -A 2 'architecture_analyzer' dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md
+  # 修复后预期：在"Phase 4 待实施"段，明确标注未实施
+
+  # 2. implementation_plan 标注 Phase 4 未实施
+  grep -nE 'Phase 4.*未实施|Phase 4.*待立项' dev/V3.0/confirmed/005-complexity-dashboard/implementation_plan.md
+  # 修复后预期：≥ 1 处命中
+
+  # 3. PROGRESS.md V3.0+ 段是否含 architecture-analyzer 候选条目（可选）
+  grep -nE 'architecture-analyzer|trend-analyzer' dev/V3.0/PROGRESS.md
+  ```
+
+---
+
+### B4 集群修复策略（架构师建议）
+
+> 017 + 020 + 026 + 015（B2 已修） 共同形成"实施-文档 gap 集群"。本批次治理建议合并思考。
+
+**集群根因**：
+- AICC 框架在 V3.0 早期阶段为快速推进，部分工具被"先文档化、后实施"，但实施未跟上文档
+- 单点修复每个 Issue 不能根除根因；需建立"工具实体一致性 gate"
+
+**修复优先级与执行顺序**（B4 范围内）：
+
+| 序 | Issue | 类型 | 推荐时机 | 阻断关系 |
+|:-:|---|---|---|---|
+| 1 | **019** | 已闭环登记 | 优先：仅状态更新 | 不阻断 |
+| 2 | **020** | 单行替换 | 与 019 同批次（最简） | 不阻断 |
+| 3 | **026** | 文档诚实化（3 处编辑） | 与 020 同批次 | 不阻断 |
+| 4 | **017** | 实施 doc_health_checker 编排层（双脚本 + 工具索引） | **最后**：按分阶段（P0 先骨架） | 短期：阻断 maintenance_workflow 与 commit_guided 真实可用性 |
+
+**集群级长期防御**（建议进入 V3.0+ 后期增益）：
+- 引入 CI gate：每次 commit 检查所有 workflows/*.md 的 `python tools/py/*.py` 命令实际可执行
+- 引入 SSOT 章节（在 B1 新建的 `core/framework_spec.md` 标准产物路径下）登记"已实施工具 vs 设计中工具"清单
+- 与 #034 P1 联动：workflows/ 文件批量补 frontmatter 时同步审视命令真实性
+
+### B4 修复后回归验证清单（一次性脚本）
+
+```bash
+# 017: doc_health_checker 双脚本存在 + 关键参数支持
+test -f tools/py/doc_health_checker.py && test -f tools/js/doc_health_checker.js && echo "✅ 017 双脚本存在"
+python tools/py/doc_health_checker.py --help 2>&1 | grep -cE '\-\-file|\-\-check-code-samples|\-\-check-file-paths|\-\-check-dependencies|\-\-full-check|\-\-mode'
+# P0 阶段后预期：≥ 2（--file + --mode 至少）；P2 完整后预期 ≥ 6
+
+# 017: 11 处引用都能解析（首批至少 --mode quick + --file 可执行）
+python tools/py/doc_health_checker.py --mode quick 2>&1 | head -3
+python tools/py/doc_health_checker.py --file workflows/path_a_first_generation.md 2>&1 | head -3
+
+# 019: 端到端剧本 4 可演练（已由 B3#027 闭环）
+python tools/py/complexity_scanner.py --since "1 day ago" --output /tmp/c.json && \
+python tools/py/report_generator.py --data /tmp/c.json --output /tmp/c.md --format markdown && \
+test -s /tmp/c.md && echo "✅ 019 剧本 4 端到端通过"
+
+# 020: phantom 参数已删除
+grep -n 'check-doc-errors' workflows/document_health_check.md tools/py/complexity_scanner.py
+# 修复后预期：返回空
+
+# 026: walkthrough 已标注 Phase 4 未实施
+grep -nE 'Phase 4.*未实施|Phase 4.*待立项|Phase 4 待实施' dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md
+# 修复后预期：≥ 1 处命中
+
+# 026: PROGRESS.md V3.0+ 段含 Phase 4 候选条目（可选）
+grep -nE 'architecture-analyzer|trend-analyzer' dev/V3.0/PROGRESS.md
+```
+
+### B4 横切洞察
+
+1. **"实施 - 文档" gap 集群**：017 + 020 + 026 + B2 已修 015 共同显示 — AICC 在 V3.0 早期 P0/P1 推进时存在"先承诺再实施"模式。建议在 quality 体系中加入"工具实体核查"作为标准 verification 步骤。
+
+2. **B1#022 重命名连锁第二例**：026 与 027（B3）同样面临"前批次修复使 Issue 描述路径过期"。这强化了 B3 已识别的"修复链问题"模式 — 在最终系统性发现章节应作为独立专题。
+
+3. **Phase 4 未实施识别为"未来优化点"**：026 修复时把 architecture_analyzer + trend_analyzer 升级为 V3.0+ 候选条目，是把"虚标"转化为"路线图清晰度"的范例。可作为后续类似情况的处置模板。
+
+4. **017 编排层模式作为框架扩展范式**：薄编排层 + delegate 现有工具的模式，比"重新实现完整工具"成本低 60%+，且避免了双脚本重复实施。建议把此模式登记到 `core/design_decisions.md` 作为框架级扩展规范。
+
+5. **019 闭环验证证明 B3#027 杠杆点价值**：单点修复 027 同时关闭 019、间接强化 023（语境一致），符合架构师"杠杆点优先"判断。
 
 ---
 

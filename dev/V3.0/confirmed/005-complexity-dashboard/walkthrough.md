@@ -11,10 +11,17 @@
 - **可视化**: `dev_docs/complexity/dashboard/` - HTML 模板和最终页面
 
 ### 2. 🛠️ 支持工具链 (Dual-Engine: Py/JS)
+
+**Phase 1-3 已实施 ✅（005 P1 范围内）**：
 - **扫描工具**: `complexity_scanner.py` & `complexity_scanner.js` - 基础数据采集
-- **报告生成**: `report_generator.py` - Markdown/HTML 报告生成
+- **报告生成**: `report_generator.py` & `report_generator.js` - Markdown/HTML 报告生成
 - **通知工具**: `notifier.py` - Slack/Email 通知
-- **架构分析**: `architecture_analyzer.py` - 高级架构分析
+
+**Phase 4 待实施 🔜（不在 005 P1 范围；建议作为新优化点立项）**：
+- **架构分析**: `architecture_analyzer.py` - 高级架构分析（设计完成，待立项实施）
+- **趋势分析**: `trend_analyzer.py` - 历史趋势 + 预测（设计完成，待立项实施）
+
+> 详见 `implementation_plan.md` Phase 4 段。Phase 4 升级为独立优化点的候选条目登记于 `dev/V3.0/PROGRESS.md` "V3.0+ 后期增益"。
 
 ### 3. 🔄 自动化集成 (Git Hooks)
 - **pre-commit**: 提交前检查复杂度增量
