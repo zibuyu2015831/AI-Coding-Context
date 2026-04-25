@@ -510,24 +510,24 @@ knowledge/
 
 ```bash
 # 1. 克隆此规范到新项目
-cp -r ai_documentation_framework new_project/
+cp -r ai_coding_context new_project/
 
 # 2. 让AI分析项目生成文档
-"请按照 ai_documentation_framework/AI_DOCS_GENERATION_GUIDE.md
+"请按照 ai_coding_context/AI_ENTRY_POINT.md
 分析当前项目并生成完整文档体系"
 
 # 3. 人工审核和优化
-# 4. 删除 ai_documentation_framework（可选）
+# 4. 删除 ai_coding_context（可选）
 ````
 
 ### 场景 2: 已有项目补充文档
 
 ```bash
 # 1. 添加规范到项目
-cp -r ai_documentation_framework existing_project/
+cp -r ai_coding_context existing_project/
 
 # 2. 让AI审查现有文档
-"参考 ai_documentation_framework 规范，审查并优化现有文档"
+"参考 ai_coding_context 规范，审查并优化现有文档"
 
 # 3. 补充缺失的文档和目录
 ```

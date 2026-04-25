@@ -696,7 +696,7 @@ fi
 
 #### ✅ 立即行动 (本周)
 
-1. **创建优化点文档**: `dev/V3.0/pending/018-commit-guided-documentation.md`
+1. **创建优化点文档**: `dev/V3.0/confirmed/018-commit-guided-documentation/`（注：018 已 confirmed，本节为历史分析记录）
 2. **纳入 V3.0 规划**: 更新 `dev/V3.0/README.md` 和 `PROGRESS.md`
 3. **优先级标记**: P1 (高价值功能)
 

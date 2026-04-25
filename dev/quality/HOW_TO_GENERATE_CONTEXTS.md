@@ -278,7 +278,7 @@ save_file(save_path, generated_context)
 
 - ✅ `quality/contexts/_template.md` - 上下文模板
 - ✅ `DOCUMENT_OPTIMIZATION_GUIDE.md`（旧版）- 原有的文档上下文信息
-- ✅ `quality/standards/BY_DOCUMENT_TYPE.md` - 文档类型标准（待创建）
+- ✅ `quality/standards/BY_DOCUMENT_TYPE.md` - 文档类型标准（已创建，详见该文件）
 - ✅ 各个实际文档
 
 ### 执行阶段

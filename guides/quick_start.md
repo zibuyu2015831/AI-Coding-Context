@@ -1,6 +1,22 @@
+---
+title: 快速开始指南 — 方案优先 6 步流程
+summary: 5-10 分钟快速上手 AICC 框架；遵循"方案优先"原则，先生成审核方案再生成文档；与 workflows/path_a_first_generation.md 的 S0-S8 完整流程对齐
+keywords: quick start | 方案优先 | 新用户旅程 | aicc
+scope: 新用户首个 AICC 项目的入门路径；不涵盖中后期维护流程（见 workflows/maintenance_workflow.md）
+related_files:
+  - workflows/path_a_first_generation.md
+  - templates/GENERATION_PLAN_TEMPLATE.md
+  - AI_ENTRY_POINT.md
+  - README.md
+dependencies:
+  - tools/py/project_scanner.py
+  - tools/js/project_scanner.js
+verified_at: 2026-04-26
+---
+
 # 快速开始指南
 
-> **重要**: 本指南已更新为"方案优先"流程，确保文档基于实际代码  
+> **重要**: 本指南采用"方案优先"流程，确保文档基于实际代码
 > 5-10 分钟快速上手：如何在新项目中使用这套文档体系规范
 
 ---
@@ -20,19 +36,28 @@ graph LR
     style C fill:#f99,stroke:#f00,stroke-width:2px
 ```
 
+> 完整 8 步流程见 [`workflows/path_a_first_generation.md`](../workflows/path_a_first_generation.md)（S0-S8）。本指南是其精简的 6 步入门版（步骤 1-6，前置步骤 0 用于规模评估）。
+
 ---
 
 ## 🚀 场景 1: 新项目从零开始
 
 ### 步骤 0: 评估项目规模 🆕
 
-**重要**: 先评估项目规模，选择合适的策略
+**重要**: 先评估项目规模，选择合适的策略。**优先使用 AICC 工具**（跨平台 + 零依赖红线）：
 
 ```bash
-# 统计代码量
-find . -name "*.ts" -o -name "*.js" -o -name "*.vue" | wc -l  # 文件数
-cloc . --exclude-dir=node_modules,dist  # 代码行数
+# 推荐：使用 AICC 工具（与 V3.0 双脚本对称模式一致）
+python tools/py/project_scanner.py . --exclude-standard
+# 或 Node.js 版本：
+node tools/js/project_scanner.js . --exclude-standard
+
+# 降级 fallback（无 Python/Node.js 环境时）：
+find . -name "*.ts" -o -name "*.js" -o -name "*.vue" | wc -l   # 文件数
+# cloc 为第三方工具，违反零依赖红线，仅供应急参考
 ```
+
+> 工具索引详见 [`AI_ENTRY_POINT.md` → 工具脚本标准段](../AI_ENTRY_POINT.md)。
 
 **规模判断**:
 
@@ -51,24 +76,50 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 
 ### 步骤 1: 复制规范到新项目
 
-````bash
-# 克隆或复制 ai_documentation_framework 目录到新项目根目录
+```bash
+# 克隆或复制 ai_coding_context 目录到新项目根目录
+cp -r ai_coding_context/ /path/to/your_project/
+cd /path/to/your_project/
+```
 
-#### 审核清单（打印出来检查）
+---
+
+### 步骤 2: 生成分析方案
+
+发送给 AI（使用 [`templates/GENERATION_PLAN_TEMPLATE.md`](../templates/GENERATION_PLAN_TEMPLATE.md)）：
+
+```
+请阅读 ai_coding_context/AI_ENTRY_POINT.md，然后基于
+ai_coding_context/templates/GENERATION_PLAN_TEMPLATE.md
+为本项目生成文档分析方案，输出到 dev_docs/_analysis/generation_plan.md。
+
+注意：本步骤只生成方案，不生成正式文档。等我审核通过后再继续。
+```
+
+AI 会自动完成：
+
+1. 项目检测（语言 / 类型 / 规模）
+2. 主文档结构规划（章节 / 子文档清单）
+3. 数据采样（用于审核数据准确性）
+4. 输出 `dev_docs/_analysis/generation_plan.md`
+
+---
+
+### 步骤 3: 审核方案
+
+打开 `dev_docs/_analysis/generation_plan.md`，按以下清单逐项核对：
+
+#### 审核清单
 
 **1. 数据准确性审核**
 
 - [ ] 项目规模数据
-
-  - [ ] 运行AI提供的统计命令，验证文件数
+  - [ ] 运行 AI 提供的统计命令，验证文件数
   - [ ] 抽查几个目录，验证代码量
   - [ ] 技术栈描述准确
-
 - [ ] 目录结构描述
-
   - [ ] 核心目录无遗漏
   - [ ] 目录用途描述准确
-
 - [ ] 业务模块识别
   - [ ] 模块划分合理
   - [ ] 无重要模块遗漏
@@ -83,12 +134,12 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 **3. 架构特点审核**
 
 - [ ] 每个架构特点都有代码依据
-- [ ] 无AI臆测的内容
+- [ ] 无 AI 臆测的内容
 - [ ] 描述与实际一致
 
 **4. 填写审核意见**
 
-在方案文档末尾填写：
+在 `dev_docs/_analysis/generation_plan.md` 末尾追加：
 
 ```markdown
 ## 审核意见
@@ -105,8 +156,8 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 - [ ] 拒绝
 
 签名: [your name]
-日期: 2025-11-27
-````
+日期: 2026-04-26
+```
 
 ---
 
@@ -120,7 +171,7 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 请严格按照审核通过的方案生成完整文档：
 
 1. 生成主文档 dev_docs/AI_Coding_Context.md
-2. 生成高优先级子文档（3个）
+2. 生成高优先级子文档（按方案中列出的清单）
 3. 创建 plans/ 和 knowledge/ 目录
 4. 确保所有数据来自方案中标注的实际代码
 
@@ -142,7 +193,7 @@ cloc . --exclude-dir=node_modules,dist  # 代码行数
 
 ```bash
 # 确认文档完成后，可删除规范和分析目录
-rm -rf ai_documentation_framework/
+rm -rf ai_coding_context/
 rm -rf dev_docs/_analysis/
 ```
 
@@ -155,12 +206,12 @@ rm -rf dev_docs/_analysis/
 ### 步骤 1: 添加规范到项目
 
 ```bash
-cp -r ai_documentation_framework /path/to/existing_project/
+cp -r ai_coding_context /path/to/existing_project/
 ```
 
-### 步骤 2: 生成补充方案
+### 步骤 2-6: 同场景 1
 
-同样遵循"方案优先"原则，先生成审查和补充方案。
+同样遵循"方案优先"原则，先生成审查和补充方案，按场景 1 步骤 2-6 推进。
 
 ---
 
@@ -186,7 +237,7 @@ cp -r ai_documentation_framework /path/to/existing_project/
 ### ❌ 错误做法
 
 ```
-"请为我的项目生成完整的AI文档体系"
+"请为我的项目生成完整的 AI 文档体系"
 ```
 
 **问题**: 直接生成，没有方案审核环节，容易出现：
@@ -214,7 +265,7 @@ cp -r ai_documentation_framework /path/to/existing_project/
 
 ### Q: 方案优先会不会太繁琐？
 
-A: 虽然多花 1-2 小时，但避免了大量返工。实践证明，方案优先让准确率从 70%提升到 95%+，返工率从 30%降到 5%，总体更高效。
+A: 虽然多花 1-2 小时，但避免了大量返工。实践证明，方案优先让准确率从 70% 提升到 95%+，返工率从 30% 降到 5%，总体更高效。
 
 ### Q: 如果方案审核发现问题怎么办？
 
@@ -226,10 +277,12 @@ A: **强烈不建议**。除非是非常小的项目（<10 个文件），否则
 
 ### Q: 如何在多个项目间复用？
 
-A: 把 `ai_documentation_framework/` 维护为独立仓库，每个新项目 clone 即可。
+A: 把 `ai_coding_context/` 维护为独立仓库，每个新项目 clone 即可。
 
 ---
 
 ## 🎉 开始使用
 
-选择场景 1，严格按照 6 个步骤执行，确保方案优先！
+选择场景 1，严格按照 6 个步骤（步骤 1-6，含前置步骤 0 评估）执行，确保方案优先！
+
+> 完整 8 步流程（S0-S8，含 finalize / publish 阶段）见 [`workflows/path_a_first_generation.md`](../workflows/path_a_first_generation.md)。

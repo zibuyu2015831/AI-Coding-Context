@@ -20,7 +20,7 @@ verified_at: [YYYY-MM-DD 格式日期]
 
 为了便于后续归档和提取关键要点到`knowledge/`，所有方案文档应使用统一模板：
 
-**模板位置**: `ai_documentation_framework/templates/PLAN_TEMPLATE.md`
+**模板位置**: `ai_coding_context/templates/PLAN_TEMPLATE.md`
 
 **规范化优势**:
 
@@ -58,7 +58,7 @@ verified_at: [YYYY-MM-DD 格式日期]
 
 ### **方案文档模板**
 
-请使用统一模板 `ai_documentation_framework/templates/PLAN_TEMPLATE.md`
+请使用统一模板 `ai_coding_context/templates/PLAN_TEMPLATE.md`
 
 **核心章节**:
 

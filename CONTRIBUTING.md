@@ -39,7 +39,7 @@ AI Coding Context 是一个模块化的文档生成框架。本指南说明如�
 ### 文件组织
 
 ```
-ai_documentation_framework/
+ai_coding_context/
 ├── core/           # 核心规范（添加新规范）
 ├── workflows/      # 流程文档（添加新流程）
 ├── tools/          # 实用工具（添加新脚本）

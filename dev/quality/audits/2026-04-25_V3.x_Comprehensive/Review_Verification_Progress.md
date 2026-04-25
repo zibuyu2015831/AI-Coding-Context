@@ -36,7 +36,7 @@ verified_at: 2026-04-26
 | **B2** | 文档漂移 + SSOT | 001, 011, 012, 014, 015, 013, 018, 023 | 8 | ✅ 已完成（复审 + 修复） |
 | **B3** | dogfood 自指 + 合规扫描 | 034, 027, 024, 025, 035, 021 | 6 | ✅ 已完成（复审） |
 | **B4** | 实体缺失 + 工作流闭环 | 017, 020, 026, 019 | 4 | ✅ 已完成（复审；019 已由 B3#027 同步关闭） |
-| **B5** | 用户旅程 + 已修复回放 + 卫生 | 028, 030, 031, 033, 004, 005, 006, 007, 008, 009 | 10 | ⏳ 待启动 |
+| **B5** | 用户旅程 + 已修复回放 + 卫生 | 028, 030, 031, 033, 004, 005, 006, 007, 008, 009 | 10 | ✅ 已完成（复审 + 修复 + 回归 PASS）|
 
 **状态图例**：⏳ 待启动 / 🔵 进行中 / ✅ 已完成
 
@@ -60,12 +60,12 @@ verified_at: 2026-04-26
 | 001 | FRAMEWORK_CONTEXT vs PROGRESS 漂移 | 主要 | B | B2 | ✅ 真实 | ⚠️ 项数细节偏差 | ✅ 通过（统领条目） | B2#001 ✅ 已修复 |
 | 002 | Public→dev/ 死链 | 主要 | A | B1 | ✅ 真实 | ✅ 准确 | ✅ 通过 | B1#002 ✅ 已修复 |
 | 003 | audit_metadata.py 孤儿文件 | 次要 | C+A | B1 | ✅ 真实 | ✅ 准确 | 🟡 需补充判据→重写为"删除" | B1#003 ✅ 已修复 |
-| 004 | dev/quality 编码乱码 | 次要 | C | B5 | ⏳ | - | - | - |
-| 005 | Framework_Review_Guidelines 自相矛盾 | 主要 | B | B5 | ⏳ | - | - | - |
-| 006 | 基础设施长期缺失 | 主要 | B+C | B5 | ⏳ | - | - | - |
-| 007 | BY_DOCUMENT_TYPE 被引用但缺失 | 次要 | B | B5 | ⏳ | - | - | - |
-| 008 | PROGRESS.md 末尾乱码+重复 | 次要 | C | B5 | ⏳ | - | - | - |
-| 009 | dev/ 内部悬空引用 | 次要 | C | B5 | ⏳ | - | - | - |
+| 004 | dev/quality 编码乱码 | 次要 | C | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（git-diff 回放 PASS） | B5#004 ✅ 已修复（Phase 0） |
+| 005 | Framework_Review_Guidelines 自相矛盾 | 主要 | B | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（git-diff 回放 PASS） | B5#005 ✅ 已修复（Phase 0） |
+| 006 | 基础设施长期缺失 | 主要 | B+C | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（git-diff 回放 PASS） | B5#006 ✅ 已修复（Phase 0） |
+| 007 | BY_DOCUMENT_TYPE 被引用但缺失 | 次要 | B | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（git-diff 回放 PASS；附带清理 HOW_TO_GENERATE_CONTEXTS L281 待创建标记） | B5#007 ✅ 已修复（Phase 0） |
+| 008 | PROGRESS.md 末尾乱码+重复 | 次要 | C | B5 | ✅ 真实 | ✅ 准确 | 🟡 需补充（合并 B2 附带 L86+L274-L293） | B5#008 🟢 已修复（C4 同步附带 B2 + 007 衍生） |
+| 009 | dev/ 内部悬空引用 | 次要 | C | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过 | B5#009 🟢 已修复 |
 | 010 | 文件位置疑似错误 | 建议 | C | B1 | ✅ 真实 | ✅ 准确 | 🟡 需补充更优目标位置 | B1#010 ✅ 已修复 |
 | 011 | FRAMEWORK_CONTEXT 顶部摘要严重过时 | 主要 | B+A | B2 | ✅ 真实 | ✅ 准确 | 🟡 需补充（与 015 联动改分母） | B2#011 ✅ 已修复 |
 | 012 | PROGRESS 自身内部不一致 | 次要 | B | B2 | ✅ 真实 | ✅ 准确 | ✅ 通过 | B2#012 ✅ 已修复 |
@@ -84,12 +84,12 @@ verified_at: 2026-04-26
 | 025 | 措辞与策略不一致 | 建议 | B | B3 | ✅ 真实 | ✅ 准确 | ✅ 通过（重写 L44-L58，对齐 v2.0 三级口径） | B3#025 ✅ 已修复 |
 | 026 | architecture_analyzer 工具不存在 | 次要 | B+C | B4 | ✅ 真实 | ⚠️ 漏报 trend_analyzer 同源 + 源路径未对齐 B1#022 | 🔴 重大缺陷已重写（推荐选项 B：文档诚实化 + Phase 4 升级为独立优化点） | B4#026 🟢 已修复（含 PROGRESS 路线图登记） |
 | 027 | 005 walkthrough 未提升至 Public | 建议 | A+B | B3 | ✅ 真实 | ⚠️ 源路径未对齐 B1#022 重命名 | 🟡 需补充（路径对齐 + frontmatter 联动 + 工具索引细化） | B3#027 ✅ 已修复（同步关闭 019） |
-| 028 | quick_start 结构错乱+步骤跳号 | 严重 | A | B5 | ⏳ | - | - | - |
+| 028 | quick_start 结构错乱+步骤跳号 | 严重 | A | B5 | ✅ 真实 | ✅ 准确 | 🔴 重大缺陷已重写（嵌套 fence 拆解 + 步骤 2/3 内容草案 + L235 计数同步 + path_a 8 步对齐） | B5#028 🟢 已修复（C1 合并 commit） |
 | 029 | AI_RULES.md 路径多版本不一致 | 主要 | A+B | B1 | ✅ 真实 | ⚠️ 误称权威源 + 错估 majority | 🔴 重大缺陷已重写 | B1#029 ✅ 已修复 |
-| 030 | quick_start 过时框架名残留 | 主要 | A | B5 | ⏳ | - | - | - |
-| 031 | README "3 步"计数错误 | 主要 | A | B5 | ⏳ | - | - | - |
+| 030 | quick_start 过时框架名残留 | 主要 | A | B5 | ✅ 真实 | ⚠️ 严重漏报（实际 13 处 Public，仅列 4 处） | 🟡 需补充覆盖范围（含 framework_spec L513-530 + CONTRIBUTING + plans_README_TEMPLATE + generation_workflow） | B5#030 🟢 已修复（C1 + C3 双 commit；最终 13 处全清） |
+| 031 | README "3 步"计数错误 | 主要 | A | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（推荐选项 A：标题 4 步） | B5#031 🟢 已修复（C2 single-line commit） |
 | 032 | 主文档名 ai_coding_context 大小写 | 次要 | A+B | B1 | ✅ 真实 | ⚠️ 漏 workflows/generation_workflow.md L493 | 🟡 需补充 | B1#032 ✅ 已修复 |
-| 033 | quick_start 推荐 find/cloc 与 V3.0 脱节 | 次要 | A | B5 | ⏳ | - | - | - |
+| 033 | quick_start 推荐 find/cloc 与 V3.0 脱节 | 次要 | A | B5 | ✅ 真实 | ✅ 准确 | ✅ 通过（推荐 V3.0 工具优先 + shell fallback） | B5#033 🟢 已修复（C1 合并 commit） |
 | 034 | V3.0 强制 frontmatter 14% 自指 | 严重 | A+B | B3 | ✅ 真实 | ⚠️ templates 分母过期（B1#022 后 5/12 而非 5/29） | 🟡 需补充（验收双层门槛+CI gate 同步+dogfood 闭环验证） | B3#034 🟡 P0 已完成（10 文件 strict 通过；P1/P2 待后续） |
 | 035 | 工具头部 docstring 不规范 | 建议 | C | B3 | ✅ 真实 | ✅ 准确 | ✅ 通过（直接使用 JSDoc 模板，参考 .py 内容质量） | B3#035 ✅ 已修复 |
 
@@ -249,9 +249,51 @@ verified_at: 2026-04-26
   - 019：B3#027 已闭环（workflows/complexity_alert_workflow.md 存在 + AI_ENTRY_POINT 索引 5 行 + path_d @complexity 章节）✅
 
 ### B5（用户旅程 + 已修复回放 + 卫生）
-- 启动：—
-- 完成：—
-- 关键发现：—
+- 启动：2026-04-26
+- 复审完成：2026-04-26
+- **修复完成：— ⏳ 待执行**
+- **关键发现**：
+  1. **004/005/006/007 git-diff 回放 4 项全 PASS**：U+FFFD 已清；Framework_Review_Guidelines 三视角并存；audits/ + 5 件套全在；BY_DOCUMENT_TYPE 10 类齐全 — quality 体系自审能力首次真实兑现。
+  2. **028 严重级 — R4 用户旅程首次出现严重缺陷**：quick_start.md 同时存在步骤跳号（缺 2/3）+ 嵌套 fence 错位（L54-L109 整段被吞入代码块）+ L235 计数自矛盾（声明 6 步实际 5 步段落）+ 审核清单段落定位错位。原方案"重写"过粗，已扩展为 4 项明确动作（拆解嵌套 fence + 补步骤 2/3 内容草案 + L235 计数同步 + 与 path_a S0-S8 对齐）。
+  3. **030 严重漏报 — 第 5 例**：Issue 称 quick_start 4 处，实测 Public 层共 **13 处**（quick_start 4 + CONTRIBUTING 1 + framework_spec 5 + plans_README_TEMPLATE 2 + generation_workflow 2）。继 016/017/032（B1）、017/026（B4）后第 5 例"漏报模式"，已构成系统性弱点 — 应升级为系统性发现独立专题（"R3 引用与边界扫描深度不够"）。
+  4. **028+030+033 同 quick_start.md 必合并修复**：3 项同文件，若按 Issue ID 逐个修复将产生 3 次 commit + 3 次同文件冲突风险。架构师推荐 C1 合并 commit（先嵌套 fence 拆解 → 后框架名替换 → 后工具引导）。
+  5. **PROGRESS.md 残留集群**（008 + B2 附带 L86 + L274-L293）：B2 修复 V3.0+ 段时未顺手清理旧的"相关链接 + 状态图例"段，反而使重复结构更显眼（fence 数 7 奇数 + 相关链接 ×2 + 状态图例 ×2 + L87 015 误列 P1 待办）。本批次合并为 C4 单 commit 治理。
+  6. **L31-L34 推荐 find/cloc**（033）与 AI_ENTRY_POINT.md L320 推荐的 project_scanner 脱节 — 复审证实并强化 V3.0 双脚本+零依赖红线在用户入口的同步缺口。
+  7. **HOW_TO_GENERATE_CONTEXTS.md L281 衍生问题**：007 已修但 L281 仍标"BY_DOCUMENT_TYPE.md 待创建" — 与实际状态不符。本批次合并清理。
+  8. **长期防御承诺需兑现**：004 修复时承诺 pre-commit hook 检查 U+FFFD，008 同性质问题再次出现 = 承诺未落地。建议本批次外升级为 C7 hook 部署专项任务。
+
+- **修复优先级与执行顺序**（架构师推荐）：
+  1. **C1（quick_start 大重写）** = 028 + 030(部分 4 处) + 033 → 同 quick_start.md 合并 1 commit
+  2. **C2（README 单行）** = 031 → 1 commit
+  3. **C3（030 剩余 9 处）** = CONTRIBUTING + framework_spec + plans_README_TEMPLATE + generation_workflow → 1 commit
+  4. **C4（PROGRESS 末尾清理）** = 008 + B2 附带 L86 + L274-L293 + 007 衍生 HOW_TO L281 → 1 commit
+  5. **C5（009 单行）** = commit_as_prompt_analysis.md L699 → 1 commit
+  6. **C7**（pre-commit hook 长期防御）：建议范围外推进，与 R5 自指治理规划合并
+
+- **修复成果汇总**（2026-04-26）：
+  - **C1（quick_start 大重写）**：`guides/quick_start.md` 全文重写（235 行 → 286 行）
+    - 步骤连续：0/1/2/3/4/5/6（场景 1）+ 1/2-6 同场景 1（场景 2）；嵌套 fence 完全拆解；fence 数 20（偶数）✅
+    - 新增步骤 2（生成分析方案，引用 GENERATION_PLAN_TEMPLATE.md）+ 步骤 3（审核方案，含原 L57-L109 审核清单的完整迁移 + 4 项决策路径）
+    - L286 计数同步为"6 个步骤（步骤 1-6，含前置步骤 0 评估）"
+    - 末尾追加引用：`workflows/path_a_first_generation.md` S0-S8 完整流程
+    - L31-L34 改为"V3.0 工具优先 + shell fallback"双层模式（033 同步修复）
+    - quick_start 内 4 处 ai_documentation_framework 全部替换（030 部分）
+    - frontmatter 完整：title/summary/keywords/scope/related_files/dependencies/verified_at（与 V3.0-012 兼容）
+  - **C2（README 4 步）**：`README.md` L130 标题 `（3 步）` → `（4 步）`，与详细 4 个步骤段落对齐 ✅
+  - **C3（030 剩余处）**：实际清理 11 处（高于复审估计的 9 处 — 复审遗漏 `workflows/generation_workflow.md` L494/L1063 2 处）
+    - `CONTRIBUTING.md` L42（1 处）
+    - `core/framework_spec.md` L513/L516/L520/L527/L530（5 处）
+    - `templates/plans_README_TEMPLATE.md` L23/L61（2 处）
+    - `guides/generation_workflow.md` L172/L569（2 处）
+    - `workflows/generation_workflow.md` L494/L1063（2 处 — 复审遗漏新发现）
+    - 全 Public 层 grep 命中归零 ✅（仅 dev/V2.x 历史 + dev/quality/audits/ 复审记录保留）
+  - **C4（PROGRESS 末尾清理 + B2 附带 + 007 衍生）**：
+    - `dev/V3.0/PROGRESS.md` 删除 L274-L293 旧版"相关链接 + 状态图例 + 最后更新 + 孤字'发布' + 未闭合 fence"段
+    - 同 commit 删除 L87 `- [ ] 实现质量保证体系集成 (015)`（B2 附带）+ 加"015 已归档不属本里程碑"注脚
+    - PROGRESS 顶部 + 末尾"最后更新"统一刷为 2026-04-26
+    - `dev/quality/HOW_TO_GENERATE_CONTEXTS.md` L281 "（待创建）" → "（已创建）"（007 衍生清理）
+  - **C5（009 单行）**：`dev/V3.0/reference/commit_as_prompt_analysis.md` L699 `dev/V3.0/pending/...` → `dev/V3.0/confirmed/018-commit-guided-documentation/`（注：018 已 confirmed 历史分析记录）
+  - **回归通过**：B5 全 8 修复点 + 已修复 4 项回放 = 12/12 PASS（quick_start 步骤连续 + fence 偶数 / 030 Public 层归零 / README 标题=步骤数=4 / 033 V3.0 工具引导 / PROGRESS 末尾整洁 / 015 误列已清 / V3.0/pending 真泄漏归零 / HOW_TO 待创建标记已清 / 004 U+FFFD 归零 / 005 三视角并存 / 006 audits 5 件套 / 007 BY_DOCUMENT_TYPE 10 类齐全）
 
 ---
 

@@ -491,7 +491,7 @@ src/
 
 ```
 基础之前的分析，请生成主文档 dev_docs/AI_Coding_Context.md，
-包含以下章节（参考 ai_documentation_framework/README.md 规范）：
+包含以下章节（参考 ai_coding_context/README.md 规范）：
 
 1. 文档定位说明
 2. 项目概览
@@ -1060,7 +1060,7 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 # 阶段2: 生成主文档
 基于分析结果，生成 dev_docs/AI_Coding_Context.md
-参考 ai_documentation_framework/README.md 规范
+参考 ai_coding_context/README.md 规范
 包含所有必需章节，长度300-500行
 
 # 阶段3: 生成子文档（分批）
