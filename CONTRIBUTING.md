@@ -1,3 +1,13 @@
+---
+title: AICC 框架贡献指南
+summary: 指导贡献者如何为 AICC 框架添加新功能、扩展 agents/tools/workflows、提交规范与代码评审约定
+keywords: contributing | extension | guidelines | aicc
+scope: 贡献者新增框架能力或修复缺陷的流程指南
+related_files: README.md | AI_ENTRY_POINT.md | core/framework_spec.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 框架扩展指南 (CONTRIBUTING)
 
 > **版本**: v2.3  

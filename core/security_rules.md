@@ -1,3 +1,13 @@
+---
+title: 安全规范 — 敏感信息脱敏
+summary: 定义 AICC 框架在文档生成、commit 分析、知识沉淀等场景下对敏感信息的识别与脱敏规则；涉及密钥、令牌、内部 URL、个人信息等
+keywords: security | redaction | sensitive-data | aicc
+scope: AI 在 AICC 框架内处理代码或文档时对敏感信息的处理约束
+related_files: AI_ENTRY_POINT.md | core/framework_spec.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 安全规范 - 敏感信息脱敏
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

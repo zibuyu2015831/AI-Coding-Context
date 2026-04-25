@@ -1,3 +1,13 @@
+---
+title: 框架语言规范
+summary: 定义 AICC 框架文档生成与代码注释的语言策略；含中英双语场景判定规则、术语表使用规范、命令行示例语言一致性约定
+keywords: language-rules | i18n | aicc
+scope: AI 在 AICC 框架内生成或修改文档时的语言判定与一致性
+related_files: AI_ENTRY_POINT.md | core/framework_spec.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 语言规范
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

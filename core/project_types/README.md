@@ -1,3 +1,13 @@
+---
+title: 项目类型配置索引
+summary: AICC 框架支持的 13 种项目类型详细配置目录的索引；每个 type 含适用场景、关键库识别规则、子文档清单建议、特殊场景处理等
+keywords: project-types | index | configurations | aicc
+scope: 项目类型详细配置文档的目录入口（与 core/project_types.md 决策树配套使用）
+related_files: core/project_types.md | AI_ENTRY_POINT.md | workflows/path_a_first_generation.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 项目类型配置索引
 
 > **目录**: `core/project_types/`  

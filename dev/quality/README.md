@@ -41,21 +41,21 @@
 | [QUALITY_CHECKLIST.md](./standards/QUALITY_CHECKLIST.md) | 快速核对清单 |
 | [BY_DOCUMENT_TYPE.md](./standards/BY_DOCUMENT_TYPE.md) | 按文档类型的专项标准（入口 / core / workflows / agents / tools / templates / guides / config） |
 
-### contexts/ — 单文档审查上下文
+### contexts/ — 单文档审查上下文（按需生成）
 
-每个 🔴 优先级文档对应一份 context，作为新建 AI 会话时的"领域知识 + 检查要点"载体。
+采用**按需生成**策略：仅在审查 🔴 优先级文档时，按 [HOW_TO_GENERATE_CONTEXTS.md](./HOW_TO_GENERATE_CONTEXTS.md) 现场生成对应 context。目录通常仅含 `_template.md` 模板，**不预先落地全部文档的 context**（成本过高且易过时）。
 
 **使用方式**：
 
 ```
 【新建 AI 会话】
 1. 发送: dev/FRAMEWORK_CONTEXT.md            （全局心智模型）
-2. 发送: dev/quality/contexts/[文档名].md    （单文档审查上下文）
+2. 若审查 🔴 文档：现场按 HOW_TO_GENERATE_CONTEXTS.md 生成对应 context 并发送
 3. 发送: 实际文档内容
 4. 开始审查讨论
 ```
 
-`contexts/_template.md` 是模板。具体清单见下方"📊 完整文档索引"。
+详细的"何时需要 context / 何时批审 / 何时仅合规扫描"分级策略，见下方"🎚️ Context 优先级分级（v2.0 引入）"。
 
 ### audits/ — 审查归档
 

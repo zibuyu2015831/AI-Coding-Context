@@ -1,3 +1,13 @@
+---
+title: AI 辅助开发文档体系规范
+summary: AICC 框架的总规范；定义文档体系结构、目录约定、SSOT 标准产物路径、双脚本红线、零依赖红线等核心约束
+keywords: framework-spec | ssot | aicc | v3 | architecture
+scope: AICC 框架的根级规范文档（SSOT 章节为命名一致性集群的真相源）
+related_files: AI_ENTRY_POINT.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # AI 辅助开发文档体系规范
 
 > **版本**: v2.0 ✨ 已更新  

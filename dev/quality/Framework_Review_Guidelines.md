@@ -442,65 +442,63 @@ AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对�
 
 所有审查相关文档将统一存放在`dev/quality/audits/`目录下，每次审查创建一个独立的子目录，以审查日期和版本命名。每次审查目录命名规范为`YYYY-MM-DD_Version_Scope`。
 
-### 审查交付物清单
+### 审查交付物清单（必需 5 件套 + 可选附加）
+
+每轮审查的产出分两类：**必需 5 件套**（每轮强制）与**可选附加**（按本轮范围/复杂度按需产出）。本结构与 `dev/quality/README.md` "audits/ 审查归档" 章节同口径。
+
+#### 必需 5 件套
 
 1. **审查计划**：`Review_Plan.md`
 
    - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
-   - 内容：本次审查的计划和方案
+   - 内容：本次审查的计划和方案（范围、视角、批次切分、退出条件）
 
-2. **全面审查报告**：`Comprehensive_Review_Report.md`
+2. **问题跟踪表**：`Issue_Tracking.md`
 
    - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
+   - 内容：所有发现的问题的详细记录（按 PROJ-YYYYMMDD-XXX 编号），含文件路径和相关文档路径
+
+3. **进度跟踪**：`Progress_Tracking.md`
+
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
+   - 格式：Markdown
+   - 内容：阶段/任务进度，支持中断恢复（断点续审）
+
+4. **审查日志**：`Review_Log.md`
+
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
+   - 格式：Markdown
+   - 内容：审查过程中的每日日志、关键决策、临时观察
+
+5. **问题复查清单**：`Review_Checklist.md`
+
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
+   - 格式：Markdown
+   - 内容：基于问题跟踪表生成的复查清单，方便后续修复验证
+
+#### 可选附加（按本轮范围/复杂度按需）
+
+1. **全面审查报告**：`Comprehensive_Review_Report.md`
+
    - 内容：按照上述报告大纲结构，包含所有审查发现和评估
+   - 触发条件：Comprehensive 级别审查（A+B+C 全视角）
 
-3. **问题跟踪表**：`Issue_Tracking.md`
+2. **问题分类统计报告**：`Issue_Analysis.md`
 
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：Markdown
-   - 内容：所有发现的问题的详细记录，包含文件路径和相关文档路径
-
-4. **问题分类统计报告**：`Issue_Analysis.md`
-
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：Markdown
    - 内容：按类型、严重级别、组件分布等维度对问题进行统计分析
+   - 触发条件：发现问题数 ≥ 20 项时建议产出
 
-5. **审查数据与证据**：`Review_Data.zip`
+3. **改进路线图**：`Improvement_Roadmap.md`
 
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 内容：原始审查数据、测试日志、代码分析结果、性能测试报告等
-
-6. **框架评估仪表板**：`Assessment_Dashboard.html`
-
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：HTML 交互式仪表板
-   - 内容：可视化呈现框架各维度评估结果和问题分布
-
-7. **改进路线图**：`Improvement_Roadmap.md`
-
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：Markdown
    - 内容：基于问题跟踪表的短期、中期、长期改进计划与实施路线图
+   - 触发条件：本轮问题需跨多周期解决
 
-8. **特定任务专项报告**：`[Task_Name]_Assessment_Report.md`
+4. **特定任务专项报告**：`[Task_Name]_Assessment_Report.md`
 
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：Markdown
-   - 内容：针对特定任务的专项评估与完成情况分析，包含相关问题的详细路径
-
-9. **审查日志**：`Review_Log.md`
-
-   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-   - 格式：Markdown
-   - 内容：审查过程中的每日日志记录，包含当日发现问题的初步记录
-
-10. **问题复查清单**：`Review_Checklist.md`
-    - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
-    - 格式：Markdown
-    - 内容：基于问题跟踪表生成的复查清单，方便后续修复验证
+   - 内容：针对特定任务的专项评估与完成情况分析
+   - 触发条件：本轮含特定任务的专项评估
 
 ## 📋 审查准备工作模板
 

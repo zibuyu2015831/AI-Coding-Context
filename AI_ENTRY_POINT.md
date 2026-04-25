@@ -1,3 +1,13 @@
+---
+title: AI Coding Context Framework — AI 入口
+summary: AICC 框架的 AI 唯一入口；定义框架边界、术语表、工作流路由（路径 A/B/C/D）、核心规范与工具索引；AI 首次接入需读完此文档以建立全局心智模型
+keywords: aicc | ai-entry | framework-boundary | workflow-routing | terminology
+scope: AI 首次进入 AICC 框架的认知初始化与执行决策入口
+related_files: core/framework_spec.md | core/SUMMARY_FORMAT_SPEC.md | workflows/path_a_first_generation.md | workflows/path_d_specific_tasks.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # AI Coding Context - Entry Point
 
 > **AI 专用入口文档**
@@ -337,6 +347,11 @@ git add ai_coding_context/
 | 修复历史管理   | `tools/py/fix_history_manager.py`     | 记录和查询修复历史（011 优化点）|
 | 语义关联检测   | `tools/py/semantic_related_detector.py` | 检测语义关联文档（011 优化点）|
 | 批量修复管理   | `tools/py/batch_fix_manager.py`       | 批量文档修复（011 优化点）|
+| 复杂度扫描     | `tools/py/complexity_scanner.py`      | 项目复杂度数据采集（005 优化点）|
+| 复杂度扫描     | `tools/js/complexity_scanner.js`      | Node.js 镜像（005 优化点）|
+| 复杂度报告     | `tools/py/report_generator.py`        | 渲染复杂度 Markdown / HTML 报告（005 优化点）|
+| 复杂度报告     | `tools/js/report_generator.js`        | Node.js 镜像（005 优化点）|
+| 复杂度通知     | `tools/py/notifier.py`                | Slack / Email 阈值告警（005 优化点）|
 
 
 ### 框架边界术语
@@ -467,6 +482,7 @@ graph TD
 | `workflows/commit_guided_update.md`      | Commit 驱动更新流程  | **路径 C 必读 (V3.0)**      |
 | `workflows/git_safety_workflow.md`       | Git 操作安全流程     | **执行 Git 修改前必读 (V3.0)**|
 | `workflows/doc_error_fix_workflow.md`    | 文档谬误修复工作流   | **报告文档谬误时必读 (V3.0)**|
+| `workflows/complexity_alert_workflow.md` | 复杂度告警工作流（剧本 4） | **路径 D `@complexity` 时必读 (V3.0)** |
 
 ### 共享资源文档 (`workflows/shared/`)
 

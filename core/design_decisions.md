@@ -1,3 +1,13 @@
+---
+title: 框架设计决策说明
+summary: 记录 AICC 框架历次重大设计决策的背景、选项、取舍与最终决议；含 Markdown 选型、双脚本对称、零依赖、AI_RULES 子系统等
+keywords: design-decisions | adr | rationale | aicc
+scope: 框架架构演进与重大选型的决策档案
+related_files: core/framework_spec.md | AI_ENTRY_POINT.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 框架设计决策说明
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

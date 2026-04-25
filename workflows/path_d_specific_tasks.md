@@ -14,6 +14,7 @@
 | [@think 系列](#think-系列) | 设计思维引导 | ⭐⭐⭐⭐ | 深度设计思考 |
 | [@review 系列](#review-系列) | AI 互审 | ⭐⭐⭐ | 方案质量审查 |
 | [@skip 系列](#skip-系列) | 跳过某些步骤 | ⭐ | 快速执行 |
+| [@complexity](#complexity) | 复杂度告警（剧本 4） | ⭐⭐ | 项目复杂度扫描与决策建议 |
 | [其他指令](#其他指令) | 特定功能 | ⭐⭐ | 按需扩展 |
 
 ---
@@ -641,6 +642,39 @@ graph TD
 **快速参考**:
 - 生成方案时：数据验证、问题记录、内容质量
 - 生成文档时：方案执行、文档结构、摘要与关联、进度记录
+
+---
+
+## @complexity
+
+### 概述
+
+**目的**：执行项目复杂度扫描，按阈值给出告警与决策建议。对应 005 优化点（剧本 4 端到端工作流）。
+
+**触发**：用户输入 `@complexity` 或同义指令（"扫描项目复杂度"、"生成复杂度报告"、"代码增长是否健康"）。
+
+**完整 SOP**：见 [`workflows/complexity_alert_workflow.md`](./complexity_alert_workflow.md)（必读）。
+
+### 简化执行链
+
+```
+1. 数据采集：python tools/py/complexity_scanner.py --since "1 day ago" --output <data.json>
+2. 阈值判定：读取 risk_assessment.risks[]，按 low / warning / critical 归类
+3. 报告产出：python tools/py/report_generator.py --data <data.json> --output <report.md> --format markdown
+4. 通知告警：若级别 ≥ warning 调用 tools/py/notifier.py（按 config 通道）
+5. 决策建议：在对话中向用户输出具体行动建议（拆 commit / 抽象层 / 清 TODO / 阻断危险函数等）
+```
+
+### 配置 fallback
+
+`complexity_scanner` 按以下顺序探测配置（B3#021 引入）：
+
+1. CLI `--config <path>` 显式
+2. `dev_docs/complexity/config.yaml`（用户项目）
+3. `dev/complexity/config.yaml`（框架自审）
+4. 工具内置默认
+
+详细参数与场景验证脚本见 [`workflows/complexity_alert_workflow.md`](./complexity_alert_workflow.md)。
 
 ---
 

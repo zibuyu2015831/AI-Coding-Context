@@ -19,7 +19,12 @@
                             支持格式：
                             - 绝对时间："2026-04-12"
                             - 相对时间："1 day ago"、"7 days ago"、"24 hours ago"
-    --config CONFIG          配置文件路径（默认：dev_docs/complexity/config.yaml）
+    --config CONFIG          配置文件路径
+                             默认按以下顺序 fallback 探测：
+                             1. CLI 显式 --config 指定（优先）
+                             2. dev_docs/complexity/config.yaml （用户项目场景）
+                             3. dev/complexity/config.yaml （框架自审 / dogfood）
+                             4. 工具内置默认
 
 输出格式：
     {
@@ -518,7 +523,16 @@ def calculate_risk_assessment(data, config):
 
 
 def load_config(config_path):
-    """加载配置文件"""
+    """加载配置文件
+
+    Fallback 优先级（B3#021 引入）：
+        1. CLI 显式 config_path（非空且存在） → 使用之
+        2. dev_docs/complexity/config.yaml （用户项目场景）
+        3. dev/complexity/config.yaml （框架自审 / dogfood 场景）
+        4. 内置默认配置
+
+    任意候选若解析失败则降级到下一候选。
+    """
     # 默认配置
     default_config = {
         "warning_threshold": {
@@ -561,26 +575,33 @@ def load_config(config_path):
         }
     }
 
-    # 尝试从配置文件加载
-    if config_path and os.path.exists(config_path):
+    def _merge_configs(default, user):
+        result = default.copy()
+        for key, value in user.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = _merge_configs(result[key], value)
+            else:
+                result[key] = value
+        return result
+
+    # 候选路径按优先级排列
+    candidates = []
+    if config_path:
+        candidates.append(config_path)
+    candidates.append("dev_docs/complexity/config.yaml")
+    candidates.append("dev/complexity/config.yaml")
+
+    for path in candidates:
+        if not os.path.exists(path):
+            continue
         try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                # 使用简单的YAML解析
-                parsed_config = parse_yaml(content)
+            with open(path, 'r', encoding='utf-8') as f:
+                parsed_config = parse_yaml(f.read())
                 if parsed_config:
-                    # 合并配置（用户配置覆盖默认配置）
-                    def merge_configs(default, user):
-                        result = default.copy()
-                        for key, value in user.items():
-                            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                                result[key] = merge_configs(result[key], value)
-                            else:
-                                result[key] = value
-                        return result
-                    return merge_configs(default_config, parsed_config)
+                    return _merge_configs(default_config, parsed_config)
         except Exception as e:
-            print(f"Warning: 无法加载配置文件 {config_path}, 使用默认配置: {e}")
+            print(f"Warning: 无法加载配置文件 {path}, 尝试下一候选: {e}")
+            continue
 
     return default_config
 
@@ -592,7 +613,7 @@ def main():
     parser.add_argument("--path", default=".", help="扫描路径")
     parser.add_argument("--output", help="输出文件路径")
     parser.add_argument("--since", default="1 day ago", help="分析时间窗口")
-    parser.add_argument("--config", default="dev_docs/complexity/config.yaml", help="配置文件路径")
+    parser.add_argument("--config", default="", help="配置文件路径（不传则按 fallback 顺序探测：dev_docs/complexity/config.yaml → dev/complexity/config.yaml → 内置默认）")
 
     args = parser.parse_args()
 

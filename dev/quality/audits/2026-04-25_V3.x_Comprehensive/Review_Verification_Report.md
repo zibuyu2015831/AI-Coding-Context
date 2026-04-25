@@ -573,7 +573,316 @@ verified_at: 2026-04-26
 
 ## 🔹 Batch 3：dogfood 自指 + 合规扫描
 
-> 待启动。
+> **批次目标**：核查 V3.0 强制规则的自指落地情况（034）、设计-发布转化 gap（027）、SOP 与现状对齐（024/025）、双脚本对称质量（035）、配置路径假设（021）。
+>
+> **完成日期**：2026-04-26
+>
+> **批次结论**：
+> - 6 项 Issue 全部 **真实存在**
+> - 描述完全准确：4 项（034, 024, 025, 035）
+> - 描述有偏差需补充：2 项（027 — 源路径未对齐 B1#022 重命名；034 — templates 分母数字偏差）
+> - 修复方案处置：✅ 通过 2 项（024, 025） / 🟡 需补充 4 项（034, 027, 035, 021）
+> - 全批次无 🔴 重大缺陷需重写
+> - **横切发现**：034+027+021+035 共同指向"AICC 框架的 dogfood 能力薄弱"集群
+
+---
+
+### AICC-20260425-034 — V3.0 强制 frontmatter 14% 自指失败
+
+- **真实性**：✅ 真实存在（严重）
+- **描述准确性**：⚠️ 偏差 — 主体数据完全吻合，仅 templates 行有数字偏差
+  - **完全吻合**：Public 总计 20/138 = 14% ✅；顶层入口 0/3 = 0% ✅；core/ 14/21 = 66% ✅；workflows/ 1/26 = 3% ✅；guides/ 0/15 = 0% ✅；agents/ 0/59 = 0% ✅；config/ 0/2 ≈ 0% ✅
+  - **偏差**：Issue 称 templates "5 / 29 (17%)"，实测为 **5 / 12 (41%)**。原因：B1#022 修复时已删除 `004/005/006-*.md/` 内嵌套子目录变体，分母从 29 降至 12（合规率 17%→41%）。结论方向不变（仍偏低），但数字过期需修订。
+  - **关键失败点**全部得证：`AI_ENTRY_POINT.md` ❌、`README.md` ❌、`CONTRIBUTING.md` ❌、`core/SUMMARY_FORMAT_SPEC.md` ❌、`core/framework_spec.md` ❌
+- **关键证据**：
+  - `summary_validator.py` / `summary_extractor.py` 双语言版本均存在并可运行（CLI `--help` 通过）
+  - `summary_validator.py` 支持 `--strict --recursive`，可作为 CI gate
+  - `core/SUMMARY_FORMAT_SPEC.md` 自身**不带 frontmatter** — 规范源未自证（最讽刺的 dogfood 失败点）
+- **方案评估**：🟡 **需补充**
+  - ✅ 三阶段 P0/P1/P2 划分合理
+  - ✅ 工具支持完备（summary_extractor 可批量草稿、summary_validator 可校验）
+  - ⚠️ 缺验收门槛细化（"含 frontmatter" ≠ "合规 frontmatter"，需 strict 字段校验）
+  - ⚠️ 缺与 014 智能文档推荐 / 018 commit-guided 的依赖闭环验证
+  - ⚠️ 缺 P0 后立即建立 pre-commit/CI gate 的时间序约束（否则修复后会立即倒退）
+- **架构师补充方案**（覆盖 + 增强原方案）：
+
+  **修订分阶段路线（基于实测分母）**：
+  - **P0（紧急，1 周内）— 10 个**：3 个顶层入口（`AI_ENTRY_POINT.md` / `README.md` / `CONTRIBUTING.md`）+ 7 个 core/ 缺失（含 `SUMMARY_FORMAT_SPEC.md` 自带示范级 frontmatter，作为规范的"自证"）
+  - **P1（短期，2 周内）— 40 个**：workflows/ 25 个 + guides/ 15 个
+  - **P2（中期，1 月内）— 68 个**：agents/ 59 个 + templates/ 7 个（5/12 已有，余 7 个）+ config/ 2 个
+
+  **验收门槛（双层）**：
+  1. **形式合规**：`head -1` 能看到 `---` 分隔符
+  2. **质量合规**（strict 模式）：`python tools/py/summary_validator.py --dir <path> --strict --recursive` 必须 0 错误，验证 `title / summary / keywords / scope` 四字段齐全且非空
+
+  **dogfood 闭环验证（修复完成后必做）**：
+  - 用 014 智能文档推荐工具针对一个真实任务生成推荐，确认能基于 frontmatter 命中
+  - 用 018 commit-guided 自动关联，确认能利用 frontmatter 关联到对应文档
+
+  **CI/Git 防御（与 P0 同步上线，不可滞后）**：
+  - 加入 pre-commit hook：阻止根目录 + Public 层无 frontmatter 的新 .md 提交
+  - 加入 CI gate：`summary_validator.py --strict --recursive` 必须通过
+  - 注：CI gate 应与 P0/P1/P2 同步推进 — 每完成一阶段，将该范围纳入 strict gate（避免一次性卡死所有未修复文件）
+
+  **与其他 Issue 联动**：
+  - 与 027（005 walkthrough 提升 Public）联动：新建 `workflows/complexity_alert_workflow.md` 时即应带完整 frontmatter，作为 workflows/ 的第 2 个样板
+  - 与 023（README 索引）联动：模板补全完成后，dev/quality/README.md 索引数字需同步刷新
+  - 与 035（双脚本对称）联动：`core/SUMMARY_FORMAT_SPEC.md` 的 frontmatter 示范本身应同时给出 .py 与 .js 工具引用
+
+---
+
+### AICC-20260425-027 — 005 walkthrough 已含端到端流程但未提升至 Public
+
+- **真实性**：✅ 真实存在
+  - `workflows/complexity_alert_workflow.md` 不存在 ✅
+  - `AI_ENTRY_POINT.md` 无 complexity / complexity_scanner 索引 ✅（grep 返回空）
+  - `workflows/path_d_specific_tasks.md` 无 `@complex` 路由 ✅（grep 返回空）
+- **描述准确性**：⚠️ 偏差 — Issue 引用源路径 `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` 已**因 B1#022 修复而过期**。当前真实路径为 `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md`（去掉 `.md/` 后缀）。Issue 中所有 `.md/` 风格路径引用均需对齐。
+- **关键证据**：
+  - `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` 存在
+  - `workflows/path_d_specific_tasks.md` 存在但无 @complexity 章节
+- **方案评估**：🟡 **需补充**（方向正确，需对齐源路径 + 增强 frontmatter 联动 + 工具索引细化）
+- **架构师补充方案**：
+
+  **源路径对齐**（B1 已重命名）：
+  - 旧：`dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` ❌
+  - 新：`dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` ✅
+
+  **新建工作流的具体规范**：
+  1. **新文件**：`workflows/complexity_alert_workflow.md`
+     - 头部带完整 frontmatter（title / summary / keywords / scope / verified_at）— 作为 workflows/ 第 2 个样板（与 #034 联动）
+     - 内容来源：从 walkthrough.md 提取"实施产出 + 验证场景 A/B/C"段落，重写为面向 AI 的 SOP（去除"开发完成验证"语境，改为"用户/AI 触发剧本 4 时执行"语境）
+     - 章节建议：**触发条件 → 工具链调用 → 阈值与告警判定 → 报告产出 → 决策建议**
+  2. **AI_ENTRY_POINT.md 索引**（按当前实际段落结构修订）：
+     - **L317 "工具脚本标准"** 表格：补 `tools/py/complexity_scanner.py`、`tools/py/report_generator.py` + 各 `.js` 镜像 4 行
+     - **L371 "🗺️ 工作流全景图"** 段：在路径分类区补"剧本 4：复杂度告警 → `workflows/complexity_alert_workflow.md`"链接
+     - **L439 "📁 框架文件索引"** 段：在 workflows/ 子目录列表补该新文件
+     - 注：原 Issue 描述的"工作流路由段"在 AI_ENTRY_POINT.md 中**不存在**，实际段落名为上述三处
+  3. **path_d 路由**：
+     - `workflows/path_d_specific_tasks.md` 新增 `@complexity` 章节，指向上述新工作流
+  4. **联动闭环**：
+     - 修复 027 即同步关闭 019（端到端工作流缺失）— 这是原 Issue 已识别的因果关系
+     - 020（`--check-doc-errors` 参数不存在）与 026（architecture_analyzer 不存在）属独立 bug，不在本条范围
+
+---
+
+### AICC-20260425-024 — Framework_Review_Guidelines.md SOP 过度承诺
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 完全准确 — L471 `Review_Data.zip` ✓、L476 `Assessment_Dashboard.html` ✓
+- **关键证据**：
+  - 实测 `dev/quality/audits/2026-04-25_V3.x_Comprehensive/` 与历史轮次均**未产出**这两件
+  - `dev/quality/README.md` L62-L73 已采用"5 件套（Plan / Issue_Tracking / Progress_Tracking / Review_Log / Review_Checklist）+ 可选附加"口径
+  - 当前 Framework_Review_Guidelines.md L443-L504 仍列 10 项 — README 与 Guidelines 已不一致（自指连锁）
+- **方案评估**：✅ **通过**（推荐选项 A：删除 2 项，10→8 项）
+- **架构师补充**：
+
+  **超出原方案的同步项**（避免修复后留尾）：
+  1. **当前 Guidelines 结构观察**：L445 "审查交付物清单" 是**平铺 10 项**，**没有"必需 vs 可选"二级层次**。仅删除 5/6 项后形成的 8 项仍为平铺，与 README L62-L73 的"5 件套 + 可选附加"结构不一致。
+  2. **重组方案**（覆盖原 Issue 的"仅删除"建议）：
+     - 把 L445 章节标题改为 `### 审查交付物清单（必需 5 件套 + 可选附加）`
+     - 在标题下增加 1-2 句导语说明分组规则（与 README 完全同口径）
+     - **必需 5 件套小节**：列 Review_Plan、Issue_Tracking、Progress_Tracking、Review_Log、Review_Checklist
+     - **可选附加小节**：列 Comprehensive_Review_Report、Issue_Analysis、Improvement_Roadmap、特定任务专项报告
+     - **删除**：原 L471 `Review_Data.zip` 与 L476 `Assessment_Dashboard.html`
+     - **重排序号**：当前编号 7-10 → 5-8（如保留平铺则）；二级分组下序号在各组内重置即可
+  3. **修复连锁**：与 #025 的 README/contexts 措辞修复一并提交（同源治理 — SOP 与策略漂移）
+
+---
+
+### AICC-20260425-025 — dev/quality/README.md contexts 措辞与策略不一致
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 完全准确 — L46 / L53 / L58 措辞与现状脱节
+- **关键证据**：
+  - `dev/quality/contexts/` 仅含 `_template.md`（其他全部空）
+  - L18 已宣告"分级 context — 不要求每个文件都有独立 context"（v2.0 三级策略），但 L44-L58 旧措辞未同步
+- **方案评估**：✅ **通过**（建议措辞合理）
+- **架构师补充**（覆盖原方案 + 三级口径对齐）：
+
+  **重写 L44-L58 章节**，措辞与 v2.0 三级（🔴/🟡/⚪）策略完全对齐：
+
+  ```markdown
+  ### contexts/ — 单文档审查上下文（按需生成）
+
+  采用**按需生成**策略：仅在审查 🔴 优先级文档时，按 [HOW_TO_GENERATE_CONTEXTS.md](./HOW_TO_GENERATE_CONTEXTS.md) 现场生成对应 context。目录通常仅含 `_template.md` 模板。
+
+  **使用方式**：
+
+  \`\`\`
+  【新建 AI 会话】
+  1. 发送: dev/FRAMEWORK_CONTEXT.md            （全局心智模型）
+  2. 若审查 🔴 文档：现场按 HOW_TO_GENERATE_CONTEXTS.md 生成对应 context 并发送
+  3. 发送: 实际文档内容
+  4. 开始审查讨论
+  \`\`\`
+
+  详细分级策略见下方"🎚️ Context 优先级分级（v2.0 引入）"。
+  ```
+
+  **要点**：
+  - 不再写"每个 🔴 优先级文档对应一份 context"（暗示已存在），改为"按需生成"
+  - 不再引用"具体清单见下方'📊 完整文档索引'"（容易让用户期待目录已落地清单）
+  - 引用 v2.0 三级章节作为详情入口（已存在于 L110-L118）
+
+---
+
+### AICC-20260425-035 — tools/js/aac_validator.js 头部缺规范 docstring
+
+- **真实性**：✅ 真实存在
+  - `tools/js/aac_validator.js` 前 7 行无 JSDoc 块（仅 shebang + require + 行注释）
+  - `tools/py/aac_validator.py` 有完整 docstring（功能说明 / 使用方法 / 输出 / 退出码等）
+- **描述准确性**：✅ 完全准确（双脚本对称度 32/33 = 97%）
+- **方案评估**：✅ **通过**（建议直接使用 Issue 给出的 JSDoc 模板）
+- **架构师补充**（细化 + V3.0 红线呼应）：
+
+  **JSDoc 块应参考 .py 版的实际内容质量**（不只是格式），完整字段包含：
+  - **功能说明**：与 .py 版一致（"从 ADR 中提取 YAML 约束，对代码静态扫描验证"）
+  - **使用方法**：含完整命令示例（扫描整个目录、单文件、指定 ADR 目录）
+  - **参数说明**：与 argparse / parseArgs 完全对齐
+  - **输出格式**：与 .py 版一致（JSON 违规清单结构）
+  - **退出码**：0 = 无违规、1 = 有违规、2 = 错误
+  - **零依赖红线说明**：保留并整合现有 L4-L6 的"自实现 yaml parser"内联注释（V3.0 设计决策的良好证据），但形式上整合进 JSDoc 块中作为"设计决策"段
+
+  **V3.0 双脚本红线对齐**：
+  - 修复后应跑回归：`for f in tools/js/*.js; do head -3 "$f" | grep -qE '^/\*' && echo OK || echo MISS:$f; done` 返回 100% OK
+  - 形式对称（结构）+ 质量对称（字段）双层达标
+
+---
+
+### AICC-20260425-021 — 默认配置路径 dev_docs/ 假设需明示
+
+- **真实性**：✅ 真实存在
+  - `tools/py/complexity_scanner.py` L595：`default="dev_docs/complexity/config.yaml"` ✅
+  - `dev/complexity/config.yaml` 存在（框架自身）✅
+  - `dev_docs/complexity/config.yaml` **不存在**（在 framework 仓库中）
+- **描述准确性**：✅ 完全准确
+- **关键证据**：
+  - JS 镜像 `tools/js/complexity_scanner.js` L25 / L102 / L587-L646 文档与 defaultConfig 同样使用 `dev_docs/complexity/config.yaml` 假设
+  - **双脚本对称问题已存在**：修复必须双版本同步（Issue 已点出"应同步检查"，但未明示这是 V3.0 红线）
+  - **⚠️ 内部隐性 bug**（实地核查发现，Issue 未提）：`tools/py/complexity_scanner.py` L520-L585 `load_config()` 已含"file 不存在 → fallback 内置默认"逻辑（仅对 path != ""）；但 L363、L434 等内部调用点直接传 **空字符串** `load_config("")`，意味着 `args.config` 的 CLI 值**根本未流入这些调用点** — 即使用户加 `--config dev/complexity/config.yaml` 也对部分逻辑无效。这是与 021 同源但更深的结构性问题。
+- **方案评估**：🟡 **需补充**（推荐 fallback 覆盖 + 同步修复内部调用点）
+- **架构师补充**（推荐选项 B 覆盖原推荐 A）：
+
+  **修正推荐：选项 B（fallback 逻辑）优于选项 A（仅文档说明）**
+
+  理由：
+  1. **dogfood 频次**：框架自审是高频操作（B3#034 修复期间将密集使用），每次手动加 `--config dev/complexity/config.yaml` 不友好
+  2. **零误用风险**：用户项目下 `dev/complexity/config.yaml` 几乎不会出现（用户用 `dev_docs/`），fallback 不污染用户场景
+  3. **集群治理**：021 + 034 + 023 同源 — 都是 dogfood 一致性问题。fallback 让 framework 工具具备"自审 vs 用户项目"的自感知能力，是治理 dogfood 集群的杠杆点
+
+  **fallback 优先级（双脚本同步）**：
+  ```
+  1. CLI 显式 --config 指定 → 使用之
+  2. dev_docs/complexity/config.yaml 存在 → 使用之（用户项目场景）
+  3. dev/complexity/config.yaml 存在 → 使用之（框架自审场景）
+  4. 否则 → 使用工具内置默认（已有 defaultConfig 逻辑）
+  ```
+
+  **修复点（双脚本对称 + 内部 bug）**：
+  1. `tools/py/complexity_scanner.py`：
+     - L520-L585 `load_config(config_path)`：`config_path` 为空/None/路径不存在时按 fallback 顺序探测（dev_docs/ → dev/ → 内置默认）
+     - L595 argparse default：保持 `dev_docs/complexity/config.yaml` 不变（用户项目场景仍优先），但 help 文本更新为"默认按 fallback 顺序探测"
+     - **L363、L434 等内部调用点**：把 `load_config("")` 改为 `load_config(args.config)`（需将 args 透传或在 main() 装载一次共享 dict）
+  2. `tools/js/complexity_scanner.js`：
+     - L587-L646 实现镜像 fallback 逻辑
+     - 内部调用点同步对齐
+  3. `--help` 文档（双脚本 L13-L25 段）：明示三层 fallback 顺序
+  4. `tools/README.md`：补"框架自审 vs 用户项目"差异说明段
+
+  **更稳妥的工程化**（可选增强）：
+  - 引入 `AICC_FRAMEWORK_SELF=1` 环境变量显式声明自审场景（避免在用户项目偶然存在 dev/complexity/config.yaml 时产生歧义）
+  - 在 `core/framework_spec.md` 的"标准产物路径"章节（B1 新建的 SSOT）追加"工具默认路径与 fallback 规则"小节，登记此约定
+
+  **横切收益**：本修复同时为 #034 修复期间的 dogfood 操作清障 — 修 034 时需大量调用 `summary_validator.py`、`complexity_scanner.py` 等工具自审，021 修好则一切顺畅
+
+---
+
+### B3 修复优先级与执行顺序（架构师推荐）
+
+> 基于跨 Issue 依赖与 dogfood 集群治理，建议执行顺序如下。
+
+| 序 | Issue | 类型 | 阻断/被阻 | 推荐时机 |
+|:-:|---|---|---|---|
+| 1 | **021** | dogfood 工具修复（fallback + 内部 bug） | 不阻断 → 阻断 034 修复期间的 dogfood 操作 | **优先**：先扫平工具 dogfood 阻碍 |
+| 2 | **035** | 双脚本对称（aac_validator.js docstring） | 独立 | 与 021 同批次（都是 tools/ 卫生） |
+| 3 | **025** | dev/quality/README.md L44-L58 措辞 | 不阻断 | 与 024 同批次（同源 SOP 漂移） |
+| 4 | **024** | Framework_Review_Guidelines.md SOP 重组 | 不阻断 | 与 025 同批次 |
+| 5 | **027** | 005 walkthrough 提升 Public（含创建 workflows/） | 阻断 019 闭合（B4） | 在 034 P1 阶段同步推进（新文件即第 2 个 frontmatter 样板） |
+| 6 | **034** | frontmatter 14% 自指 | 横跨长周期，分 P0/P1/P2 三阶段 | **最后启动 P0**：因 P0 涉及顶层入口文件（含 AI_ENTRY_POINT.md），应在 027 完成索引补全后再统一加 frontmatter，避免重复编辑 |
+
+### B3 修复后回归验证清单（一次性脚本）
+
+```bash
+# 021: complexity_scanner 在框架仓库根可正常运行（无 --config）
+python tools/py/complexity_scanner.py --since "1 day ago" 2>&1 | head -5
+node   tools/js/complexity_scanner.js --since "1 day ago" 2>&1 | head -5
+# 修复后预期：无"找不到 dev_docs/complexity/config.yaml"错误，自动 fallback 到 dev/
+
+# 024: Guidelines 不再列 Review_Data.zip / Assessment_Dashboard.html
+grep -nE 'Review_Data\.zip|Assessment_Dashboard\.html' dev/quality/Framework_Review_Guidelines.md
+# 修复后预期：返回空
+
+# 024: Guidelines 已含"必需 5 件套 + 可选附加"结构
+grep -nE '必需.*5.*件套|可选附加' dev/quality/Framework_Review_Guidelines.md
+# 修复后预期：≥ 2 处命中
+
+# 025: README 不再承诺"每个 🔴 文档对应一份 context"
+grep -nE '每个.*context.*对应一份|具体清单见下方' dev/quality/README.md
+# 修复后预期：返回空
+
+# 025: README 已使用"按需生成"语境
+grep -cE '按需生成' dev/quality/README.md
+# 修复后预期：≥ 1
+
+# 027: workflows/complexity_alert_workflow.md 已创建且带 frontmatter
+test -f workflows/complexity_alert_workflow.md && head -1 workflows/complexity_alert_workflow.md | grep -q '^---$' && echo "✅ 027 创建+frontmatter 通过"
+
+# 027: AI_ENTRY_POINT 已索引 complexity_scanner
+grep -cE 'complexity_scanner' AI_ENTRY_POINT.md
+# 修复后预期：≥ 2（py + js）
+
+# 027: path_d 已含 @complexity 路由
+grep -cE '@complex' workflows/path_d_specific_tasks.md
+# 修复后预期：≥ 1
+
+# 034 P0: 顶层入口 + core/SUMMARY_FORMAT_SPEC + core/framework_spec 已带 frontmatter
+for f in AI_ENTRY_POINT.md README.md CONTRIBUTING.md core/SUMMARY_FORMAT_SPEC.md core/framework_spec.md; do
+  head -1 "$f" 2>/dev/null | grep -q '^---$' && echo "✅ $f" || echo "❌ $f"
+done
+# 修复后预期：全部 ✅
+
+# 034: summary_validator strict 校验 P0 范围 0 错误
+python tools/py/summary_validator.py --file AI_ENTRY_POINT.md --strict
+python tools/py/summary_validator.py --file README.md --strict
+python tools/py/summary_validator.py --file CONTRIBUTING.md --strict
+python tools/py/summary_validator.py --file core/SUMMARY_FORMAT_SPEC.md --strict
+# 修复后预期：全部 PASS
+
+# 035: tools/js/aac_validator.js 已含 JSDoc 头部块
+head -3 tools/js/aac_validator.js | grep -qE '^/\*' && echo "✅ 035"
+# 修复后预期：✅
+
+# 035: 双脚本对称回归
+total=0; missing=0
+for f in tools/js/*.js; do
+  [[ "$f" == *.test.js ]] && continue
+  total=$((total+1))
+  head -3 "$f" | grep -qE '^/\*|^//' || missing=$((missing+1))
+done
+echo "JS 主脚本头部 docstring: $(( (total-missing) * 100 / total ))%"
+# 修复后预期：100%
+```
+
+### B3 横切洞察
+
+1. **dogfood 失败集群**：034（frontmatter 14%）+ 027（设计-发布 gap）+ 021（默认路径假设）+ 035（双脚本对称偏差）共同显示"AICC 框架对自身的 dogfood 能力薄弱"。这是 R5（自指一致性）维度的本质性问题，单点修复治标不治本。建议在 SSOT 章节追加"框架自审 mode"约定。
+
+2. **dev_docs/ vs dev/ 二元结构未在工具行为中显式处理**：021 暴露根因 —"框架开发者用 dev/，用户项目用 dev_docs/"二元约定仅在文档层存在，工具默认值单方向硬编码偏向用户场景，造成框架自审摩擦。fallback 逻辑是治理点。
+
+3. **B1#022 重命名连锁**：027 的源路径已因 B1 修复而过期 — 这提示后续批次需特别注意"前批次修复对后批次 Issue 描述的连锁影响"。建议在最终系统性发现章节中归并这类"修复链"问题。
+
+4. **SOP 与策略漂移集群**：024（Guidelines 列 10 项实际 5 件套）+ 025（README 措辞与 contexts 现状脱节）共同指向"SOP 文档随策略迭代时未同步"。与 B2 的 014（FRAMEWORK_CONTEXT 自相矛盾）同源，是 R2 V3.0 一致性的横切问题。建议把"策略变更必须同步刷新 SOP 引用"列入 quality 体系的 verification 清单。
 
 ---
 

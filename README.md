@@ -1,3 +1,13 @@
+---
+title: AI Coding Context Framework — 人类开发者入门
+summary: AICC 框架对人类用户的介绍；说明框架核心理念、目标用户、与传统文档系统的差异、快速上手步骤；AI 不需读此文档，应转读 AI_ENTRY_POINT.md
+keywords: aicc | readme | onboarding | human-readers
+scope: 人类开发者首次了解 AICC 框架的入门读物
+related_files: AI_ENTRY_POINT.md | CONTRIBUTING.md | guides/quick_start.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # AI Coding Context Framework (AICC)
 
 > **AI 编程上下文框架** (AI Coding Context Framework)  

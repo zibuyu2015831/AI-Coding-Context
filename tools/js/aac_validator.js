@@ -1,10 +1,47 @@
 #!/usr/bin/env node
+/**
+ * AaC Validator: 架构即代码静态验证工具 (Architecture as Code) — Node.js 版本
+ *
+ * 功能说明:
+ *     从 Markdown ADR 文档中提取 YAML 约束，对代码进行静态扫描验证。
+ *     - 解析 ADR 中的 machine-readable constraints 代码块
+ *     - 支持 regex_check 正则匹配检查
+ *     - 支持 dependency_check 依赖检查
+ *     - 输出架构违规报告
+ *
+ * 使用方法:
+ *     # 扫描整个目录
+ *     node tools/js/aac_validator.js --scan-dir ./src
+ *
+ *     # 扫描特定文件
+ *     node tools/js/aac_validator.js --scan-file src/utils/helpers.ts
+ *
+ *     # 指定自定义 ADR 目录
+ *     node tools/js/aac_validator.js --adr-dir docs/architecture/decisions --scan-dir ./src
+ *
+ * 参数说明:
+ *     --scan-file PATH    扫描特定文件路径
+ *     --scan-dir PATH     扫描目录 (默认: 当前目录)
+ *     --adr-dir PATH      ADR 文档目录 (默认: dev_docs/architecture/decisions)
+ *
+ * 输出格式:
+ *     文本输出，包含以下信息:
+ *     - 加载的约束数量
+ *     - 扫描的文件数量
+ *     - 违规详情列表 (ADR来源、违规类型、违规信息、文件路径)
+ *     - 或合规确认信息
+ *
+ *     退出码:
+ *     - 0: 无违规或未发现约束
+ *     - 1: 发现架构违规
+ *
+ * 设计决策（V3.0 红线）:
+ *     遵守"零依赖"约束 — 不引入 js-yaml，自实现简化 YAML 解析（针对 ADR
+ *     constraints 代码块格式特化）。与 tools/py/aac_validator.py 双脚本对称。
+ */
 
 const fs = require('fs');
 const path = require('path');
-// Note: Normally we would use a real yaml parser 'js-yaml' through require,
-// but for zero-dependency standard, we'll do a simple naive text regex parser
-// specifically tuned for the constraints format in ADRs.
 
 function parseArgs() {
     const args = process.argv.slice(2);

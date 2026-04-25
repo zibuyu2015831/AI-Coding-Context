@@ -1,3 +1,13 @@
+---
+title: 文档更新触发机制
+summary: 定义 AICC 框架文档何时需要更新；含基于 commit 类型、文件变更范围、人工触发等多种触发规则
+keywords: update-triggers | doc-maintenance | commit-driven | aicc
+scope: AI 在用户项目演进时判断文档何时需要刷新的决策依据
+related_files: AI_ENTRY_POINT.md | core/framework_spec.md | workflows/commit_guided_update.md
+dependencies: 无
+verified_at: 2026-04-26
+---
+
 # 文档更新触发机制
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

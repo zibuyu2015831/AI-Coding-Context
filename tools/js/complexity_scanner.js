@@ -22,7 +22,12 @@
                             支持格式：
                             - 绝对时间："2026-04-12"
                             - 相对时间："1 day ago"、"7 days ago"、"24 hours ago"
-    --config CONFIG          配置文件路径（默认：dev_docs/complexity/config.yaml）
+    --config CONFIG          配置文件路径
+                             默认按以下顺序 fallback 探测：
+                             1. CLI 显式 --config 指定（优先）
+                             2. dev_docs/complexity/config.yaml （用户项目场景）
+                             3. dev/complexity/config.yaml （框架自审 / dogfood）
+                             4. 工具内置默认
 
 输出格式：
     {
@@ -99,7 +104,12 @@ function showHelp() {
                             支持格式：
                             - 绝对时间："2026-04-12"
                             - 相对时间："1 day ago"、"7 days ago"、"24 hours ago"
-    --config CONFIG          配置文件路径（默认：dev_docs/complexity/config.yaml）
+    --config CONFIG          配置文件路径
+                             默认按以下顺序 fallback 探测：
+                             1. CLI 显式 --config 指定（优先）
+                             2. dev_docs/complexity/config.yaml （用户项目场景）
+                             3. dev/complexity/config.yaml （框架自审 / dogfood）
+                             4. 工具内置默认
     --help, -h              显示此帮助信息
 
 版本信息：
@@ -582,6 +592,12 @@ function calculateReviewRisk(reviewData) {
 }
 
 // 加载配置
+//
+// Fallback 优先级（B3#021 引入，与 tools/py/complexity_scanner.py 同源）：
+//   1. CLI 显式 configPath（非空且存在）
+//   2. dev_docs/complexity/config.yaml （用户项目场景）
+//   3. dev/complexity/config.yaml （框架自审 / dogfood 场景）
+//   4. 工具内置默认
 function loadConfig(configPath) {
   // 默认配置
   const defaultConfig = {
@@ -618,28 +634,35 @@ function loadConfig(configPath) {
     }
   };
 
-  // 尝试从配置文件加载
-  if (configPath && fs.existsSync(configPath)) {
+  function mergeConfigs(defaults, user) {
+    const result = { ...defaults };
+    for (const [key, value] of Object.entries(user)) {
+      if (key in result && typeof result[key] === 'object' && typeof value === 'object' && !Array.isArray(result[key]) && !Array.isArray(value)) {
+        result[key] = mergeConfigs(result[key], value);
+      } else {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
+  // 候选路径按优先级排列
+  const candidates = [];
+  if (configPath) candidates.push(configPath);
+  candidates.push('dev_docs/complexity/config.yaml');
+  candidates.push('dev/complexity/config.yaml');
+
+  for (const p of candidates) {
+    if (!fs.existsSync(p)) continue;
     try {
-      const content = fs.readFileSync(configPath, 'utf8');
+      const content = fs.readFileSync(p, 'utf8');
       const parsedConfig = parseYaml(content);
       if (parsedConfig) {
-        // 合并配置（用户配置覆盖默认配置）
-        function mergeConfigs(defaultConfig, userConfig) {
-          const result = { ...defaultConfig };
-          for (const [key, value] of Object.entries(userConfig)) {
-            if (key in result && typeof result[key] === 'object' && typeof value === 'object' && !Array.isArray(result[key]) && !Array.isArray(value)) {
-              result[key] = mergeConfigs(result[key], value);
-            } else {
-              result[key] = value;
-            }
-          }
-          return result;
-        }
         return mergeConfigs(defaultConfig, parsedConfig);
       }
     } catch (e) {
-      console.error(`Warning: 无法加载配置文件 ${configPath}, 使用默认配置:`, e.message);
+      console.error(`Warning: 无法加载配置文件 ${p}, 尝试下一候选:`, e.message);
+      continue;
     }
   }
 
