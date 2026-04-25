@@ -1,0 +1,4 @@
+# dev/ 是 AICC 框架自身的开发工作区，不进入 release 产物
+# git archive、GitHub release tarball 会自动剔除该目录
+dev/ export-ignore
+.gitattributes export-ignore

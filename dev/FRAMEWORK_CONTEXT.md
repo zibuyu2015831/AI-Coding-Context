@@ -3,9 +3,9 @@ title: AICC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
 summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V2.3 稳定能力和 V3.0 基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
 keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
-related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | quality/README.md | reference/design_decisions.md | reference/SUMMARY_FORMAT_SPEC.md
-dependencies: reference/SUMMARY_FORMAT_SPEC.md | reference/design_decisions.md
-verified_at: 2026-04-06
+related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
+dependencies: core/SUMMARY_FORMAT_SPEC.md | core/design_decisions.md
+verified_at: 2026-04-25
 ---
 
 **当前框架版本**: V2.3  
@@ -302,22 +302,36 @@ V3.0: ADR系统 + 演进历史（P1 规划中）
 
 ```text
 ai_coding_context/
-├── AI_ENTRY_POINT.md         # AI 入口（AI 读这个）
-├── README.md                 # 对人类的框架介绍（取代早期 INTRODUCTION.md）
-├── core/                     # 核心规范（语言/安全/项目类型/更新触发）
-├── docs/                     # 🆕 通用文档库
-├── dev/                      # 框架开发与版本规划文档
-│   ├── FRAMEWORK_CONTEXT.md  # 本文档，全局上下文
-│   └── V3.0/                 # V3.0 规划与进度
-├── config/                   # 配置管理系统（user_config + CONFIG_TEMPLATE）
-├── tools/                    # 实用脚本工具库（project_scanner, content_searcher, summary_* 等）
-├── agents/                   # AI 角色库（runtime/development/language_specific/workflows 等）
-├── workflows/                # 🆕 核心工作流（生成/检查/互审/Git 安全等）
-├── quality/                  # 文档质量保证体系（标准、审查工作流、contexts 模板）
-├── guides/                   # 使用与适配指南
-├── templates/                # 各类文档模板
-└── reference/                # 设计决策与摘要规范等参考文档
+│
+├─[Public — main + dev 分支均可见]──────────
+│  ├── AI_ENTRY_POINT.md         # AI 入口（AI 读这个）
+│  ├── README.md                 # 对人类的框架介绍
+│  ├── CONTRIBUTING.md           # 贡献指南
+│  ├── core/                     # 核心规范（语言/安全/项目类型/更新触发/摘要规范/设计决策）
+│  ├── agents/                   # AI 角色库（runtime/development/language_specific/workflows 等）
+│  ├── config/                   # 配置管理系统（user_config + CONFIG_TEMPLATE）
+│  ├── tools/                    # 实用脚本工具库（project_scanner, content_searcher, summary_* 等）
+│  ├── workflows/                # 核心工作流（生成/检查/互审/Git 安全等）
+│  ├── guides/                   # 使用与适配指南（含 commit_guided_* 等）
+│  └── templates/                # 各类文档模板
+│
+└─[Dev-only — 仅 dev 分支可见，release 自动剔除]─────
+   └── dev/                              # 框架自身开发工作区
+       ├── FRAMEWORK_CONTEXT.md          # 本文档（全局上下文）
+       ├── architecture/                 # 架构产物（dogfood ADR 系统）
+       │   ├── adr-template.md           # ADR 模板
+       │   ├── evolution.md              # ADR 演进图谱
+       │   └── decisions/                # 已接受 ADR（001 markdown / 002 layered）
+       ├── complexity/                   # 复杂度仪表盘运行时（config + dashboard + data）
+       ├── quality/                      # 文档质量保证体系（标准 + 审查 SOP + contexts）
+       ├── V3.0/                         # V3.0 规划、提案、进度
+       ├── V2.3/  V2.2/                  # 历史版本审查
+       ├── reference/                    # 开发参考资料（理论分析、外部案例研究等）
+       ├── real_case/                    # 真实项目案例素材
+       └── case_skillatlas_review/       # SkillAtlas 项目审查案例（019 ADR 来源）
 ```
+
+**⚠️ `dev/` 目录排除机制**：通过 `.gitattributes` 设置 `dev/ export-ignore`，`git archive` 与 GitHub release 自动剔除该目录；merge 到 main 分支时也应保持 `dev/` 不进入 main（详见 `dev/README.md`）。
 
 #### 3.1.2 典型用户项目结构（复制框架后的目标形态）
 
