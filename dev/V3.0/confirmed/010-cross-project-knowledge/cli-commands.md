@@ -593,7 +593,7 @@ node tools/js/knowledge_cli.js config --shared https://github.com/your-org/share
 - [010 - 跨项目知识复用主文档](./010-cross-project-knowledge.md)
 - [知识仓库架构设计](./architecture-design.md)
 - [框架自进化系统](./self-evolution-system.md)
-- [AICC 工具库开发规范](../tools/README.md)
+- [AICC 工具库开发规范](../../../../tools/README.md)
 
 ---
 

@@ -267,7 +267,7 @@ AI: 加载 ai_agents/language_specific/python/python_engineer.md
 
 ## 📝 贡献新角色
 
-参考 [\_templates/agent_template.md](./_templates/agent_template.md)
+参考 [\_templates/agent_template.md](../../../../agents/_templates/agent_template.md)
 ```
 
 #### 4. 角色协作机制

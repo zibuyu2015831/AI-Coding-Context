@@ -591,8 +591,7 @@ README.md 包含：
 
 ## 📚 参考资源
 
-- [文档体系规范](../README.md)
-- [结构规范](./STRUCTURE_SPEC.md)
+- [文档体系规范](../core/framework_spec.md)
 - [文档模板](../templates/)
 
 ---

@@ -223,9 +223,8 @@ cp CONFIG_TEMPLATE.md user_config.md
 
 ## 📚 相关文档
 
-- [AI_ENTRY_POINT.md](../../AI_ENTRY_POINT.md) - 框架入口
-- [README.md](../../README.md) - 框架介绍
-- [优化点 016](../../dev/V3.0/confirmed/016-unified-config-system/) - 配置系统设计文档
+- [AI_ENTRY_POINT.md](../../../../AI_ENTRY_POINT.md) - 框架入口
+- [README.md](../../../../README.md) - 框架介绍
 
 ---
 

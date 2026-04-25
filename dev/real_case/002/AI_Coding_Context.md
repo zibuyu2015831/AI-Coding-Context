@@ -10,6 +10,12 @@ verified_at: 2025-12-19
 
 # Claude Code AI 编码上下文
 
+> ⚠️ **本文件为"案例样本"，请勿当作真实文档使用**
+>
+> 本文档是为 Claude Code（Anthropic）项目生成的 AI 编码上下文示例，用于演示框架在真实项目上的产出形态。
+>
+> 文中所有 markdown 链接（如 `architecture.md`、`api_reference.md`、`dev_docs/...`、`ai_coding_context/...`）均面向 Claude Code 项目假设的目录结构，**在本仓库内无法跳转**，这是**预期行为**，不是失效引用。
+
 > **文档定位**:
 >
 > - 本文档为 AI 辅助编程的快速上下文入口（索引 + 速查手册）

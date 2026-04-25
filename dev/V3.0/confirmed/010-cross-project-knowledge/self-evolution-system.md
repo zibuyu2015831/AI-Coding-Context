@@ -1021,8 +1021,8 @@ const PerformanceAcceptance = {
 
 - [010 - 跨项目知识复用主文档](./010-cross-project-knowledge.md)
 - [知识仓库架构设计](./architecture-design.md)
-- [AICC 框架全局上下文](../FRAMEWORK_CONTEXT.md)
-- [V3.0 开发规划](../DISCUSSION_CONTEXT.md)
+- [AICC 框架全局上下文](../../../FRAMEWORK_CONTEXT.md)
+- [V3.0 开发规划](../../DISCUSSION_CONTEXT.md)
 
 ---
 

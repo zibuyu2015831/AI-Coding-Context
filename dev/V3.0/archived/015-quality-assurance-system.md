@@ -314,9 +314,9 @@ quality/                          # 质量保证体系 ⭐ 新增
 
 ## 📚 相关文档
 
-- [workflows/document_health_check.md](../../workflows/document_health_check.md) - 已有的健康度检查
-- [011-doc-error-fix-workflow.md](./011-doc-error-fix-workflow.md) - 文档修复工作流（配合使用）
-- [012-mandatory-doc-summary.md](./012-mandatory-doc-summary.md) - 文档摘要机制（提升审查效率）
+- [workflows/document_health_check.md](../../../workflows/document_health_check.md) - 已有的健康度检查
+- [011-doc-error-fix-workflow.md](../confirmed/011-doc-error-fix-workflow/011-doc-error-fix-workflow.md) - 文档修复工作流（配合使用）
+- [012-mandatory-doc-summary.md](../confirmed/012-mandatory-doc-summary/012-mandatory-doc-summary.md) - 文档摘要机制（提升审查效率）
 
 ---
 
