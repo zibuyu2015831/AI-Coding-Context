@@ -21,11 +21,28 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 审查范围说明
 
-**重要说明**：审查将专注于生产环境中的框架核心组件，跳过`dev/`目录下的开发中文件（除`dev/quality/audits/`审查文档目录）。`dev/`目录包含开发过程中使用的临时文件、讨论记录和未完成的工作，不代表框架的正式实现状态。
+AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对应 `.gitattributes` 中未被 `export-ignore` 的所有内容）与 **dev/ 层**（仅 dev 分支可见，release 时自动剔除）。任何一次完整审查都必须明确选择"视角"，避免把"终端用户体验问题"与"开发工作区问题"混为一谈。
+
+### 审核视角分层（V1.1 起）
+
+| 视角 | 可见范围 | 审核目标 | 何时使用 |
+|---|---|---|---|
+| **A. 用户视角** | 仅 Public 层 | 模拟终端用户照着 `README.md` → `AI_ENTRY_POINT.md` 能否跑通；**任何对 `dev/` 路径的引用都视为 release tarball 中的断链缺陷** | 评估上手路径、对外承诺与实现一致性、文档闭环 |
+| **B. 完整性视角** | Public + dev/ | 交叉检查 实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ V3.0/PROGRESS 是否一致；验证设计意图是否在代码中落地 | 评估架构演进、设计-实现匹配度、自指一致性 |
+| **C. dev/ 卫生视角** | 仅 dev/ | dev/ 自身组织清晰、无悬空引用、不向 main 泄漏；确认 `.gitattributes export-ignore` 真的封住边界 | 评估开发工作区健康度、版本演进档案完整性 |
+
+**与旧政策的关系**：v1.0 曾要求"跳过 dev/ 目录"——该政策仅在视角 A 下成立。v1.1 起三视角并存，依据视角决定可见范围，不再统一排除 dev/。
+
+**视角使用原则**：
+
+- 一次完整审查（Comprehensive round）应同时执行 A、B、C 三视角
+- 每条问题在 `Issue_Tracking.md` 中必须标注其归属视角（便于按视角分类修复）
+- 同一文件在不同视角下可能得出不同结论：例如 `core/design_decisions.md` 链接 `dev/V3.0/` 在视角 A 是缺陷、在视角 B 是设计意图证据 —— **以视角 A 为优先**（用户体验是底线）
+- 仅在专项审查（Component / Security / Performance scope）时可省略部分视角，需在 `Review_Plan.md` 中显式声明
 
 ### 整体架构审查
 
-- **框架结构**：整体目录结构的合理性与逻辑性（排除 dev/目录）
+- **框架结构**：整体目录结构的合理性与逻辑性（按所选视角决定是否含 dev/）
 - **模块划分**：各模块的功能划分与职责边界清晰度
 - **版本管理**：版本迭代过程中的架构演进与一致性
 - **设计原则**：框架设计原则的贯彻与实施情况
@@ -79,18 +96,22 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ## 🤖 子代理委派策略 (Sub-agents Strategy)
 
-为了提升审查效率并保持上下文纯净，主代理应根据任务特性委派子代理：
+为了提升审查效率并保持上下文纯净，主代理应根据任务特性委派子代理。AICC 在 `agents/runtime/` 下内置了多个专业角色；同时也可以使用宿主 IDE（Claude Code / Cursor / Codex 等）提供的通用 Explore / Search 子代理处理与角色无强绑定的批量任务。
 
-| 委派对象 | 适用场景 | 任务描述 |
+| 委派任务模式 | 推荐角色（agents/runtime/） | 适用场景 |
 | :--- | :--- | :--- |
-| **`generalist`** | **批量合规性核查** | 1. 检查 `tools/py/` 与 `tools/js/` 的文件对称性。<br>2. 扫描所有 Markdown 文件验证 YAML 摘要 (012) 完整性。<br>3. 静态检查脚本的 `import` 语句以验证“零依赖”约束。 |
-| **`codebase_investigator`** | **深度架构审计** | 1. 扫描代码库生成的依赖图，对比 `dev_docs/architecture/` 中的 ADR 记录。<br>2. 识别跨组件的隐性耦合和违反职责边界的行为。 |
-| **`cli_help`** | **IDE 规则评估** | 1. 评估 `AI_RULES.md` 在 IDE 环境中的提示质量和优先级表现。 |
+| **批量合规性核查** | 通用 Explore / Search 子代理（无需特定角色） | 1. 检查 `tools/py/` 与 `tools/js/` 的文件对称性<br>2. 扫描所有 Markdown 文件验证 YAML 摘要 (012) 完整性<br>3. 静态检查脚本的 `import` 语句以验证"零依赖"约束<br>4. 全仓库 grep 死链/悬空引用 |
+| **深度架构审计** | `code_reviewer.md` + `agents/development/architecture_analyst.md` | 1. 扫描代码库依赖图，对比 `dev/architecture/decisions/` 中的 ADR 记录<br>2. 识别跨组件的隐性耦合和违反职责边界的行为 |
+| **安全红线检查** | `security_auditor.md` | 1. 验证 `core/security_rules.md` 红线在脚本/工作流中的落地<br>2. 敏感信息泄漏扫描<br>3. `git_safety_workflow` 执行情况抽查 |
+| **文档与代码一致性** | `understanding_guardian.md` | 抽样验证文档对实现的描述是否与代码现状一致，发现"文档说一套实际另一套"的偏差 |
+| **Commit 历史合规** | `commit_analyst.md` | 验证 Commit-Guided Documentation (018) 的实际运行情况：结构化 commit 比例、文档同步触达率 |
+| **摘要规范扫描** | `summary_generator.md` 反向使用 | 抽样验证已生成的 YAML Frontmatter 摘要是否符合 `core/SUMMARY_FORMAT_SPEC.md` |
 
 **委派原则**：
-1. **输入明确**：给子代理提供清晰的审查清单和判定标准。
-2. **输出总结**：子代理只需返回“合规报告”或“异常清单”，无需在主会话中展示所有读取细节。
-3. **主代理决策**：主代理负责整合子代理的发现，并将其记录至 `Issue_Tracking.md`。
+
+1. **输入明确**：给子代理提供清晰的审查清单和判定标准（最好是 yes/no 的二元判断）
+2. **输出总结**：子代理只需返回"合规报告"或"异常清单"，无需在主会话中展示所有读取细节
+3. **主代理决策**：主代理负责整合子代理的发现，并将其记录至 `Issue_Tracking.md`，标注归属视角
 
 ## 📅 审查计划时间表模板
 
@@ -108,14 +129,14 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 整体架构审查清单
 
-- [ ] 框架整体目录结构是否清晰合理（排除 dev/目录）
+- [ ] 框架整体目录结构是否清晰合理（视角 A：仅 Public；视角 B/C：含 dev/）
 - [ ] 各模块的功能划分与职责边界是否明确
 - [ ] 版本迭代过程中的架构演进是否保持一致性
 - [ ] 设计原则是否在框架中得到贯彻
 - [ ] 框架的扩展机制是否满足未来发展需求
 - [ ] 核心概念模型是否清晰且一致
 - [ ] 框架命名规范与约定是否统一
-- [ ] dev/目录与生产环境的分离是否清晰合理
+- [ ] dev/ 与 Public 的边界是否封闭良好（视角 A 下任何 dev/ 引用都是缺陷；`.gitattributes export-ignore` 应真实生效）
 
 ### 核心组件审查清单 (V3.0 增强)
 
@@ -171,8 +192,10 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 #### ADR 与架构治理
 
-- [ ] `dev_docs/architecture/` 目录下的 ADR 记录是否完整且及时
-- [ ] 架构探针工具（如 `why_tool`）是否能在 IDE 环境中正常触发
+- [ ] AICC 框架自身 ADR（`dev/architecture/decisions/`，视角 B/C）是否完整且及时
+- [ ] 用户项目 ADR 模板与生成路径（`dev_docs/architecture/`，由模板/工作流提供）是否文档化
+- [ ] 架构探针工具（`tools/py/why_tool.py` / `tools/js/why_tool.js`）是否能在 IDE 环境中正常触发
+- [ ] `aac_validator` 静态拦截工具的规则是否覆盖核心约束
 
 #### 复杂度仪表盘
 
@@ -486,7 +509,7 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
    - 准备完整的 AI Coding Context 框架环境
    - 确保所有依赖和工具可用
    - 准备测试数据和测试用例
-   - 配置审查工具，排除 dev/目录的干扰
+   - 根据本轮使用的视角配置审查工具的扫描范围（视角 A 排除 dev/，视角 B 全量，视角 C 仅 dev/）
 
 2. **文档准备**
 
@@ -497,16 +520,17 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 3. **工具准备**
 
-   - 准备代码分析工具，配置排除 dev/目录
+   - 根据所选视角设置代码分析工具的扫描范围
    - 准备测试自动化工具
    - 准备性能监控工具
-   - 准备文档一致性检查工具
+   - 准备文档一致性检查工具（如 `tools/summary_validator`、`tools/aac_validator`）
 
-4. **范围界定确认**
+4. **视角与范围确认**
 
-   - 明确标记 dev/目录为开发环境文件，不纳入审查范围
-   - 确认审查范围仅限于生产环境组件和文件
-   - 准备 dev/目录与生产环境的差异说明文档（如需要）
+   - 在 `Review_Plan.md` 中显式声明本轮使用的视角集合（A / B / C 或子集）及理由
+   - 视角 A 必检项：所有从 Public 文件出发的链接、引用必须不指向 dev/
+   - 视角 B 必检项：实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ PROGRESS 一致性
+   - 视角 C 必检项：dev/ 自身无悬空引用、`.gitattributes export-ignore` 实际生效
 
 5. **审查文档目录创建**
    - 创建 dev/quality/audits/目录（如果不存在）
@@ -544,10 +568,13 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ---
 
-**文档版本**：1.1  
+**文档版本**：1.2  
 **创建日期**：2025-12-18  
-**更新日期**：2026-04-17  
+**更新历史**：
+- 2026-04-17 v1.1：适配 V3.0（强制摘要、双脚本、ADR、Commit-Guided）
+- 2026-04-25 v1.2：引入"审核视角分层"（用户/完整性/dev 卫生），删除自相矛盾的"跳过 dev/"政策，修正 sub-agent 名称对齐到实际 `agents/runtime/` 角色
+
 **创建人**：AI 助手  
-**状态**：标准化指南（已适配 V3.0）  
+**状态**：标准化指南（V1.2 引入三视角分层）  
 **适用范围**：所有 AI Coding Context 框架审查活动  
-**最后更新**：2026-04-17
+**最后更新**：2026-04-25
