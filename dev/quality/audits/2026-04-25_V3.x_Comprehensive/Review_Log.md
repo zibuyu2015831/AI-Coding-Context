@@ -175,19 +175,67 @@ verified_at: 2026-04-25
 
 - 复杂度告警工作流（剧本 4 缺失项）是 005 的"未完成尾巴"还是"V3.0 未规划项"？应在 B4 自指审查阶段查 005 confirmed 文档原始设计意图判定
 
-### B4 R5 自指审查（下一步）
+### B4 R5 自指审查（已完成）
 
-**计划**：用 v2.0 quality 体系审 quality 体系自身
-- README v2.0 索引覆盖率（应通过）
-- Guidelines v1.2 内部一致性（应通过）
-- 被引用标准存在性（BY_DOCUMENT_TYPE.md 已补，应通过）
-- contexts/ 数量 vs README 标注差距说明
-- sub-agent 名称对齐验证
-- 复审 005 confirmed/ 是否原本规划了"复杂度告警工作流"
+**做了什么**：
 
-**预计**：0.5-1 小时
+1. 通读 `dev/quality/README.md` v2.0（337 行）核对索引覆盖率
+2. 通读 `dev/quality/Framework_Review_Guidelines.md` v1.2（581 行）核对内部一致性 + sub-agent 对齐
+3. 验证 `dev/quality/standards/` 三件套：BY_DOCUMENT_TYPE.md / COMMON_STANDARDS.md / QUALITY_CHECKLIST.md 全部 ✅
+4. 验证 `agents/runtime/` 与 Guidelines L101-L107 sub-agent 表对齐：code_reviewer / security_auditor / understanding_guardian / commit_analyst / summary_generator + agents/development/architecture_analyst.md 全部 ✅
+5. 复审 `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` 设计意图（剧本 4 缺失工作流的根因诊断）
+6. 抽样核查 confirmed/ 14 项档案命名一致性
+
+**核查结果**：
+
+| 验证项 | 状态 | 备注 |
+|---|:-:|---|
+| README v2.0 索引覆盖率 | ⚠️ | 漏 _templates/；examples 数字偏差 21→18 |
+| Guidelines v1.2 内部一致性 | ⚠️ | 第 5/6 项交付物（Review_Data.zip / Assessment_Dashboard.html）从未产出 |
+| 被引用标准存在性 | ✅ | BY_DOCUMENT_TYPE.md 已补；引用方均能解析 |
+| sub-agent 名称对齐 | ✅ | 全部对齐 agents/runtime/ 与 development/ |
+| 三视角分层条款 | ✅ | "跳过 dev/" 矛盾措辞已根除 |
+| contexts/ 措辞 vs 现状 | ⚠️ | README L46 仍引导读者去 contexts/ 找具体文件，但目录仍空 |
+| 005 walkthrough 完整性 | ⚠️ | 工具链虚标 architecture_analyzer.py（不存在）|
+| confirmed/ 命名规范 | 🔴 | 004/005/006 目录名带 .md 后缀（不一致）|
+
+**新增 Issue**（共 6 项）：
+
+- 🔴 AICC-20260425-022（主要）：dev/V3.0/confirmed/ 下 004/005/006 目录名带 `.md` 后缀，与其他 10 个目录不一致；Read 工具会报 EISDIR
+- 🔴 AICC-20260425-023（次要）：quality/README v2.0 索引漏 agents/_templates/；examples 数字偏差（写 21 实际 18）
+- 🔴 AICC-20260425-024（次要）：Framework_Review_Guidelines.md 第 5/6 项交付物（Review_Data.zip / Assessment_Dashboard.html）从未产出 — SOP 过度承诺
+- 🔴 AICC-20260425-025（建议）：README v2.0 contexts/ 章节措辞与"按需生成"策略有张力（仍引导去找具体文件）
+- 🔴 AICC-20260425-026（次要）：005 walkthrough.md 声称的 `architecture_analyzer.py` 在 tools/py/ 中不存在（实体虚标）
+- 🔴 AICC-20260425-027（建议）：005 walkthrough.md 已含完整端到端"扫描→报告→Hooks"剧本，但未提升至 Public workflows/ — 是 AICC-20260425-019 的根因诊断
+
+**关键决策**：
+
+- 决策 15：B3 留下的疑问"剧本 4 是 005 未完成尾巴还是未规划项"在 B4 得到答案 → **设计已完整规划（walkthrough.md 含端到端流程）**，缺的仅是"提升至 Public"这一步。这把 019 从"主要功能缺失"重新定性为"发布最后一里未走完"
+- 决策 16：004/005/006 目录命名带 .md 后缀属设计早期遗留（创建时可能为单文件后扩展为目录），与 010-018 创建时已是目录形成不一致。修复成本极低（3 次 git mv + grep 引用），优先级高
+- 决策 17：Guidelines 中的 Review_Data.zip / Assessment_Dashboard.html 是 SOP 写大但实践无的典型案例，与 AICC 自身倡导的"务实而非膨胀"理念冲突，应主动精简
+- 决策 18：B4 同步发现 005 工具链虚标 architecture_analyzer.py，让 B2 的"12 项实体全部 ✅"结论需要打小补丁：实体存在但子工具集不完整。这是有价值的"二次审查"反馈
+
+**重大正面发现**：
+
+- ✅ Quality 体系核心方法论（标准 / 视角分层 / sub-agent 名称对齐）经审查无重大缺陷
+- ✅ Phase 0 在 B0 阶段补全的 BY_DOCUMENT_TYPE / audits/ 体系经实际使用验证有效
+- ✅ 005 设计意图完整 — 这进一步证明 V3.0 P1 阶段产出真实，仅缺"发布"
+
+**未解疑问**：
+
+- 005 walkthrough.md 声明 5 个验证场景（A-E?），但实际 architecture_analyzer 缺失会让"高级架构分析"场景无法跑通；剧本 4 工作流提升时是否应一并补 architecture_analyzer 还是先发布功能子集？建议改进路线图（B7）讨论
+
+### B5 R4 新用户旅程（下一步）
+
+**计划**：模拟"我是新用户"路径
+- 仅看 Public 层：README → AI_ENTRY_POINT → quick_start → 第一份 AI_Coding_Context.md
+- 记录每个停顿点、歧义点、断链点
+- 检查 30 分钟时间预算
+- 与 016（AI_RULES.md 大小写）联动验证用户体验断点
+
+**预计**：1-2 小时
 
 ---
 
-**版本**：v1.3
-**最后更新**：2026-04-25（B3 完成）
+**版本**：v1.4
+**最后更新**：2026-04-25（B4 完成）

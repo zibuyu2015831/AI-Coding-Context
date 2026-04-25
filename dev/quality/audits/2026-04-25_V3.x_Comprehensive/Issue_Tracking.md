@@ -20,21 +20,21 @@ verified_at: 2026-04-25
 | 严重级别 | 数量 |
 |---|---|
 | 严重 | 0 |
-| 主要 | 7 |
-| 次要 | 9 |
-| 建议 | 5 |
-| **合计** | **21**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6；后续批次将追加） |
+| 主要 | 8 |
+| 次要 | 12 |
+| 建议 | 7 |
+| **合计** | **27**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6 + B4 新增 6；后续批次将追加） |
 
 | 视角分布 | 数量 |
 |---|---|
 | 视角 A（用户） | 5 |
-| 视角 B（完整性） | 12 |
-| 视角 C（dev 卫生） | 4 |
+| 视角 B（完整性） | 17 |
+| 视角 C（dev 卫生） | 5 |
 
 | 修复状态 | 数量 |
 |---|---|
 | 🟢 已修复（Phase 0 顺手处理） | 4 |
-| 🔴 待修复 | 17 |
+| 🔴 待修复 | 23 |
 
 ---
 
@@ -1522,12 +1522,465 @@ B3 R1 工作流端到端闭环（剧本 4，附带观察）
 
 ---
 
-## 📈 后续批次将追加的问题段落
+## 问题 ID: AICC-20260425-022
 
-每个批次（B4-B7）执行后将在此追加问题，编号继续：AICC-20260425-022 起。
+- **类型**: 设计问题（目录命名规范不一致）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: B（完整性）+ C（dev 卫生）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`dev/V3.0/confirmed/` 下的优化点档案命名规范不统一：
+
+- **目录名带 `.md` 后缀**（异常，3 个）：
+  - `004-adr-system.md/`（目录）
+  - `005-complexity-dashboard.md/`（目录）
+  - `006-auto-review-report.md/`（目录）
+
+- **目录名无后缀**（正常，10 个）：
+  - `001-ai-agent-library/` / `003-design-thinking-guide/` / `010-cross-project-knowledge/` / `011-doc-error-fix-workflow/` / `012-mandatory-doc-summary/` / `013-ai-mutual-review/` / `014-doc-reading-habit-guide/` / `016-unified-config-system/` / `017-utility-script-library/` / `018-commit-guided-documentation/`
+
+- **单文件 `.md`**（合理，1 个）：
+  - `019-systematic-review-framework.md`
+
+`Read` 工具直接打开 `004-adr-system.md`、`005-complexity-dashboard.md`、`006-auto-review-report.md` 会因 EISDIR 报错。视觉上无法区分文件 vs 目录。AI 写代码生成内部链接易错。
+
+### 影响范围
+
+- AI 工具读取 confirmed/ 档案易报错（EISDIR）
+- ADR 链接、内部交叉引用易混淆
+- B4 自指审查中实际遇到此问题（Read 工具直接报 EISDIR）
+- 视角 C（dev/ 卫生）核心缺陷
+
+### 主要文件路径
+
+- `dev/V3.0/confirmed/004-adr-system.md/`
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/`
+- `dev/V3.0/confirmed/006-auto-review-report.md/`
+
+### 相关文件路径
+
+- `dev/V3.0/PROGRESS.md`（如内含相对链接需同步更新）
+- `dev/quality/README.md` L264（文档引用方式）
+
+### 具体位置
+
+```
+dev/V3.0/confirmed/004-adr-system.md/         ← 应为 004-adr-system/
+   ├── 004-adr-system.md
+   ├── implementation_plan.md
+   └── walkthrough.md
+
+dev/V3.0/confirmed/005-complexity-dashboard.md/   ← 应为 005-complexity-dashboard/
+   ├── 005-complexity-dashboard.md
+   ├── implementation_plan.md
+   └── walkthrough.md
+
+dev/V3.0/confirmed/006-auto-review-report.md/    ← 应为 006-auto-review-report/
+   ├── 006-auto-review-report.md
+   ├── implementation_plan.md
+   ├── walkthrough.md
+   ├── 修复记录.md
+   └── 资深用户审核报告.md
+```
+
+### 复查方法（验证修复）
+
+```bash
+# 1. confirmed/ 下应只有目录无 .md 后缀，或单文件 .md（如 019）
+ls -d dev/V3.0/confirmed/*/ 2>/dev/null | grep '\.md/$'
+# 修复后预期：返回空
+
+# 2. 旧目录名引用方应同步更新
+grep -rn '004-adr-system\.md/\|005-complexity-dashboard\.md/\|006-auto-review-report\.md/' \
+  --include='*.md' dev/ | grep -v '/\.git'
+# 修复后预期：返回空
+
+# 3. Read 工具不再报 EISDIR
+test -d dev/V3.0/confirmed/004-adr-system && echo OK
+test -d dev/V3.0/confirmed/005-complexity-dashboard && echo OK
+test -d dev/V3.0/confirmed/006-auto-review-report && echo OK
+```
+
+### 建议修复方案
+
+```bash
+git mv dev/V3.0/confirmed/004-adr-system.md dev/V3.0/confirmed/004-adr-system
+git mv dev/V3.0/confirmed/005-complexity-dashboard.md dev/V3.0/confirmed/005-complexity-dashboard
+git mv dev/V3.0/confirmed/006-auto-review-report.md dev/V3.0/confirmed/006-auto-review-report
+# 然后 grep 全仓库更新引用
+```
+
+长期：在 `dev/V3.0/README.md` 中明确"优化点目录命名规范：单文件用 `NNN-name.md`，多文件用 `NNN-name/` 目录无后缀"。
+
+### 审查阶段
+
+B4 R5 自指审查（confirmed/ 命名审查）
 
 ---
 
-**版本**：v1.3
+## 问题 ID: AICC-20260425-023
+
+- **类型**: 文档问题（README 索引覆盖率缺口）
+- **严重级别**: 次要
+- **优先级**: 低
+- **归属视角**: B+C
+- **关联任务/ADR**: 与 AICC-20260425-006（README v2.0 重写）同源
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`dev/quality/README.md` v2.0 在 agents/ 索引段（L153-L173）存在多处差异：
+
+1. **遗漏 `agents/_templates/` 子目录**：实际含 `agent_template.md` 与 `quality_checklist.md`，但 README 完全未列
+2. **examples 计数偏差**：README L171 写"21 个"，实际为 18 个（含 1 个 `design_thinking/` 子目录 + 1 个 `README.md` + 16 个 `*_examples.md`）
+3. **language_specific 计数偏差**：README L163 写"7 个"，需复核（仓库实际 5 项 + base/ 子目录）
+
+这些差距不会破坏使用，但作为"完整索引 200+ 公共文档"的 v2.0 定位，索引精度应保证。
+
+### 影响范围
+
+- 读 README 后建立的"agents 总览"心智模型存在偏差
+- 索引覆盖率作为 v2.0 主要卖点，部分失真
+
+### 主要文件路径
+
+- `dev/quality/README.md`
+
+### 相关文件路径
+
+- `agents/_templates/`（实际存在但未索引）
+- `agents/examples/`（实际数量与索引不符）
+- `agents/language_specific/`（实际数量与索引不符）
+
+### 具体位置
+
+- `dev/quality/README.md` L153-L173 agents/ 索引段
+- L169：`**custom/（1 个，⚪ 仅合规）**：\`_template.md\``（应增加 _templates/ 索引）
+- L171：`**examples/（21 个，🟡 批审...）**`（应改为实际数量）
+
+### 复查方法（验证修复）
+
+```bash
+# 1. README 应包含 _templates 索引
+grep -nE '_templates' dev/quality/README.md
+
+# 2. 数量复核
+echo "examples actual:" && ls agents/examples/ | wc -l
+echo "language_specific actual:" && ls agents/language_specific/ | wc -l
+echo "personas actual:" && ls agents/personas/ | wc -l
+
+# 3. 索引声明数 vs 实际数
+grep -oE 'examples/（[0-9]+ ?个|language_specific/（[0-9]+ ?个|personas/（[0-9]+ ?个' \
+  dev/quality/README.md
+```
+
+### 建议修复方案
+
+- 在 L169 后增加：`**_templates/（2 个，⚪ 仅合规）**：\`agent_template.md\`、\`quality_checklist.md\``
+- L171 改为：`**examples/（实际 18 个含 1 个子目录，🟡 批审...）**`
+- 同步检查 language_specific 与 personas 数字
+
+### 审查阶段
+
+B4 R5 自指审查（README 索引覆盖率验证）
+
+---
+
+## 问题 ID: AICC-20260425-024
+
+- **类型**: 设计问题（SOP 过度承诺）
+- **严重级别**: 次要
+- **优先级**: 低
+- **归属视角**: B（完整性）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`dev/quality/Framework_Review_Guidelines.md` v1.2 L443-L504 的"审查交付物清单模板"列出 10 项，但其中 2 项**从未在历史或本轮审查中实际产出**：
+
+- 第 5 项 `Review_Data.zip`：声称"原始审查数据、测试日志、代码分析结果、性能测试报告"
+- 第 6 项 `Assessment_Dashboard.html`：声称"HTML 交互式仪表板，可视化呈现框架各维度评估结果"
+
+实际审查（含本轮）仅产出 5 件套（Review_Plan / Issue_Tracking / Progress_Tracking / Review_Log / Review_Checklist）+ 可选附加（Comprehensive_Review_Report / Improvement_Roadmap / Issue_Analysis）。
+
+`Review_Data.zip` 与 `Assessment_Dashboard.html` 是 SOP 写得太大、实践无人执行的虚标项。AI 按 SOP 执行会浪费精力寻找如何产出，或在最终报告中遗憾解释"未产出"。
+
+### 影响范围
+
+- 视角 B：SOP 与实践不一致
+- 后续审查者会困惑"为什么没人做这俩"
+- 体系成熟度评估时会扣分
+
+### 主要文件路径
+
+- `dev/quality/Framework_Review_Guidelines.md`
+
+### 相关文件路径
+
+- `dev/quality/audits/README.md`（5 件套规范）
+- `dev/quality/README.md` L62-L73（5 件套实际清单）
+
+### 具体位置
+
+- `dev/quality/Framework_Review_Guidelines.md` L471-L480：
+  - L471-L474 第 5 项 `Review_Data.zip`
+  - L476-L480 第 6 项 `Assessment_Dashboard.html`
+
+### 复查方法（验证修复）
+
+```bash
+# 1. SOP 清单应与 audits/README.md 5 件套一致
+grep -nE 'Review_Data\.zip|Assessment_Dashboard\.html' dev/quality/Framework_Review_Guidelines.md
+# 修复后预期：要么删除（推荐），要么标注"可选附加，本框架尚未自动化产出"
+
+# 2. 实际历史轮次产出应与 SOP 一致
+ls dev/quality/audits/2026-04-25_V3.x_Comprehensive/
+# 预期：5 件套 + 可选附加
+```
+
+### 建议修复方案
+
+- **选项 A（推荐）**：从 SOP 删除第 5 项 `Review_Data.zip` 与第 6 项 `Assessment_Dashboard.html`，将 10 项交付物精简为 8 项
+- 选项 B：保留两项，但明确标注"可选附加，仅当审查复杂度达 Critical 级别才需产出，且需先实施自动化生成工具"
+- 推荐 A，与"务实而非膨胀"的 quality 体系定位一致
+
+### 审查阶段
+
+B4 R5 自指审查（Guidelines 内部一致性）
+
+---
+
+## 问题 ID: AICC-20260425-025
+
+- **类型**: 文档问题（措辞与策略不一致）
+- **严重级别**: 建议
+- **优先级**: 低
+- **归属视角**: B
+- **关联任务/ADR**: 与 AICC-20260425-006（contexts/ 改按需生成）同源
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`dev/quality/README.md` v2.0 L44-L58 contexts/ 章节措辞与"按需生成"新策略有张力：
+
+- L46：`每个 🔴 优先级文档对应一份 context`（旧表述：每个文档→一份 context）
+- L48-56：使用方式仍引导读者"发送 contexts/[文档名].md"
+- L58：`contexts/_template.md 是模板。具体清单见下方"📊 完整文档索引"`
+
+但实际 contexts/ 目录仅含 `_template.md`，**所有 🔴 优先级文档对应的 context 均未生成**。
+
+L46 与 L48-56 措辞会让新读者期待 contexts/ 下有完整文件集，开箱却为空，导致困惑。
+
+虽然 AICC-20260425-006 已"修复"（标记为按需生成），但 README 表述未同步调整。
+
+### 影响范围
+
+- README v2.0 的"完整索引"承诺与 contexts/ 的"几乎为空"现状产生张力
+- 新读者首次按 README 操作会失败
+
+### 主要文件路径
+
+- `dev/quality/README.md`
+
+### 相关文件路径
+
+- `dev/quality/contexts/`（仅 _template.md）
+- `dev/quality/HOW_TO_GENERATE_CONTEXTS.md`（context 生成 SOP）
+
+### 具体位置
+
+- `dev/quality/README.md` L44-L58
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 实际 contexts/ 内容
+ls dev/quality/contexts/
+
+# 2. README 措辞应与现状一致
+grep -nE '每个.*context|contexts/\[' dev/quality/README.md
+# 修复后预期：明示"按需生成"，不再承诺每文档一份
+
+# 3. 新读者按 README 操作能否成功
+# 模拟操作：尝试 cat dev/quality/contexts/AI_ENTRY_POINT.md
+test -f dev/quality/contexts/AI_ENTRY_POINT.md && echo "已生成" || echo "需现场生成（按 HOW_TO_GENERATE_CONTEXTS.md）"
+```
+
+### 建议修复方案
+
+- 改写 L44-L58，明确：
+  - "contexts/ 采用按需生成策略，仅在审查 🔴 优先级文档时现场生成对应 context"
+  - "目录通常仅含 `_template.md`；具体 context 在审查时按 HOW_TO_GENERATE_CONTEXTS.md 现场生成"
+- 删除"具体清单见下方"措辞，改为"具体生成 SOP 见 HOW_TO_GENERATE_CONTEXTS.md"
+- 与 v2.0 三级优先级（🔴/🟡/⚪）的"按需"原则保持一致
+
+### 审查阶段
+
+B4 R5 自指审查（README 与 contexts 现状对齐）
+
+---
+
+## 问题 ID: AICC-20260425-026
+
+- **类型**: 集成问题（声明工具不存在）
+- **严重级别**: 次要
+- **优先级**: 中
+- **归属视角**: B（完整性）+ C（dev 卫生）
+- **关联任务/ADR**: 005-复杂度仪表盘
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` 的"实施产出摘要"段（L13-L17）声明 005 的工具链包含：
+
+- `complexity_scanner.py` ✅ 存在
+- `complexity_scanner.js` ✅ 存在
+- `report_generator.py` ✅ 存在
+- `notifier.py` ✅ 存在
+- **`architecture_analyzer.py`** ❌ 不存在
+
+`tools/py/` 与 `tools/js/` 中均无 `architecture_analyzer.py`/`.js`。
+
+005 walkthrough.md 提供的"工具链 dual-engine"图景含 5 项，实际仅 4 项落地，**1 项虚标**。
+
+### 影响范围
+
+- 005-复杂度仪表盘的"高级架构分析"能力实际缺失
+- B2 的"12 项实体核查全部 ✅"结论需打补丁：实体存在，但子工具集不完整
+- 视角 B 完整性受损
+
+### 主要文件路径
+
+- `tools/py/architecture_analyzer.py`（应存在但不存在）
+- `tools/js/architecture_analyzer.js`（应存在但不存在）
+
+### 相关文件路径
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` L17
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/implementation_plan.md`（应说明此工具的角色）
+- `tools/README.md`（应索引该工具或说明缺失）
+
+### 具体位置
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` L17：`**架构分析**: \`architecture_analyzer.py\` - 高级架构分析`
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 工具应存在（双脚本对称）
+ls tools/py/architecture_analyzer.py tools/js/architecture_analyzer.js
+
+# 2. 文档与实体一致性
+grep -rn 'architecture_analyzer' dev/V3.0/confirmed/005-complexity-dashboard.md/ tools/
+
+# 3. 与 complexity_scanner 协同
+python tools/py/architecture_analyzer.py --help 2>&1 | head -5
+```
+
+### 建议修复方案
+
+- **选项 A（推荐）**：补全 `architecture_analyzer.py/.js` 双脚本（005 P1 完结的最后一里）
+- 选项 B：从 walkthrough.md 删除该工具的引用，承认它未实施
+- 推荐 A，因 walkthrough.md 已含完整设计意图（高级架构分析），补全成本低于重写文档
+- 同步更新 `tools/README.md` 与 005 implementation_plan
+
+### 审查阶段
+
+B4 R5 自指审查（005 实体一致性复审）
+
+---
+
+## 问题 ID: AICC-20260425-027
+
+- **类型**: 设计问题（设计已完成但未提升至 Public）
+- **严重级别**: 建议
+- **优先级**: 中
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 与 AICC-20260425-019 关联（剧本 4 端到端工作流缺失）的根因诊断
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+B3 阶段记录 AICC-20260425-019："剧本 4 复杂度告警端到端工作流文档缺失"。B4 阶段进一步诊断：
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` 已含完整端到端流程：
+  - 实施产出摘要（目录结构 + 工具链 + Git Hooks）
+  - 验证场景 A: 基础数据采集
+  - 验证场景 B/C/...（推断含报告生成、阈值告警、决策建议）
+
+- 但该 walkthrough.md 位于 `dev/V3.0/confirmed/`（开发档案区），**未提升到 Public `workflows/` 目录**：
+  - `workflows/complexity_alert_workflow.md` 不存在
+  - `workflows/path_d_specific_tasks.md` 无 @complexity 路由
+  - `AI_ENTRY_POINT.md` 无 complexity_scanner 索引
+
+设计意图已完整规划，仅缺"提升至 Public 工作流"这最后一步。这与 AICC-20260425-019 互为因果：019 是症状，027 是根因。
+
+### 影响范围
+
+- 与 019 联动评估：剧本 4 缺失工作流的根本原因是"设计完整但未发布"
+- 005 的"已完成"标识需配 walkthrough → workflows/ 转换才算完整闭环
+- 修复 027 即修复 019
+
+### 主要文件路径
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md`（设计文档源）
+- `workflows/complexity_alert_workflow.md`（应新建的 Public 流程）
+- `AI_ENTRY_POINT.md`（应新增索引）
+- `workflows/path_d_specific_tasks.md`（应新增 @complexity 路由）
+
+### 相关文件路径
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/implementation_plan.md`
+- `tools/py/complexity_scanner.py`、`tools/py/report_generator.py`
+- `dev/complexity/config.yaml`
+
+### 具体位置
+
+- `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md`（提取源）
+- `workflows/`（增补目标）
+
+### 复查方法（验证修复）
+
+```bash
+# 1. Public workflows 应有复杂度告警工作流
+ls workflows/complexity_alert_workflow.md
+
+# 2. AI_ENTRY_POINT 应有索引
+grep -nE 'complexity|complexity_scanner' AI_ENTRY_POINT.md
+
+# 3. path_d 应有 @complexity 路由
+grep -nE '@complex' workflows/path_d_specific_tasks.md
+
+# 4. 端到端剧本可演练
+python tools/py/complexity_scanner.py --since "1 day ago" --output /tmp/c.json && \
+python tools/py/report_generator.py --data /tmp/c.json --output /tmp/c.md && \
+test -s /tmp/c.md && echo "剧本 4 可跑通"
+```
+
+### 建议修复方案
+
+- 将 `dev/V3.0/confirmed/005-complexity-dashboard.md/walkthrough.md` 中的"实施产出 + 验证场景"段落提取为 `workflows/complexity_alert_workflow.md`（面向 AI 的 SOP，非"开发完成验证"）
+- 在 `AI_ENTRY_POINT.md` "实用工具库 (tools/)" 段补充 `tools/py/complexity_scanner.py` 索引
+- 在 `workflows/path_d_specific_tasks.md` 新增 `@complexity` 指令章节
+- 联动修复 AICC-20260425-019 / 020 / 026
+
+### 审查阶段
+
+B4 R5 自指审查（005 设计-发布 gap 诊断）
+
+---
+
+## 📈 后续批次将追加的问题段落
+
+每个批次（B5-B7）执行后将在此追加问题，编号继续：AICC-20260425-028 起。
+
+---
+
+**版本**：v1.4
 **创建日期**：2026-04-25
-**最后更新**：2026-04-25（B3 完成；新增 016-021，全部含完整六大要素）
+**最后更新**：2026-04-25（B4 完成；新增 022-027，全部含完整六大要素）
