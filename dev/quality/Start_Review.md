@@ -9,16 +9,16 @@
 ### 1. 初始化审查
 ```bash
 # 读取审查入口文档
-read_file dev/reviews/Start_Review.md
+read_file dev/quality/Start_Review.md
 
 # 读取标准指南
-read_file dev/reviews/Framework_Review_Guidelines.md
+read_file dev/quality/Framework_Review_Guidelines.md
 
 # 读取问题记录标准
-read_file dev/reviews/Issue_Recording_Standard.md
+read_file dev/quality/Issue_Recording_Standard.md
 
 # 读取进度跟踪标准
-read_file dev/reviews/Progress_Tracking_Standard.md
+read_file dev/quality/Progress_Tracking_Standard.md
 ```
 
 ### 2. 确定审查参数
@@ -35,16 +35,16 @@ read_file dev/reviews/Progress_Tracking_Standard.md
 ### 3. 创建审查目录
 ```bash
 # 创建审查目录（替换 YYYY-MM-DD、Version 和 Scope 为实际值）
-mkdir -p dev/reviews/YYYY-MM-DD_Version_Scope
+mkdir -p dev/quality/audits/YYYY-MM-DD_Version_Scope
 ```
 
 ### 4. 制定专项审查计划
 ```bash
 # 读取框架审查指南（包含专项审查计划模板）
-read_file dev/reviews/Framework_Review_Guidelines.md
+read_file dev/quality/Framework_Review_Guidelines.md
 
 # 基于指南中的模板创建新的专项审查计划
-write_file dev/reviews/YYYY-MM-DD_Version_Scope/Review_Plan_Specific.md
+write_file dev/quality/audits/YYYY-MM-DD_Version_Scope/Review_Plan_Specific.md
 ```
 
 ## 📊 审查执行流程
@@ -75,7 +75,7 @@ write_file dev/reviews/YYYY-MM-DD_Version_Scope/Review_Plan_Specific.md
 ### 归档阶段
 1. 更新审查状态
 2. 完成所有交付物归档
-3. 更新 `dev/reviews/README.md` 的审查历史
+3. 更新 `dev/quality/README.md` 的审查历史
 
 ## 🚀 快速启动代码示例
 
@@ -88,7 +88,7 @@ version = "V3.0"
 scope = "Comprehensive"
 
 # 2. 创建目录
-review_dir = f"dev/reviews/{review_date}_{version}_{scope}"
+review_dir = f"dev/quality/audits/{review_date}_{version}_{scope}"
 
 # 3. 初始化文件（基于模板）
 # ... 逻辑执行 ...

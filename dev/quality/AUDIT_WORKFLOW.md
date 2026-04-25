@@ -29,10 +29,10 @@
 **需要准备的材料**:
 
 1. **全局上下文**: `dev/FRAMEWORK_CONTEXT.md`
-2. **文档审查上下文**: `quality/contexts/[文档名].md`
+2. **文档审查上下文**: `dev/quality/contexts/[文档名].md`
 3. **质量标准**（可选参考）:
-   - `quality/standards/COMMON_STANDARDS.md`
-   - `quality/standards/BY_DOCUMENT_TYPE.md`
+   - `dev/quality/standards/COMMON_STANDARDS.md`
+   - `dev/quality/standards/QUALITY_CHECKLIST.md`
 4. **实际文档内容**: 要审查的文档
 
 ### 步骤 3: 新建 AI 会话窗口
@@ -187,7 +187,7 @@ AI生成修改后的完整文档
 - [建议 1]
 ```
 
-**保存位置**: `quality/reports/YYYY-MM-DD-[文档名]-audit.md`
+**保存位置**: `dev/quality/audits/YYYY-MM-DD-[文档名]-audit.md`
 
 ---
 

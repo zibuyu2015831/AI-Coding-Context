@@ -21,7 +21,7 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 审查范围说明
 
-**重要说明**：审查将专注于生产环境中的框架核心组件，跳过`dev/`目录下的开发中文件（除`dev/reviews/`审查文档目录）。`dev/`目录包含开发过程中使用的临时文件、讨论记录和未完成的工作，不代表框架的正式实现状态。
+**重要说明**：审查将专注于生产环境中的框架核心组件，跳过`dev/`目录下的开发中文件（除`dev/quality/audits/`审查文档目录）。`dev/`目录包含开发过程中使用的临时文件、讨论记录和未完成的工作，不代表框架的正式实现状态。
 
 ### 整体架构审查
 
@@ -417,65 +417,65 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 审查文档组织结构
 
-所有审查相关文档将统一存放在`dev/reviews/`目录下，每次审查创建一个独立的子目录，以审查日期和版本命名。每次审查目录命名规范为`YYYY-MM-DD_Version_Scope`。
+所有审查相关文档将统一存放在`dev/quality/audits/`目录下，每次审查创建一个独立的子目录，以审查日期和版本命名。每次审查目录命名规范为`YYYY-MM-DD_Version_Scope`。
 
 ### 审查交付物清单
 
 1. **审查计划**：`Review_Plan.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：本次审查的计划和方案
 
 2. **全面审查报告**：`Comprehensive_Review_Report.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：按照上述报告大纲结构，包含所有审查发现和评估
 
 3. **问题跟踪表**：`Issue_Tracking.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：所有发现的问题的详细记录，包含文件路径和相关文档路径
 
 4. **问题分类统计报告**：`Issue_Analysis.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：按类型、严重级别、组件分布等维度对问题进行统计分析
 
 5. **审查数据与证据**：`Review_Data.zip`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 内容：原始审查数据、测试日志、代码分析结果、性能测试报告等
 
 6. **框架评估仪表板**：`Assessment_Dashboard.html`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：HTML 交互式仪表板
    - 内容：可视化呈现框架各维度评估结果和问题分布
 
 7. **改进路线图**：`Improvement_Roadmap.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：基于问题跟踪表的短期、中期、长期改进计划与实施路线图
 
 8. **特定任务专项报告**：`[Task_Name]_Assessment_Report.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：针对特定任务的专项评估与完成情况分析，包含相关问题的详细路径
 
 9. **审查日志**：`Review_Log.md`
 
-   - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+   - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
    - 格式：Markdown
    - 内容：审查过程中的每日日志记录，包含当日发现问题的初步记录
 
 10. **问题复查清单**：`Review_Checklist.md`
-    - 位置：`dev/reviews/YYYY-MM-DD_Version_Scope/`
+    - 位置：`dev/quality/audits/YYYY-MM-DD_Version_Scope/`
     - 格式：Markdown
     - 内容：基于问题跟踪表生成的复查清单，方便后续修复验证
 
@@ -509,9 +509,9 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
    - 准备 dev/目录与生产环境的差异说明文档（如需要）
 
 5. **审查文档目录创建**
-   - 创建 dev/reviews/目录（如果不存在）
-   - 创建本次审查专用目录：dev/reviews/YYYY-MM-DD_Version_Scope/
-   - 创建 dev/reviews/README.md 文件（作为审查文档索引）
+   - 创建 dev/quality/audits/目录（如果不存在）
+   - 创建本次审查专用目录：dev/quality/audits/YYYY-MM-DD_Version_Scope/
+   - 创建 dev/quality/README.md 文件（作为审查文档索引）
 
 ## 🔁 审查文档管理机制
 
@@ -523,7 +523,7 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 审查文档索引维护
 
-- 每次审查完成后更新 dev/reviews/README.md
+- 每次审查完成后更新 dev/quality/README.md
 - 索引包含：审查日期、版本、范围、主要发现、改进建议状态
 - 提供跨审查的对比和演进分析
 

@@ -227,7 +227,7 @@ save_file(save_path, generated_context)
 
 ... (已有文档)
 
-- [ ] [new_workflow.md](../workflows/new_workflow.md) → [审查上下文](./contexts/workflows_new_feature_workflow.md)
+- [ ] [new_workflow.md](../../workflows/new_workflow.md) → [审查上下文](./contexts/workflows_new_feature_workflow.md)
 ```
 
 ### 步骤 9: 报告完成
@@ -410,7 +410,7 @@ save_file(save_path, generated_context)
 
 **同类文档** (相同类型的):
 
-- [README.md](../README.md) - 人类版本的入门指南
+- [README.md](../../README.md) - 人类版本的入门指南
 
 ---
 
@@ -537,7 +537,7 @@ save_file(save_path, generated_context)
 
 **上游文档** (引用本文档的):
 
-- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) - 引用此规范
+- [AI_ENTRY_POINT.md](../../AI_ENTRY_POINT.md) - 引用此规范
 
 **下游文档** (本文档引用的):
 
@@ -545,8 +545,8 @@ save_file(save_path, generated_context)
 
 **同类文档** (相同类型的):
 
-- [security_rules.md](../core/security_rules.md)
-- [project_types.md](../core/project_types.md)
+- [security_rules.md](../../core/security_rules.md)
+- [project_types.md](../../core/project_types.md)
 
 ---
 

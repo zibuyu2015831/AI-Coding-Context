@@ -143,7 +143,6 @@ python tools/py/commit_template_cli.py
 **培训材料**:
 
 - [快速开始指南](./commit_guided_quick_start.md)
-- [完整规范文档](../../dev_docs/architecture/decisions/003-commit-guided-documentation.md)
 
 #### 3.2 制定团队规范
 
@@ -474,9 +473,8 @@ HOW: ...
 ### 文档资源
 
 - [快速开始指南](./commit_guided_quick_start.md)
-- [完整规范](../../dev_docs/architecture/decisions/003-commit-guided-documentation.md)
-- [Git 安全工作流](../../workflows/git_safety_workflow.md)
-- [工具使用文档](../../tools/README.md)
+- [Git 安全工作流](../workflows/git_safety_workflow.md)
+- [工具使用文档](../tools/README.md)
 
 ### 常见问题
 

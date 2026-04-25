@@ -23,12 +23,22 @@
 
 ## 📁 目录结构
 
+### 审查指南与流程（顶层文件）
+
+**用途**: 全框架审查的方法论、入口与标准
+
+- [Start_Review.md](./Start_Review.md) - 启动框架审查的入口与指令模板
+- [Framework_Review_Guidelines.md](./Framework_Review_Guidelines.md) - 全框架审查方法论与范围定义（详尽指南）
+- [AUDIT_WORKFLOW.md](./AUDIT_WORKFLOW.md) - 单文档审查工作流（9 步法）
+- [HOW_TO_GENERATE_CONTEXTS.md](./HOW_TO_GENERATE_CONTEXTS.md) - 批量生成审查上下文指南
+- [Issue_Recording_Standard.md](./Issue_Recording_Standard.md) - 问题记录标准与模板
+- [Progress_Tracking_Standard.md](./Progress_Tracking_Standard.md) - 审查进度跟踪标准（支持中断恢复）
+
 ### standards/ - 质量标准
 
 **用途**: 定义各类文档的质量标准
 
 - [COMMON_STANDARDS.md](./standards/COMMON_STANDARDS.md) - 适用于所有文档的通用标准（准确性、完整性、一致性、可读性、可操作性）
-- [BY_DOCUMENT_TYPE.md](./standards/BY_DOCUMENT_TYPE.md) - 按文档类型分类的专项标准（入口文档、核心规范、工作流、指导、模板）
 - [QUALITY_CHECKLIST.md](./standards/QUALITY_CHECKLIST.md) - 快速检查清单（5 个维度）
 
 ### contexts/ - 单个文档审查上下文
@@ -49,18 +59,13 @@
 
 **文件清单**: 见下方"文档索引"
 
-### reports/ - 审查报告
+### audits/ - 审查归档
 
-**用途**: 归档历史审查报告，作为质量改进的记录
+**用途**: 每次全框架审查独立子目录，归档报告与跟踪数据
 
-**命名规范**: `YYYY-MM-DD-vX.X-audit.md`
+**命名规范**: `YYYY-MM-DD_Version_Scope/`（如 `2026-04-17_V3.0_Final_Check/`）
 
-### tools/ - 审查辅助工具（可选）
-
-**用途**: 提供自动化检查工具的说明文档
-
-- [LINK_CHECKER.md](./tools/LINK_CHECKER.md) - 链接有效性检查工具说明
-- [TERMINOLOGY_CHECKER.md](./tools/TERMINOLOGY_CHECKER.md) - 术语一致性检查工具说明
+每个子目录建议包含：审查计划、综合报告、问题跟踪、进度跟踪、审查日志等（详见 [Framework_Review_Guidelines.md](./Framework_Review_Guidelines.md)）。
 
 ---
 
@@ -88,42 +93,42 @@
 
 ### 入口文档
 
-- [ ] [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md) → [审查上下文](../AI_ENTRY_POINT.md)
-- [ ] [README.md](../README.md) → [审查上下文](../README.md)
+- [ ] [AI_ENTRY_POINT.md](../../AI_ENTRY_POINT.md) → [审查上下文](../../AI_ENTRY_POINT.md)
+- [ ] [README.md](../../README.md) → [审查上下文](../../README.md)
 
 ### 核心规范文档 (core/)
 
-- [ ] [language_rules.md](../core/language_rules.md) → [审查上下文](./contexts/core_language_rules.md)
-- [ ] [security_rules.md](../core/security_rules.md) → [审查上下文](./contexts/core_security_rules.md)
-- [ ] [project_types.md](../core/project_types.md) → [审查上下文](./contexts/core_project_types.md)
-- [ ] [update_triggers.md](../core/update_triggers.md) → [审查上下文](./contexts/core_update_triggers.md)
+- [ ] [language_rules.md](../../core/language_rules.md) → [审查上下文](./contexts/core_language_rules.md)
+- [ ] [security_rules.md](../../core/security_rules.md) → [审查上下文](./contexts/core_security_rules.md)
+- [ ] [project_types.md](../../core/project_types.md) → [审查上下文](./contexts/core_project_types.md)
+- [ ] [update_triggers.md](../../core/update_triggers.md) → [审查上下文](./contexts/core_update_triggers.md)
 
 ### 工作流文档 (workflows/)
 
-- [ ] [generation_workflow.md](../workflows/generation_workflow.md) → [审查上下文](./contexts/workflows_generation_workflow.md)
-- [ ] [detection_workflow.md](../workflows/detection_workflow.md) → [审查上下文](./contexts/workflows_detection_workflow.md)
-- [ ] [decision_workflow.md](../workflows/decision_workflow.md) → [审查上下文](./contexts/workflows_decision_workflow.md)
-- [ ] [progress_tracking.md](../workflows/progress_tracking.md) → [审查上下文](./contexts/workflows_progress_tracking.md)
-- [ ] [incremental_update_workflow.md](../workflows/incremental_update_workflow.md) → [审查上下文](./contexts/workflows_incremental_update_workflow.md)
-- [ ] [monorepo_workflow.md](../workflows/monorepo_workflow.md) → [审查上下文](./contexts/workflows_monorepo_workflow.md)
-- [ ] [document_health_check.md](../workflows/document_health_check.md) → [审查上下文](./contexts/workflows_document_health_check.md)
+- [ ] [generation_workflow.md](../../workflows/generation_workflow.md) → [审查上下文](./contexts/workflows_generation_workflow.md)
+- [ ] [detection_workflow.md](../../workflows/detection_workflow.md) → [审查上下文](./contexts/workflows_detection_workflow.md)
+- [ ] [decision_workflow.md](../../workflows/decision_workflow.md) → [审查上下文](./contexts/workflows_decision_workflow.md)
+- [ ] [progress_tracking.md](../../workflows/progress_tracking.md) → [审查上下文](./contexts/workflows_progress_tracking.md)
+- [ ] [incremental_update_workflow.md](../../workflows/incremental_update_workflow.md) → [审查上下文](./contexts/workflows_incremental_update_workflow.md)
+- [ ] [monorepo_workflow.md](../../workflows/monorepo_workflow.md) → [审查上下文](./contexts/workflows_monorepo_workflow.md)
+- [ ] [document_health_check.md](../../workflows/document_health_check.md) → [审查上下文](./contexts/workflows_document_health_check.md)
 
 ### 指导文档 (guides/)
 
-- [ ] [quick_start.md](../guides/quick_start.md) → [审查上下文](./contexts/guides_quick_start.md)
-- [ ] [project_types.md](../guides/project_types.md) → [审查上下文](./contexts/guides_project_types.md)
-- [ ] [language_support.md](../guides/language_support.md) → [审查上下文](./contexts/guides_language_support.md)
-- [ ] [documentation_maintenance.md](../guides/documentation_maintenance.md) → [审查上下文](./contexts/guides_documentation_maintenance.md)
-- [ ] [ai_rules_maintenance.md](../guides/ai_rules_maintenance.md) → [审查上下文](./contexts/guides_ai_rules_maintenance.md)
-- [ ] [configuration_management.md](../guides/configuration_management.md) → [审查上下文](./contexts/guides_configuration_management.md)
+- [ ] [quick_start.md](../../guides/quick_start.md) → [审查上下文](./contexts/guides_quick_start.md)
+- [ ] [project_types.md](../../guides/project_types.md) → [审查上下文](./contexts/guides_project_types.md)
+- [ ] [language_support.md](../../guides/language_support.md) → [审查上下文](./contexts/guides_language_support.md)
+- [ ] [documentation_maintenance.md](../../guides/documentation_maintenance.md) → [审查上下文](./contexts/guides_documentation_maintenance.md)
+- [ ] [ai_rules_maintenance.md](../../guides/ai_rules_maintenance.md) → [审查上下文](./contexts/guides_ai_rules_maintenance.md)
+- [ ] [configuration_management.md](../../guides/configuration_management.md) → [审查上下文](./contexts/guides_configuration_management.md)
 
 ### 模板文档 (templates/)
 
-- [ ] [GENERATION_PLAN_TEMPLATE.md](../templates/GENERATION_PLAN_TEMPLATE.md) → [审查上下文](./contexts/templates_GENERATION_PLAN_TEMPLATE.md)
-- [ ] [PROJECT_ANALYSIS_REPORT_TEMPLATE.md](../templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md) → [审查上下文](./contexts/templates_PROJECT_ANALYSIS_REPORT_TEMPLATE.md)
-- [ ] [PROGRESS_TEMPLATE.md](../templates/PROGRESS_TEMPLATE.md) → [审查上下文](./contexts/templates_PROGRESS_TEMPLATE.md)
-- [ ] [AI_RULES_TEMPLATE.md](../templates/AI_RULES_TEMPLATE.md) → [审查上下文](./contexts/templates_AI_RULES_TEMPLATE.md)
-- [ ] [AI_Coding_Context_TEMPLATE.md](../templates/AI_Coding_Context_TEMPLATE.md) → [审查上下文](./contexts/templates_AI_Coding_Context_TEMPLATE.md)
+- [ ] [GENERATION_PLAN_TEMPLATE.md](../../templates/GENERATION_PLAN_TEMPLATE.md) → [审查上下文](./contexts/templates_GENERATION_PLAN_TEMPLATE.md)
+- [ ] [PROJECT_ANALYSIS_REPORT_TEMPLATE.md](../../templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md) → [审查上下文](./contexts/templates_PROJECT_ANALYSIS_REPORT_TEMPLATE.md)
+- [ ] [PROGRESS_TEMPLATE.md](../../templates/PROGRESS_TEMPLATE.md) → [审查上下文](./contexts/templates_PROGRESS_TEMPLATE.md)
+- [ ] [AI_RULES_TEMPLATE.md](../../templates/AI_RULES_TEMPLATE.md) → [审查上下文](./contexts/templates_AI_RULES_TEMPLATE.md)
+- [ ] [AI_Coding_Context_TEMPLATE.md](../../templates/AI_Coding_Context_TEMPLATE.md) → [审查上下文](./contexts/templates_AI_Coding_Context_TEMPLATE.md)
 
 ---
 
@@ -144,7 +149,7 @@
 ```
 1. 为所有文档创建审查上下文（contexts/）
 2. 按分类逐一审查（入口→核心→工作流→指导→模板）
-3. 记录审查报告（reports/）
+3. 记录审查报告（audits/）
 4. 汇总改进点并执行
 ```
 
@@ -170,7 +175,7 @@
 
 ## 🔗 相关文档
 
-- [workflows/document_health_check.md](../workflows/document_health_check.md) - 文档健康度检查（配合使用）
+- [workflows/document_health_check.md](../../workflows/document_health_check.md) - 文档健康度检查（配合使用）
 
 ---
 

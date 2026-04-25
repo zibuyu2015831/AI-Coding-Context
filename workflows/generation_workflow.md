@@ -693,8 +693,8 @@ README.md 包含：
 ```
 请为刚生成的所有文档（主文档和子文档）添加 YAML Frontmatter 摘要。
 
-参考格式规范: reference/SUMMARY_FORMAT_SPEC.md
-参考示例: reference/examples/summary_examples/
+参考格式规范: core/SUMMARY_FORMAT_SPEC.md
+参考示例: guides/examples/summary_examples/
 
 每个文档开头添加以下格式的摘要：
 

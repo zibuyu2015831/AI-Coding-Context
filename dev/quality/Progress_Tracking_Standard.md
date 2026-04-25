@@ -20,7 +20,7 @@
 # 审查进度跟踪表 - YYYY-MM-DD_Version_Scope
 
 ## 基本信息
-- **审查目录**：dev/reviews/YYYY-MM-DD_Version_Scope
+- **审查目录**：dev/quality/audits/YYYY-MM-DD_Version_Scope
 - **开始时间**：YYYY-MM-DD HH:MM
 - **最后更新**：YYYY-MM-DD HH:MM
 - **总体进度**：XX%

@@ -84,7 +84,7 @@
 
 - [ ] **摘要检查：所有文档包含符合 YAML 规范的摘要** ⭐
   - 必须包含 YAML frontmatter
-  - 格式符合 `reference/SUMMARY_FORMAT_SPEC.md`
+  - 格式符合 `core/SUMMARY_FORMAT_SPEC.md`
   - 所有必需字段都已填写
 
 - [ ] **关联检查：`related_files` 字段准确无误** ⭐
