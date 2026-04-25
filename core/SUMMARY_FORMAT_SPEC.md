@@ -400,4 +400,4 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 **文档版本**: v1.0  
 **维护者**: Framework Team  
-**反馈**: 如有疑问请在 dev/discussions/ 提出
+**反馈**: 如有疑问请通过仓库 Issues 提出（贡献者另请参见 `CONTRIBUTING.md`）

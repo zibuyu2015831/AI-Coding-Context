@@ -538,7 +538,7 @@ python tools/py/git_safety.py --mode suggest-branch --branch-name "用户积分�
 
 **更新流程**:
 
-1. AI 生成更新后的 rule 到`dev_docs/AI_RULES.md`
+1. AI 生成更新后的 rule 到`dev_docs/rules/combined/AI_RULES.md`
 2. 提醒用户手动更新 IDE 的 rule 配置
 3. 记录更新日期
 

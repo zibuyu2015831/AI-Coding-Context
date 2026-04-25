@@ -82,9 +82,9 @@ dev/V3.0/
 ├── confirmed/                   # 已确认的优化点
 │   ├── 001-ai-agent-library/    # AI 角色库 (已完成)
 │   ├── 003-design-thinking-guide/ # 设计思维引导 (已完成)
-│   ├── 004-adr-system.md/       # ADR 系统 (已完成)
-│   ├── 005-complexity-dashboard.md/ # 复杂度仪表盘 (已完成)
-│   ├── 006-auto-review-report.md/ # 自动审查报告 (已完成)
+│   ├── 004-adr-system/       # ADR 系统 (已完成)
+│   ├── 005-complexity-dashboard/ # 复杂度仪表盘 (已完成)
+│   ├── 006-auto-review-report/ # 自动审查报告 (已完成)
 │   ├── 010-cross-project-knowledge/ # 跨项目知识复用 (已确认)
 │   ├── 011-doc-error-fix-workflow/ # 文档谬误修复工作流 (已确认)
 │   ├── 012-mandatory-doc-summary/ # 强制文档摘要 (已完成)

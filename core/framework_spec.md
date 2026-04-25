@@ -20,17 +20,57 @@ project_root/
 ├── dev_docs/                           # 开发文档根目录
 │   ├── AI_Coding_Context.md           # 🎯 主入口文档（必需）
 │   │
+│   ├── _analysis/                      # 🧪 分析与生成元数据
+│   │   ├── generation_plan.md         # 生成方案
+│   │   ├── project_analysis_report.md # 项目问题报告
+│   │   └── generation_progress.md     # 生成进度跟踪
+│   │
+│   ├── rules/                          # 📐 AI Rules 子系统
+│   │   └── combined/
+│   │       └── AI_RULES.md            # IDE 规则源文件（合并版）
+│   │
 │   ├── plans/                          # 🔧 开发方案目录
 │   │   ├── README.md                  # 方案索引
 │   │   ├── features/                  # 功能开发方案
 │   │   └── bugfixes/                  # Bug修复方案
 │   │
-│   ├── knowledge/                      # 📚 知识库目录
-│   │   ├── README.md                  # 知识库索引
-│   │   ├── troubleshooting/           # 问题解决
-│   │   ├── patterns/                  # 架构模式
-│   │   └── performance/               # 性能优化
-│   │
+│   └── knowledge/                      # 📚 知识库目录
+│       ├── README.md                  # 知识库索引
+│       ├── troubleshooting/           # 问题解决
+│       ├── patterns/                  # 架构模式
+│       └── performance/               # 性能优化
+```
+
+---
+
+## 🗂️ 标准产物路径（SSOT）
+
+> **本节是 AICC 框架对所有"用户项目内生成产物"的单一真相源（Single Source of Truth）。**
+> 任何文档（workflows / templates / guides / agents / core）若引用产物路径，**必须**与本表一致。
+
+| 产物              | 标准路径                                          | 命名规则           | 说明                                |
+| ----------------- | ------------------------------------------------- | ------------------ | ----------------------------------- |
+| 主文档            | `dev_docs/AI_Coding_Context.md`                   | 驼峰式             | 用户项目的文档入口（注意大小写）    |
+| AI Rules 文件     | `dev_docs/rules/combined/AI_RULES.md`             | 全大写             | IDE 规则源文件（IDE 配置文件惯例）  |
+| 分析方案          | `dev_docs/_analysis/generation_plan.md`           | 小写下划线         | 生成方案（详见 generation_workflow） |
+| 项目问题报告      | `dev_docs/_analysis/project_analysis_report.md`   | 小写下划线         | 项目分析问题清单                    |
+| 生成进度          | `dev_docs/_analysis/generation_progress.md`       | 小写下划线         | 生成进度跟踪                        |
+| 子文档（架构等）  | `dev_docs/architecture_overview.md` 等            | 小写下划线         | 详见"📖 子文档规范"                  |
+| 计划目录          | `dev_docs/plans/`                                 | 小写复数           | features/ 与 bugfixes/ 子目录       |
+| 知识库            | `dev_docs/knowledge/`                             | 小写单数           | troubleshooting / patterns / performance |
+
+### 命名规范要点
+
+1. **核心入口产物用驼峰/大写**：体现身份（`AI_Coding_Context.md`、`AI_RULES.md`）
+2. **过程性产物用小写下划线**：与子文档一致（`generation_plan.md`、`api_layer.md`）
+3. **目录全小写**：避免跨平台大小写歧义
+4. **大小写敏感声明**：所有路径在 Linux 下严格区分大小写。AI 在生成时务必按本表大小写写入文件。
+
+### 反例（已知冲突，请勿使用）
+
+- ❌ `项目根/ai_rules.md`（小写 + 错位置）
+- ❌ `dev_docs/AI_RULES.md`（缺 rules/combined/ 子路径）
+- ❌ `ai_coding_context.md`（小写主文档）
 
 ### 必需章节
 

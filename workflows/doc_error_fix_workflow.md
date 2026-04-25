@@ -504,10 +504,8 @@ python tools/py/batch_fix_manager.py --preview --plan "dev_docs/_analysis/doc_fi
 
 ## 📚 相关文档
 
-- [011-文档谬误修复工作流](../dev/V3.0/confirmed/011-doc-error-fix-workflow/011-doc-error-fix-workflow.md)
-- [011-实施方案](../dev/V3.0/confirmed/011-doc-error-fix-workflow/implementation_plan.md)
-- [011-使用指南](../dev/V3.0/confirmed/011-doc-error-fix-workflow/walkthrough.md)
 - [工具清单](../tools/README.md)
+- 设计源（仅 dev 分支可见）：`dev/V3.0/confirmed/011-doc-error-fix-workflow/` —— 含 011 设计方案、实施方案、使用指南
 
 ---
 

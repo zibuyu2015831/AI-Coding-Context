@@ -415,7 +415,7 @@ node tools/js/ai_doc_fix.js batch --pattern "用户 ID" --replacement "userId" -
 - [011-实施方案.md](./implementation_plan.md)
 
 ### 相关优化点
-- [006-自动审查报告](./../006-auto-review-report.md/006-auto-review-report.md)
+- [006-自动审查报告](./../006-auto-review-report/006-auto-review-report.md)
 - [009-文档自动修复](./../../pending/009-doc-auto-repair.md)
 - [018-Commit-Guided 更新](./../018-commit-guided-documentation/018-commit-guided-documentation.md)
 

@@ -749,11 +749,11 @@ design_thinking:
 3. 中优先级子文档（按批次）
 4. 可选子文档（按需求）
 5. `plans/` 和 `knowledge/` 目录结构
-6. **AI Rules 文件** `ai_rules.md`（根目录）
+6. **AI Rules 文件** `dev_docs/rules/combined/AI_RULES.md`
 
 ### 8.4 生成 AI Rules 文件
 
-**位置**: 项目根目录 `ai_rules.md`
+**位置**: `dev_docs/rules/combined/AI_RULES.md`（详见 [`core/framework_spec.md` "标准产物路径"章节](../core/framework_spec.md#-标准产物路径ssot)）
 
 **目的**: 为后续 AI 交互提供项目特定的规则和上下文
 

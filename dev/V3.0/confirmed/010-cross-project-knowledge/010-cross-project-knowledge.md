@@ -22,6 +22,7 @@
 | [self-evolution-system.md](./self-evolution-system.md) | 🔄 框架自进化系统（自动适配检测、必要性评估、自动框架扩充） |
 | [cli-commands.md](./cli-commands.md)　　　　　　　　　 | 💻 CLI 命令参考（知识库管理、配置、更新、策略调整）　　　　 |
 | [implementation_plan.md](./implementation_plan.md)　　 | 📋 实施方案（技术架构、开发步骤、时间表、验收标准）　　　　 |
+| [senior_review_report.md](./senior_review_report.md)　 | 🔍 资深用户审核报告（识别 32 项遗漏点、优先级建议、改进方案） |
 
 ---
 

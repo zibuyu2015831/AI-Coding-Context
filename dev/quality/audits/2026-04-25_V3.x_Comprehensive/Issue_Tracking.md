@@ -34,7 +34,8 @@ verified_at: 2026-04-25
 | 修复状态 | 数量 |
 |---|---|
 | 🟢 已修复（Phase 0 顺手处理） | 4 |
-| 🔴 待修复 | 31 |
+| 🟢 已修复（B1 复审 + 修复 2026-04-26） | 7 |
+| 🔴 待修复 | 24 |
 
 ---
 
@@ -118,7 +119,7 @@ B0 基线快照
 - **优先级**: 高
 - **归属视角**: A（用户）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：5 处真泄漏链接全部移除/转描述；故意保留段已含边界声明；详见 `Review_Verification_Report.md` Batch 1#002）
 
 ### 问题描述
 
@@ -211,7 +212,7 @@ B0 基线快照（B1 已穷尽性扫描确认无新增）
 - **优先级**: 低
 - **归属视角**: C（dev 卫生）+ A（用户）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：实读后判定 importance 字段不属框架标准、违反双脚本红线、已被 summary_validator 取代；执行 git rm；详见 `Review_Verification_Report.md` Batch 1#003）
 
 ### 问题描述
 
@@ -656,7 +657,7 @@ B1 R3 引用与边界扫描
 - **优先级**: 低
 - **归属视角**: C（dev 卫生）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：迁入 `dev/V3.0/confirmed/010-cross-project-knowledge/senior_review_report.md`，与所审核的优化点 010 同档案；010 索引已加链接；详见 `Review_Verification_Report.md` Batch 1#010）
 
 ### 问题描述
 
@@ -1058,7 +1059,7 @@ B2 R2 V3.0 一致性核查（B4 自指审查时复审）
 - **优先级**: 高
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：原 Issue 称"AI_ENTRY_POINT 术语表 L306 权威源"在文档中根本不存在，已重新建立 SSOT 于 `core/framework_spec.md`"标准产物路径"章节；统一为大写 + 完整路径 `dev_docs/rules/combined/AI_RULES.md`；修订 path_a/.kiro/AI_RULES_TEMPLATE 共 3 处；详见 `Review_Verification_Report.md` Batch 1#016）
 
 ### 问题描述
 
@@ -1529,7 +1530,7 @@ B3 R1 工作流端到端闭环（剧本 4，附带观察）
 - **优先级**: 高
 - **归属视角**: B（完整性）+ C（dev 卫生）
 - **关联任务/ADR**: 无
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：3 个目录 git mv 去掉 .md 后缀；同步更新 dev/V3.0/README.md / DISCUSSION_CONTEXT.md / 011 walkthrough 共 3 处跨引用；详见 `Review_Verification_Report.md` Batch 1#022）
 
 ### 问题描述
 
@@ -2068,7 +2069,7 @@ B5 R4 新用户旅程
 - **优先级**: 高
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 与 AICC-20260425-016（AI_RULES.md 大小写）联动加重
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：⚠️ **原方案有重大缺陷** — 推荐统一为 `dev_docs/AI_RULES.md` 是少数派路径（仅 1 处），实际仓库主流（17 处）使用 `dev_docs/rules/combined/AI_RULES.md`。已重写方案：统一为深路径，仅修订 templates/AI_RULES_TEMPLATE.md L541 + path_a + .kiro 共 3 处 + AI_ENTRY_POINT 术语表新增 AI_RULES 行；详见 `Review_Verification_Report.md` Batch 1#029）
 
 ### 问题描述
 
@@ -2299,7 +2300,7 @@ B5 R4 新用户旅程
 - **优先级**: 中
 - **归属视角**: A（用户）+ B（完整性）
 - **关联任务/ADR**: 与 AICC-20260425-016（AI_RULES 大小写）同性质
-- **状态**: 🔴 待修复
+- **状态**: 🟢 已修复（B1 复审 2026-04-26：原 Issue 漏报 `workflows/generation_workflow.md L493`；已修订 quick_start L122 + generation_workflow L493 共 2 处，统一为 `dev_docs/AI_Coding_Context.md`；详见 `Review_Verification_Report.md` Batch 1#032）
 
 ### 问题描述
 

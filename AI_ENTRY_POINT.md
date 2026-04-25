@@ -154,7 +154,7 @@ test -f ai_coding_context/AI_ENTRY_POINT.md && echo "框架位于: ai_coding_con
   - dev_docs/*.md（生成的子文档）
   - dev_docs/knowledge/（知识库）
   - dev_docs/architecture/（架构决策记录与准则 ADR）
-  - AI_RULES.md
+  - dev_docs/rules/combined/AI_RULES.md（AI Rules 文件）
 ```
 
 ### 实际操作示例
@@ -305,11 +305,14 @@ git add ai_coding_context/
 | 框架名称       | `ai_coding_context`                             | 本框架名称，也是根目录的名称     |
 | 框架入口文档   | `AI_ENTRY_POINT.md`                             | 本文档（位于框架根目录）         |
 | 用户项目主文档 | `dev_docs/AI_Coding_Context.md`                 | 用户项目的文档入口（注意大小写） |
+| AI Rules 文件  | `dev_docs/rules/combined/AI_RULES.md`           | IDE 规则源文件（全大写）         |
 | 用户配置文件   | `config/user_config.md`                         | 用户个人配置（相对于框架根目录） |
 | 配置模板       | `config/CONFIG_TEMPLATE.md`                     | 默认配置模板                     |
 | 分析方案       | `dev_docs/_analysis/generation_plan.md`         | 生成方案文档                     |
 | 问题报告       | `dev_docs/_analysis/project_analysis_report.md` | 项目问题报告                     |
 | 进度记录       | `dev_docs/_analysis/generation_progress.md`     | 生成进度跟踪                     |
+
+> **SSOT 提示**：所有产物路径以 [`core/framework_spec.md` "标准产物路径"章节](core/framework_spec.md#-标准产物路径ssot) 为权威源。
 
 ### 工具脚本标准
 

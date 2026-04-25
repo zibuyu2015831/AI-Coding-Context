@@ -4,7 +4,7 @@ summary: [100-200字概述：AI规则库的索引和使用规范，管理项目�
 keywords: AI Rules | 规则库 | 编码规范 | 规则管理 | 索引
 scope: AI规则库索引 (dev_docs/rules/)
 related_files: 无
-dependencies: templates/RULE_TEMPLATE.md | dev_docs/AI_RULES.md
+dependencies: templates/RULE_TEMPLATE.md | dev_docs/rules/combined/AI_RULES.md
 verified_at: [YYYY-MM-DD 格式日期]
 ---
 

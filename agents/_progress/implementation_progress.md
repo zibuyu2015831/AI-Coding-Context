@@ -2,7 +2,7 @@
 
 **项目**: 001 - AI 角色库实施  
 **优先级**: P0  
-**实施方案**: [001-ai-agent-library/implementation.md](../../dev/V3.0/confirmed/001-ai-agent-library/implementation.md)
+**实施方案**: `dev/V3.0/confirmed/001-ai-agent-library/`（仅 dev 分支可见）
 
 ---
 

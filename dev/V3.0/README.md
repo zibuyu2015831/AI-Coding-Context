@@ -68,18 +68,18 @@
 #### 4. ADR 架构决策记录系统 ⭐ [004]
 - **状态**: ✅ 已完成 (2026-04-12)
 - **产物**: `dev_docs/architecture/`
-- **详细信息**: [004-adr-system.md](./confirmed/004-adr-system.md/004-adr-system.md)
+- **详细信息**: [004-adr-system.md](./confirmed/004-adr-system/004-adr-system.md)
 
 #### 5. 复杂度实时仪表盘 [005]
 - **状态**: ✅ 已完成 (2026-04-13)
 - **产物**: `dev_docs/complexity/`, `tools/complexity_scanner.py`, `tools/report_generator.py`
-- **详细信息**: [005-complexity-dashboard.md](./confirmed/005-complexity-dashboard.md/005-complexity-dashboard.md)
+- **详细信息**: [005-complexity-dashboard.md](./confirmed/005-complexity-dashboard/005-complexity-dashboard.md)
 
 #### 6. 自动化审查报告（整合到005）[006]
 - **状态**: ✅ 已完成 (2026-04-13)
 - **整合方案**: 扩展 005 工具链，新增代码审查功能
 - **实际工作量**: 1 天（快速实施）
-- **详细信息**: [006-auto-review-report.md](./confirmed/006-auto-review-report.md/006-auto-review-report.md)
+- **详细信息**: [006-auto-review-report.md](./confirmed/006-auto-review-report/006-auto-review-report.md)
 
 #### 14. 文档阅读习惯引导机制 [014]
 - **状态**: ✅ 已完成 (2026-04-14)

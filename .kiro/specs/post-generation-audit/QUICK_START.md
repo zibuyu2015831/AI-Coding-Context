@@ -154,7 +154,7 @@ SECTION_CONTENT_CHECKS = {
         "SUMMARY_FORMAT_SPEC.md"
     ],
     "AI_RULES 生成计划": [
-        "ai_rules.md",
+        "dev_docs/rules/combined/AI_RULES.md",
         "AI_RULES_TEMPLATE.md"
     ]
 }
