@@ -275,13 +275,13 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 ## 📈 审查进度跟踪
 
-**当前状态**：v2.0 体系刚补全完毕，准备启动 V3.0+ Comprehensive round
+**当前状态**：V3.0+ Comprehensive round 已完成；待修 31 项 Issue 进入 P0/P1/P2 修复阶段
 
 **历史轮次**：
 
-| 日期 | 范围 | 报告路径 |
-|---|---|---|
-| 2026-04-25 | V3.0+ Comprehensive | `audits/2026-04-25_V3.x_Comprehensive/` |
+| 日期 | 范围 | 报告路径 | 主要发现 |
+|---|---|---|---|
+| 2026-04-25 | V3.0+ Comprehensive | `audits/2026-04-25_V3.x_Comprehensive/` | 35 项 Issue（严重 2 / 主要 11 / 次要 14 / 建议 8）；V3.0 12 项实体 ✅ 真实落地；frontmatter 14% 自指失败；30 分钟用户旅程不达标；详见该轮 Comprehensive_Review_Report.md |
 
 （先前的 V2.3 / V2.2 审查档案位于 `dev/V2.3/`、`dev/V2.2/`，未走当前 `audits/` 规范）
 
