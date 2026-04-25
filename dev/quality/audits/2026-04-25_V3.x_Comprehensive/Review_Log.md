@@ -225,17 +225,85 @@ verified_at: 2026-04-25
 
 - 005 walkthrough.md 声明 5 个验证场景（A-E?），但实际 architecture_analyzer 缺失会让"高级架构分析"场景无法跑通；剧本 4 工作流提升时是否应一并补 architecture_analyzer 还是先发布功能子集？建议改进路线图（B7）讨论
 
-### B5 R4 新用户旅程（下一步）
+### B5 R4 新用户旅程（已完成）
 
-**计划**：模拟"我是新用户"路径
-- 仅看 Public 层：README → AI_ENTRY_POINT → quick_start → 第一份 AI_Coding_Context.md
-- 记录每个停顿点、歧义点、断链点
-- 检查 30 分钟时间预算
-- 与 016（AI_RULES.md 大小写）联动验证用户体验断点
+**做了什么**：
+
+1. 完整通读 `README.md`（344 行）作为新用户首次接触点
+2. 完整通读 `guides/quick_start.md`（236 行）作为快速开始路径
+3. 模拟新用户在 Linux 环境下从 `cp -r ai_coding_context your-project/` 起步
+4. 跟踪 4 个产物路径承诺：主文档 / AI_RULES / 进度文件 / 分析方案
+5. 测算 30 分钟时间预算可行性
+
+**用户旅程模拟结果**（致命断点全记录）：
+
+```
+阶段 1：阅读 README（5-8 分钟）
+  ✅ 介绍清晰，理念明确
+  🔴 L120 "快速开始（3 步）" 与正文 4 步不符 → 用户怀疑准确性
+
+阶段 2：复制框架（30 秒）
+  ✅ cp -r ai_coding_context 顺利
+
+阶段 3：转向 quick_start.md（10-15 分钟）
+  🔴 文档结构错乱：步骤 0 / 1 / 4 / 5 / 6（缺 2、3）
+  🔴 L54 未闭合代码块；审核清单嵌入步骤 1 内
+  🔴 L235 写"按 6 步执行"但实际数不到 6
+  → 用户在第二份核心文档就完全迷失
+
+阶段 4：发送 AI 指令（1 分钟）
+  ✅ "请阅读 AI_ENTRY_POINT.md..." 简单清晰
+
+阶段 5：AI 生成（取决于项目规模）
+  🔴 path_a 让 AI 生成 ai_rules.md（小写）
+  🔴 README 期待 dev_docs/rules/combined/AI_RULES.md
+  🔴 templates 写 dev_docs/AI_RULES.md
+  → 4 处路径承诺不一致，IDE 集成大概率失败
+
+阶段 6：配置 IDE（约 1 分钟）
+  🔴 用户找不到 README 承诺的产物位置
+  → 需手动 find . -name '*RULES*' 排查
+```
+
+**新增 Issue**（共 6 项，含 1 项严重级别）：
+
+- 🔴 AICC-20260425-028（**严重**）：guides/quick_start.md 结构错乱 — 步骤跳号（缺 2、3）、未闭合代码块、末尾计数自相矛盾
+- 🔴 AICC-20260425-029（主要）：AI_RULES.md 在 README/templates/path_a 共 4 处给出 3 个不同路径
+- 🔴 AICC-20260425-030（主要）：guides/quick_start.md 4 处引用过时框架名 `ai_documentation_framework`
+- 🔴 AICC-20260425-031（主要）：README L120 标题"快速开始（3 步）"与实际 4 步不符
+- 🔴 AICC-20260425-032（次要）：主文档名 `ai_coding_context.md`（quick_start）vs `AI_Coding_Context.md`（AI_ENTRY_POINT 术语表）大小写不一致
+- 🔴 AICC-20260425-033（次要）：quick_start 步骤 0 推荐用户用 `find` + `cloc`，与 V3.0 标准化 project_scanner 工具脱节
+
+**关键决策**：
+
+- 决策 19：028 是本轮第一个**严重**级别问题。原因：quick_start.md 是新用户旅程的核心入口，结构错乱让 30 分钟时间预算彻底失效，可能导致用户直接放弃使用框架。R4 维度的核心断点
+- 决策 20：016 / 029 / 032 形成"V3.0 命名一致性系统问题"集群（AI_RULES 大小写 + AI_RULES 路径 + 主文档大小写）— 应在 B7 报告中作为同类问题集中诊断与批量修复
+- 决策 21：030（过时框架名 `ai_documentation_framework`）是文档同步机制失灵的指示器 — README 已升级到 ai_coding_context 但 guides/ 未同步，说明 V3.0 阶段没有 grep 检查机制
+- 决策 22：B5 复盘 016（B3 发现）的影响 — 在 B5 实测下，016 不是孤立问题，而是与 029 / 032 共同导致用户旅程崩溃。B3 时只算"主要"级别，但联合作用应升级感知
+
+**重大正面发现**：
+
+- README 的"📖 框架核心理念"与"方案对比"段（L8-L94）写得清晰、有说服力 — 用户首次接触的"价值印象"良好
+- AI_ENTRY_POINT.md 自身结构完整 — 框架边界声明、术语表、工作流概览都很扎实
+- 真正的断点都集中在 README 局部 + quick_start.md 整体 — 修复成本可控（主要是文档维护问题，不涉及架构）
+
+**未解疑问**：
+
+- README 的"步骤 0 评估项目规模"（quick_start L27-L42）与 path_a 自动检测项目规模（无需用户手动评估）矛盾 — 用户视角的"评估项目规模"步骤是否真的需要？建议 B7 讨论是否删除该步骤
+- quick_start L113 的"步骤 4: 执行文档生成"与 path_a Step 8 重复表述 — 是否合并到工作流文档而非用户指南？
+
+### B6 批量合规扫描（下一步）
+
+**计划**：⚪ 仅合规级文件批量扫描
+- tools/ 双版本对称（py vs js 文件名 diff）
+- Python 零依赖（grep import）
+- JS 零依赖（grep require）
+- YAML Frontmatter 摘要合规率（按 SUMMARY_FORMAT_SPEC）
+- Markdown 头部 docstring 完整性
 
 **预计**：1-2 小时
 
 ---
 
-**版本**：v1.4
-**最后更新**：2026-04-25（B4 完成）
+**版本**：v1.5
+**最后更新**：2026-04-25（B5 完成）

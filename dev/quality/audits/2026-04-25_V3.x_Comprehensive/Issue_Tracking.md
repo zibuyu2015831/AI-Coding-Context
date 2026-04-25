@@ -19,22 +19,22 @@ verified_at: 2026-04-25
 
 | 严重级别 | 数量 |
 |---|---|
-| 严重 | 0 |
-| 主要 | 8 |
-| 次要 | 12 |
+| 严重 | 1 |
+| 主要 | 11 |
+| 次要 | 14 |
 | 建议 | 7 |
-| **合计** | **27**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6 + B4 新增 6；后续批次将追加） |
+| **合计** | **33**（B0 基线 8 + B1 新增 2 + B2 新增 5 + B3 新增 6 + B4 新增 6 + B5 新增 6；后续批次将追加） |
 
 | 视角分布 | 数量 |
 |---|---|
-| 视角 A（用户） | 5 |
+| 视角 A（用户） | 11 |
 | 视角 B（完整性） | 17 |
 | 视角 C（dev 卫生） | 5 |
 
 | 修复状态 | 数量 |
 |---|---|
 | 🟢 已修复（Phase 0 顺手处理） | 4 |
-| 🔴 待修复 | 23 |
+| 🔴 待修复 | 29 |
 
 ---
 
@@ -1975,12 +1975,487 @@ B4 R5 自指审查（005 设计-发布 gap 诊断）
 
 ---
 
-## 📈 后续批次将追加的问题段落
+## 问题 ID: AICC-20260425-028
 
-每个批次（B5-B7）执行后将在此追加问题，编号继续：AICC-20260425-028 起。
+- **类型**: 文档问题（结构错乱 + 步骤跳号）
+- **严重级别**: 严重
+- **优先级**: 高
+- **归属视角**: A（用户）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`guides/quick_start.md` 是新用户旅程的核心入口，但当前结构严重损坏：
+
+1. **步骤编号跳号**：明确列出"步骤 0 / 步骤 1 / 步骤 4 / 步骤 5 / 步骤 6"，**完全缺失步骤 2 和步骤 3**
+2. **代码块未闭合**：L54 处 ` ```bash ` 开启代码块后，紧接着 L57 出现 `#### 审核清单` 二级标题，破坏 markdown 结构
+3. **末尾自相矛盾**：L235 写 "选择场景 1，严格按照 6 个步骤执行"，但实际只能数到 5 个步骤（0/1/4/5/6）
+4. **审核清单段落定位错位**：L57-L109 的"审核清单"内容应在步骤 3 内，但实际嵌入步骤 1 的代码块中
+
+新用户按此文档操作会在步骤 1 后完全迷失：找不到步骤 2、3 在哪，跳到步骤 4 又写"审核通过后..."但前面没"步骤 3：审核"。
+
+### 影响范围
+
+- **R4（新用户旅程）核心断点**：30 分钟时间预算无法兑现
+- **视角 A 致命缺陷**：用户旅程在第二个文档就崩溃
+- 用户可能直接放弃使用框架
+
+### 主要文件路径
+
+- `guides/quick_start.md`
+
+### 相关文件路径
+
+- `README.md`（首先引导用户来此文档）
+- `workflows/path_a_first_generation.md`（与 quick_start 应一致）
+- `templates/GENERATION_PLAN_TEMPLATE.md`（应在缺失的步骤 2/3 中提及）
+
+### 具体位置
+
+- L52-L54：步骤 1 起始
+- L54：未闭合 ` ```bash ` 代码块
+- L57-L109：审核清单（位置错误）
+- L113：直接跳到"步骤 4: 执行文档生成"（应有步骤 2、3）
+- L235：`严格按照 6 个步骤执行`（计数错误）
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 步骤编号应连续完整
+grep -nE '^### 步骤 [0-9]' guides/quick_start.md
+# 修复后预期：返回连续编号 0/1/2/3/4/5/6 或 1/2/3/4/5/6
+
+# 2. 代码块成对闭合（开闭数应为偶数）
+grep -c '^```' guides/quick_start.md
+# 修复后预期：偶数
+
+# 3. 末尾计数与实际步骤数一致
+grep -nE '步骤数|个步骤|步骤执行' guides/quick_start.md
+# 修复后预期：声明的数字 = 实际 ### 步骤 段落数
+
+# 4. 模拟 markdown 渲染（粗略）
+python -c "
+import re
+with open('guides/quick_start.md') as f: c = f.read()
+steps = re.findall(r'^### 步骤 (\d+)', c, re.M)
+print('步骤序列:', steps)
+print('是否连续:', steps == [str(i) for i in range(int(steps[0]), int(steps[-1])+1)])
+"
+```
+
+### 建议修复方案
+
+- 重写 quick_start.md，确保：
+  - 步骤连续：0 → 1 → 2 → 3 → 4 → 5 → 6（或 1-6）
+  - 步骤 2：生成分析方案（引用 GENERATION_PLAN_TEMPLATE.md）
+  - 步骤 3：审核方案（"审核清单"段落应在此）
+  - 所有代码块成对闭合
+  - L235 的步骤计数与实际一致
+- 与 `workflows/path_a_first_generation.md` 9 步流程对齐（path_a 有完整 8 步：S0-S8）
+- 长期：在 CI/pre-commit 中加入 markdown 结构校验
+
+### 审查阶段
+
+B5 R4 新用户旅程
 
 ---
 
-**版本**：v1.4
+## 问题 ID: AICC-20260425-029
+
+- **类型**: 文档问题（路径承诺多版本不一致）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 与 AICC-20260425-016（AI_RULES.md 大小写）联动加重
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`AI_RULES.md` 文件最终生成路径在不同文档中有 **4 处不同表述**：
+
+1. `README.md` L168：`📐 Rule文件已生成: dev_docs/rules/combined/AI_RULES.md`（深嵌套路径，大写）
+2. `README.md` L173：`打开dev_docs/rules/combined/AI_RULES.md`（同上）
+3. `templates/AI_RULES_TEMPLATE.md` L541：`AI 生成更新后的 rule 到\`dev_docs/AI_RULES.md\``（dev_docs/ 直下，大写）
+4. `workflows/path_a_first_generation.md` L752/L756：`项目根目录 \`ai_rules.md\``（项目根，**小写**）
+5. `AI_ENTRY_POINT.md` L157：`- AI_RULES.md`（仅文件名，未指定位置）
+
+这导致：
+
+- 用户读 README 期待 `dev_docs/rules/combined/AI_RULES.md`
+- 但 path_a 让 AI 生成 `项目根/ai_rules.md`（小写）
+- 模板说应该到 `dev_docs/AI_RULES.md`
+- IDE 集成（Cursor `.cursorrules`）会因位置错位失效
+
+### 影响范围
+
+- **R4 新用户旅程致命断点**：用户找不到生成的 AI_RULES.md
+- **R1 工作流闭环致命断点**：剧本 1 path_a 最后一步产物去向不明
+- 与 AICC-20260425-016（大小写不一致）耦合放大问题
+- IDE 集成失败
+
+### 主要文件路径
+
+- `README.md`
+- `templates/AI_RULES_TEMPLATE.md`
+- `workflows/path_a_first_generation.md`
+- `AI_ENTRY_POINT.md`
+
+### 相关文件路径
+
+- `guides/ai_rules_maintenance.md`（应明示权威路径）
+- `core/framework_spec.md`（应权威约定文件位置）
+
+### 具体位置
+
+- `README.md` L168、L173
+- `templates/AI_RULES_TEMPLATE.md` L541
+- `workflows/path_a_first_generation.md` L752、L756
+- `AI_ENTRY_POINT.md` L157、术语表 L306-L307
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 全仓库 AI_RULES 路径所有出现处统一
+grep -rnE 'AI_RULES\.md|ai_rules\.md' --include='*.md' \
+  AI_ENTRY_POINT.md README.md templates/ workflows/ guides/ core/ \
+  | grep -oE '[a-zA-Z_/]+(AI_RULES\.md|ai_rules\.md)' | sort -u
+# 修复后预期：所有路径前缀完全一致（推荐统一为 `dev_docs/AI_RULES.md`）
+
+# 2. Linux 大小写敏感测试
+grep -nE '\bai_rules\.md\b' --include='*.md' .
+# 修复后预期：返回空（统一大写）
+
+# 3. AI_ENTRY_POINT 术语表是权威源
+grep -nE 'AI_RULES\.md' AI_ENTRY_POINT.md
+```
+
+### 建议修复方案
+
+- 以 `AI_ENTRY_POINT.md` 术语表为权威源，统一为 `dev_docs/AI_RULES.md`（大写、dev_docs/ 直下）
+- 修订四处：
+  - `README.md` L168/L173：路径改为 `dev_docs/AI_RULES.md`
+  - `templates/AI_RULES_TEMPLATE.md` L541：保持 `dev_docs/AI_RULES.md`（已正确）
+  - `workflows/path_a_first_generation.md` L752/L756：改为 `dev_docs/AI_RULES.md`
+- 与 016（大小写）一并修复
+- 长期：在 `core/framework_spec.md` 增加"标准产物路径"章节作为单一真相源
+
+### 审查阶段
+
+B5 R4 新用户旅程
+
+---
+
+## 问题 ID: AICC-20260425-030
+
+- **类型**: 文档问题（过时框架名残留）
+- **严重级别**: 主要
+- **优先级**: 高
+- **归属视角**: A（用户）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`guides/quick_start.md` 多处引用过时框架名 **`ai_documentation_framework`**（应为当前框架名 `ai_coding_context`）：
+
+- L55：`# 克隆或复制 ai_documentation_framework 目录到新项目根目录`
+- L146：`rm -rf ai_documentation_framework/`
+- L158：`cp -r ai_documentation_framework /path/to/existing_project/`
+- L228：`把 \`ai_documentation_framework/\` 维护为独立仓库`
+
+新用户按 README L131 用 `cp -r ai_coding_context your-project/` 复制后，再读 quick_start 看到要操作 `ai_documentation_framework` 会困惑：
+
+- 是否还需要再 cp 一份？
+- 框架的真实名字是什么？
+- 之前复制的 `ai_coding_context` 用错了吗？
+
+### 影响范围
+
+- **R4 新用户旅程严重断点**：用户对框架身份产生混淆
+- 视角 A 用户可信度受损
+- 文档一致性维护机制失灵的指示器（README 已升级，guides 未同步）
+
+### 主要文件路径
+
+- `guides/quick_start.md`
+
+### 相关文件路径
+
+- `README.md`（已使用 `ai_coding_context` 正确名称）
+
+### 具体位置
+
+- L55、L146、L158、L228（共 4 处）
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 全仓库不应再有 ai_documentation_framework 残留
+grep -rn 'ai_documentation_framework' --include='*.md' .
+# 修复后预期：返回空（或仅在 dev/V2.x 历史档案中，可豁免）
+
+# 2. 当前框架名应为 ai_coding_context
+grep -rn 'ai_coding_context' --include='*.md' \
+  README.md AI_ENTRY_POINT.md guides/ workflows/ \
+  | head -10
+
+# 3. 历史归档区可保留旧名作为版本演进证据
+grep -rn 'ai_documentation_framework' --include='*.md' dev/V2.3/ dev/V2.2/ 2>&1
+# 此处出现可接受
+```
+
+### 建议修复方案
+
+- 全文替换 `guides/quick_start.md` 中的 `ai_documentation_framework` → `ai_coding_context`
+- 同步检查其他 guides/ 文档是否有类似过时名残留
+- 长期：在框架更名时加入 grep 检查项到 release checklist
+
+### 审查阶段
+
+B5 R4 新用户旅程
+
+---
+
+## 问题 ID: AICC-20260425-031
+
+- **类型**: 文档问题（首页计数错误）
+- **严重级别**: 主要
+- **优先级**: 中
+- **归属视角**: A（用户）
+- **关联任务/ADR**: 无
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`README.md` L120 标题写 `## 🚀 快速开始（3 步）`，但紧接着 L122-L125 实际列出 **4 步**：
+
+```
+1. 完整阅读 README.md（即本文档）了解框架
+2. 复制框架到你的项目
+3. 让 AI 读取 AI_ENTRY_POINT.md
+4. AI 自动生成文档体系
+```
+
+后续详细说明又有：
+- 步骤 1: 复制框架（L127）
+- 步骤 2: 让 AI 自主执行（L134）
+- 步骤 3: 审核确认（L152）
+- 步骤 4: 配置 AI Rules（L163）
+
+总共 4 个详细步骤，与"3 步"标题不符。L122 第一项"完整阅读 README"也未在详细说明中作为独立步骤展开。
+
+新用户从首页的"3 步"承诺起步，看到 4 步详细说明，会怀疑文档准确性。
+
+### 影响范围
+
+- README 是新用户首次接触的入口，首页计数错误会立即破坏信任
+- R4 新用户旅程的"第一印象"断点
+
+### 主要文件路径
+
+- `README.md`
+
+### 相关文件路径
+
+- `guides/quick_start.md`（应与 README 步骤数对齐）
+- `AI_ENTRY_POINT.md`（与 README 一致的快速指引）
+
+### 具体位置
+
+- L120：`## 🚀 快速开始（3 步）` 标题
+- L122-L125：4 项编号列表（"完整阅读" + 3 个执行步骤）
+- L127、L134、L152、L163：详细说明的 4 个步骤
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 标题数字与实际步骤数一致
+TITLE=$(grep -oE '快速开始（[0-9]+ ?步）' README.md | grep -oE '[0-9]+')
+DETAIL=$(grep -cE '^### 步骤 [0-9]+:' README.md)
+echo "标题: $TITLE 步; 详细步骤数: $DETAIL"
+# 修复后预期：两者相等
+
+# 2. 顶部编号列表项数与详细说明数一致
+sed -n '/快速开始/,/### 步骤 1/p' README.md | grep -cE '^[0-9]+\.'
+```
+
+### 建议修复方案
+
+- **选项 A**：标题改为 `## 🚀 快速开始（4 步）`，与详细说明匹配
+- **选项 B**：将 L122-L125 的"完整阅读 README"合并到正文导言（不作为独立步骤），保持 3 步详细说明
+- 推荐 A：保留"完整阅读 README"作为隐含前提，详细说明 4 步保持一致
+
+### 审查阶段
+
+B5 R4 新用户旅程
+
+---
+
+## 问题 ID: AICC-20260425-032
+
+- **类型**: 文档问题（主文档名大小写不一致）
+- **严重级别**: 次要
+- **优先级**: 中
+- **归属视角**: A（用户）+ B（完整性）
+- **关联任务/ADR**: 与 AICC-20260425-016（AI_RULES 大小写）同性质
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+主文档（用户项目根）名称在不同文档存在大小写不一致：
+
+- `AI_ENTRY_POINT.md` 术语表 L307：`dev_docs/AI_Coding_Context.md`（驼峰）
+- `guides/quick_start.md` L120：`生成主文档 ai_coding_context.md`（小写）
+- `templates/AI_Coding_Context_TEMPLATE.md`（驼峰）
+
+Linux 文件系统区分大小写：
+
+- 若 AI 按 quick_start 生成 `ai_coding_context.md`，与 AI_ENTRY_POINT 术语表的 `AI_Coding_Context.md` 不一致
+- 后续 AI 会话查找 `dev_docs/AI_Coding_Context.md` 会失败
+- 与项目目录 `ai_coding_context/`（框架本身的目录名）混淆
+
+### 影响范围
+
+- 视角 A：用户在 Linux/macOS 下生成的产物可能与文档预期不一致
+- 与 016（AI_RULES.md）+ 029（AI_RULES 路径）形成"V3.0 命名一致性系统问题"集群
+- 长期看是框架自动化能力受损
+
+### 主要文件路径
+
+- `AI_ENTRY_POINT.md`
+- `guides/quick_start.md`
+
+### 相关文件路径
+
+- `templates/AI_Coding_Context_TEMPLATE.md`
+- `core/framework_spec.md`
+
+### 具体位置
+
+- `guides/quick_start.md` L120：`生成主文档 ai_coding_context.md`
+- `AI_ENTRY_POINT.md` L307：`dev_docs/AI_Coding_Context.md`
+
+### 复查方法（验证修复）
+
+```bash
+# 1. 不应再有小写形式的主文档名
+grep -rn '\bai_coding_context\.md\b' --include='*.md' .
+# 修复后预期：返回空
+
+# 2. 大写形式应统一
+grep -rn 'AI_Coding_Context\.md' --include='*.md' \
+  AI_ENTRY_POINT.md guides/ workflows/ templates/ core/ \
+  | head -10
+
+# 3. 模板文件名作为权威源
+ls templates/AI_Coding_Context_TEMPLATE.md
+```
+
+### 建议修复方案
+
+- 以 `AI_ENTRY_POINT.md` 术语表 L307 为权威源（`dev_docs/AI_Coding_Context.md`）
+- 修订 `guides/quick_start.md` L120：`生成主文档 ai_coding_context.md` → `生成主文档 dev_docs/AI_Coding_Context.md`
+- 与 016 / 029 一并修复，作为"V3.0 命名规范统一"的批次修复
+
+### 审查阶段
+
+B5 R4 新用户旅程
+
+---
+
+## 问题 ID: AICC-20260425-033
+
+- **类型**: 设计问题（推荐工具与 V3.0 标准化脱节）
+- **严重级别**: 次要
+- **优先级**: 低
+- **归属视角**: A（用户）
+- **关联任务/ADR**: 与 017-实用脚本工具库（已完成）的"消除命令行不确定性"原则相关
+- **状态**: 🔴 待修复
+
+### 问题描述
+
+`guides/quick_start.md` 步骤 0（项目规模评估）推荐用户使用：
+
+```bash
+# L33-L34
+find . -name "*.ts" -o -name "*.js" -o -name "*.vue" | wc -l
+cloc . --exclude-dir=node_modules,dist
+```
+
+这与 V3.0 强调的"消除 AI 命令行操作不确定性"原则脱节：
+
+- AICC 已有 `tools/py/project_scanner.py`（Python，跨平台）和 `tools/js/project_scanner.js`（双脚本对称）
+- AI_ENTRY_POINT.md 工具索引 L320 明确推荐使用 project_scanner
+- 但 quick_start 推荐用户用 `find` + `cloc`：
+  - `find` 命令在 Windows PowerShell 下行为不同
+  - `cloc` 是第三方工具，违反"零依赖"红线
+  - 没引导用户走 V3.0 工具链
+
+### 影响范围
+
+- 用户养成"用 shell 命令而非 AICC 工具"的习惯，绕过 V3.0 标准化
+- 跨平台一致性受损（Windows 用户运行 find 会失败）
+- 017-实用脚本工具库的价值未被引导发掘
+
+### 主要文件路径
+
+- `guides/quick_start.md`
+
+### 相关文件路径
+
+- `tools/py/project_scanner.py`
+- `tools/js/project_scanner.js`
+- `AI_ENTRY_POINT.md` L320 工具索引
+
+### 具体位置
+
+- `guides/quick_start.md` L31-L36 步骤 0 命令示例
+
+### 复查方法（验证修复）
+
+```bash
+# 1. quick_start 应优先推荐 V3.0 工具
+grep -nE 'project_scanner|tools/py|tools/js' guides/quick_start.md
+# 修复后预期：≥ 1 处明确引导
+
+# 2. find/cloc 等 shell 命令应作为降级方案而非主推
+grep -nE 'find \. -name|cloc \.' guides/quick_start.md
+# 修复后：要么删除，要么明示"作为 fallback 方案"
+
+# 3. 与 AI_ENTRY_POINT 工具索引一致
+grep -nE 'project_scanner' AI_ENTRY_POINT.md guides/quick_start.md
+```
+
+### 建议修复方案
+
+- 将 L31-L36 改为：
+
+```bash
+# 推荐：使用 AICC 工具（跨平台 + 零依赖）
+python tools/py/project_scanner.py . --exclude-standard
+# 或 Node.js 版本：
+node tools/js/project_scanner.js . --exclude-standard
+
+# 降级（无 Python/Node.js 时）：
+find . -name "*.ts" -o -name "*.js" -o -name "*.vue" | wc -l
+```
+
+- 引用 `AI_ENTRY_POINT.md` 工具索引段
+- 与 V3.0 双脚本对称模式保持一致
+
+### 审查阶段
+
+B5 R4 新用户旅程
+
+---
+
+## 📈 后续批次将追加的问题段落
+
+每个批次（B6-B7）执行后将在此追加问题，编号继续：AICC-20260425-034 起。
+
+---
+
+**版本**：v1.5
 **创建日期**：2026-04-25
-**最后更新**：2026-04-25（B4 完成；新增 022-027，全部含完整六大要素）
+**最后更新**：2026-04-25（B5 完成；新增 028-033，含 1 项严重级别 quick_start.md 结构错乱）
