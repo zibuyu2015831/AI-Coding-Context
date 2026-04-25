@@ -110,7 +110,7 @@ ID: language_specific.vue3_expert
 
 ### 示例文档
 
-**详细示例**: [`vue3_expert_examples.md`](../../examples/vue3_expert_examples.md)
+**详细示例**: [`vue3_expert_examples.md`](../examples/vue3_expert_examples.md)
 
 ### 快速示例
 
@@ -217,7 +217,7 @@ const handleEdit = (user: User) => {
 
 ### 下游角色
 
-- **test_engineer** ([runtime/test_engineer.md](../../runtime/test_engineer.md)) - 编写组件单元测试 (Vitest)
+- **test_engineer** ([runtime/test_engineer.md](../runtime/test_engineer.md)) - 编写组件单元测试 (Vitest)
 
 ---
 

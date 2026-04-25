@@ -119,7 +119,7 @@
 
 | 角色       | 示例文档                                                         | 状态        |
 | ---------- | ---------------------------------------------------------------- | ----------- |
-| 前端工程师 | [frontend_engineer_examples.md](./frontend_engineer_examples.md) | ✅ _已存在_ |
+| 前端工程师 | [frontend_engineer_examples.md](./frontend_engineer_examples.md) | ✅ 已完成 |
 | 后端工程师 | [backend_engineer_examples.md](./backend_engineer_examples.md)   | ✅ 已完成   |
 
 ### Language Expert 角色示例

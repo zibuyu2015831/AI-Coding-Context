@@ -128,7 +128,12 @@ verified_at: 2025-12-19
 
 - [生成方案](../generation_plan.md) - 原始文档生成方案
 - [项目分析报告](../project_analysis_report.md) - 项目问题分析
-- [设计思维文档](../design_thinking_step*.md) - 5步设计思维过程
+- 设计思维文档 - 5步设计思维过程
+  - [step1_why](../design_thinking_step1.md)
+  - [step2_how](../design_thinking_step2.md)
+  - [step3_risk](../design_thinking_step3.md)
+  - [step4_reflection](../design_thinking_step4.md)
+  - [step5_decision](../design_thinking_step5.md)
 - [框架上下文](../../../FRAMEWORK_CONTEXT.md) - 框架全局上下文
 
 ---

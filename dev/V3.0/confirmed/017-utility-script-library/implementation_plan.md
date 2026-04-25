@@ -86,7 +86,7 @@ tools/
 
 ### 3. 框架集成
 
-#### [MODIFY] [AI_ENTRY_POINT.md](file:///d:/zibuyu_code/ai_coding_context/AI_ENTRY_POINT.md)
+#### [MODIFY] [AI_ENTRY_POINT.md](../../../../AI_ENTRY_POINT.md)
 
 - 更新 "步骤 0" 和 "步骤 1" 以使用 `tools/project_scanner`。
 - 更新 "步骤 2" 逻辑以使用扫描器的 JSON 输出。

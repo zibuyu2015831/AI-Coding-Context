@@ -365,4 +365,4 @@ find . -type f | wc -l
 
 ## 📌 导航
 
-[← 返回主文档](../../AI_ENTRY_POINT.md) | [查看其他共享资源](../README.md)
+[← 返回主文档](../../AI_ENTRY_POINT.md) | [查看其他共享资源](./README.md)

@@ -474,8 +474,8 @@ doc_reading_guide:
 ## 📚 相关文档
 
 - [design_decisions.md](../../../../core/design_decisions.md) - 已补充相关设计理念
-- [012-mandatory-doc-summary.md](./012-mandatory-doc-summary.md) - 文档摘要机制（配合使用）
-- [003-design-thinking-guide.md](./003-design-thinking-guide.md) - 设计思维引导（思路类似）
+- [012-mandatory-doc-summary.md](../012-mandatory-doc-summary/012-mandatory-doc-summary.md) - 文档摘要机制（配合使用）
+- [003-design-thinking-guide.md](../003-design-thinking-guide/003-design-thinking-guide.md) - 设计思维引导（思路类似）
 
 ---
 

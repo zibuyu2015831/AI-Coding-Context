@@ -110,7 +110,7 @@ ID: language_specific.vue3_state_manager
 
 ### 示例文档
 
-**详细示例**: [`vue3_state_manager_examples.md`](../../examples/vue3_state_manager_examples.md)
+**详细示例**: [`vue3_state_manager_examples.md`](../examples/vue3_state_manager_examples.md)
 
 ### 快速示例
 
@@ -168,7 +168,7 @@ export const useCounterStore = defineStore(
 
 ### 下游角色
 
-- **test_engineer** ([runtime/test_engineer.md](../../runtime/test_engineer.md)) - 编写 Store 单元测试
+- **test_engineer** ([runtime/test_engineer.md](../runtime/test_engineer.md)) - 编写 Store 单元测试
 
 ---
 

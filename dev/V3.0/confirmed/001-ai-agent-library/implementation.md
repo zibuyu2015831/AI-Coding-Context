@@ -903,7 +903,7 @@ ID: [类型].[英文名称]
 
 #### 步骤 2.5.1: 更新角色模板
 
-**文件**: [agents/\_templates/agent_template.md](cci:7://file:///d:/zibuyu_code/ai_coding_context/agents/_templates/agent_template.md:0:0-0:0)
+**文件**: [agents/\_templates/agent_template.md](../../../../agents/_templates/agent_template.md)
 
 **需要调整**:
 
