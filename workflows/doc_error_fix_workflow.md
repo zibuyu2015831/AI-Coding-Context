@@ -484,12 +484,19 @@ python tools/py/commit_template_cli.py --message "fix: {{错误描述}}"
 ### 单元测试
 
 ```bash
-# 运行工具测试
-python -m pytest tests/ -v -k "doc_error"
-
-# 集成测试
-python -m pytest tests/integration/ -v -k "doc_fix"
+# 现有工具测试（截至 2026-04-26 实测覆盖范围）
+python -m pytest tools/py/tests/ -v
 ```
+
+> ⚠️ **测试覆盖现状**：`tools/py/tests/` 当前仅覆盖 commit_integrity / git_safety；
+> doc_error_fix 工具链（detection / fix_executor / dependency_tracer）的单元测试与集成测试**尚未补全**。
+> 后续补全任务建议入 `dev/V3.0/PROGRESS.md` 011 后续清单：
+>
+> - `tools/py/tests/test_doc_error_detection.py`
+> - `tools/py/tests/test_doc_fix_executor.py`
+> - `tools/py/tests/integration/test_doc_fix_e2e.py`
+>
+> 补全后命令恢复为 `python -m pytest tools/py/tests/ -v -k "doc_error or doc_fix"`
 
 ### 模拟测试场景
 

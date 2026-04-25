@@ -311,7 +311,263 @@ verified_at: 2026-04-26
 
 ## 🔹 Batch 2：文档漂移 + SSOT
 
-> 待启动。
+> **批次目标**：核查 FRAMEWORK_CONTEXT vs PROGRESS 漂移集群（001/011/012/014/015）与文档间引用错误（013/018/023）的真实性与方案最优性。
+>
+> **完成日期**：2026-04-26
+>
+> **批次结论**：
+> - 8 项 Issue 全部 **真实存在**
+> - 描述完全准确：5 项（011, 012, 013, 014, 018）
+> - 描述有偏差：3 项（001 项数计数小偏差 / 015 实体处置假设错误 / 023 personas 数计算口径不清）
+> - 修复方案处置：✅ 通过 5 项 / 🟡 需补充 2 项 / 🔴 重大缺陷需重写 1 项（015）
+
+---
+
+### AICC-20260425-001 — FRAMEWORK_CONTEXT vs PROGRESS 漂移（统领条目）
+
+- **真实性**：✅ 真实存在（漂移宏观存在）
+- **描述准确性**：⚠️ 项数细节偏差 — Issue 称"顶部摘要列出 8 项 P0 + 019（共 9 项）"，**实际 L17-L24 仅 8 项总数**（含 019），不是 8+1=9
+- **关键证据**：
+  - FRAMEWORK_CONTEXT L17-L24 实际 8 项：001 / 003 / 012 / 013 / 016 / 017 / 018 / 019
+  - PROGRESS L18 实际 11 项（漏 011）：001 / 003 / 004 / 005 / 006 / 012 / 013 / 014 / 016 / 017 / 018
+  - PROGRESS L88 实际：011 标记 ✅（与 L18 缺失矛盾，由 012 详细定位）
+  - 应包含的 12 项已完成 = L18 的 11 项 + 011 = 12
+  - FRAMEWORK_CONTEXT 顶部漏列 5 项（004/005/006/011/014）— 与 011 描述一致
+- **方案评估**：✅ **通过**（本条已被 011/012 精确细分；统领角色保留即可）
+- **架构师建议**：001 作为统领可关闭，引用 011 + 012 作为具体修复入口；推荐在修复后保留 001 作为"集群说明锚点"，状态置 🟢 时备注"由 011/012/014/015 联合修复完成"
+
+---
+
+### AICC-20260425-011 — FRAMEWORK_CONTEXT 顶部摘要严重过时
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 准确 — 全部 5 项漏列、L703 "(10/17)" 与 11 项列举矛盾均已核实
+- **关键证据**：
+  - L17-L24 缺 004/005/006/011/014 ✓
+  - L25-L28 "**剩余关键能力（规划中）**" 包含 ADR/复杂度仪表盘/自动审查报告 — 与 L711-L714 的 ✅ 标记矛盾（014 详细定位）
+  - L703 写 `已完成 (10/17)`，但 L704-L714 实际列了 11 项 ✓
+  - L711 含 019 + 2026-04-11 日期
+- **方案评估**：🟡 **需补充修复后的目标数字**
+  - ✅ 思路正确："顶部摘要同步到 12 项 + L703 改为 (12/18)"
+  - ⚠️ **依赖关系遗漏**：原方案 (12/18) 假设总数仍为 18。但 015 提议把 019 登记为正式优化点 → 总数应为 **(13/19)**。两 Issue 的修复结果在分母上需联动
+- **架构师补充方案**：
+  - **必须先决策 019 的处置**（见 015 复审），再统一修复分母：
+    - 若 015 选 A（推荐）：FRAMEWORK_CONTEXT L703 改为 `已完成 (13/19)`；顶部 L14-L23 列 13 项含 011 + 019
+    - 若 015 选 B：分母保持 (12/18)，把 019 移出 V3.0 主清单到独立"V3.0+ 增益"章节
+  - L25-L28 P1/P2 表述与 014 一并重写（见 014 复审）
+  - **新增推荐措施**：在 FRAMEWORK_CONTEXT 顶部 frontmatter 增加 `progress_synced_at: <date>` 字段（与 PROGRESS.md 的 verified_at 对齐），约定每次 PROGRESS 变更后必须同步更新此字段；CI 可加校验"两份文档的优化点编号集合 diff 应为空"
+
+---
+
+### AICC-20260425-012 — PROGRESS 自身内部不一致
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 准确 — L18 缺 011、L34 P1 中 011 用 🟢、L88 标 ✅ 三处全部核实
+- **关键证据**：
+  - L18 实测：`已完成: 11个 (001, 003, 004, 005, 006, 012, 013, 016, 017, 018, 014)` 数 11 项缺 011
+  - L34 实测：`P1 (高价值): 5个 (004 ✅, 005 ✅, 006 ✅, 011 🟢, 014 ✅)` — 011 用 🟢
+  - L85 实测：`- [x] 实现文档谬误修复工作流 (011) ✅` — 011 已完成
+- **方案评估**：✅ **通过**
+- **架构师补充**：
+  1. 修复 L18 同时**也要修 L17 的 13个**（已确认 confirmed/ 数）：当前 13 个含 010 进行中、011 已完成等 13 项；如 015 选项 A 落地新增 019，应升至 14 项
+  2. L34 011 🟢 → ✅ 后，**P1 计数 (5个)** 应保持（004/005/006/011/014 全 ✅，本身 5 项不变）
+  3. **回归校验加强**（在原方案 grep 基础上）：
+     ```bash
+     # P1 中所有项应为 ✅ 或 🟢 一致；不能既 ✅ 又 🟢 矛盾
+     grep -E '011 ?[✅🟢]' dev/V3.0/PROGRESS.md
+     # 应统一为 ✅
+     ```
+  4. **建议在 PROGRESS.md 头部加 frontmatter `verified_at` 字段**（见 011 联动）
+
+---
+
+### AICC-20260425-013 — FRAMEWORK_CONTEXT 同文档对相同文件给两处不同路径
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 准确 — L539/L540 用 `reference/`、L744/L745 用 `core/`；实体在 `core/` ✓
+- **关键证据**：
+  - L539: `reference/SUMMARY_FORMAT_SPEC.md` ❌
+  - L540: `reference/design_decisions.md` ❌
+  - L744-L745: `core/design_decisions.md` / `core/SUMMARY_FORMAT_SPEC.md` ✓
+  - 实体确认：`ls core/SUMMARY_FORMAT_SPEC.md core/design_decisions.md` 都存在
+  - **附带发现**：L740 + L741 还指向 `dev/reference/AI编程的现状.md`、`dev/reference/AI_PROGRAMMING_ANALYSIS.md`，这些是 dev/reference/（不同于 core/reference 不存在）— 路径正确，与 L539/L540 的 `reference/` 错引用是无关情况
+- **方案评估**：✅ **通过**（修订两行即可，复查方法正确）
+- **架构师补充**：
+  - 顺手做一次全文档"路径前缀一致性"扫描：
+    ```bash
+    grep -nE '\b(reference|core|workflows|agents|templates|tools|guides|config)/(SUMMARY_FORMAT_SPEC|design_decisions|framework_spec)' dev/FRAMEWORK_CONTEXT.md
+    ```
+  - 长期：建议在 `tools/py/doc_link_validator.py`（如果存在）或 summary_validator 中加入"声称的相对路径必须能 ls 到"的回归校验
+
+---
+
+### AICC-20260425-014 — FRAMEWORK_CONTEXT L25-L28 与 L703-L714 自相矛盾
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 准确 — L25-L28 把 ADR/复杂度/审查报告列为"规划中"，与 L711-L714 的 ✅ 矛盾
+- **关键证据**：
+  - L25-L28（实际 L27-L29）："**剩余关键能力（规划中）**：P1：ADR 系统、复杂度仪表盘、自动审查报告"
+  - L711-L713：004/005/006 全部 ✅
+- **方案评估**：✅ **基本通过**，措辞建议优化
+  - ✅ 选项一"L25-L28 改写为 P1 部分已完成 (004/005/006/011/014)..." — 思路正确
+  - ⚠️ 措辞欠精确：原推荐措辞列了"剩余 015"，但 015 实为已归档（PROGRESS L19：`已归档: 5个 (002, 007, 008, 009, 015)`），应排除；P1 真正剩余项为 011（已完成，应在已完成列）
+- **架构师重写方案**：
+
+  **L25-L28 推荐改写**（架构师视角更精确）：
+
+  ```markdown
+  **V3.0 进度概览**：
+
+  - P0：✅ 7 项全部完成（001/003/012/013/016/017/018 + 027 待补登记）
+  - P1：✅ 5 项全部完成（004/005/006/011/014）
+  - P2：🟢 010 进行中；其余 002/007/008/009/015 已归档（详见 PROGRESS.md）
+  - V3.0+ 后期增益：019-系统化文档审核框架 ✅（2026-04-11）
+
+  **详见 [`dev/V3.0/PROGRESS.md`](./V3.0/PROGRESS.md) 与 [`dev/V3.0/README.md`](./V3.0/README.md)**
+  ```
+
+  - 与 011 联动：本节大改后，原 L11-L29 顶部摘要可彻底简化为"指针式快照"（不再罗列优化点编号），由 PROGRESS.md 作为唯一详细清单
+  - **架构升级**：从"两份独立漂移文档"改为"概览（FRAMEWORK_CONTEXT）+ 详情（PROGRESS）"层级关系，根除漂移可能性
+
+---
+
+### AICC-20260425-015 — 019 已完成但未登记（总数 17 vs 18）
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：⚠️ 偏差 — 实体描述部分**重大错误**
+  - Issue 描述说"019 实际实体存在 (templates/review/、workflows/generation_workflow.md 等)"
+  - 但实际还有 **`dev/V3.0/confirmed/019-systematic-review-framework.md`**（单文件 24KB）— Issue 完全没提到这个 confirmed/ 单文件已经存在！
+- **关键证据**：
+  - `ls dev/V3.0/confirmed/019-*` 返回 `019-systematic-review-framework.md`（单文件，与 022 修复后的命名规范一致："单文件用 NNN-name.md"）
+  - PROGRESS L15: `总优化点: 18个`
+  - FRAMEWORK_CONTEXT L703: `(10/17)`
+  - PROGRESS L16-L41 18 项清单确实不含 019
+- **方案评估**：🔴 **重大缺陷需重写**
+  - 原方案 选项 A 称"创建 019 的优化点档案"— **优化点档案已经以单文件形式存在**于 `dev/V3.0/confirmed/`，不需要"创建"
+  - 原方案选项 A 又说"在 dev/V3.0/confirmed/019-systematic-review-framework/（目录）下"— 这暗示要把单文件转为目录形式，但 022 修复刚明确"单文件用 NNN-name.md"是合法形式，没必要为 019 单独转目录
+  - 原方案选项 B（移到独立"V3.0+ 后期增益"章节）有保留意义，但缺技术细节
+- **架构师重写方案**：
+
+  **简化版 选项 A（推荐）：直接登记，不动实体结构**
+
+  019 confirmed 实体已存在且符合命名规范，无需重组。修复仅需：
+
+  1. **PROGRESS.md L15**：`总优化点: 18个` → `总优化点: 19个`
+  2. **PROGRESS.md L16-L19**：
+     - 已确认 13个 → 14个（加入 019）
+     - 已完成 11个 → 13个（加入 011 + 019，结合 012 修复）
+  3. **PROGRESS.md L18**：在已完成清单加 019：`已完成: 13个 (001, 003, 004, 005, 006, 011, 012, 013, 014, 016, 017, 018, 019)`
+  4. **PROGRESS.md 优化点池清单（L21-L41）** 末尾追加：
+     ```markdown
+     ### 后期增益（V3.0+）
+     - 019-系统化文档审核框架 ✅（2026-04-11）
+       - 来源：dev/case_skillatlas_review/ 实践
+       - 实体：dev/V3.0/confirmed/019-systematic-review-framework.md, templates/review/, workflows/generation_workflow.md
+     ```
+     特别说明 019 是 V3.0 后期突生需求（不在原 V3.0 18 项规划），但已纳入正式登记
+  5. **FRAMEWORK_CONTEXT.md L703**：`(10/17)` → `(13/19)`（与 011 联动）
+
+  **理由汇总**：
+  - 实体已就位且符合 022 修复后的命名规范，**不重组、只登记**
+  - 总数从 18 调到 19（不是 18 不变）— 反映 019 是真正的 V3.0 优化点
+  - 在 PROGRESS 单设"后期增益（V3.0+）"小节，**保留追溯透明度**（让读者知道 019 是后期纳入）— 这是原选项 B 的价值与选项 A 的清单优势的合并
+  - **不创建 019 子目录**：单文件足够，避免无意义重组
+
+  **副作用规避**：
+  - 需同步 023 修复时统一其他文档对总数的引用（如 dev/V3.0/README.md 若有提及）
+  - PROGRESS L17 的 `已确认 (confirmed/): 13个 (72.22%)` 百分比也需重算：14/19 = 73.68%
+
+---
+
+### AICC-20260425-018 — doc_error_fix_workflow.md 测试命令路径假设错误
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：✅ 准确 — L488/L491 命令使用根级 `tests/` 路径，仓库无此目录；实际测试在 `tools/py/tests/` 与 `tools/js/`
+- **关键证据**：
+  - 实测 L487-L491：`python -m pytest tests/ -v -k "doc_error"` ✓ 错路径
+  - `tools/py/tests/` 实际只有 `test_commit_integrity_validator.py` + `test_git_safety.py`
+  - `tools/js/` 含 `commit_template_cli.test.js` / `install_hooks.test.js` / `integration.test.js`
+  - **新发现**：tools/py/tests/ 中 **无任何 `doc_error` 或 `doc_fix` 相关测试文件**（grep `-l doc_error tools/py/tests/*.py` 应为空）
+- **方案评估**：🟡 **需补充**
+  - ✅ 思路正确：路径改为 `tools/py/tests/`
+  - ⚠️ 缺判据：原方案保留命令但改路径前缀，但实际"doc_error" / "doc_fix" 测试本身**就不存在**于该目录。改完路径执行仍会得到"no tests collected"，命令名义可执行但无效
+- **架构师补充方案**：
+
+  **两层修复**：
+
+  1. **诚实修复（短期推荐）**：将命令改为反映实际测试覆盖的形式，并明确缺失项：
+
+     ```bash
+     # 现有相关测试（截至 2026-04-26）
+     python -m pytest tools/py/tests/ -v
+     # ⚠️ 注意：tools/py/tests/ 当前覆盖 commit_integrity / git_safety；
+     # doc_error_fix 工具的单元/集成测试尚未补全，参见 PROGRESS / 011 后续任务
+     ```
+
+  2. **长期补全（推荐入 PROGRESS 后续任务）**：补 `tools/py/tests/test_doc_error_detection.py`、`test_doc_fix_executor.py`、`tests/integration/test_doc_fix_e2e.py`（仿 011 工作流剧本）；补完后将命令恢复为：
+
+     ```bash
+     python -m pytest tools/py/tests/ -v -k "doc_error or doc_fix"
+     ```
+
+  **同步检查**：本批次顺手 grep `pytest tests/` 是否在其他工作流文档也错误使用：
+
+  ```bash
+  grep -rnE 'pytest tests/' --include='*.md' workflows/
+  ```
+
+---
+
+### AICC-20260425-023 — dev/quality/README.md agents/ 索引覆盖率缺口
+
+- **真实性**：✅ 真实存在
+- **描述准确性**：⚠️ 偏差 — 部分数字描述与实际不完全一致
+  - examples：README "21 个" vs 实际 18 项（含 1 子目录 + 1 README + 16 examples）— ✓ Issue 准确
+  - language_specific：README "7 个" vs Issue 称"5 项 + base/"，**实际 6 项**（base/ + java/ + python/ + typescript/ + vue3_expert.md + vue3_state_manager.md）— Issue 数字 5 偏低，正确数字 6
+  - personas：Issue 未提及，但 README 写 "3 个"（不计 README.md），实际有 4 项（含 README.md）。这是计数口径差异，非缺陷
+  - _templates：README 完全未列 ✓
+- **关键证据**：
+  - `ls agents/_templates/` 实存：agent_template.md + quality_checklist.md（2 项）✓
+  - `ls agents/examples/ | wc -l` = 18（README 写 21，差 3）
+  - `ls agents/language_specific/ | wc -l` = 6（README 写 7，差 1）
+  - `ls agents/personas/ | wc -l` = 4（README 写 3，正确口径下应为 3 排除 README.md）
+- **方案评估**：🟡 **需补充**
+  - ✅ 补 `_templates/` 索引 — 正确
+  - ⚠️ examples "实际 18 个" 改写正确
+  - ⚠️ Issue 描述对 language_specific 数字不准（说 5，实际 6）；修复时应直接写 6 不写 5
+  - ⚠️ personas 未涉及但应顺手核对：现 README 数字 3 是按"角色文件"口径，可保留但加注"(不含 README.md)"
+- **架构师补充方案**：
+
+  **完整修订**（README L153-L173 agents 索引段）：
+
+  1. 在 `**custom/（1 个，⚪ 仅合规）**` 后增加：
+     ```markdown
+     **_templates/（2 个，⚪ 仅合规）**：`agent_template.md`、`quality_checklist.md`
+     ```
+  2. L171 改为：
+     ```markdown
+     **examples/（18 个，🟡 批审，重点：示例与角色定义一致性，含 1 个 design_thinking/ 子目录）**
+     ```
+  3. L163 改为：
+     ```markdown
+     **language_specific/（6 个，🟡 批审）**：`base/`（含 backend_engineer / frontend_engineer）、`java/`、`python/`、`typescript/`、`vue3_expert.md`、`vue3_state_manager.md`
+     ```
+  4. L165 加注口径：
+     ```markdown
+     **personas/（3 个角色 + 1 个 README，🟡 批审...）**：`linus_torvalds.md`、`martin_fowler.md`、`uncle_bob.md`
+     ```
+  5. **回归测试加强**：
+
+     ```bash
+     # 自动校核 README 声明数 vs ls 实际数
+     for d in examples language_specific personas _templates custom development workflows runtime; do
+       declared=$(grep -oE "\*\*${d}/.*?[0-9]+ ?个" dev/quality/README.md | grep -oE '[0-9]+' | head -1)
+       actual=$(ls agents/${d}/ 2>/dev/null | wc -l)
+       echo "${d}: declared=${declared}, actual=${actual}"
+     done
+     ```
+
+---
 
 ---
 

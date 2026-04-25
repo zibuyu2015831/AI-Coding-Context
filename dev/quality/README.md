@@ -160,15 +160,17 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 **development/（4 个，🟡 批审）**：`api_designer.md`、`architecture_analyst.md`、`database_designer.md`、`product_manager.md`
 
-**language_specific/（7 个，🟡 批审）**：`backend_engineer.md`、`frontend_engineer.md`、`java_expert.md`、`python_expert.md`、`typescript_expert.md`、`vue3_expert.md`、`vue3_state_manager.md`
+**language_specific/（6 个，🟡 批审）**：`base/`（含 backend_engineer / frontend_engineer）、`java/`、`python/`、`typescript/`、`vue3_expert.md`、`vue3_state_manager.md`
 
-**personas/（3 个，🟡 批审，重点：人格定义边界与"是否仍合规"）**：`linus_torvalds.md`、`martin_fowler.md`、`uncle_bob.md`
+**personas/（3 个角色 + 1 个 README，🟡 批审，重点：人格定义边界与"是否仍合规"）**：`linus_torvalds.md`、`martin_fowler.md`、`uncle_bob.md`
 
 **workflows/（7 个，🟡 批审）**：`create_custom_agent_workflow.md`、`document_fix_coordinator.md`、`document_recommender.md`、`error_detector.md`、`knowledge_librarian.md`、`knowledge_matcher.md`、`understanding_guardian.md`
 
 **custom/（1 个，⚪ 仅合规）**：`_template.md`
 
-**examples/（21 个，🟡 批审，重点：示例与角色定义一致性）**
+**_templates/（2 个，⚪ 仅合规）**：`agent_template.md`、`quality_checklist.md`
+
+**examples/（18 个，🟡 批审，含 1 个 design_thinking/ 子目录与 1 个 README，重点：示例与角色定义一致性）**
 
 **_progress/（3 个，视角 B 专属）**：`implementation_progress.md`、`issues_and_feedback.md`、`role_conversion_log.md` —— 视角 A 下应不存在引用泄漏（已知 implementation_progress.md 引用 dev/V3.0/，是 F-2 缺陷之一）
 

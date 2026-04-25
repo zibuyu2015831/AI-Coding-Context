@@ -5,27 +5,21 @@ keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
 related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
 dependencies: core/SUMMARY_FORMAT_SPEC.md | core/design_decisions.md
-verified_at: 2026-04-25
+verified_at: 2026-04-26
+progress_synced_at: 2026-04-26
 ---
 
 **当前框架版本**: V2.3  
-**开发中的版本**: V3.0（P0 核心功能已完成）
+**开发中的版本**: V3.0（P0/P1 核心功能已完成）
 
-**V3.0 已完成模块（基础设施与 P0 核心）**：
+**V3.0 进度概览（13/19 已完成，详见 [`V3.0/PROGRESS.md`](./V3.0/PROGRESS.md)）**：
 
-- ✅ 001-AI 角色库（agents/）
-- ✅ 003-设计思维引导
-- ✅ 012-强制文档摘要机制（SUMMARY_FORMAT_SPEC + summary_* 工具）
-- ✅ 013-AI 互审机制
-- ✅ 016-配置管理系统（config/）
-- ✅ 017-实用脚本工具库（tools/）
-- ✅ 018-Commit-Guided Documentation（workflows/commit_guided_update.md）
-- ✅ 019-系统化文档审核框架（templates/review/ + workflows/generation_workflow.md）
+- **P0 核心基础设施**（7/7 ✅）：001 角色库 / 003 设计思维 / 012 文档摘要 / 013 AI 互审 / 016 配置 / 017 工具库 / 018 commit-guided
+- **P1 高价值能力**（5/5 ✅）：004 ADR 系统 / 005 复杂度仪表盘 / 006 自动审查报告 / 011 文档谬误修复 / 014 文档阅读习惯
+- **P2 增强功能**（1/6 进行中）：010 跨项目知识复用 🟢；其余 002/007/008/009/015 已归档
+- **V3.0+ 后期增益**（1 项 ✅）：019 系统化文档审核框架（2026-04-11，源自 dev/case_skillatlas_review）
 
-**剩余关键能力（规划中）**：
-
-- P1：ADR 系统、复杂度仪表盘、自动审查报告
-- P2：学习曲线追踪、AI 能力分级、文档自修复、跨项目知识复用
+> **SSOT 提示**：本文件仅做摘要快照；优化点详细清单、状态、归档原因等以 [`V3.0/PROGRESS.md`](./V3.0/PROGRESS.md) 为单一真相源。本文件更新日期请参见顶部 frontmatter `verified_at`。
 
 ---
 
@@ -536,8 +530,8 @@ project_root/
   - 配置行为 → 查阅 `config/README.md`
   - 工具使用与性能 → 查阅 `tools/README.md`
   - AI 角色行为与职责 → 查阅 `agents/README.md`
-  - 摘要格式与校验规则 → 查阅 `reference/SUMMARY_FORMAT_SPEC.md`
-  - 设计理念与权衡 → 查阅 `reference/design_decisions.md`
+  - 摘要格式与校验规则 → 查阅 `core/SUMMARY_FORMAT_SPEC.md`
+  - 设计理念与权衡 → 查阅 `core/design_decisions.md`
 - 若本文件与其他文档在“目录结构 / 模块角色”方面出现冲突：
   - **以本文件为全局结构与职责划分的最终裁决**，并在审查报告中记录该冲突，后续修正文档。
 
@@ -699,8 +693,8 @@ project_root/
 
 ### V3.0 (开发中) - 战略式编程增强
 
-- **当前阶段**: 核心 P0 功能完成，进入 P1/P2 阶段 (2025-12-18 ~ 2026-Q2)
-- **已完成** (10/17):
+- **当前阶段**: P0/P1 核心功能完成，P2 进入开发 (2025-12-18 ~ 2026-Q2)
+- **已完成** (13/19):
   - ✅ 001-AI 角色库 (2025-11-29)
   - ✅ 017-实用脚本工具库 (2025-12-01)
   - ✅ 016-配置管理系统 (2025-12-02)
@@ -708,14 +702,15 @@ project_root/
   - ✅ 003-设计思维引导 (2025-12-03)
   - ✅ 012-强制文档摘要 (2025-12-03)
   - ✅ 018-Commit-Guided Documentation (2025-12-18)
-  - ✅ 019-系统化文档审核框架 (2026-04-11)
+  - ✅ 019-系统化文档审核框架 (2026-04-11，V3.0+ 后期增益)
   - ✅ 004-ADR 系统 (2026-04-12)
   - ✅ 005-复杂度仪表盘 (2026-04-13)
   - ✅ 006-自动审查报告 (2026-04-13，已整合到005)
-- **进行中**: P1/P2 剩余优化点开发
-- **已归档**: 002-危险指令拦截系统
-- **P1 功能**: 文档谬误修复工作流、文档阅读习惯引导、质量保证体系
-- **P2 功能**: 学习曲线追踪、AI 能力分级、文档自修复、跨项目知识复用
+  - ✅ 011-文档谬误修复工作流 (2026-04-13)
+  - ✅ 014-文档阅读习惯引导 (2026-04-14)
+- **进行中**: 010-跨项目知识复用 🟢
+- **已归档** (5 项): 002-危险指令拦截 / 007-学习曲线追踪 / 008-AI 能力分级 / 009-文档自修复 / 015-质量保证体系集成
+- **未启动 P2**: 002/007/008/009/015（已决策归档）
 
 **详见**: `dev/V3.0/README.md` 和 `dev/V3.0/PROGRESS.md`
 
