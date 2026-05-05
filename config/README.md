@@ -1,3 +1,13 @@
+---
+title: AI Coding Context 配置系统
+summary: 说明 AICC 配置目录的组成、用户配置与默认模板的关系、首次配置方式以及安全与隐私边界，帮助使用者正确理解配置系统的运行机制。
+keywords: config | configuration | user-config | template | guide | aicc
+scope: 框架配置系统的目录说明与使用指南
+related_files: config/CONFIG_TEMPLATE.md | config/.gitignore
+dependencies: README.md | AI_ENTRY_POINT.md
+verified_at: 2026-05-05
+---
+
 # AI Coding Context 配置系统
 
 ## 📖 概述

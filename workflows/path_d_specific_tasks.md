@@ -1,3 +1,13 @@
+---
+title: 路径 D 特定任务执行
+summary: 定义在检测到显式指令如 @think、@review、@skip、@complexity 等时，AI 如何跳转到对应专项流程，按任务意图执行设计思考、审查或复杂度分析等操作。
+keywords: path-d | specific-tasks | commands | workflow | review | complexity
+scope: 显式指令驱动的专项任务路由流程
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | workflows/complexity_alert_workflow.md | workflows/review-workflow.md | workflows/decision_workflow.md
+verified_at: 2026-05-05
+---
+
 # 路径 D: 特定任务执行
 
 > **触发条件**: 检测到显式指令 (`@think`, `@review`, `@skip` 等)  

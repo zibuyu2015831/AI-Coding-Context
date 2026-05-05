@@ -1,3 +1,13 @@
+---
+title: Vue3 专家角色使用示例
+summary: 展示 Vue3 专家角色在用户列表和表单组件场景中的典型输出，帮助用户理解其组件设计与交互实现风格。
+keywords: example | vue3-expert | component | vue | form | aicc
+scope: Vue3 专家角色示例
+related_files: 无
+dependencies: agents/language_specific/vue3_expert.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # Vue3 专家角色使用示例
 
 **角色**: Vue3 专家 (Vue3 Expert)  

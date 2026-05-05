@@ -1,3 +1,13 @@
+---
+title: 文档阅读触发器示例 Rule
+summary: 提供文档阅读触发器类 Rule 的示例模板，展示触发条件、使用层级和正文说明的标准结构。
+keywords: template | rule-example | document-reading | trigger | aicc
+scope: 文档阅读触发器示例 Rule 模板
+related_files: 无
+dependencies: templates/RULE_TEMPLATE.md | templates/rules/AI_RULES_STANDARD_TEMPLATE.md
+verified_at: 2026-05-05
+---
+
 # 文档阅读触发器
 
 <!-- 使用说明 START -->

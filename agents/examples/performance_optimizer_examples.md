@@ -1,3 +1,13 @@
+---
+title: 性能优化专家角色使用示例
+summary: 展示性能优化专家角色在慢查询和高并发接口场景中的分析与优化建议输出，帮助用户理解其瓶颈定位方式。
+keywords: example | performance-optimizer | performance | query | concurrency | aicc
+scope: 性能优化专家角色示例
+related_files: 无
+dependencies: agents/runtime/performance_optimizer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 性能优化专家角色使用示例
 
 **角色**: 性能优化专家 (Performance Optimizer)  

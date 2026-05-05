@@ -1,3 +1,13 @@
+---
+title: Workflows 协作流程模板
+summary: 介绍 AI 角色库中的协作流程模板目录，说明现有工作流、规划中的多角色协作模板及其在角色体系中的用途。
+keywords: agents | workflows | collaboration | templates | guide | aicc
+scope: AI 角色库协作流程模板目录说明
+related_files: 无
+dependencies: agents/README.md | agents/workflows/create_custom_agent_workflow.md
+verified_at: 2026-05-05
+---
+
 # Workflows - 协作流程模板
 
 ## 📋 概述

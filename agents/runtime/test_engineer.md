@@ -1,3 +1,13 @@
+---
+title: 测试工程师
+summary: 定义测试工程师运行时角色如何从需求和实现中提取测试目标、设计测试用例并生成测试代码或回归建议，提升方案与实现的可验证性。
+keywords: runtime-agent | test-engineer | testing | qa | regression | aicc
+scope: 测试设计与质量保证的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/review_standards/feature_review_standard.md | workflows/review_standards/bugfix_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 测试工程师 (Test Engineer)
 
 <!-- AGENT_META_START -->
@@ -205,4 +215,3 @@ def test_login_success(client):
 
 **模板版本**: v1.0
 **最后更新**: 2025-11-29
-

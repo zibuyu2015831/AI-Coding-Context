@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 大型项目文档生成进度跟踪表
-summary: [100-200字概述：大型项目文档生成的详细进度跟踪，记录各阶段、各批次的完成状态，支持分批执行和中断恢复]
-keywords: 进度跟踪 | 大型项目 | 分批执行 | 文档生成 | 进度管理
-scope: 大型项目进度追踪 (dev_docs/_analysis/)
+title: 大型项目进度跟踪模板
+summary: 提供大型项目文档生成的详细进度跟踪模板，用于记录阶段、批次和完成状态，支持分批执行与恢复。
+keywords: template | progress-tracking | large-project | batches | aicc
+scope: 大型项目进度跟踪模板
 related_files: 无
 dependencies: templates/GENERATION_PLAN_TEMPLATE.md | workflows/generation_workflow.md
-verified_at: [YYYY-MM-DD 格式日期]
+verified_at: 2026-05-05
 ---
 
 # 大型项目文档生成进度跟踪表

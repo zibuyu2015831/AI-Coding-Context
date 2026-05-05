@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 项目分析与问题报告
-summary: [100-200字概述：AI项目分析过程中发现的问题、疑问和隐患汇总，包括严重问题、警告、疑问和优化建议]
-keywords: 项目分析 | 问题报告 | 代码质量 | 技术债务 | 优化建议
-scope: 项目分析报告 (dev_docs/_analysis/)
+title: 项目分析与问题报告模板
+summary: 提供项目分析阶段的问题与隐患汇总模板，用于记录严重问题、警告、疑问和优化建议，支撑正式生成前的人工审核。
+keywords: template | analysis-report | issues | risks | aicc
+scope: 项目分析与问题报告模板
 related_files: 无
-dependencies: templates/GENERATION_PLAN_TEMPLATE.md
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: templates/GENERATION_PLAN_TEMPLATE.md | workflows/generation_workflow.md
+verified_at: 2026-05-05
 ---
 
 # 项目分析与问题报告模板

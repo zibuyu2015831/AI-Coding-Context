@@ -1,3 +1,13 @@
+---
+title: 路径 A 首次生成流程
+summary: 定义在目标项目尚未存在 dev_docs 文档体系时，AI 如何完成配置读取、项目检测、策略决策、方案生成、人工审核等待与正式生成的完整首轮流程。
+keywords: path-a | first-generation | workflow | strategy | review | aicc
+scope: 框架首次生成文档体系时的主流程
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | workflows/generation_workflow.md | core/framework_spec.md | core/SUMMARY_FORMAT_SPEC.md
+verified_at: 2026-05-05
+---
+
 # 路径 A: 首次生成流程
 
 > **触发条件**: `dev_docs/` 目录不存在  

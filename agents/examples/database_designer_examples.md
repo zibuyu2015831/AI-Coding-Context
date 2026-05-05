@@ -1,3 +1,13 @@
+---
+title: 数据库设计师角色使用示例
+summary: 展示数据库设计师角色在订单系统与权限系统场景中的建模和表设计方式，帮助用户理解其数据层设计思路。
+keywords: example | database-designer | schema | sql | modeling | aicc
+scope: 数据库设计师角色示例
+related_files: 无
+dependencies: agents/development/database_designer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 数据库设计师角色使用示例
 
 **角色**: 数据库设计师 (Database Designer)  

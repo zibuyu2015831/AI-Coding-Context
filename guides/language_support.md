@@ -1,3 +1,13 @@
+---
+title: 多语言项目分析指南
+summary: 汇总不同编程语言项目的依赖识别方式、结构分析命令与关注重点，帮助 AI 在多语言或非前端项目中生成更准确的上下文文档。
+keywords: language-support | guide | python | java | go | aicc
+scope: 多语言项目的分析与文档生成支持
+related_files: 无
+dependencies: workflows/detection_workflow.md | guides/project_types.md | core/project_types.md
+verified_at: 2026-05-05
+---
+
 # 多语言项目分析指南
 
 > **用途**: 指导如何分析不同编程语言的项目并生成文档  

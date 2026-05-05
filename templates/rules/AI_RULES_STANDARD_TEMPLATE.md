@@ -1,3 +1,13 @@
+---
+title: AI Rules 标准版模板
+summary: 提供标准版 AI Rules 组合文件模板，用于在项目生成后快速汇总核心规则、触发器和工作流规则并配置到 IDE。
+keywords: template | ai-rules | standard | ide | aicc
+scope: 标准版 AI Rules 组合模板
+related_files: 无
+dependencies: templates/RULE_TEMPLATE.md | templates/AI_RULES_TEMPLATE.md
+verified_at: 2026-05-05
+---
+
 # AI Rules - [项目名称] (标准版)
 
 <!-- 使用说明 START -->

@@ -1,3 +1,13 @@
+---
+title: Java 专家角色使用示例
+summary: 展示 Java 专家角色在现代 Java 语法、高并发缓存和 Spring Boot 异步任务等场景中的典型输出方式。
+keywords: example | java-expert | java | concurrency | spring-boot | aicc
+scope: Java 专家角色示例
+related_files: 无
+dependencies: agents/language_specific/java/java_expert.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # Java 专家 (Java Expert) 角色使用示例
 
 **角色**: Java 专家

@@ -1,3 +1,13 @@
+---
+title: Document Recommender
+summary: 定义文档推荐工作流角色如何分析任务上下文并推荐相关文档，用于在跨工作流场景中增强上下文建立能力。
+keywords: workflow-agent | document-recommender | docs | recommendation | context | aicc
+scope: 文档推荐编排角色
+related_files: 无
+dependencies: agents/runtime/document_recommender.md | agents/README.md | guides/quick_start.md
+verified_at: 2026-05-05
+---
+
 # Document Recommender
 
 ## 基本信息

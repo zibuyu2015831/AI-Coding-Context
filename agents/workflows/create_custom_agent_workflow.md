@@ -1,3 +1,13 @@
+---
+title: 创建自定义 Agent 工作流角色
+summary: 定义用于引导用户创建自定义 Agent 的工作流角色，帮助在需求澄清、命名规范和角色文档生成之间建立标准化流程。
+keywords: workflow-agent | custom-agent | creation | prompts | guide | aicc
+scope: 自定义 Agent 创建流程的工作流角色
+related_files: 无
+dependencies: agents/custom/_template.md | agents/custom/README.md | workflows/create_custom_agent_workflow.md
+verified_at: 2026-05-05
+---
+
 # 创建自定义 Agent 工作流
 
 **用途**: 指导 AI 辅助用户创建项目专属的自定义 Agent

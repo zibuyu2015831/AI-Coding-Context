@@ -1,3 +1,13 @@
+---
+title: 自定义 Agent 模板
+summary: 提供项目自定义 Agent 的标准模板结构，帮助用户按统一元数据和角色定义格式创建可维护的自定义角色文档。
+keywords: custom-agent | template | agent | metadata | prompt | aicc
+scope: 项目自定义 Agent 的模板文档
+related_files: 无
+dependencies: agents/custom/README.md | agents/workflows/create_custom_agent_workflow.md
+verified_at: 2026-05-05
+---
+
 # [自定义角色名称] ([Custom Agent Name])
 
 <!-- AGENT_META_START -->

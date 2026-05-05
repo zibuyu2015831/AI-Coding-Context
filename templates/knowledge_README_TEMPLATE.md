@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 知识库索引
-summary: [100-200字概述：项目知识库的索引和使用规范，沉淀开发中的难题、解决方案和最佳实践]
-keywords: 知识库 | 问题解决 | 最佳实践 | 架构模式 | 性能优化
-scope: 知识库索引 (dev_docs/knowledge/)
+title: 知识库索引模板
+summary: 提供项目知识库索引文档模板，用于沉淀难题、解决方案、最佳实践和架构模式。
+keywords: template | knowledge | index | best-practice | aicc
+scope: 知识库索引模板
 related_files: 无
-dependencies: [列出相关的知识库文档] | 无
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # knowledge/README.md 模板

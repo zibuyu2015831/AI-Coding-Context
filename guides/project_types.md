@@ -1,3 +1,13 @@
+---
+title: 项目类型适配指南
+summary: 汇总不同项目类型的推荐文档清单、特殊关注点与分析重点，帮助 AI 按项目特征生成更贴合实际的文档体系，而不是套用统一模板。
+keywords: project-types | guide | adaptation | frontend | backend | aicc
+scope: 不同项目类型的文档适配策略
+related_files: 无
+dependencies: core/project_types.md | workflows/detection_workflow.md | workflows/decision_workflow.md
+verified_at: 2026-05-05
+---
+
 # 项目类型适配指南
 
 > **用途**: 指导如何为不同类型的项目生成合适的文档体系  

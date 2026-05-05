@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 文档生成方案 (Medium 级别)
+title: Medium 级别文档生成方案模板
 summary: 中型项目的完整文档生成方案,包含详细分析、代码模式提取、子文档规划、AI 互审和维护规划
-keywords: 文档生成 | 中型项目 | AI互审 | 子文档规划 | 维护
-scope: 文档生成方案 (dev_docs/_analysis/)
+keywords: template | generation-plan | medium | review | aicc
+scope: Medium 级别文档生成方案模板
 related_files: 无
 dependencies: workflows/generation_workflow.md | workflows/review-workflow.md
-verified_at: [YYYY-MM-DD 格式日期]
+verified_at: 2026-05-05
 ---
 
 # [项目名称] - AI 文档生成方案 (Medium 级别)

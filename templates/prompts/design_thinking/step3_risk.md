@@ -1,3 +1,13 @@
+---
+title: 设计思维 Prompt Step 3 Risk
+summary: 提供设计思维引导中第三步“风险与测试”的标准 Prompt 模板，用于帮助架构与测试视角识别风险并制定验证策略。
+keywords: template | design-thinking | prompt | risk | testing | aicc
+scope: 设计思维 Step 3 Prompt 模板
+related_files: 无
+dependencies: agents/development/architecture_analyst.md | agents/runtime/test_engineer.md | templates/prompts/design_thinking/step4_reflection.md
+verified_at: 2026-05-05
+---
+
 # Step 3: 风险与测试 (The "Risk")
 
 **执行者**: ArchitectureAnalyst & TestEngineer

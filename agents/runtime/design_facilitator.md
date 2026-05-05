@@ -1,3 +1,13 @@
+---
+title: 设计引导者
+summary: 定义设计引导者运行时角色如何组织设计思考流程、协调多角色视角并帮助用户在复杂问题上形成高质量方案决策。
+keywords: runtime-agent | design-facilitator | design-thinking | decision | coordination | aicc
+scope: 设计思考引导与多视角决策协调的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/path_d_specific_tasks.md | templates/prompts/design_thinking/step1_why.md
+verified_at: 2026-05-05
+---
+
 # 设计引导者 (Design Facilitator)
 
 <!-- AGENT_META_START -->

@@ -1,3 +1,13 @@
+---
+title: Linus Torvalds 人格
+summary: 定义 Linus Torvalds 人格型 Agent 的思维风格、适用场景与输出规范，用于在系统架构、性能和代码审查类任务中提供强烈的实用主义视角。
+keywords: persona | linus-torvalds | pragmatism | architecture | review | aicc
+scope: Linus Torvalds 人格型 Agent 定义
+related_files: 无
+dependencies: agents/personas/README.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Linus Torvalds 人格
 
 <!-- AGENT_META_START -->

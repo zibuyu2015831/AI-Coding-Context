@@ -1,11 +1,11 @@
 ---
 title: 文档审核规程（{PROJECT_NAME}）
 summary: 定义 {PROJECT_NAME} 项目文档体系系统化审核的完整执行规程，包括八阶段协议、三套子代理 Prompt 模板、触发机制、文档分层策略、_meta.md 与 REVIEW_LOG.md 维护规范，是启动每轮审核的操作手册。
-keywords: 文档审核 | 执行规程 | 子代理 | 审核流程 | Prompt 模板
+keywords: 文档审核 | 执行规程 | 子代理 | 审核流程 | 模板
 scope: {PROJECT_NAME} 项目 dev_docs/ 文档体系的审核执行规程
-related_files:
-dependencies: dev_docs/review/sys_review_principles.md | dev_docs/AI_Coding_Context.md
-verified_at: {GENERATION_DATE}
+related_files: 无
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # 文档审核规程（{PROJECT_NAME}）

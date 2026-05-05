@@ -1,3 +1,13 @@
+---
+title: 方案审查员
+summary: 定义方案审查员运行时角色如何从架构、一致性和执行可行性角度评估技术方案，并给出结构化审查结论与改进建议。
+keywords: runtime-agent | plan-reviewer | architecture | feasibility | review | aicc
+scope: 技术方案与实施计划审查的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/review-workflow.md | workflows/review_standards/feature_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 方案审查员 (Plan Reviewer)
 
 <!-- AGENT_META_START -->

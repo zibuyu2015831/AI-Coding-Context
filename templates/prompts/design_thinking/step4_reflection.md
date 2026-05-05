@@ -1,3 +1,13 @@
+---
+title: 设计思维 Prompt Step 4 Reflection
+summary: 提供设计思维引导中第四步“反思与整合”的标准 Prompt 模板，用于帮助设计引导者整合前序结论并识别缺口与冲突。
+keywords: template | design-thinking | prompt | reflection | facilitator | aicc
+scope: 设计思维 Step 4 Prompt 模板
+related_files: 无
+dependencies: agents/runtime/design_facilitator.md | templates/prompts/design_thinking/step5_decision.md
+verified_at: 2026-05-05
+---
+
 # Step 4: 反思与整合 (Synthesis & Reflection)
 
 **执行者**: Design Facilitator ([runtime/design_facilitator.md](../../../agents/runtime/design_facilitator.md))

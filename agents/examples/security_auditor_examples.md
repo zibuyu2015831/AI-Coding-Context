@@ -1,3 +1,13 @@
+---
+title: 安全审计员角色使用示例
+summary: 展示安全审计员角色在登录接口和文件上传功能场景中的漏洞识别与修复建议输出方式。
+keywords: example | security-auditor | security | upload | auth | aicc
+scope: 安全审计员角色示例
+related_files: 无
+dependencies: agents/runtime/security_auditor.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 安全审计员角色使用示例
 
 **角色**: 安全审计员 (Security Auditor)  

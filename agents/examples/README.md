@@ -1,3 +1,13 @@
+---
+title: AI 角色示例库
+summary: 说明 AI 角色示例库的定位、命名规范与使用价值，帮助用户在不增加角色定义负担的前提下按需查看详细示例。
+keywords: agents | examples | library | usage | guide | aicc
+scope: AI 角色示例目录的组织与使用说明
+related_files: 无
+dependencies: agents/README.md | agents/examples/architecture_analyst_examples.md | agents/examples/security_auditor_examples.md
+verified_at: 2026-05-05
+---
+
 # AI 角色示例库 (Agent Examples Library)
 
 **版本**: v1.0  

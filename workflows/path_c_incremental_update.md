@@ -1,3 +1,13 @@
+---
+title: 路径 C 增量更新流程（Commit-Guided）
+summary: 定义在检测到 Git 上下文或用户显式触发 @commit 时，AI 如何基于代码变更和提交意图精准定位需要更新的文档，并执行增量更新而非全量重建。
+keywords: path-c | incremental-update | commit-guided | workflow | git | aicc
+scope: 基于 Git 变更的增量文档更新主流程
+related_files: tools/py/summary_related_checker.py | tools/js/summary_related_checker.js | tools/py/doc_dependency_tracer.py | tools/js/doc_dependency_tracer.js
+dependencies: AI_ENTRY_POINT.md | workflows/commit_guided_update.md | workflows/incremental_update_workflow.md | core/update_triggers.md
+verified_at: 2026-05-05
+---
+
 # 路径 C: 增量更新流程 (Commit-Guided)
 
 > **触发条件**: 检测到 `@commit` 或 Git 上下文  

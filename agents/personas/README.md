@@ -1,3 +1,13 @@
+---
+title: Personas 人格型 Agent
+summary: 说明人格型 Agent 的设计理念、适用场景与调用方式，帮助用户理解其与职责型 Agent 的区别以及在复杂决策中的价值。
+keywords: personas | agents | mentor | roles | guide | aicc
+scope: 人格型 Agent 分类说明与使用指南
+related_files: 无
+dependencies: agents/README.md | agents/personas/linus_torvalds.md | agents/personas/martin_fowler.md
+verified_at: 2026-05-05
+---
+
 # Personas - 人格型 Agent
 
 ## 📋 概述

@@ -1,3 +1,13 @@
+---
+title: 理解偏差检测专家
+summary: 定义运行时偏差检测角色如何根据项目文档与用户输入识别理解偏差，并通过文档引用和温和提醒引导用户回到正确上下文。
+keywords: runtime-agent | understanding-guardian | deviation-detection | docs | guidance | aicc
+scope: 用户理解偏差识别与纠正的运行时角色
+related_files: 无
+dependencies: config/CONFIG_TEMPLATE.md | agents/README.md | core/framework_spec.md
+verified_at: 2026-05-05
+---
+
 # 理解偏差检测专家
 
 **角色类型**: 框架运行时角色 (Runtime)

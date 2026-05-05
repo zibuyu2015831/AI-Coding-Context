@@ -1,11 +1,11 @@
 ---
 title: 文档审核核心原则（{PROJECT_NAME}）
 summary: 定义 {PROJECT_NAME} 项目文档体系系统化审核的核心原则，包括双目标（准确性+完整性）、五条核心原则、审核范围边界、禁止事项与成功标准，作为所有审核轮次的行为准则。
-keywords: 文档审核 | 核心原则 | 准确性 | 完整性 | 审核边界
+keywords: 文档审核 | 核心原则 | 准确性 | 完整性 | 模板
 scope: {PROJECT_NAME} 项目 dev_docs/ 文档体系的审核行为准则
-related_files:
-dependencies: dev_docs/review/sys_review_plan.md | dev_docs/AI_Coding_Context.md
-verified_at: {GENERATION_DATE}
+related_files: 无
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # 文档审核核心原则（{PROJECT_NAME}）

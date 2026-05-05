@@ -1,3 +1,13 @@
+---
+title: 文档谬误修复工作流
+summary: 定义当用户报告文档谬误时，AI 如何验证问题真实性、定位关联文档、选择修复策略并记录修复过程，以降低文档错误扩散风险。
+keywords: doc-error-fix | workflow | documentation | validation | repair | aicc
+scope: 用户报告文档错误后的标准化处理流程
+related_files: tools/py/doc_dependency_tracer.py | tools/js/doc_dependency_tracer.js | tools/py/doc_health_checker.py | tools/js/doc_health_checker.js
+dependencies: workflows/document_health_check.md | workflows/commit_guided_update.md | core/SUMMARY_FORMAT_SPEC.md
+verified_at: 2026-05-05
+---
+
 # 文档谬误修复工作流
 
 > **版本**: v3.0

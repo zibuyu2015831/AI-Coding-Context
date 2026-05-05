@@ -210,7 +210,7 @@ ai_coding_context/
 ├── config/                     # ⚙️ 配置系统 (v3.0)
 │   ├── README.md               # 配置系统使用指南
 │   ├── CONFIG_TEMPLATE.md      # 配置模板（框架默认值）
-│   ├── user_config.md          # 用户个人配置（不提交到Git）
+│   ├── user_config.md          # 用户个人配置（首次运行创建，不提交到Git）
 │   └── .gitignore              # 排除用户配置
 │
 ├── agents/                     # 🤖 AI 角色库 (v3.0)

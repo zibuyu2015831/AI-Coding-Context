@@ -1,3 +1,13 @@
+---
+title: Martin Fowler 人格
+summary: 定义 Martin Fowler 人格型 Agent 的设计哲学、适用场景与输出规范，用于在架构设计、重构和企业应用治理任务中提供结构化指导。
+keywords: persona | martin-fowler | refactoring | architecture | enterprise | aicc
+scope: Martin Fowler 人格型 Agent 定义
+related_files: 无
+dependencies: agents/personas/README.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Martin Fowler 人格
 
 <!-- AGENT_META_START -->

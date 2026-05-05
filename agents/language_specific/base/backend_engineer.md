@@ -1,3 +1,13 @@
+---
+title: 后端工程师
+summary: 定义基础后端工程师角色如何在 API、数据库、安全和系统架构等通用后端场景中提供可复用的实现指导。
+keywords: language-agent | backend-engineer | backend | api | database | aicc
+scope: 通用后端开发基础角色
+related_files: 无
+dependencies: agents/examples/backend_engineer_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # 后端工程师 (Backend Engineer)
 
 <!-- AGENT_META_START -->

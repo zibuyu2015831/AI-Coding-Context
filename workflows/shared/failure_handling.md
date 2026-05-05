@@ -1,3 +1,13 @@
+---
+title: 故障降级决策机制
+summary: 定义 AI 在工作流执行过程中遇到工具失败、信息不足或环境受限时的降级原则、替代策略与用户告知方式，确保流程能在合理边界内持续推进。
+keywords: failure-handling | fallback | workflow | degradation | resilience | aicc
+scope: 各工作流共享的故障处理与降级策略
+related_files: 无
+dependencies: workflows/shared/README.md | workflows/shared/ai_checklist.md
+verified_at: 2026-05-05
+---
+
 # 故障降级决策机制
 
 > **适用范围**: 所有工作流路径  

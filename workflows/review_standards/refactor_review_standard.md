@@ -1,3 +1,13 @@
+---
+title: 架构重构审核标准
+summary: 定义重构类方案在理由充分性、影响评估、回滚策略等维度的审核标准，帮助识别高风险重构提案并强化决策质量。
+keywords: refactor-review | standard | architecture | risk | rollback | aicc
+scope: 架构重构场景下的审核标准
+related_files: 无
+dependencies: workflows/review-workflow.md | workflows/shared/ai_checklist.md
+verified_at: 2026-05-05
+---
+
 # 架构重构审核标准
 
 ## 审核清单 (权重分配)

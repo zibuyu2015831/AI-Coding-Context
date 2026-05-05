@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 方案文档索引
-summary: [100-200字概述：方案文档库的索引和使用规范，记录功能开发和Bug修复的方案，支持方案归档到知识库]
-keywords: 方案文档 | 功能开发 | Bug修复 | 方案归档 | 知识沉淀
-scope: 方案文档索引 (dev_docs/plans/)
+title: 方案文档索引模板
+summary: 提供项目方案文档索引模板，用于管理功能开发和 Bug 修复的临时方案文档并支持后续归档。
+keywords: template | plans | index | bugfix | feature | aicc
+scope: 方案文档索引模板
 related_files: 无
-dependencies: templates/PLAN_TEMPLATE.md | dev_docs/knowledge/README.md
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: templates/PLAN_TEMPLATE.md | 无
+verified_at: 2026-05-05
 ---
 
 # plans/README.md 模板

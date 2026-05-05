@@ -1,11 +1,11 @@
 ---
-title: [项目名称] AI Rules 规则库索引
-summary: [100-200字概述：AI规则库的索引和使用规范，管理项目级AI编码规则，支持规则分类和按需加载]
-keywords: AI Rules | 规则库 | 编码规范 | 规则管理 | 索引
-scope: AI规则库索引 (dev_docs/rules/)
+title: AI Rules 规则库索引模板
+summary: 提供项目 AI Rules 规则库索引模板，用于组织规则目录、分类说明和组合方式。
+keywords: template | ai-rules | rules | index | aicc
+scope: AI Rules 规则库索引模板
 related_files: 无
-dependencies: templates/RULE_TEMPLATE.md | dev_docs/rules/combined/AI_RULES.md
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: templates/RULE_TEMPLATE.md | 无
+verified_at: 2026-05-05
 ---
 
 # AI Rules 目录说明

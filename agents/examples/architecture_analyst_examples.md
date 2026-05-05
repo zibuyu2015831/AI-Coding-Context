@@ -1,3 +1,13 @@
+---
+title: 架构分析师角色使用示例
+summary: 展示架构分析师角色在积分系统和秒杀系统等复杂业务场景中的分析与方案输出方式，帮助用户理解其技术方案深度。
+keywords: example | architecture-analyst | architecture | domain | seckill | aicc
+scope: 架构分析师角色示例
+related_files: 无
+dependencies: agents/development/architecture_analyst.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 架构分析师角色使用示例
 
 **角色**: 架构分析师 (Architecture Analyst)  

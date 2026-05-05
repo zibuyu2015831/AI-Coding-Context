@@ -1,3 +1,13 @@
+---
+title: 详细生成流程指南（Guide）
+summary: 面向人类维护者解释 AI 辅助文档体系从项目分析到正式产出的完整阶段划分、执行重点与时间预估，帮助理解整体生成过程。
+keywords: generation-guide | workflow | project-analysis | documents | process | aicc
+scope: 面向维护者的文档生成流程说明
+related_files: 无
+dependencies: workflows/generation_workflow.md | workflows/path_a_first_generation.md | templates/GENERATION_PLAN_TEMPLATE.md
+verified_at: 2026-05-05
+---
+
 # 详细生成流程指南
 
 > **用途**: 指导如何一步步生成 AI 辅助开发文档体系  

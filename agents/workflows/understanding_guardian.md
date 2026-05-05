@@ -1,3 +1,13 @@
+---
+title: Understanding Guardian
+summary: 定义理解守护者工作流角色如何检测用户与 AI 的理解偏差并引导回到相关文档，用于降低重复解释与上下文误读。
+keywords: workflow-agent | understanding-guardian | deviation | docs | guidance | aicc
+scope: 理解偏差检测与引导编排角色
+related_files: 无
+dependencies: agents/runtime/understanding_guardian.md | agents/README.md | guides/quick_start.md
+verified_at: 2026-05-05
+---
+
 # Understanding Guardian
 
 ## 基本信息

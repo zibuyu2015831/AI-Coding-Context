@@ -1,3 +1,13 @@
+---
+title: 013 AI 互审工作流逻辑
+summary: 定义 AI 在生成方案后如何判断是否需要进入互审、选择审查深度与轮次，并根据复杂度和用户指令决定后续审核动作。
+keywords: mutual-review | workflow | review | quality | decision | aicc
+scope: AI 互审阶段的决策与执行逻辑
+related_files: 无
+dependencies: workflows/path_d_specific_tasks.md | workflows/shared/ai_checklist.md | core/framework_spec.md
+verified_at: 2026-05-05
+---
+
 # 013 AI 互审工作流逻辑
 
 **版本**: 1.0

@@ -1,3 +1,13 @@
+---
+title: 用户登录流程设计示例
+summary: 展示设计思维引导模式在“用户登录功能”场景中的完整 walkthrough，帮助用户理解多阶段提问与方案收敛过程。
+keywords: example | design-thinking | login-flow | walkthrough | product | aicc
+scope: 设计思维引导示例：用户登录流程
+related_files: 无
+dependencies: templates/prompts/design_thinking/step1_why.md | templates/prompts/design_thinking/step2_how.md | templates/prompts/design_thinking/step3_risk.md
+verified_at: 2026-05-05
+---
+
 # 示例: 用户登录流程设计 (Design Thinking Walkthrough)
 
 本文档展示了使用**设计思维引导模式**设计"用户登录功能"的完整过程。

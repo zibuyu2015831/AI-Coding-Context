@@ -1,3 +1,13 @@
+---
+title: Vue 3 专家
+summary: 定义 Vue 3 专家角色如何在 Composition API、组件开发和 Vue 生态最佳实践场景中提供针对性的实现与设计指导。
+keywords: language-agent | vue3-expert | vue | composition-api | frontend | aicc
+scope: Vue 3 技术栈专项角色
+related_files: 无
+dependencies: agents/language_specific/base/frontend_engineer.md | agents/examples/vue3_expert_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Vue 3 专家 (Vue 3 Expert)
 
 <!-- AGENT_META_START -->

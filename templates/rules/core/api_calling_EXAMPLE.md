@@ -1,3 +1,13 @@
+---
+title: API 调用规范示例 Rule
+summary: 提供 API 调用规范类 Rule 的示例模板，展示规则说明、适用层级和正文结构的组织方式。
+keywords: template | rule-example | api-calling | rules | aicc
+scope: API 调用规范示例 Rule 模板
+related_files: 无
+dependencies: templates/RULE_TEMPLATE.md | templates/rules/AI_RULES_STANDARD_TEMPLATE.md
+verified_at: 2026-05-05
+---
+
 # API调用规范
 
 <!-- 使用说明 START -->

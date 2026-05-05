@@ -1,11 +1,11 @@
 ---
-title: [功能/Bug名称] 实施方案
-summary: [100-200字概述：功能开发或Bug修复的详细方案，包括背景、技术选型、实施步骤和验证计划]
-keywords: 方案文档 | [功能类型] | [相关模块] | 实施计划
-scope: 单个功能/Bug方案 (dev_docs/plans/)
-related_files: [列出涉及的代码文件，如 "src/api/user.ts | src/views/UserProfile.vue"]
-dependencies: [列出相关文档，如 "dev_docs/api_layer.md"] | 无
-verified_at: [YYYY-MM-DD 格式日期]
+title: 实施方案模板
+summary: 提供功能开发、Bug 修复或性能优化等场景的统一方案模板，用于记录背景、技术选型、实施步骤和验证计划。
+keywords: template | implementation-plan | bugfix | feature | aicc
+scope: 单个功能或 Bug 的方案模板
+related_files: 无
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # [功能/Bug] 简短标题

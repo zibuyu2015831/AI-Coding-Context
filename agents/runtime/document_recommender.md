@@ -1,3 +1,13 @@
+---
+title: 文档推荐专家
+summary: 定义运行时文档推荐角色如何根据用户任务、配置开关和推荐频率智能推荐相关文档，帮助用户在执行任务前建立必要上下文。
+keywords: runtime-agent | document-recommender | recommendation | docs | context | aicc
+scope: 基于任务意图的文档推荐运行时角色
+related_files: 无
+dependencies: config/CONFIG_TEMPLATE.md | agents/README.md | guides/quick_start.md
+verified_at: 2026-05-05
+---
+
 # 文档推荐专家
 
 **角色类型**: 框架运行时角色 (Runtime)

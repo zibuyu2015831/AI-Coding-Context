@@ -1,3 +1,13 @@
+---
+title: AI 角色库
+summary: 介绍 AICC 的 AI 角色库结构、核心价值与调用方式，帮助使用者理解不同角色分类及其在框架工作流中的定位。
+keywords: agents | roles | runtime | personas | guide | aicc
+scope: AI 角色库总览与使用入口
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | agents/runtime/summary_generator.md | agents/personas/README.md | agents/workflows/README.md
+verified_at: 2026-05-05
+---
+
 # AI 角色库 (AI Agent Library)
 
 **版本**: v3.0  

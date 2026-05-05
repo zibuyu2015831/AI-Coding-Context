@@ -1,3 +1,13 @@
+---
+title: AI 自检项清单
+summary: 提供 AI 在生成方案、编写文档和执行工作流时应统一遵守的自检项，帮助在正式输出前完成数据、结构、引用和质量层面的快速把关。
+keywords: ai-checklist | quality | workflow | self-check | validation | aicc
+scope: 各工作流共享的 AI 自检清单
+related_files: 无
+dependencies: workflows/shared/README.md | core/SUMMARY_FORMAT_SPEC.md
+verified_at: 2026-05-05
+---
+
 # AI 自检项清单
 
 > **适用范围**: 所有工作流路径  

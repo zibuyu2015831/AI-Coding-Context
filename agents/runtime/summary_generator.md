@@ -1,3 +1,13 @@
+---
+title: Summary Generator 文档摘要生成专家
+summary: 定义 Summary Generator 运行时角色的职责、工具集成方式与摘要生成标准，用于支撑 AICC 的 frontmatter 提取、验证和摘要索引维护。
+keywords: runtime-agent | summary-generator | frontmatter | metadata | documentation | aicc
+scope: 文档摘要生成与摘要关系维护的运行时角色
+related_files: tools/py/summary_extractor.py | tools/js/summary_extractor.js | tools/py/summary_validator.py | tools/js/summary_validator.js
+dependencies: core/SUMMARY_FORMAT_SPEC.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Summary Generator (文档摘要生成专家)
 
 **角色类型**: 框架运行时角色 (Runtime)

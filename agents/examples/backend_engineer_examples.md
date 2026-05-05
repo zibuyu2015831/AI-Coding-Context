@@ -1,3 +1,13 @@
+---
+title: 后端工程师角色使用示例
+summary: 展示基础后端工程师角色在接口设计、事务处理与查询优化场景中的典型输出，用于帮助用户理解其实现导向的工作方式。
+keywords: example | backend-engineer | api | transaction | optimization | aicc
+scope: 后端工程师角色示例
+related_files: 无
+dependencies: agents/language_specific/base/backend_engineer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 后端工程师 (Backend Engineer) 角色使用示例
 
 **角色**: 后端工程师 (基础)

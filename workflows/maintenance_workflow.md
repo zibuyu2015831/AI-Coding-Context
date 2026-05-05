@@ -5,7 +5,7 @@ keywords: 维护 | 更新 | 健康检查 | 触发条件 | 文档同步
 scope: 文档维护流程 (workflows/)
 related_files: workflows/generation_workflow.md | workflows/incremental_update_workflow.md
 dependencies: core/update_triggers.md | workflows/document_health_check.md
-verified_at: 2025-12-16
+verified_at: 2026-05-05
 ---
 
 # 文档维护工作流

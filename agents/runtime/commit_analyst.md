@@ -1,3 +1,13 @@
+---
+title: Commit 分析师
+summary: 定义 Commit 分析师运行时角色如何解析提交信息、提取变更意图并支撑 Commit-Guided Documentation 流程中的文档更新判断。
+keywords: runtime-agent | commit-analyst | git | commit-guided | intent | aicc
+scope: Commit 信息分析与文档更新意图提取的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/commit_guided_update.md | workflows/path_c_incremental_update.md
+verified_at: 2026-05-05
+---
+
 # Commit 分析师 (Commit Analyst)
 
 <!-- AGENT_META_START -->

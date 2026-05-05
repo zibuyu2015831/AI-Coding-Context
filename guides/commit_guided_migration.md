@@ -1,3 +1,13 @@
+---
+title: Commit-Guided Documentation 迁移指南
+summary: 说明现有项目如何从传统文档更新方式迁移到 Commit-Guided 模式，包括迁移目标、收益、步骤与风险控制要点。
+keywords: commit-guided | migration | guide | git | documentation | aicc
+scope: Commit-Guided 文档模式的迁移实践
+related_files: 无
+dependencies: workflows/commit_guided_update.md | guides/commit_guided_quick_start.md | workflows/git_safety_workflow.md
+verified_at: 2026-05-05
+---
+
 # Commit-Guided Documentation 迁移指南
 
 **版本**: v1.0  

@@ -1,3 +1,13 @@
+---
+title: Commit-Guided 文档更新工作流
+summary: 说明 AI 如何解析结构化 commit 信息，将 WHAT、WHY、HOW 转换为受影响文档定位、更新草稿生成与知识沉淀动作，实现代码与文档的同步维护。
+keywords: commit-guided | workflow | git | documentation | update | aicc
+scope: 基于结构化提交信息的文档更新工作流
+related_files: tools/py/summary_related_checker.py | tools/js/summary_related_checker.js | tools/py/doc_dependency_tracer.py | tools/js/doc_dependency_tracer.js
+dependencies: workflows/path_c_incremental_update.md | core/update_triggers.md | workflows/git_safety_workflow.md
+verified_at: 2026-05-05
+---
+
 # Commit-Guided 文档更新工作流
 
 > **版本**: v1.0  

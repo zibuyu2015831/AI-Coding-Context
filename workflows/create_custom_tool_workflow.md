@@ -1,3 +1,13 @@
+---
+title: 自定义工具创建工作流
+summary: 指导 AI 在遇到复杂、重复或高风险任务时，判断何时应该沉淀为自定义工具，并按统一规范设计、实现与验证脚本。
+keywords: custom-tool | workflow | automation | scripting | safety | aicc
+scope: 面向特定开发场景的自定义工具沉淀流程
+related_files: 无
+dependencies: tools/README.md | workflows/shared/failure_handling.md | workflows/shared/ai_checklist.md
+verified_at: 2026-05-05
+---
+
 # 自定义工具创建工作流
 
 本工作流旨在指导 AI 在遇到特定场景时，创建高质量、标准化的自定义工具脚本，丰富项目的工具生态。

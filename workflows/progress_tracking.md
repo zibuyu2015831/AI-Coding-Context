@@ -1,3 +1,13 @@
+---
+title: 进度记录机制
+summary: 说明 AI 在文档生成和维护过程中为何需要持续记录进度、如何组织进度信息，以及这些记录如何支持中断恢复与用户审核。
+keywords: progress | tracking | workflow | recovery | review | aicc
+scope: 文档生成与维护过程中的进度记录机制
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | templates/PROGRESS_TRACKING_TEMPLATE.md | workflows/path_a_first_generation.md
+verified_at: 2026-05-05
+---
+
 # 进度记录机制
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

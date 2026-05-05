@@ -1,3 +1,13 @@
+---
+title: Java 专家
+summary: 定义 Java 专家角色如何在现代 Java、JVM、Spring Boot 和后端性能优化场景中提供符合 Java 生态的实现与架构建议。
+keywords: language-agent | java-expert | java | jvm | spring-boot | aicc
+scope: Java 技术栈专项角色
+related_files: 无
+dependencies: agents/language_specific/base/backend_engineer.md | agents/examples/java_expert_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Java 专家 (Java Expert)
 
 <!-- AGENT_META_START -->

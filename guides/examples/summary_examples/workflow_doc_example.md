@@ -1,3 +1,13 @@
+---
+title: 工作流文档摘要示例
+summary: 展示工作流类文档应如何编写标准 frontmatter 摘要，并通过完整示例说明何时使用 related_files、何时仅保留 dependencies。
+keywords: summary-example | workflow-doc | frontmatter | guide | examples | aicc
+scope: 工作流类文档摘要的示例说明
+related_files: 无
+dependencies: core/SUMMARY_FORMAT_SPEC.md | workflows/generation_workflow.md
+verified_at: 2026-05-05
+---
+
 # 工作流文档摘要示例
 
 本文档展示工作流类文档的标准摘要格式。

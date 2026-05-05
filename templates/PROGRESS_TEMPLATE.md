@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 文档生成进度记录
-summary: [100-200字概述：文档生成过程的进度追踪文件，记录各阶段完成状态，支持中断后继续生成]
-keywords: 进度记录 | 文档生成 | 任务追踪 | 中断恢复
-scope: 文档生成进度追踪 (dev_docs/_analysis/)
+title: 文档生成进度记录模板
+summary: 提供文档生成过程的进度追踪模板，用于记录各阶段状态、支持中断恢复并向用户展示当前执行进展。
+keywords: template | progress | tracking | generation | aicc
+scope: 文档生成进度记录模板
 related_files: 无
 dependencies: templates/GENERATION_PLAN_TEMPLATE.md | workflows/generation_workflow.md
-verified_at: [YYYY-MM-DD 格式日期]
+verified_at: 2026-05-05
 ---
 
 # 文档生成进度记录

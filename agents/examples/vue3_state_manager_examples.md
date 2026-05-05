@@ -1,3 +1,13 @@
+---
+title: Vue3 状态管理师角色使用示例
+summary: 展示 Vue3 状态管理师角色在用户 Store 和购物车 Store 场景中的状态设计与实现方式。
+keywords: example | vue3-state-manager | pinia | store | vue | aicc
+scope: Vue3 状态管理师角色示例
+related_files: 无
+dependencies: agents/language_specific/vue3_state_manager.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # Vue3 状态管理师角色使用示例
 
 **角色**: Vue3 状态管理师 (Vue3 State Manager)  

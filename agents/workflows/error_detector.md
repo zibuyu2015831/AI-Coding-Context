@@ -1,3 +1,13 @@
+---
+title: Error Detector
+summary: 定义错误检测员角色如何扫描文档中的潜在错误、过时信息和错误引用，用于支撑文档健康检查与修复流程。
+keywords: workflow-agent | error-detector | docs | validation | health-check | aicc
+scope: 文档错误检测编排角色
+related_files: 无
+dependencies: workflows/document_health_check.md | agents/README.md | agents/workflows/document_fix_coordinator.md
+verified_at: 2026-05-05
+---
+
 # Error Detector
 
 ## 基本信息

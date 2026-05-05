@@ -1,3 +1,13 @@
+---
+title: 设计思维 Prompt Step 5 Decision
+summary: 提供设计思维引导中第五步“最终决策”的标准 Prompt 模板，用于帮助设计引导者输出可直接进入实施计划阶段的决策结果。
+keywords: template | design-thinking | prompt | decision | facilitator | aicc
+scope: 设计思维 Step 5 Prompt 模板
+related_files: 无
+dependencies: agents/runtime/design_facilitator.md | templates/prompts/design_thinking/step4_reflection.md
+verified_at: 2026-05-05
+---
+
 # Step 5: 最终决策 (Final Decision)
 
 **执行者**: Design Facilitator ([runtime/design_facilitator.md](../../../agents/runtime/design_facilitator.md))

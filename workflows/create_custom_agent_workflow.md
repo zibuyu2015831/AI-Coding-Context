@@ -1,3 +1,13 @@
+---
+title: 创建自定义 Agent 工作流
+summary: 指导 AI 通过结构化需求收集、设计约束确认和内容生成步骤，帮助用户创建面向特定项目场景的自定义 Agent 文档。
+keywords: custom-agent | workflow | agent | prompts | generation | aicc
+scope: 用户自定义 Agent 的需求采集与生成流程
+related_files: 无
+dependencies: agents/custom/_template.md | agents/custom/README.md | workflows/shared/ai_checklist.md
+verified_at: 2026-05-05
+---
+
 # 创建自定义 Agent 工作流
 
 ## 📋 工作流概述

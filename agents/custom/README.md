@@ -1,3 +1,13 @@
+---
+title: Custom 项目自定义 Agent
+summary: 说明项目自定义 Agent 目录的作用、适用场景、命名规范与最佳实践，帮助用户为标准角色无法覆盖的需求创建专属 AI 助手。
+keywords: custom-agent | agents | project-specific | guide | naming | aicc
+scope: 项目自定义 Agent 的目录说明与创建指引
+related_files: 无
+dependencies: agents/README.md | agents/custom/_template.md | agents/workflows/create_custom_agent_workflow.md
+verified_at: 2026-05-05
+---
+
 # Custom - 项目自定义 Agent
 
 ## 📋 概述

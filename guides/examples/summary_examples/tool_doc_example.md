@@ -1,3 +1,13 @@
+---
+title: 工具文档摘要示例
+summary: 展示工具类文档应如何编写标准 frontmatter 摘要，并通过完整示例说明 related_files、dependencies 和 verified_at 等字段的填写方式。
+keywords: summary-example | tool-doc | frontmatter | guide | examples | aicc
+scope: 工具类文档摘要的示例说明
+related_files: 无
+dependencies: core/SUMMARY_FORMAT_SPEC.md | guides/quick_start.md
+verified_at: 2026-05-05
+---
+
 # 工具文档摘要示例
 
 本文档展示工具类文档的标准摘要格式。

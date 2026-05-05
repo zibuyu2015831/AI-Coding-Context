@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 文档生成方案 (Critical 级别)
+title: Critical 级别文档生成方案模板
 summary: 超大型/关键项目的完整文档生成方案,包含全面深度分析、强制设计思维引导、多轮 AI 互审、详细批次规划和企业级维护体系
-keywords: 文档生成 | 超大型项目 | 关键系统 | 设计思维 | 多轮互审 | 批次规划
-scope: 文档生成方案 (dev_docs/_analysis/)
+keywords: template | generation-plan | critical | review | aicc
+scope: Critical 级别文档生成方案模板
 related_files: 无
-dependencies: workflows/generation_workflow.md | workflows/review-workflow.md | templates/prompts/design_thinking/
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: workflows/generation_workflow.md | workflows/review-workflow.md
+verified_at: 2026-05-05
 ---
 
 # [项目名称] - AI 文档生成方案 (Critical 级别)

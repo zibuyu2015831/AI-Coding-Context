@@ -1,3 +1,13 @@
+---
+title: 项目检测流程（步骤 0-1）
+summary: 说明 AI 如何在任务开始阶段检测项目语言、规模、结构和基础环境能力，为后续策略决策、文档生成与维护路径选择提供输入。
+keywords: detection | workflow | project-analysis | routing | environment | aicc
+scope: AI 入口阶段的环境预检与项目检测
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | workflows/decision_workflow.md | core/project_types.md
+verified_at: 2026-05-05
+---
+
 # 项目检测流程 (步骤 0-1)
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

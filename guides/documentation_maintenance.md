@@ -1,3 +1,13 @@
+---
+title: 文档维护策略指南
+summary: 说明如何识别文档更新触发条件、组织维护节奏并选择合适的维护策略，确保文档体系能够持续跟随代码和架构演进。
+keywords: documentation | maintenance | guide | triggers | strategy | aicc
+scope: 文档体系的长期维护与更新策略
+related_files: 无
+dependencies: core/update_triggers.md | workflows/document_health_check.md | workflows/incremental_update_workflow.md
+verified_at: 2026-05-05
+---
+
 # 文档维护策略指南
 
 > **用途**: 指导如何维护和更新 AI 文档体系  

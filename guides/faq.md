@@ -1,3 +1,13 @@
+---
+title: 常见问题（FAQ）
+summary: 汇总 AI Coding Context 框架的常见使用问题与答案，帮助用户快速理解框架定位、适用边界、输出形式与常见误解。
+keywords: faq | guide | onboarding | questions | usage | aicc
+scope: 框架常见问题解答
+related_files: 无
+dependencies: README.md | AI_ENTRY_POINT.md | guides/quick_start.md
+verified_at: 2026-05-05
+---
+
 # 常见问题 (FAQ)
 
 > **说明**: 这里汇总了关于 AI Coding Context 框架的常见疑问。

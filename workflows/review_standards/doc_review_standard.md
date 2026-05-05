@@ -1,3 +1,13 @@
+---
+title: 文档更新审核标准
+summary: 定义文档更新场景的审核维度、权重与检查项，帮助在准确性、清晰度和完整性三个层面判断文档修改是否达到可接受质量。
+keywords: doc-review | standard | documentation | checklist | quality | aicc
+scope: 文档更新场景下的审核标准
+related_files: 无
+dependencies: workflows/review-workflow.md | workflows/shared/ai_checklist.md | core/SUMMARY_FORMAT_SPEC.md
+verified_at: 2026-05-05
+---
+
 # 文档更新审核标准
 
 ## 审核清单 (权重分配)

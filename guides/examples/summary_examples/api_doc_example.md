@@ -1,3 +1,13 @@
+---
+title: API 文档摘要示例
+summary: 展示 API 规范类文档应如何编写标准 frontmatter 摘要，并通过完整示例说明接口层文档中 related_files 与 dependencies 的典型写法。
+keywords: summary-example | api-doc | frontmatter | guide | examples | aicc
+scope: API 类文档摘要的示例说明
+related_files: 无
+dependencies: core/SUMMARY_FORMAT_SPEC.md | guides/project_types.md
+verified_at: 2026-05-05
+---
+
 # API 文档摘要示例
 
 本文档展示 API 规范类文档的标准摘要格式。

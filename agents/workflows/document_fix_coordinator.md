@@ -1,3 +1,13 @@
+---
+title: Document Fix Coordinator
+summary: 定义文档修复协调员角色如何分析文档错误、定位关联文档并协调修复策略，用于管理文档谬误的处理流程。
+keywords: workflow-agent | document-fix | coordinator | documentation | repair | aicc
+scope: 文档谬误修复编排角色
+related_files: 无
+dependencies: agents/workflows/error_detector.md | workflows/doc_error_fix_workflow.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Document Fix Coordinator
 
 ## 基本信息

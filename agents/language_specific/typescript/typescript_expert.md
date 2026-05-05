@@ -1,3 +1,13 @@
+---
+title: TypeScript 专家
+summary: 定义 TypeScript 专家角色如何在类型系统、前后端通用开发和工具链场景中提供强类型导向的设计与实现建议。
+keywords: language-agent | typescript-expert | typescript | types | frontend | aicc
+scope: TypeScript 技术栈专项角色
+related_files: 无
+dependencies: agents/language_specific/base/frontend_engineer.md | agents/language_specific/base/backend_engineer.md | agents/examples/typescript_expert_examples.md
+verified_at: 2026-05-05
+---
+
 # TypeScript 专家 (TypeScript Expert)
 
 <!-- AGENT_META_START -->

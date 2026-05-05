@@ -1,3 +1,13 @@
+---
+title: 设计思维 Prompt Step 1 Why
+summary: 提供设计思维引导中第一步“问题本质”的标准 Prompt 模板，用于帮助产品经理角色追问需求背后的真实业务动机。
+keywords: template | design-thinking | prompt | why | product | aicc
+scope: 设计思维 Step 1 Prompt 模板
+related_files: 无
+dependencies: agents/development/product_manager.md | templates/prompts/design_thinking/step2_how.md
+verified_at: 2026-05-05
+---
+
 # Step 1: 问题本质 (The "Why")
 
 **执行者**: ProductManager ([development/product_manager.md](../../../agents/development/product_manager.md))

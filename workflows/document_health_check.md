@@ -1,3 +1,13 @@
+---
+title: 文档健康度检查流程
+summary: 说明 AI 如何对现有文档体系执行健康度评估，覆盖快速扫描、标准检查和深度分析三种模式，并据此给出明确的维护建议。
+keywords: document-health | workflow | health-check | dev-docs | maintenance | aicc
+scope: 文档健康度评估与维护建议生成流程
+related_files: tools/py/doc_health_checker.py | tools/js/doc_health_checker.js
+dependencies: workflows/path_b_health_check.md | core/update_triggers.md | tools/README.md
+verified_at: 2026-05-05
+---
+
 # 文档健康度检查流程
 
 > **版本**: v3.0

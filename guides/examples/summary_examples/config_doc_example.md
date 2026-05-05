@@ -1,3 +1,13 @@
+---
+title: 配置文档摘要示例
+summary: 展示配置类文档应如何编写标准 frontmatter 摘要，并通过完整示例说明配置范围、依赖文档和关联配置文件的表达方式。
+keywords: summary-example | config-doc | frontmatter | guide | examples | aicc
+scope: 配置类文档摘要的示例说明
+related_files: 无
+dependencies: core/SUMMARY_FORMAT_SPEC.md | config/README.md
+verified_at: 2026-05-05
+---
+
 # 配置文档摘要示例
 
 本文档展示配置类文档的标准摘要格式。

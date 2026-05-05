@@ -1,3 +1,13 @@
+---
+title: 产品经理
+summary: 定义产品经理角色如何澄清业务目标、拆解需求和形成验收标准，用于帮助技术方案与真实业务价值保持一致。
+keywords: development-agent | product-manager | requirements | business | acceptance | aicc
+scope: 需求分析与业务价值澄清角色
+related_files: 无
+dependencies: agents/README.md | workflows/path_d_specific_tasks.md | workflows/review_standards/feature_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 产品经理 (Product Manager)
 
 <!-- AGENT_META_START -->

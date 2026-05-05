@@ -1,11 +1,11 @@
 ---
-title: [Rule名称]
-summary: [100-200字概述：AI规则模板，定义特定场景的编码规范、触发条件和检查清单]
-keywords: AI Rules | 编码规范 | [规则类型] | [适用场景]
-scope: AI规则定义
+title: AI Rule 模板
+summary: 提供单条 AI 规则文档的标准模板，用于定义特定场景下的编码规范、触发条件和检查清单。
+keywords: template | ai-rule | rules | guideline | aicc
+scope: 单条 AI 规则模板
 related_files: 无
-dependencies: [列出依赖的其他规则文档] | 无
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # [Rule 名称]

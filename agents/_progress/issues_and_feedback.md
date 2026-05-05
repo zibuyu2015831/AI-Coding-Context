@@ -1,3 +1,13 @@
+---
+title: 问题和反馈收集
+summary: 用于记录 AI 角色库实施过程中的技术问题、风险、用户反馈和改进建议，帮助持续改进角色体系。
+keywords: issues | feedback | progress | agent-library | risks | aicc
+scope: AI 角色库实施过程的问题与反馈记录
+related_files: 无
+dependencies: agents/_progress/implementation_progress.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # 问题和反馈收集
 
 **用途**: 记录实施过程中的问题、风险和用户反馈  

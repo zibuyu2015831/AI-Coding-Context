@@ -1,3 +1,13 @@
+---
+title: 安全审计员
+summary: 定义安全审计员运行时角色如何识别漏洞、评估风险并给出修复建议，用于在方案和代码层面补齐安全审查能力。
+keywords: runtime-agent | security-auditor | security | audit | risk | aicc
+scope: 安全审查与风险评估的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/review_standards/bugfix_review_standard.md | workflows/review_standards/feature_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 安全审计员 (Security Auditor)
 
 <!-- AGENT_META_START -->

@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 文档生成方案 (Trivial 级别)
+title: Trivial 级别文档生成方案模板
 summary: 超简单项目（单文件或小脚本）的文档生成方案，包含基础项目分析和简化的维护规划
-keywords: 文档生成 | 简单项目 | 单文件 | 脚本
-scope: 文档生成方案 (dev_docs/_analysis/)
+keywords: template | generation-plan | trivial | script | aicc
+scope: Trivial 级别文档生成方案模板
 related_files: 无
-dependencies: workflows/generation_workflow.md
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md
+verified_at: 2026-05-05
 ---
 
 # [项目名称] - AI 文档生成方案 (Trivial 级别)

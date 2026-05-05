@@ -1,3 +1,13 @@
+---
+title: 角色质量检查清单
+summary: 提供角色创建与改造过程中的统一质量验收清单，帮助维护者在提交前完成格式、内容和可用性自检。
+keywords: checklist | quality | agent-template | review | validation | aicc
+scope: Agent 角色创建与改造质量检查
+related_files: 无
+dependencies: agents/_templates/agent_template.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # 角色质量检查清单
 
 **用途**: 用于角色改造和创建过程中的质量验收  

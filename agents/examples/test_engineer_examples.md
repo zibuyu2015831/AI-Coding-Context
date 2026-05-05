@@ -1,3 +1,13 @@
+---
+title: 测试工程师角色使用示例
+summary: 展示测试工程师角色在登录功能和订单接口场景中的测试用例设计与测试代码输出方式。
+keywords: example | test-engineer | testing | regression | qa | aicc
+scope: 测试工程师角色示例
+related_files: 无
+dependencies: agents/runtime/test_engineer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 测试工程师角色使用示例
 
 **角色**: 测试工程师 (Test Engineer)  

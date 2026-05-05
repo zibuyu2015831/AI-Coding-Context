@@ -1,3 +1,13 @@
+---
+title: 代码审查员
+summary: 定义代码审查员运行时角色的定位、输入输出约束与审查重点，用于在实现完成后从质量、安全和规范角度评估代码变更。
+keywords: runtime-agent | code-reviewer | quality | security | review | aicc
+scope: 代码审查与质量评估的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/review_standards/feature_review_standard.md | workflows/review_standards/bugfix_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 代码审查员 (Code Reviewer)
 
 <!-- AGENT_META_START -->

@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 部署文档
-summary: [100-200字概述：项目部署流程、环境配置、运维操作和故障排查指南，支持传统部署、Docker和Kubernetes]
-keywords: 部署 | Docker | Kubernetes | CI/CD | 运维 | 环境配置
-scope: 项目部署文档 (dev_docs/)
-related_files: [列出部署相关的配置文件，如 "docker-compose.yml | k8s/deployment.yaml" 或 "无"]
-dependencies: [列出相关文档] | 无
-verified_at: [YYYY-MM-DD 格式日期]
+title: 部署文档模板
+summary: 提供项目部署文档模板，用于记录部署流程、环境配置、运维操作和故障排查指南。
+keywords: template | deployment | docker | kubernetes | aicc
+scope: 项目部署文档模板
+related_files: 无
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # 部署文档模板

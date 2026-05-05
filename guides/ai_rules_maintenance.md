@@ -1,3 +1,13 @@
+---
+title: AI Rules 维护指南
+summary: 指导维护者识别何时需要更新 AI Rules 文件、如何同步规则变更以及更新后的验证方式，确保 IDE 中的 AI 行为与框架规范持续一致。
+keywords: ai-rules | maintenance | guide | rules | ide | aicc
+scope: AI Rules 文件的维护与验证实践
+related_files: 无
+dependencies: AI_ENTRY_POINT.md | templates/AI_RULES_TEMPLATE.md | workflows/commit_guided_update.md
+verified_at: 2026-05-05
+---
+
 # AI Rules 维护指南
 
 > **版本**: v2.3  

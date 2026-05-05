@@ -1,3 +1,13 @@
+---
+title: Monorepo 项目处理流程
+summary: 说明 AI 如何识别 Monorepo 项目结构、理解多包边界，并据此制定分层文档生成与维护策略，避免把单仓多包项目错误当作单体项目处理。
+keywords: monorepo | workflow | multi-package | strategy | project-type | aicc
+scope: Monorepo 项目的文档生成与维护流程
+related_files: 无
+dependencies: workflows/detection_workflow.md | workflows/decision_workflow.md | core/project_types.md
+verified_at: 2026-05-05
+---
+
 # Monorepo 项目处理流程
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  

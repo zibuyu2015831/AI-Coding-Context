@@ -1,3 +1,13 @@
+---
+title: Agent 模板
+summary: 提供标准 Agent 定义文档的基础模板，帮助维护者按统一元数据和结构创建 runtime、development 或 language-specific 角色。
+keywords: agent-template | template | metadata | roles | prompts | aicc
+scope: 标准 Agent 定义模板
+related_files: 无
+dependencies: agents/_templates/quality_checklist.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # [角色名称] ([Agent Name])
 
 <!-- AGENT_META_START -->

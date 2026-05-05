@@ -1,3 +1,13 @@
+---
+title: 方案审查员角色使用示例
+summary: 展示方案审查员角色在新功能、重构和性能优化方案场景中的审查输出方式，帮助用户理解其可行性与风险评估方法。
+keywords: example | plan-reviewer | review | architecture | feasibility | aicc
+scope: 方案审查员角色示例
+related_files: 无
+dependencies: agents/runtime/plan_reviewer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 方案审查员角色使用示例
 
 **角色**: 方案审查员 (Plan Reviewer)  

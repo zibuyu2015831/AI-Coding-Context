@@ -1,3 +1,13 @@
+---
+title: 路径 B 文档健康度检查
+summary: 定义在项目已存在 dev_docs 文档体系时，AI 如何以快速、标准或深度模式评估现有文档的健康状态，并据此决定是否需要更新或重建文档。
+keywords: path-b | health-check | workflow | dev-docs | assessment | aicc
+scope: 已有文档体系的健康度检查与后续动作决策
+related_files: tools/py/doc_health_checker.py | tools/js/doc_health_checker.js
+dependencies: AI_ENTRY_POINT.md | workflows/document_health_check.md | core/framework_spec.md
+verified_at: 2026-05-05
+---
+
 # 路径 B: 文档健康度检查
 
 > **触发条件**: `dev_docs/` 存在且主文档存在  

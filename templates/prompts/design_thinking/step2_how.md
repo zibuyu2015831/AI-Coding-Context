@@ -1,3 +1,13 @@
+---
+title: 设计思维 Prompt Step 2 How
+summary: 提供设计思维引导中第二步“方案探索”的标准 Prompt 模板，用于帮助架构分析师生成并比较多种技术方案。
+keywords: template | design-thinking | prompt | how | architecture | aicc
+scope: 设计思维 Step 2 Prompt 模板
+related_files: 无
+dependencies: agents/development/architecture_analyst.md | templates/prompts/design_thinking/step3_risk.md
+verified_at: 2026-05-05
+---
+
 # Step 2: 方案探索 (The "How")
 
 **执行者**: ArchitectureAnalyst ([development/architecture_analyst.md](../../../agents/development/architecture_analyst.md))

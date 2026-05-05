@@ -1,3 +1,13 @@
+---
+title: 前端工程师
+summary: 定义基础前端工程师角色如何在组件设计、响应式布局和交互实现等通用前端场景中提供可复用的实现指导。
+keywords: language-agent | frontend-engineer | frontend | components | ui | aicc
+scope: 通用前端开发基础角色
+related_files: 无
+dependencies: agents/examples/frontend_engineer_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # 前端工程师 (Frontend Engineer)
 
 <!-- AGENT_META_START -->

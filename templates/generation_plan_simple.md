@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 文档生成方案 (Simple 级别)
+title: Simple 级别文档生成方案模板
 summary: 小型项目的文档生成方案,包含基础分析、代码模式提取、简化的子文档规划和完整维护规划
-keywords: 文档生成 | 小型项目 | 代码模式 | 维护规划
-scope: 文档生成方案 (dev_docs/_analysis/)
+keywords: template | generation-plan | simple | dev-docs | aicc
+scope: Simple 级别文档生成方案模板
 related_files: 无
-dependencies: workflows/generation_workflow.md
-verified_at: [YYYY-MM-DD 格式日期]
+dependencies: workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md
+verified_at: 2026-05-05
 ---
 
 # [项目名称] - AI 文档生成方案 (Simple 级别)

@@ -1,3 +1,13 @@
+---
+title: 性能优化专家
+summary: 定义性能优化专家运行时角色如何分析系统瓶颈、提出优化方向并平衡性能收益与实现成本，用于复杂系统的性能诊断与改进。
+keywords: runtime-agent | performance-optimizer | optimization | bottleneck | performance | aicc
+scope: 性能分析与优化建议的运行时角色
+related_files: 无
+dependencies: agents/README.md | workflows/review_standards/feature_review_standard.md | workflows/complexity_alert_workflow.md
+verified_at: 2026-05-05
+---
+
 # 性能优化专家 (Performance Optimizer)
 
 <!-- AGENT_META_START -->

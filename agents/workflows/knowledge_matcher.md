@@ -1,3 +1,13 @@
+---
+title: Knowledge Matcher
+summary: 定义知识匹配器角色如何根据项目特征、技术栈和问题类型匹配知识条目，用于支撑跨项目知识复用与经验推荐。
+keywords: workflow-agent | knowledge-matcher | reuse | recommendation | patterns | aicc
+scope: 跨项目知识匹配与推荐角色
+related_files: 无
+dependencies: agents/README.md | agents/workflows/knowledge_librarian.md | workflows/path_d_specific_tasks.md
+verified_at: 2026-05-05
+---
+
 # Knowledge Matcher
 
 ## 基本信息

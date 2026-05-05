@@ -1,3 +1,13 @@
+---
+title: 工作流共享资源
+summary: 说明 workflows/shared 目录中横切资源的定位、用途与引用边界，帮助维护者理解哪些内容应被抽取为共享组件，哪些应保留在具体工作流中。
+keywords: shared | workflows | reusable | checklist | fallback | aicc
+scope: 工作流共享资源目录的说明与使用边界
+related_files: 无
+dependencies: workflows/shared/ai_checklist.md | workflows/shared/failure_handling.md | workflows/shared/special_scenarios.md
+verified_at: 2026-05-05
+---
+
 # 工作流共享资源 (Shared Resources)
 
 本目录为各 workflow 文档复用的横切组件，可被任意工作流引用。

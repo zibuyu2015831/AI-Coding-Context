@@ -1,3 +1,13 @@
+---
+title: 前端工程师角色使用示例
+summary: 展示前端工程师角色在响应式组件和通用 Hook 设计场景中的典型输出，帮助用户理解其实现与抽象平衡方式。
+keywords: example | frontend-engineer | component | hook | responsive | aicc
+scope: 前端工程师角色示例
+related_files: 无
+dependencies: agents/language_specific/base/frontend_engineer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 前端工程师角色使用示例
 
 **角色**: 前端工程师 (Frontend Engineer — Base)  

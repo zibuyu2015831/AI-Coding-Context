@@ -1,3 +1,13 @@
+---
+title: 配置管理最佳实践
+summary: 说明项目配置管理的推荐策略、配置分层原则与敏感信息处理方式，帮助维护者建立可演进且可审计的配置体系。
+keywords: configuration | guide | best-practice | env | secrets | aicc
+scope: 项目配置管理与配置文档化实践
+related_files: 无
+dependencies: config/README.md | config/CONFIG_TEMPLATE.md | core/security_rules.md
+verified_at: 2026-05-05
+---
+
 # 配置管理最佳实践
 
 > **版本**: v2.3  

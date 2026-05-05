@@ -1,3 +1,13 @@
+---
+title: Knowledge Librarian
+summary: 定义知识图书管理员角色如何维护跨项目知识库的结构、版本与条目组织，用于支持知识沉淀与复用场景。
+keywords: workflow-agent | knowledge-librarian | knowledge-base | reuse | maintenance | aicc
+scope: 跨项目知识库维护角色
+related_files: 无
+dependencies: agents/README.md | agents/workflows/knowledge_matcher.md | workflows/path_d_specific_tasks.md
+verified_at: 2026-05-05
+---
+
 # Knowledge Librarian
 
 ## 基本信息

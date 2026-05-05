@@ -1,3 +1,13 @@
+---
+title: Bug 修复审核标准
+summary: 定义 Bug 修复方案在根因分析、修复方式与影响范围上的审核标准，帮助避免绕过式修复和缺乏回归验证的问题。
+keywords: bugfix-review | standard | bug | root-cause | regression | aicc
+scope: Bug 修复场景下的审核标准
+related_files: 无
+dependencies: workflows/review-workflow.md | workflows/shared/ai_checklist.md | workflows/doc_error_fix_workflow.md
+verified_at: 2026-05-05
+---
+
 # Bug 修复审核标准
 
 ## 审核清单 (权重分配)

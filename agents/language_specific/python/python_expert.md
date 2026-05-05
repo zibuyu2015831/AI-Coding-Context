@@ -1,3 +1,13 @@
+---
+title: Python 专家
+summary: 定义 Python 专家角色如何在数据处理、后端开发、自动化脚本与 AI 相关场景中提供符合 Python 生态习惯的实现建议。
+keywords: language-agent | python-expert | python | backend | automation | aicc
+scope: Python 技术栈专项角色
+related_files: 无
+dependencies: agents/language_specific/base/backend_engineer.md | agents/examples/python_expert_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Python 专家 (Python Expert)
 
 <!-- AGENT_META_START -->

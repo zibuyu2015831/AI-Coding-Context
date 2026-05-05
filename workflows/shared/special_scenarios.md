@@ -1,3 +1,13 @@
+---
+title: 特殊场景处理
+summary: 汇总多语言项目、Monorepo、未识别框架、遗留项目等跨工作流特殊情境的处理方法，帮助 AI 在非标准输入下仍保持稳定决策。
+keywords: special-scenarios | workflow | monorepo | legacy | multi-language | aicc
+scope: 各工作流共享的特殊项目场景处理
+related_files: 无
+dependencies: workflows/shared/README.md | workflows/monorepo_workflow.md | guides/language_support.md
+verified_at: 2026-05-05
+---
+
 # 特殊场景处理
 
 > **适用范围**: 所有工作流路径  

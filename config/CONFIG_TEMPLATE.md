@@ -1,4 +1,11 @@
 ---
+title: AICC 配置模板
+summary: 提供 AICC 框架统一配置系统的默认配置模板，包含功能开关、工具偏好、设计思维和 Git 安全等配置项的参考默认值。
+keywords: config-template | configuration | defaults | settings | aicc
+scope: AICC 配置系统默认模板
+related_files: 无
+dependencies: config/README.md | config/MIGRATION_GUIDE.md
+verified_at: 2026-05-05
 # ===========================================
 # AI Coding Context - 框架配置
 # ===========================================

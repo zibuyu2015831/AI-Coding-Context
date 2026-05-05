@@ -1,3 +1,13 @@
+---
+title: 功能开发审核标准
+summary: 定义针对功能开发方案的审核维度、权重与检查项，帮助 AI 和维护者从架构一致性、技术债和质量保证等角度评估方案质量。
+keywords: feature-review | standard | checklist | architecture | quality | aicc
+scope: 功能开发场景下的审核标准
+related_files: 无
+dependencies: workflows/review-workflow.md | workflows/shared/ai_checklist.md
+verified_at: 2026-05-05
+---
+
 # 功能开发审核标准
 
 ## 审核清单 (权重分配)

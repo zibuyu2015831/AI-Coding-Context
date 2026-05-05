@@ -1,3 +1,13 @@
+---
+title: 角色改造日志
+summary: 记录各个角色从原始来源到最终标准化定义的改造过程，包括来源、关键变更、自检与评审信息。
+keywords: conversion-log | agents | progress | review | history | aicc
+scope: Agent 角色改造过程记录
+related_files: 无
+dependencies: agents/_templates/quality_checklist.md | agents/_progress/implementation_progress.md
+verified_at: 2026-05-05
+---
+
 # 角色改造日志
 
 **用途**: 记录每个角色从原始来源到最终定义的改造过程  

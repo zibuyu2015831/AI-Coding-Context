@@ -1,3 +1,13 @@
+---
+title: API 设计师
+summary: 定义 API 设计师角色如何从业务需求出发设计接口边界、请求响应结构与文档规范，用于提升接口设计的一致性与可维护性。
+keywords: development-agent | api-designer | api | openapi | rest | aicc
+scope: API 设计与接口规范制定角色
+related_files: 无
+dependencies: agents/README.md | guides/examples/summary_examples/api_doc_example.md | workflows/review_standards/feature_review_standard.md
+verified_at: 2026-05-05
+---
+
 # API 设计师 (API Designer)
 
 <!-- AGENT_META_START -->

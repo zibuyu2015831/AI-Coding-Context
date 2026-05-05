@@ -1,3 +1,13 @@
+---
+title: 架构文档摘要示例
+summary: 展示架构类文档应如何编写标准 frontmatter 摘要，并通过完整示例说明系统边界、关联代码模块与依赖文档的描述方式。
+keywords: summary-example | architecture-doc | frontmatter | guide | examples | aicc
+scope: 架构类文档摘要的示例说明
+related_files: 无
+dependencies: core/SUMMARY_FORMAT_SPEC.md | guides/project_types.md
+verified_at: 2026-05-05
+---
+
 # 架构文档摘要示例
 
 本文档展示架构类文档的标准摘要格式。

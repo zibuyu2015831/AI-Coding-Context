@@ -1,3 +1,13 @@
+---
+title: Git 安全工作流
+summary: 定义 AI 在操作 Git 时必须遵守的安全边界、禁止动作与推荐流程，确保不会直接破坏主分支、重写历史或绕过人工审核。
+keywords: git | safety | workflow | guardrail | review | aicc
+scope: AI 执行 Git 相关操作时的安全规范与流程
+related_files: tools/py/git_safety.py | tools/js/git_safety.js
+dependencies: AI_ENTRY_POINT.md | workflows/commit_guided_update.md | guides/commit_guided_quick_start.md
+verified_at: 2026-05-05
+---
+
 # Git 安全工作流
 
 > **版本**: v1.1  

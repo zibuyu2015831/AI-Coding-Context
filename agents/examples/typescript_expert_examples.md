@@ -1,3 +1,13 @@
+---
+title: TypeScript 专家角色使用示例
+summary: 展示 TypeScript 专家角色在泛型约束、可辨识联合类型和运行时校验场景中的典型输出方式。
+keywords: example | typescript-expert | generics | zod | types | aicc
+scope: TypeScript 专家角色示例
+related_files: 无
+dependencies: agents/language_specific/typescript/typescript_expert.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # TypeScript 专家 (TypeScript Expert) 角色使用示例
 
 **角色**: TypeScript 专家

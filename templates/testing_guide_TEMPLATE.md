@@ -1,11 +1,11 @@
 ---
-title: [项目名称] 测试文档
-summary: [100-200字概述：项目测试策略、测试框架、测试用例和CI/CD集成，包括单元测试、集成测试和E2E测试]
-keywords: 测试 | 单元测试 | 集成测试 | E2E测试 | CI/CD | 测试覆盖率
-scope: 项目测试文档 (dev_docs/)
-related_files: [列出测试相关文件，如 "tests/unit/ | tests/e2e/" 或 "无"]
-dependencies: [列出相关文档] | 无
-verified_at: [YYYY-MM-DD 格式日期]
+title: 测试文档模板
+summary: 提供项目测试文档模板，用于记录测试策略、测试用例、覆盖范围和 CI/CD 集成信息。
+keywords: template | testing | e2e | unit-test | aicc
+scope: 项目测试文档模板
+related_files: 无
+dependencies: 无
+verified_at: 2026-05-05
 ---
 
 # 测试文档模板

@@ -1,3 +1,13 @@
+---
+title: API 设计师角色使用示例
+summary: 展示 API 设计师角色在 RESTful API 和分页查询等场景中的典型输出方式，帮助用户理解该角色的设计粒度与交付风格。
+keywords: example | api-designer | api | rest | pagination | aicc
+scope: API 设计师角色示例
+related_files: 无
+dependencies: agents/development/api_designer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # API 设计师角色使用示例
 
 **角色**: API 设计师 (API Designer)  

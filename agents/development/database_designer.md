@@ -1,3 +1,13 @@
+---
+title: 数据库设计师
+summary: 定义数据库设计师角色如何进行数据建模、索引设计和关系规划，用于支撑业务系统的数据层设计与性能优化。
+keywords: development-agent | database-designer | schema | sql | indexing | aicc
+scope: 数据建模与数据库设计角色
+related_files: 无
+dependencies: agents/README.md | workflows/review_standards/feature_review_standard.md | workflows/review_standards/refactor_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 数据库设计师 (Database Designer)
 
 <!-- AGENT_META_START -->

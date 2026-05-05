@@ -1,3 +1,13 @@
+---
+title: 产品经理角色使用示例
+summary: 展示产品经理角色在明确功能请求与模糊需求收敛场景中的需求澄清和验收标准定义方式。
+keywords: example | product-manager | requirements | business | acceptance | aicc
+scope: 产品经理角色示例
+related_files: 无
+dependencies: agents/development/product_manager.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 产品经理角色使用示例
 
 **角色**: 产品经理 (Product Manager)  

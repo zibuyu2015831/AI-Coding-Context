@@ -1,3 +1,13 @@
+---
+title: 代码审查员角色使用示例
+summary: 展示代码审查员角色在业务逻辑、API 接口和数据库操作等场景中的审查方式，帮助用户理解其风险识别与反馈风格。
+keywords: example | code-reviewer | review | bug | quality | aicc
+scope: 代码审查员角色示例
+related_files: 无
+dependencies: agents/runtime/code_reviewer.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # 代码审查员角色使用示例
 
 **角色**: 代码审查员 (Code Reviewer)  

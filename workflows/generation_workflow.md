@@ -1,3 +1,13 @@
+---
+title: 详细生成流程指南
+summary: 说明 AI 辅助开发文档体系从方案生成、互审、人工审核到正式产出的详细步骤，并给出 V3.0 质量保证机制在生成阶段的具体执行方式。
+keywords: generation | workflow | review | plan | documents | aicc
+scope: 首次生成与全量生成场景下的详细执行流程
+related_files: 无
+dependencies: workflows/path_a_first_generation.md | core/SUMMARY_FORMAT_SPEC.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md
+verified_at: 2026-05-05
+---
+
 # 详细生成流程指南
 
 > **用途**: 指导如何一步步生成 AI 辅助开发文档体系  

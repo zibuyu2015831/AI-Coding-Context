@@ -1,3 +1,13 @@
+---
+title: Python 专家角色使用示例
+summary: 展示 Python 专家角色在数据处理、FastAPI 异步接口和 Pythonic 重构场景中的典型输出方式。
+keywords: example | python-expert | pandas | fastapi | refactor | aicc
+scope: Python 专家角色示例
+related_files: 无
+dependencies: agents/language_specific/python/python_expert.md | agents/examples/README.md
+verified_at: 2026-05-05
+---
+
 # Python 专家 (Python Expert) 角色使用示例
 
 **角色**: Python 专家

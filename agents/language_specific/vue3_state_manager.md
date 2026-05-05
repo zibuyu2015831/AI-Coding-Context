@@ -1,3 +1,13 @@
+---
+title: Vue 3 状态管理师
+summary: 定义 Vue 3 状态管理师角色如何围绕 Pinia、Store 设计和状态流转提供专业建议，用于提升 Vue 项目的状态层质量。
+keywords: language-agent | vue3-state-manager | pinia | store | vue | aicc
+scope: Vue 3 状态管理专项角色
+related_files: 无
+dependencies: agents/language_specific/vue3_expert.md | agents/examples/vue3_state_manager_examples.md | agents/README.md
+verified_at: 2026-05-05
+---
+
 # Vue 3 状态管理师 (Vue 3 State Manager)
 
 <!-- AGENT_META_START -->

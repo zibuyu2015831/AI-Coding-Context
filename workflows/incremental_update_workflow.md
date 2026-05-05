@@ -1,3 +1,13 @@
+---
+title: 增量更新流程
+summary: 说明在已有文档体系基础上，AI 如何根据局部代码或需求变化识别受影响文档、选择更新范围，并以低成本完成增量维护而不是整体重建。
+keywords: incremental-update | workflow | maintenance | dev-docs | update | aicc
+scope: 已有文档体系的局部更新流程
+related_files: tools/py/summary_related_checker.py | tools/js/summary_related_checker.js
+dependencies: workflows/path_c_incremental_update.md | core/update_triggers.md | workflows/commit_guided_update.md
+verified_at: 2026-05-05
+---
+
 # 增量更新流程
 
 > **版本**: v3.0

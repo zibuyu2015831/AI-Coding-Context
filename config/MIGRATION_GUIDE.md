@@ -1,3 +1,13 @@
+---
+title: V2.3 到 V3.0 配置迁移指南
+summary: 指导现有用户将 V2.3 的配置方式平滑迁移到 V3.0 的统一配置系统，涵盖自动迁移、手动迁移、差异对比和常见问题处理。
+keywords: migration | config | v2.3 | v3.0 | upgrade | aicc
+scope: 配置系统从 V2.3 升级到 V3.0 的迁移流程
+related_files: config/CONFIG_TEMPLATE.md | config/README.md
+dependencies: README.md | AI_ENTRY_POINT.md
+verified_at: 2026-05-05
+---
+
 # V2.3 → V3.0 配置迁移指南
 
 > **目标用户**: 从 V2.3 升级到 V3.0 的现有用户  

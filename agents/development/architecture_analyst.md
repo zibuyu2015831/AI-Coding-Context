@@ -1,3 +1,13 @@
+---
+title: 架构分析师
+summary: 定义架构分析师角色如何分析需求、抽象领域模型并形成技术方案，用于在复杂项目中提供结构化的架构设计支持。
+keywords: development-agent | architecture-analyst | architecture | domain | design | aicc
+scope: 架构分析与技术方案设计角色
+related_files: 无
+dependencies: agents/README.md | guides/examples/summary_examples/architecture_doc_example.md | workflows/review_standards/feature_review_standard.md
+verified_at: 2026-05-05
+---
+
 # 架构分析师 (Architecture Analyst)
 
 <!-- AGENT_META_START -->

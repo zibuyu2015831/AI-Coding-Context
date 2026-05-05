@@ -1,3 +1,13 @@
+---
+title: Commit-Guided Documentation 快速开始
+summary: 为首次接触 Commit-Guided Documentation 的用户提供最短上手路径，说明核心理念、使用方式与与传统文档更新模式的差异。
+keywords: commit-guided | quick-start | guide | git | documentation | aicc
+scope: Commit-Guided Documentation 的快速上手说明
+related_files: 无
+dependencies: workflows/commit_guided_update.md | guides/commit_guided_migration.md | workflows/git_safety_workflow.md
+verified_at: 2026-05-05
+---
+
 # Commit-Guided Documentation 快速开始
 
 **版本**: v1.0  

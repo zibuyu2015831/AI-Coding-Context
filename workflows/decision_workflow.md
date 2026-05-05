@@ -1,3 +1,13 @@
+---
+title: 策略决策流程（步骤 2-3）
+summary: 定义 AI 如何根据项目规模、复杂度与上下文状态选择生成、健康检查、增量更新等执行路径，并决定批次、深度与资源投入策略。
+keywords: decision | workflow | routing | strategy | project-size | aicc
+scope: AI 在项目分析后的路径与策略决策
+related_files: 无
+dependencies: workflows/detection_workflow.md | workflows/path_a_first_generation.md | workflows/path_b_health_check.md | workflows/path_c_incremental_update.md
+verified_at: 2026-05-05
+---
+
 # 策略决策流程 (步骤 2-3)
 
 > **上级文档**: [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md)  
