@@ -1,25 +1,25 @@
 ---
 title: AICC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
-summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V2.3 稳定能力和 V3.0 基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
-keywords: framework | global-context | v2.3 | v3.0 | quality-workflow
+summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V3.0 稳定能力和核心基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
+keywords: framework | global-context | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
-related_files: AI_ENTRY_POINT.md | README.md | dev/V3.0/README.md | dev/V3.0/PROGRESS.md | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
+related_files: AI_ENTRY_POINT.md | README.md | dev/plan/ | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
 dependencies: core/SUMMARY_FORMAT_SPEC.md | core/design_decisions.md
-verified_at: 2026-04-26
-progress_synced_at: 2026-04-26
+verified_at: 2026-05-10
+progress_synced_at: 2026-05-10
 ---
 
-**当前框架版本**: V2.3  
-**开发中的版本**: V3.0（P0/P1 核心功能已完成）
+**当前框架版本**: V3.0 (2026-05)
+**框架状态**: 稳定运行，核心基础设施（P0/P1）已全部落位。
 
-**V3.0 进度概览（13/19 已完成，详见 [`V3.0/PROGRESS.md`](./V3.0/PROGRESS.md)）**：
+**V3.0 核心能力全景**：
 
-- **P0 核心基础设施**（7/7 ✅）：001 角色库 / 003 设计思维 / 012 文档摘要 / 013 AI 互审 / 016 配置 / 017 工具库 / 018 commit-guided
-- **P1 高价值能力**（5/5 ✅）：004 ADR 系统 / 005 复杂度仪表盘 / 006 自动审查报告 / 011 文档谬误修复 / 014 文档阅读习惯
-- **P2 增强功能**（1/6 进行中）：010 跨项目知识复用 🟢；其余 002/007/008/009/015 已归档
-- **V3.0+ 后期增益**（1 项 ✅）：019 系统化文档审核框架（2026-04-11，源自 dev/case_skillatlas_review）
+- **P0 核心基础设施**（✅ 全部交付）：001 角色库 / 003 设计思维 / 012 文档摘要 / 013 AI 互审 / 016 配置 / 017 工具库 / 018 commit-guided
+- **P1 高价值能力**（✅ 全部交付）：004 ADR 系统 / 005 复杂度仪表盘 / 006 自动审查报告 / 011 文档谬误修复 / 014 文档阅读习惯
+- **V3.0+ 增益**（✅ 已集成）：019 系统化文档审核框架、Git 安全规范整合
 
-> **SSOT 提示**：本文件仅做摘要快照；优化点详细清单、状态、归档原因等以 [`V3.0/PROGRESS.md`](./V3.0/PROGRESS.md) 为单一真相源。本文件更新日期请参见顶部 frontmatter `verified_at`。
+> **SSOT 提示**：V3.0 开发周期的详细过程文档（README/PROGRESS）已在版本交付后归档清理。当前框架能力的单一真相源分布在 `core/`, `agents/`, `config/`, `tools/` 等各功能目录的 README 中。
+
 
 ---
 
@@ -318,11 +318,9 @@ ai_coding_context/
        │   └── decisions/                # 已接受 ADR（001 markdown / 002 layered）
        ├── complexity/                   # 复杂度仪表盘运行时（config + dashboard + data）
        ├── quality/                      # 文档质量保证体系（标准 + 审查 SOP + contexts）
-       ├── V3.0/                         # V3.0 规划、提案、进度
-       ├── V2.3/  V2.2/                  # 历史版本审查
        ├── reference/                    # 开发参考资料（理论分析、外部案例研究等）
-       ├── real_case/                    # 真实项目案例素材
-       └── case_skillatlas_review/       # SkillAtlas 项目审查案例（019 ADR 来源）
+       ├── case_skillatlas_review/       # SkillAtlas 项目审查案例（019 ADR 来源）
+       └── plan/                         # 框架迭代的长期计划与蓝图
 ```
 
 **⚠️ `dev/` 目录排除机制**：通过 `.gitattributes` 设置 `dev/ export-ignore`，`git archive` 与 GitHub release 自动剔除该目录；merge 到 main 分支时也应保持 `dev/` 不进入 main（详见 `dev/README.md`）。
@@ -691,28 +689,19 @@ project_root/
 - 新增: 智能工作流分派、文档健康度检查、Monorepo 支持、增量更新
 - 限制: 被动式、单一 AI、缺设计引导、复杂度不可见、无 ADR
 
-### V3.0 (开发中) - 战略式编程增强
+### V3.0 (2026-05) - 战略式编程增强（当前稳定版）
 
-- **当前阶段**: P0/P1 核心功能完成，P2 进入开发 (2025-12-18 ~ 2026-Q2)
-- **已完成** (13/19):
-  - ✅ 001-AI 角色库 (2025-11-29)
-  - ✅ 017-实用脚本工具库 (2025-12-01)
-  - ✅ 016-配置管理系统 (2025-12-02)
-  - ✅ 013-AI 互审机制 (2025-12-02)
-  - ✅ 003-设计思维引导 (2025-12-03)
-  - ✅ 012-强制文档摘要 (2025-12-03)
-  - ✅ 018-Commit-Guided Documentation (2025-12-18)
-  - ✅ 019-系统化文档审核框架 (2026-04-11，V3.0+ 后期增益)
-  - ✅ 004-ADR 系统 (2026-04-12)
-  - ✅ 005-复杂度仪表盘 (2026-04-13)
-  - ✅ 006-自动审查报告 (2026-04-13，已整合到005)
-  - ✅ 011-文档谬误修复工作流 (2026-04-13)
-  - ✅ 014-文档阅读习惯引导 (2026-04-14)
-- **进行中**: 010-跨项目知识复用 🟢
-- **已归档** (5 项): 002-危险指令拦截 / 007-学习曲线追踪 / 008-AI 能力分级 / 009-文档自修复 / 015-质量保证体系集成
-- **未启动 P2**: 002/007/008/009/015（已决策归档）
+- **核心成就**: 实现了从“代码生成”向“思考伙伴”的跨越，核心基础设施 P0/P1 全部交付。
+- **交付项**:
+  - ✅ **AI 角色库**：标准化专业角色，降低 Prompt 门槛。
+  - ✅ **设计思维引导**：5 Why + 方案对比，降低 50% 返工率。
+  - ✅ **互审机制**：对抗式编程，提升问题发现率。
+  - ✅ **Commit-Guided**：自动化文档同步，闭环设计与实施。
+  - ✅ **复杂度仪表盘**：量化技术债，让架构风险可见。
+  - ✅ **ADR 系统**：结构化记录重大设计决策。
+  - ✅ **工具/配置/摘要**：标准化框架底层交互，节省 30%+ Token。
+- **状态**: 已合并至主分支，进入持续维护与长效计划（`dev/plan/`）迭代阶段。
 
-**详见**: `dev/V3.0/README.md` 和 `dev/V3.0/PROGRESS.md`
 
 ---
 
@@ -730,7 +719,8 @@ project_root/
 ### 开发文档
 
 - [dev/FRAMEWORK_CONTEXT.md](./FRAMEWORK_CONTEXT.md) - 本文档（全局上下文）
-- [dev/V3.0/](./V3.0/) - V3.0 规划与进度
+- [dev/plan/](./plan/) - 框架长期迭代计划与蓝图
+
 
 ### 参考文档
 

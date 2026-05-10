@@ -17,10 +17,9 @@
 | `complexity/` | 复杂度仪表盘运行时（config + dashboard + data） |
 | `quality/` | 文档质量保证体系：标准、审查 SOP、contexts、归档 |
 | `V3.0/` | V3.0 规划、设计提案、进度跟踪（活跃） |
-| `V2.3/` `V2.2/` | 历史版本审查归档 |
 | `reference/` | 开发参考资料：理论分析、外部案例研究 |
-| `real_case/` | 真实项目案例素材（驱动框架演进的样本） |
 | `case_skillatlas_review/` | SkillAtlas 项目审查案例（V3.0 019 ADR 真实来源） |
+| `plan/` | 框架迭代的长期计划与蓝图（如 Skill Migration） |
 
 ## 开发 AI 的入口
 
