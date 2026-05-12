@@ -199,7 +199,7 @@ AI: [切换到 api_designer,完成详细设计]
 ## 🔗 相关文档
 
 - [AI 角色库总览](../README.md)
-- [职责型 Agent 列表](../README.md#角色索引)
+- [职责型 Agent 列表](../README.md#角色分类)
 - [自定义 Agent 指南](../custom/README.md)
 
 ---

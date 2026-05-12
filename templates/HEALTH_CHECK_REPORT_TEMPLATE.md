@@ -537,7 +537,7 @@ E. 保持现有文档
 ## 📚 相关文档
 
 - [document_health_check.md](../workflows/document_health_check.md) - 健康度检查流程
-- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md#场景4-文档健康度检查) - 场景 4 概述
+- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md#路由索引-routing-index) - 场景 4 概述
 - [incremental_update_workflow.md](../workflows/incremental_update_workflow.md) - 增量更新流程
 
 ---

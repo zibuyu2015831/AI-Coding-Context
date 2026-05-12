@@ -3,7 +3,7 @@ title: 文档摘要格式规范
 summary: 定义 AICC 框架所有 Markdown 文档强制 frontmatter 摘要的字段、格式、严格模式校验规则；为 V3.0-012 强制文档摘要机制的规范源（自指：本文件首部含示范级 frontmatter 作为规范的自证）
 keywords: frontmatter | summary | spec | yaml | v3-012
 scope: 框架内所有 .md 文档的 frontmatter 标准
-related_files: tools/py/summary_validator.py | tools/py/summary_extractor.py | dev/V3.0/confirmed/012-mandatory-doc-summary
+related_files: tools/py/summary_validator.py | tools/py/summary_extractor.py
 dependencies: 无
 verified_at: 2026-04-26
 ---

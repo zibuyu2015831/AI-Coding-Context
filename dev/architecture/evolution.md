@@ -3,7 +3,7 @@ title: "AICC 架构演进与决策图谱"
 summary: "展示 AICC 框架演进的总体依赖与时间线图谱，作为所有 ADR 的全局入口和相互关系的视觉中心。"
 keywords: architecture | evolution | graph | adr
 scope: "全局系统架构"
-related_files: "dev_docs/architecture/decisions/*.md"
+related_files: "dev/architecture/decisions/001-markdown-as-first-class-doc.md | dev/architecture/decisions/002-layered-documentation.md"
 dependencies: ""
 verified_at: "2026-04-12"
 ---

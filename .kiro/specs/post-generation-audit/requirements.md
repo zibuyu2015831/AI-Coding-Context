@@ -4,7 +4,7 @@ summary: 在用户使用框架完成文档体系搭建后，自动按照既定�
 keywords: 自动审核 | 质量保证 | 文档验证 | 后置检查 | 框架合规性
 scope: 框架核心功能 - 文档生成后质量保证
 related_files: workflows/path_a_first_generation.md | workflows/shared/ai_checklist.md
-dependencies: dev/real_case/002/quality_review/COMPREHENSIVE_AUDIT.md
+dependencies: 无
 verified_at: 2025-12-19
 ---
 

@@ -264,7 +264,7 @@ cat dev_docs/_analysis/audit_report.md
 
 ### 参考案例
 
-- [002案例审核报告](../../../dev/real_case/002/quality_review/)
+- 002 案例审核报告为历史外部案例，当前仓库未随附 `dev/real_case/002/quality_review/` 归档。
   - COMPREHENSIVE_AUDIT.md - 8个遗漏项
   - MAIN_DOC_AUDIT.md - 主文档评估
   - DEFECT_ANALYSIS.md - 根因分析

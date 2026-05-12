@@ -77,7 +77,7 @@ write_file dev/quality/audits/YYYY-MM-DD_Version_Scope/Review_Plan_Specific.md
 - **死链/悬空引用扫描**：全仓库 grep 失效引用
 - **AI_RULES 加载模拟**：评估 `templates/AI_RULES_TEMPLATE.md` 在 IDE 环境中的提示质量
 
-详见 [Framework_Review_Guidelines.md §子代理委派策略](./Framework_Review_Guidelines.md#-子代理委派策略-sub-agents-strategy)。
+详见 [Framework_Review_Guidelines.md §子代理委派策略](./Framework_Review_Guidelines.md#子代理委派策略-sub-agents-strategy)。
 
 ### 执行阶段
 1. 按照 `Framework_Review_Guidelines.md` 执行各项审查活动

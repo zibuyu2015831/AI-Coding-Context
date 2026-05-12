@@ -1408,7 +1408,7 @@ E. 保持现有文档
 
 ## 🔗 相关文档
 
-- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md#场景4-文档健康度检查) - 智能工作流分流
+- [AI_ENTRY_POINT.md](../AI_ENTRY_POINT.md#路由索引-routing-index) - 智能工作流分流
 - [incremental_update_workflow.md](./incremental_update_workflow.md) - 增量更新流程
 - [core/update_triggers.md](../core/update_triggers.md) - 文档更新触发机制
 - [workflows/doc_error_fix_workflow.md](./doc_error_fix_workflow.md) - 文档谬误修复工作流（011 优化点）⭐

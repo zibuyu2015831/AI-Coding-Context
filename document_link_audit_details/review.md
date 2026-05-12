@@ -90,6 +90,15 @@ These notes do not invalidate the audit; they prevent treating pattern reference
 | `templates/` | Directory exists, no `README.md`. | Add `templates/README.md` or link concrete template files. |
 | `workflows/` | Directory exists, no `README.md`; `workflows/shared/README.md` exists. | Add `workflows/README.md` or change the link to a concrete workflow index. |
 
+## Follow-up Full-Repository Sweep
+
+After the report-driven fixes, a broader repository sweep was run against files outside the original actionable report scope. It surfaced 25 additional scanner records. Manual recheck found 3 true issues and 22 intentional template/example records:
+
+- True issue: `.kiro/specs/post-generation-audit/requirements.md` frontmatter depended on missing `dev/real_case/002/quality_review/COMPREHENSIVE_AUDIT.md`; fixed by clearing the stale dependency.
+- True issue: `.kiro/specs/post-generation-audit/QUICK_START.md` linked to missing historical case directory `dev/real_case/002/quality_review/`; fixed by converting it to a non-linked historical note.
+- True issue: `dev/quality/Start_Review.md` linked to `Framework_Review_Guidelines.md#-子代理委派策略-sub-agents-strategy`; fixed to the actual heading anchor.
+- Non-actionable records: template placeholders such as `./xxx.md`, `相对路径`, generated-project examples under `templates/`, and monorepo package examples remain illustrative references rather than repository documents.
+
 ## Independent Review Commands
 
 The review used an independent verifier script at `/private/tmp/review_document_link_audit.py` and targeted repository checks:

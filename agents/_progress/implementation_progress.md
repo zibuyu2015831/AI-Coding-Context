@@ -4,7 +4,7 @@ summary: 记录 001 AI 角色库实施过程中的整体进度、阶段状态与
 keywords: progress | agent-library | implementation | tracking | 001 | aicc
 scope: AI 角色库实施进度记录
 related_files: 无
-dependencies: dev/V3.0/confirmed/001-ai-agent-library/001-ai-agent-library.md | agents/README.md
+dependencies: agents/README.md
 verified_at: 2026-05-05
 ---
 

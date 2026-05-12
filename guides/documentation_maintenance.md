@@ -317,7 +317,7 @@ git tag -a docs-v1.1 -m "Added authentication module documentation"
 ## 🔗 相关资源
 
 - [更新触发机制](../core/update_triggers.md) - 详细的更新触发条件
-- [质量检查清单](../templates/GENERATION_PLAN_TEMPLATE.md#质量检查清单) - 模板中的质量标准
+- [质量检查清单](../templates/GENERATION_PLAN_TEMPLATE.md#质量检查清单-quality-checklist) - 模板中的质量标准
 - [Plans 目录使用](../templates/plans_README_TEMPLATE.md) - 方案文档管理
 - [Knowledge 目录使用](../templates/knowledge_README_TEMPLATE.md) - 知识沉淀指南
 

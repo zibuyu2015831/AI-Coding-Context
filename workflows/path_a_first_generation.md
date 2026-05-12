@@ -335,7 +335,7 @@ find . -type f | wc -l
 = 2.5 级 → 大型项目策略
 ```
 
-**详细检测方法**: 参见 [决策流程](./decision_workflow.md#复杂度检测)
+**详细检测方法**: 参见 [决策流程](./decision_workflow.md#步骤-2-策略决策)
 
 ---
 
@@ -763,7 +763,7 @@ design_thinking:
 
 ### 8.4 生成 AI Rules 文件
 
-**位置**: `dev_docs/rules/combined/AI_RULES.md`（详见 [`core/framework_spec.md` "标准产物路径"章节](../core/framework_spec.md#-标准产物路径ssot)）
+**位置**: `dev_docs/rules/combined/AI_RULES.md`（详见 [`core/framework_spec.md` "标准产物路径"章节](../core/framework_spec.md#标准产物路径ssot)）
 
 **目的**: 为后续 AI 交互提供项目特定的规则和上下文
 
@@ -927,4 +927,4 @@ design_thinking:
 
 ## 📌 导航
 
-[← 返回主文档](../AI_ENTRY_POINT.md) | [查看其他路径](../AI_ENTRY_POINT.md#路由索引)
+[← 返回主文档](../AI_ENTRY_POINT.md) | [查看其他路径](../AI_ENTRY_POINT.md#路由索引-routing-index)

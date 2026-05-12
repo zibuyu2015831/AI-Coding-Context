@@ -4,7 +4,7 @@ summary: AI 代理执行项目复杂度扫描、阈值判定、告警与决策�
 keywords: complexity | alert | scenario-4 | path-d | dogfood | aicc-v3
 scope: AI 在用户项目中执行复杂度告警剧本时调用本工作流；亦适用于框架仓库自审（dogfood）
 related_files: tools/py/complexity_scanner.py | tools/js/complexity_scanner.js | tools/py/report_generator.py | tools/js/report_generator.js
-dependencies: workflows/path_d_specific_tasks.md | tools/README.md | dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md
+dependencies: workflows/path_d_specific_tasks.md | tools/README.md
 verified_at: 2026-04-26
 ---
 

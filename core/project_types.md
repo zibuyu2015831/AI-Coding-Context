@@ -3,7 +3,7 @@ title: 项目类型索引与决策树
 summary: 提供13种项目类型的快速决策树和索引，支持按需加载对应的详细配置文档。包括Web前端、后端API、全栈、CLI工具、库/SDK、脚本、移动应用、桌面应用、Serverless、容器化、数据科学、微服务架构、AI/LLM应用。
 keywords: project-types | index | decision-tree | on-demand-loading
 scope: 项目类型识别与按需加载
-related_files: core/project_types/*.md | AI_ENTRY_POINT.md | workflows/path_a_first_generation.md
+related_files: core/project_types/README.md | AI_ENTRY_POINT.md | workflows/path_a_first_generation.md
 dependencies: 无
 verified_at: 2026-01-21
 ---

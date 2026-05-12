@@ -322,7 +322,7 @@ git add ai_coding_context/
 | 问题报告       | `dev_docs/_analysis/project_analysis_report.md` | 项目问题报告                     |
 | 进度记录       | `dev_docs/_analysis/generation_progress.md`     | 生成进度跟踪                     |
 
-> **SSOT 提示**：所有产物路径以 [`core/framework_spec.md` "标准产物路径"章节](core/framework_spec.md#-标准产物路径ssot) 为权威源。
+> **SSOT 提示**：所有产物路径以 [`core/framework_spec.md` "标准产物路径"章节](core/framework_spec.md#标准产物路径ssot) 为权威源。
 
 ### 工具脚本标准
 
@@ -594,7 +594,7 @@ graph TD
 
 **降级策略**: Python 工具 → Node.js 工具 → Fallback 命令
 
-**详细操作**: 参见 [workflows/detection_workflow.md](./workflows/detection_workflow.md#环境预检)
+**详细操作**: 参见 [workflows/detection_workflow.md](./workflows/detection_workflow.md#步骤-0-环境预检)
 
 **完整的错误处理策略**: 包括所有错误类型、降级方案和 Fallback 命令，详见上述文档
 
