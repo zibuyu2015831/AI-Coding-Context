@@ -43,7 +43,7 @@ Generated: 2026-05-12
 | `example_or_template_reference` | `dev/quality/contexts/_template.md` | 60 | inline | `[文档 2 名称](相对路径)` | `dev/quality/contexts/相对路径` |  |
 | `example_or_template_reference` | `dev/quality/contexts/_template.md` | 64 | inline | `[文档 1 名称](相对路径)` | `dev/quality/contexts/相对路径` |  |
 | `example_or_template_reference` | `dev/quality/contexts/_template.md` | 65 | inline | `[文档 2 名称](相对路径)` | `dev/quality/contexts/相对路径` |  |
-| `example_or_template_reference` | `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | inline | `[LICENSE](LICENSE)` | `dev/reference/ai-coding-prompt-java-main/LICENSE` |  |
+| `missing_target` | `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | inline | `[LICENSE](LICENSE)` | `dev/reference/ai-coding-prompt-java-main/LICENSE` | Reference-import documentation link; not a template placeholder. |
 | `example_or_template_reference` | `templates/AI_Coding_Context_TEMPLATE.md` | 110 | inline | `[**实用脚本库**](./tools/README.md)` | `templates/tools/README.md` |  |
 | `example_or_template_reference` | `templates/AI_Coding_Context_TEMPLATE.md` | 192 | inline | `[plans/README.md](./plans/README.md)` | `templates/plans/README.md` |  |
 | `example_or_template_reference` | `templates/AI_Coding_Context_TEMPLATE.md` | 215 | inline | `[plans/README.md](./plans/README.md)` | `templates/plans/README.md` |  |

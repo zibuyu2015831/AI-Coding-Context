@@ -17,7 +17,7 @@ The review did not modify audited source documentation.
 
 - `issues.md` contains 51 issue rows.
 - The report issue counts match `issues.md`.
-- The severe issue count in the report, excluding `example_or_template_reference`, matches `issues.md`: 27 records across 19 source files.
+- The severe issue count in the report, excluding `example_or_template_reference`, matches `issues.md`: 28 records across 20 source files.
 - Every issue row points to an existing source file and an in-range source line.
 - Every inline issue row is present on the recorded source line after correcting one raw-link transcription issue.
 - Every `missing_target` target remains absent as a literal repository path.
@@ -25,7 +25,7 @@ The review did not modify audited source documentation.
 - Every `directory_without_readme` target is an existing directory without `README.md`.
 - Every `release_boundary_risk` row is from a non-`dev/` source document and points into `dev/`.
 
-## Correction Made During Review
+## Corrections Made During Review
 
 One issue row had an inaccurate `Raw Link` value caused by code-span masking in the previous extraction pass:
 
@@ -35,6 +35,14 @@ One issue row had an inaccurate `Raw Link` value caused by code-span masking in 
 
 The issue type remains `example_or_template_reference`; only the recorded source text was corrected.
 
+One issue row was misclassified as a template/example reference:
+
+| Source | Line | Raw Link | Previous Type | Corrected Type |
+|---|---:|---|---|---|
+| `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | `[LICENSE](LICENSE)` | `example_or_template_reference` | `missing_target` |
+
+This link is in imported reference documentation, but the target `dev/reference/ai-coding-prompt-java-main/LICENSE` is absent and the source text is not a placeholder. The total issue-record count remains 51; `missing_target` increases to 9 and `example_or_template_reference` decreases to 23.
+
 ## Classification Notes
 
 The severe issue rows are valid under the audit's documented "concrete internal document link" rule. Some rows need careful handling during remediation:
@@ -42,6 +50,7 @@ The severe issue rows are valid under the audit's documented "concrete internal 
 - `core/project_types.md` uses `core/project_types/*.md` in frontmatter. This is not a literal file path; it is a glob-style dependency reference to a directory of existing project-type documents. Treat the fix as making frontmatter machine-resolvable, for example by linking `core/project_types/README.md` or enumerating concrete files.
 - `dev/architecture/decisions/002-layered-documentation.md` uses `dev_docs/*`. This reads as a user-project documentation pattern, not a repository file. If frontmatter must contain only repository documents, move this concept to body text or replace it with concrete framework docs.
 - `dev/architecture/evolution.md` uses `dev_docs/architecture/decisions/*.md`. The surrounding document describes framework ADRs, so the practical fix is likely to reference `dev/architecture/decisions/` or enumerate concrete ADR files, not to create `dev_docs/`.
+- `dev/reference/ai-coding-prompt-java-main/README.md` links `[LICENSE](LICENSE)`. Because this is imported reference material under `dev/reference/`, the fix should preserve upstream intent where possible: restore the missing license file if available, or remove/annotate the license reference if this snapshot intentionally omits it.
 
 These notes do not invalidate the audit; they prevent treating pattern references as ordinary missing Markdown files.
 
@@ -58,6 +67,7 @@ These notes do not invalidate the audit; they prevent treating pattern reference
 | `dev/architecture/decisions/002-layered-documentation.md` | `dev_docs/*` | Remove from frontmatter or replace with concrete framework docs; this appears to describe user-project output rather than a repo document. |
 | `dev/architecture/decisions/002-layered-documentation.md` | `001-markdown-as-first-class-doc` | Add the `.md` suffix: `001-markdown-as-first-class-doc.md`. |
 | `dev/architecture/evolution.md` | `dev_docs/architecture/decisions/*.md` | Replace with concrete ADR paths under `dev/architecture/decisions/`, or link the ADR directory and add a `README.md` if directory links are desired. |
+| `dev/reference/ai-coding-prompt-java-main/README.md` | `LICENSE` | Restore the referenced license file from the imported project, or remove/annotate the license link if the reference snapshot intentionally excludes license metadata. |
 | `workflows/complexity_alert_workflow.md` | `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` | Replace with a current public workflow/tool document, or restore the historical walkthrough if it is still required. |
 
 ### Missing Anchors

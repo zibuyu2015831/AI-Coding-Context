@@ -596,7 +596,7 @@ Generated: 2026-05-12
 | `dev/reference/ai-coding-prompt-java-main/README.md` | 235 | inline | `prompt整体介绍.md` | `dev/reference/ai-coding-prompt-java-main/prompt整体介绍.md` | ok | - |
 | `dev/reference/ai-coding-prompt-java-main/README.md` | 238 | inline | `prompt使用示例.md` | `dev/reference/ai-coding-prompt-java-main/prompt使用示例.md` | ok | - |
 | `dev/reference/ai-coding-prompt-java-main/README.md` | 241 | inline | `工程结构/工程结构.md` | `dev/reference/ai-coding-prompt-java-main/工程结构/工程结构.md` | ok | - |
-| `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | inline | `LICENSE` | `dev/reference/ai-coding-prompt-java-main/LICENSE` | issue | example_or_template_reference |
+| `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | inline | `LICENSE` | `dev/reference/ai-coding-prompt-java-main/LICENSE` | issue | missing_target |
 | `guides/ai_rules_maintenance.md` | 7 | frontmatter | `AI_ENTRY_POINT.md` | `AI_ENTRY_POINT.md` | ok | - |
 | `guides/ai_rules_maintenance.md` | 7 | frontmatter | `templates/AI_RULES_TEMPLATE.md` | `templates/AI_RULES_TEMPLATE.md` | ok | - |
 | `guides/ai_rules_maintenance.md` | 7 | frontmatter | `workflows/commit_guided_update.md` | `workflows/commit_guided_update.md` | ok | - |

@@ -7,19 +7,19 @@ Generated: 2026-05-12
 - Markdown files scanned: **253**
 - Internal document links identified: **894**
 - Issue records: **51**
-- Real breakage / release-risk records excluding template examples: **27**
-- Files with real breakage / release-risk records: **19**
+- Real breakage / release-risk records excluding template examples: **28**
+- Files with real breakage / release-risk records: **20**
 
 ## Issue Counts
 
 | Type | Count |
 |---|---:|
-| `missing_target` | 8 |
+| `missing_target` | 9 |
 | `missing_anchor` | 10 |
 | `case_mismatch` | 0 |
 | `directory_without_readme` | 6 |
 | `release_boundary_risk` | 3 |
-| `example_or_template_reference` | 24 |
+| `example_or_template_reference` | 23 |
 
 ## Severe Issues
 
@@ -34,6 +34,7 @@ This section excludes `example_or_template_reference` so template placeholders d
 | `missing_target` | `dev/architecture/decisions/002-layered-documentation.md` | 6 | `dev_docs/*` | `dev/architecture/decisions/dev_docs/*` |
 | `missing_target` | `dev/architecture/decisions/002-layered-documentation.md` | 7 | `001-markdown-as-first-class-doc` | `dev/architecture/decisions/001-markdown-as-first-class-doc` |
 | `missing_target` | `dev/architecture/evolution.md` | 6 | `dev_docs/architecture/decisions/*.md` | `dev/architecture/dev_docs/architecture/decisions/*.md` |
+| `missing_target` | `dev/reference/ai-coding-prompt-java-main/README.md` | 471 | `LICENSE` | `dev/reference/ai-coding-prompt-java-main/LICENSE` |
 | `missing_target` | `workflows/complexity_alert_workflow.md` | 7 | `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` | `dev/V3.0/confirmed/005-complexity-dashboard/walkthrough.md` |
 | `missing_anchor` | `agents/personas/README.md` | 202 | `../README.md#角色索引` | `agents/README.md` |
 | `missing_anchor` | `AI_ENTRY_POINT.md` | 597 | `./workflows/detection_workflow.md#环境预检` | `workflows/detection_workflow.md` |
@@ -65,7 +66,7 @@ This section excludes `example_or_template_reference` so template placeholders d
 | `dev/FRAMEWORK_CONTEXT.md` | 2 | 0 | 0 | 0 | 0 | 2 | 0 |
 | `dev/architecture` | 6 | 4 | 0 | 0 | 0 | 0 | 2 |
 | `dev/quality` | 6 | 0 | 0 | 0 | 0 | 0 | 6 |
-| `dev/reference` | 1 | 0 | 0 | 0 | 0 | 0 | 1 |
+| `dev/reference` | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
 | `guides` | 2 | 0 | 1 | 0 | 0 | 1 | 0 |
 | `templates` | 9 | 0 | 1 | 0 | 0 | 0 | 8 |
 | `workflows` | 13 | 1 | 6 | 0 | 1 | 2 | 3 |
@@ -84,6 +85,7 @@ This section excludes `example_or_template_reference` so template placeholders d
 | `AI_ENTRY_POINT.md` | 1 |
 | `core/project_types.md` | 1 |
 | `dev/architecture/evolution.md` | 1 |
+| `dev/reference/ai-coding-prompt-java-main/README.md` | 1 |
 | `guides/documentation_maintenance.md` | 1 |
 | `guides/generation_workflow.md` | 1 |
 | `templates/HEALTH_CHECK_REPORT_TEMPLATE.md` | 1 |
@@ -111,4 +113,4 @@ This section excludes `example_or_template_reference` so template placeholders d
 
 ## Strict Review Status
 
-This report was rechecked against the current repository on 2026-05-12. The review found one inaccurate `Raw Link` transcription in `issues.md` and corrected it; the issue classification and counts did not change. See `document_link_audit_details/review.md` for the verification evidence and remediation notes.
+This report was rechecked against the current repository on 2026-05-12. The review found one inaccurate `Raw Link` transcription in `issues.md` and one misclassified reference-import `LICENSE` link. Both were corrected; the total issue-record count did not change, while `missing_target`, `example_or_template_reference`, and non-template issue totals changed accordingly. See `document_link_audit_details/review.md` for the verification evidence and remediation notes.
