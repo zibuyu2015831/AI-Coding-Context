@@ -173,30 +173,35 @@ references/
 
 #### 2.2.3 `incremental-update`
 
-**职责**：根据 git 变更智能更新已有文档；包含 commit-guided 路径与 git 安全防护。
+**职责**：围绕 Git 变更提供两类能力：提交前的结构化 commit 生成（commit-authoring / prepare-commit），以及提交后的 commit-guided 文档同步；包含 Git 安全防护。
 
 **触发 description（草稿）**：
-> Use when the user mentions @commit, asks to update docs after recent code changes, references specific commits, or wants to sync `dev_docs/` with the latest git state. Includes git safety checks (no force push, branch protection). NOT for first-time setup or for full audits.
+> Use when the user asks to create/prepare/review a git commit, generate a structured commit message, mentions @commit, asks to update docs after recent code changes, references specific commits, or wants to sync `dev_docs/` with the latest git state. Covers commit-authoring before commit and commit-guided documentation updates after commit. Includes git safety checks (no force push, branch protection). NOT for first-time setup or full audits.
 
 **SKILL.md 主体结构**：
 ```
 1. Overview
 2. When to Use / Not to Use
-3. Workflow（4 步：commit 分析 → 文档定位 → 安全检查 → 智能局部更新）
-4. Git Safety Gates（关键不可逆操作前的人工确认）
-5. Output Format
-6. Edge Cases（merge commits、cherry-pick、revert）
+3. Workflow A: Commit Authoring（状态检查 → diff 概览 → 选择 conventional/prompt 格式 → 生成 WHAT/WHY/HOW → 提交前确认）
+4. Workflow B: Commit-Guided Doc Update（commit 分析 → 文档定位 → 安全检查 → 智能局部更新）
+5. Git Safety Gates（关键不可逆操作前的人工确认）
+6. Output Format
+7. Edge Cases（merge commits、cherry-pick、revert、WIP/机械提交）
 ```
 
 **references/ 目录**：
 ```
 references/
+├── workflow_a_commit_authoring.md
+├── workflow_b_commit_guided_doc_update.md
 ├── step_1_commit_deep_analysis.md
 ├── step_2_doc_localization.md
 ├── step_3_git_safety_checks.md
 ├── step_4_smart_partial_update.md
+├── structured_commit_format.md   ← prompt(type) + WHAT/WHY/HOW
 ├── git_safety_rules.md          ← 来自 git_safety_workflow.md
 ├── edge_cases/
+│   ├── wip_and_mechanical_commits.md
 │   ├── merge_commits.md
 │   ├── cherry_pick.md
 │   └── revert.md
@@ -206,9 +211,10 @@ references/
 
 **依赖**：
 - `scripts/py/git_diff_analyzer.py`、`git_safety.py`、`manage_fix_with_git.py`
+- `scripts/py/commit_template_cli.py`、`commit_quality_scorer.py`、`commit_parser.py`、`commit_integrity_validator.py`
 - `references/security_rules.md`
 
-**估算规模**：SKILL.md ≈ 280 行，references ≈ 1200 行。
+**估算规模**：SKILL.md ≈ 320 行，references ≈ 1500 行。
 
 ---
 
@@ -600,7 +606,7 @@ description: <Use when ...>
 | `commit_integrity_validator.py/.js` | Commit 完整性校验 | incremental-update |
 | `commit_parser.py/.js` | 结构化 Commit 解析 | incremental-update |
 | `commit_quality_scorer.py/.js` | Commit 质量评分 | incremental-update |
-| `commit_template_cli.py/.js` | Commit 模板 CLI | incremental-update |
+| `commit_template_cli.py/.js` | Commit 模板 CLI；支持提交前生成结构化 message | incremental-update |
 | `git_inspector.py/.js` | Git 状态检查 | incremental-update |
 | `install_hooks.py/.js` | git-hooks 安装辅助 | plugin 顶级（hooks/） |
 

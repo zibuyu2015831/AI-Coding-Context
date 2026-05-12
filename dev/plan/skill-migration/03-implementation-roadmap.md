@@ -219,19 +219,22 @@ plugin/
 
 ### 6.1 目标
 
-单独迁移 `incremental-update`，覆盖 Git 变更分析、commit-guided 文档更新、Git 安全检查和局部文档修改。此阶段单独拆出，是因为它包含写文件、读 Git 历史、可能安装 hooks，风险明显高于 `init` / `health-check`。
+单独迁移 `incremental-update`，覆盖提交前的结构化 commit 生成、Git 变更分析、commit-guided 文档更新、Git 安全检查和局部文档修改。此阶段单独拆出，是因为它包含写文件、读 Git 历史、可能安装 hooks，风险明显高于 `init` / `health-check`。
 
 ### 6.2 交付物
 
 #### Skill 3：`incremental-update`
 
-- SKILL.md（≈ 280 行）+ commit_analysis / git_safety / smart_partial_update references
+- SKILL.md（≈ 320 行）+ commit_authoring / commit_analysis / git_safety / smart_partial_update references
 - 嵌入：commit_analyst runtime agent
-- 调用脚本：git_diff_analyzer、git_safety、manage_fix_with_git、commit_parser、commit_quality_scorer
-- `bin/` 包装命令：`aicc-git-diff`、`aicc-git-safety`、`aicc-doc-update`
+- 调用脚本：git_diff_analyzer、git_safety、manage_fix_with_git、commit_template_cli、commit_parser、commit_quality_scorer、commit_integrity_validator
+- `bin/` 包装命令：`aicc-commit-message`、`aicc-commit-score`、`aicc-git-diff`、`aicc-git-safety`、`aicc-doc-update`
 
 ### 6.3 验收标准
 
+- [ ] 用户说 "commit these changes" / "提交当前改动" / "prepare commit message" → 自动触发 `incremental-update` 的 commit-authoring 子流程
+- [ ] 方案、架构、功能、修复、迁移类提交默认生成 `prompt(type)` + `WHAT/WHY/HOW` 结构化 commit message
+- [ ] 小型机械修改可降级为普通 Conventional Commit，并在输出中说明原因
 - [ ] 用户 commit 后说 "@commit" 或 "update docs" → 自动触发 `incremental-update`
 - [ ] 所有写入 dev_docs/ 的操作先输出计划，再执行局部更新
 - [ ] Git 安全检查能识别 dirty worktree、未跟踪文件、危险分支和 hook 安装风险
@@ -248,7 +251,7 @@ plugin/
 | # | 风险 | 缓解 |
 |---|---|---|
 | P1.5-1 | Git 操作误伤用户工作区 | 强制 dry-run / plan-first / 人工确认；不自动执行 destructive 命令 |
-| P1.5-2 | commit-guided 与普通增量更新边界不清 | description 中明确 @commit / commit hash / recent changes 才进入 commit-guided |
+| P1.5-2 | commit-authoring、commit-guided 与普通增量更新边界不清 | description 中明确提交前请求进入 commit-authoring；@commit / commit hash / recent changes 进入 commit-guided |
 | P1.5-3 | hook 安装触发权限或信任问题 | hook 安装永远显式确认，默认只给说明和脚本路径 |
 
 ### 8.6 里程碑产出
