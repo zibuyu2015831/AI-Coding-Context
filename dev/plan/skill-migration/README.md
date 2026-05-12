@@ -44,20 +44,22 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 
 ## 三、核心决策共识（已锁定）
 
-下表为 brainstorm 阶段与维护者达成的 10 项核心决策。任何后续设计、实施、复审都以此为基准；如需变更须走"决策变更"流程并在本表登记修订日期。
+下表为 brainstorm 阶段与 2026-05-12 架构复检后达成的核心决策。任何后续设计、实施、复审都以此为基准；如需变更须走"决策变更"流程并在本表登记修订日期。
 
 | # | 决策项 | 锁定值 | 决策依据（精简） |
 |---|---|---|---|
 | 1 | 整体走向 | **C：skill-first，clone 兜底** | 兼顾"主推方式 = skill"与"老用户/无 skill 工具不被抛弃" |
 | 2 | 打包形态 | **单 plugin × 多扁平 skill** | Anthropic 官方 `document-skills` 与 superpowers 的双重实证 |
 | 3 | 总入口 skill | **❌ 不设** | description 字段已承担路由职责；总入口会让 Claude 跳过实际 skill 内容（writing-skills 警示） |
-| 4 | skill 前缀 | **`aicc-` 固定前缀** | 跨 plugin 不冲突；用户搜 `aicc` 一目了然 |
-| 5 | plugin 名 | **`aicc`** | 与项目内部缩写、skill 前缀对齐；短、好记 |
-| 6 | 多平台 | **Claude Code 优先 → Gemini 二期 → Codex/Copilot CLI 列 backlog** | 控制测试矩阵；保留 AICC 跨工具 DNA |
-| 7 | tools 打包 | **plugin 级 `scripts/`，Python 主、JS 降级** | 多 skill 共用脚本应提到 plugin 层；保留 fallback/ 的无运行时方案 |
-| 8 | runtime agents | **嵌入对应 skill 的 references/agents/** | 与 workflow 强耦合，分散更合理 |
-| 9 | development agents | **升格为 plugin `agents/` subagent** | 用户开发期使用，Claude Code 原生体验最好 |
-| 10 | 仓库布局 | **`dev/` 不动；新增 `plugin/` 目录承载 skill 源码** | 框架开发与 plugin 产物清晰分离；release 仅发 plugin/ |
+| 4 | skill 命名 | **Claude Code plugin 内使用短名：`init` / `health-check` / `incremental-update`** | Claude Code 已用 plugin 名自动命名空间化（如 `/aicc:init`）；再写 `aicc-init` 会变成 `/aicc:aicc-init`，对资深用户冗余 |
+| 5 | 多平台命名 | **flat skill 包构建时再加 `aicc-` 前缀** | Codex/Copilot 等无 plugin namespace 的平台需要防冲突；前缀应是发布适配层，不污染 Claude Code 主形态 |
+| 6 | plugin 名 | **`aicc`** | 短、稳定、可作为 Claude Code namespace；若 marketplace 冲突再改 plugin 名，skill 语义名不变 |
+| 7 | 多平台 | **Claude Code 优先 → Gemini 二期 → Codex/Copilot flat repackage backlog** | 控制测试矩阵；保留 AICC 跨工具 DNA，但不让二级平台约束主设计 |
+| 8 | tools 打包 | **plugin 级 `bin/` 包装命令 + `scripts/` 原始脚本；Python 主、JS 降级** | `bin/` 可把可执行命令加入 PATH，减少 `${CLAUDE_PLUGIN_ROOT}` 依赖；scripts 保留源码与降级能力 |
+| 9 | runtime agents | **嵌入对应 skill 的 references/agents/** | 与 workflow 强耦合，分散更合理；映射必须以真实仓库清单为准 |
+| 10 | development agents | **仅迁移真实存在且用户开发期高频的 agents 到 plugin `agents/`** | 避免按规划虚构角色；先迁移 `api_designer`、`architecture_analyst`、`database_designer`、`product_manager` 等真实资产 |
+| 11 | 仓库布局 | **源仓库保留现有目录；新增 `plugin/` 作为发布层源码，release 由 build-time copy 生成** | 框架开发与 plugin 产物清晰分离；不用 symlink 作为发布机制，降低 Windows 和压缩包风险 |
+| 12 | 显式 commands | **MVP 暂不做 `commands/`，必要时 Phase 1 后补少量 shortcut** | Claude Code 官方建议新 plugin 优先用 `skills/`；过早引入 commands 会形成两套路由和两套文档入口 |
 
 > 注：上表的"决策依据"是浓缩版；完整推理过程见 `01-feasibility-and-architecture.md` 第四章。
 
@@ -94,6 +96,7 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 | 日期 | 修订内容 | 修订人 |
 |---|---|---|
 | 2026-04-26 | 初版产出（含 6 份文档） | Framework Team |
+| 2026-05-12 | 架构复检：更新命名、发布层、bin 包装、commands、真实资产清单等决策 | Codex |
 
 ---
 
@@ -107,7 +110,9 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 | **clone 模式** | 当前主流使用方式：用户把整个 AICC 仓库 clone 到自己项目里、发送 AI_ENTRY_POINT.md 给 AI |
 | **skill-first** | 本规划目标方式：用户安装 plugin、由 skill description 自动触发，不再 clone 仓库 |
 | **plugin** | Claude Code 插件（包含 skills/、agents/、commands/、hooks/、scripts/ 的发布单元） |
-| **skill** | 单个 SKILL.md + 可选 references/scripts 的功能单元，由 description 触发 |
+| **skill** | 单个 SKILL.md + 可选 references/scripts/assets 的功能单元，由 description 触发；Claude Code plugin 内由 plugin name 自动命名空间化 |
+| **flat skill 包** | 面向无 plugin namespace 平台的再打包产物，构建时把 `init` 等短名转换为 `aicc-init` 等全局唯一名 |
+| **build-time copy** | 发布前从 `core/`、`workflows/`、`templates/`、`agents/`、`tools/` 复制必要资产到 `plugin/`，并生成/校验资产清单；替代 symlink 作为发布机制 |
 | **subagent** | Claude Code 的专项 Agent（plugin 的 agents/ 目录），可被 Agent tool 调用 |
 | **progressive disclosure** | Anthropic 官方 skill 设计原则：SKILL.md 当目录、details 按需 Read 加载 |
 | **CSO** | Claude Search Optimization：让 description 字段更易被 Claude 找到的优化方法 |
@@ -119,4 +124,4 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 1. 维护者（你）阅读 6 份文档，记录任何反对意见或补充
 2. 召开/约定一次 review 节点，确认所有锁定决策仍然成立
 3. 决定是否将本规划登记到 `dev/V3.0/PROGRESS.md`（若立项后归类为 V3.1 或 V4.0 工作项）
-4. 立项后进入 Phase 0：搭建 `plugin/` 骨架、起草第一个 skill MVP（推荐 `aicc-init`）
+4. 立项后先进入 Phase 0a：技术验证 + 真实资产清单同步；审核通过后再搭建 `plugin/` 骨架、起草第一个 skill MVP（推荐 `init`）

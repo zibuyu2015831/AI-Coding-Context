@@ -23,14 +23,14 @@ verified_at: 2026-04-26
 
 | 紧迫度 | 数量 | 阻塞 Phase |
 |---|---|---|
-| **H 高** | 5 | Phase 0 |
-| **M 中** | 6 | Phase 0-2 |
+| **H 高** | 6 | Phase 0a-0b |
+| **M 中** | 5 | Phase 0b-2 |
 | **L 低** | 4 | Phase 3-5 |
 | **合计** | 15 | — |
 
 ---
 
-## 二、高紧迫度（H）—— Phase 0 启动前必须有结论
+## 二、高紧迫度（H）—— Phase 0a 启动后、Phase 0b 前必须有结论
 
 ### Q1：plugin.json schema 与 Anthropic 当前版本约束
 
@@ -53,20 +53,21 @@ verified_at: 2026-04-26
 
 ---
 
-### Q2：`${CLAUDE_PLUGIN_ROOT}` 是否为标准环境变量
+### Q2：plugin 脚本调用主路径：`bin/` 是否可用，是否仍需 plugin root 环境变量
 
-**问题**：每个 skill 的 SKILL.md 需要调用 `scripts/py/*.py`，需要知道 plugin 根目录的绝对路径。当前不确定 Claude Code 是否提供此 ENV，名字是什么。
+**问题**：每个 skill 需要调用 `scripts/py/*.py`。2026-05-12 复检后主方案调整为 `bin/` 包装命令（如 `aicc-project-scan`）优先，避免直接依赖 `${CLAUDE_PLUGIN_ROOT}`。但仍需验证 Claude Code plugin 的 `bin/` 是否稳定加入 Bash PATH；如果不可用，才需要确定 plugin root 环境变量或自定义 `AICC_PLUGIN_ROOT`。
 
-**提出背景**：Phase 0 的 `scripts-call-convention.md` 必须明确这一点。
+**提出背景**：Phase 0b 的 `scripts-call-convention.md` 必须明确主路径与 fallback。
 
 **影响面**：所有 11 个 skill 的脚本调用语法。
 
 **决策方**：维护者 / 实测 Claude Code
 
 **解决路径**：
-1. 在测试环境设一个 dummy plugin，body 写 `echo $CLAUDE_PLUGIN_ROOT`，观察输出
-2. 查 Anthropic 文档
-3. 兜底方案：用相对路径 + `pwd` 推断（不优雅但可行）
+1. 在测试 plugin 中创建 `bin/aicc-smoke-test`，确认 Bash 是否可直接执行
+2. 若 `bin/` 可用，SKILL.md 统一调用包装命令
+3. 若 `bin/` 不可用，再测试是否存在稳定 plugin root ENV
+4. 兜底方案：要求用户/安装脚本设置 `AICC_PLUGIN_ROOT`
 
 **紧迫度**：H
 
@@ -74,14 +75,14 @@ verified_at: 2026-04-26
 
 ---
 
-### Q3：plugin 内 skill 跨目录引用是否允许（references → ../shared-references/）
+### Q3：plugin 内 skill 跨目录引用是否允许（skill references → plugin 顶级 references）
 
-**问题**：本规划假设每个 skill 可引用 plugin 顶级 `shared-references/`（用 `../shared-references/security_rules.md`）。但 Anthropic 官方说"references 1 层深"——这是指目录深度，还是引用链深度？
+**问题**：本规划假设每个 skill 可引用 plugin 顶级 `references/`（例如共享的 `references/security_rules.md`）。但 Anthropic 官方说"references 1 层深"——这是指目录深度，还是引用链深度？
 
-**提出背景**：如果 Anthropic 禁止跨 skill 目录引用，shared-references 就不可行，必须每个 skill 内部复制一份共享文件。
+**提出背景**：如果 Anthropic 禁止跨 skill 目录引用，plugin 顶级共享 references 就不可行，必须每个 skill 内部复制一份共享文件。
 
 **影响面**：
-- 影响 02-component-mapping §六（core/ → shared-references/）
+- 影响 02-component-mapping §六（core/ → references/）
 - 影响所有 skill 的 references/ 组织
 
 **决策方**：维护者 / 实测
@@ -89,7 +90,7 @@ verified_at: 2026-04-26
 **解决路径**：
 1. 看 document-skills 是否有跨 skill 引用案例（superpowers 的 brainstorming 的 `@graphviz-conventions.dot` 是同 skill 内引用，无参考价值）
 2. 直接试装一个跨引用 plugin，观察 Claude 是否能 Read 到
-3. 兜底方案：放弃 shared-references/，每个 skill 内部复制（增加维护成本）
+3. 兜底方案：放弃顶级共享 references，每个 skill 内部复制（增加维护成本）
 
 **紧迫度**：H
 
@@ -128,16 +129,16 @@ verified_at: 2026-04-26
 
 ### Q5：skill 之间的互调用机制
 
-**问题**：`aicc-init` Step 5.5 想委托给 `aicc-design-thinking`。三种实现：
-- (a) 在 SKILL.md 内调用 `Skill('aicc-design-thinking')` 工具
+**问题**：`init` Step 5.5 想委托给 `design-thinking`。三种实现：
+- (a) 在 SKILL.md 内显式引导加载 `/aicc:design-thinking`
 - (b) 调用 Subagent（development agent）
 - (c) 内嵌简版
 
 **提出背景**：本规划假设 (a) 可行，但未验证。如不行需走 (b) 或 (c)。
 
 **影响面**：
-- 决定 aicc-init 与 design-thinking、mutual-review 的关系
-- 决定 aicc-systematic-review 与 aicc-mutual-review、aicc-doc-fallacy-fix 的关系
+- 决定 init 与 design-thinking、mutual-review 的关系
+- 决定 systematic-review 与 mutual-review、doc-fallacy-fix 的关系
 - 整体 skill 生态的可组合性
 
 **决策方**：维护者 / 实测
@@ -218,26 +219,28 @@ verified_at: 2026-04-26
 
 ---
 
-### Q9：core/ → shared-references/ 同步策略（symlink vs build-time copy）
+### Q9：core/workflows/templates/agents/tools → plugin 发布层同步策略
 
-**问题**：clone 模式下 `core/` 与 plugin 模式下 `plugin/shared-references/` 内容相同。如何避免漂移？
+**问题**：clone 模式下 `core/`、`workflows/`、`templates/`、`agents/`、`tools/` 是源码；plugin 模式下 `plugin/references/`、`plugin/skills/*/references/`、`plugin/scripts/` 是发布层副本。如何避免漂移？
 
-**提出背景**：双轨模式下 single source of truth 问题。
+**提出背景**：双轨模式下 single source of truth 问题。2026-05-12 复检后不再推荐 symlink 作为 release 机制，改为 build-time copy。
 
 **影响面**：
 - 维护成本
-- Windows 兼容（symlink 不可靠）
+- Windows / zip artifact / marketplace 兼容（symlink 不可靠）
+- 引用完整性（skill 引用的文件必须存在）
 
 **决策方**：维护者
 
 **解决路径**：
-- Linux/Mac：用 symlink
-- Windows：CI build-time copy
-- 准备 sync 脚本：`scripts/sync_shared_references.py`，每次 release 前自动同步
+- 本地开发可选 symlink，但不得进入 release artifact
+- Phase 0b 准备 build 脚本，从真实源码目录 copy 到 `plugin/`
+- 生成 `plugin-manifest.generated.json`，记录每个 skill 的 references/scripts/templates/agents 来源
+- CI 校验 manifest 中所有目标存在，且 release artifact 不包含 `__pycache__/`、开发审计文件、测试缓存
 
 **紧迫度**：M
 
-**状态**：🟡 待 Phase 0 设计
+**状态**：🟡 待 Phase 0b 设计
 
 ---
 
@@ -264,23 +267,24 @@ verified_at: 2026-04-26
 
 ---
 
-### Q11：runtime agents 的归属待确认条目
+### Q11：agents 真实资产归属待确认条目
 
-**问题**：02-component-mapping §3.1 中以下 agents 归属待定：
-- `agents/runtime/test_generator.md` → `aicc-init` 还是 `aicc-mutual-review`?
-- `agents/runtime/optimizer.md` → `aicc-complexity-dashboard` 还是其他?
+**问题**：02-component-mapping 初版中部分 agent 名称与真实仓库不一致。当前真实 runtime agents 包括 `code_reviewer.md`、`security_auditor.md`、`test_engineer.md`、`performance_optimizer.md` 等；development agents 当前真实存在 4 个：`api_designer.md`、`architecture_analyst.md`、`database_designer.md`、`product_manager.md`。
 
-**提出背景**：需查看现有 agent 内容才能精确归类。
+**提出背景**：需查看现有 agent 内容才能精确归类，避免按计划虚构不存在的角色。
 
 **影响面**：02 文档准确性。
 
 **决策方**：维护者
 
-**解决路径**：实施 Phase 1/2/3 时，逐个 agent 看其内容描述决定归属。
+**解决路径**：
+1. Phase 0b 生成真实 agents 清单
+2. 逐个 agent 阅读 frontmatter/正文，决定进入 plugin `agents/` 还是 skill references
+3. 不存在的角色如确需补齐，另行立项为新增资产，不能作为迁移默认项
 
-**紧迫度**：M
+**紧迫度**：H
 
-**状态**：🟡 待实施期决定
+**状态**：🔴 待 Phase 0b 决定
 
 ---
 

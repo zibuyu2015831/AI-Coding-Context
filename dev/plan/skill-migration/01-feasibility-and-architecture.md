@@ -106,7 +106,7 @@ description: <一句话>         # 必需，1024 字符内，第三人称，"Use
 
 **对 AICC 的启示**：
 - AICC 的能力既有"流程语义"型（`init`、`health-check`），也有"任务型"（`adr`、`mutual-review`），更接近**两者的混合**。
-- 命名风格选择 `aicc-init` / `aicc-health-check` 这样的"前缀 + 名词/动词"，介于两者之间，更稳。
+- 命名风格在 Claude Code plugin 内选择 `init` / `health-check` 这样的短名，由 plugin namespace 形成 `/aicc:init`；仅在 flat skill 包中使用 `aicc-init` / `aicc-health-check` 防冲突。
 - references 用量预计中等（templates、role 定义、长 workflow 都需要拆出去）。
 
 ### 2.3 Anthropic 官方最佳实践要点（精选）
@@ -160,24 +160,24 @@ description: <一句话>         # 必需，1024 字符内，第三人称，"Use
 
 | AICC 组件 | 可映射性 | 风险 | 备注 |
 |---|---|---|---|
-| **workflows/path_a_first_generation.md**（首次生成全流程） | 🟢 高 | 文件超 500 行，需拆 references | 自然映射为 `aicc-init` skill |
-| **workflows/path_b_health_check.md** | 🟢 高 | 健康检查模式 1/2/3 拆 references | 自然映射为 `aicc-health-check` |
-| **workflows/path_c_incremental_update.md + commit_guided_update.md + git_safety_workflow.md** | 🟢 高 | 三者合并为一个 skill；Git 操作要走 plugin 安全规范 | `aicc-incremental-update` |
-| **workflows/path_d_specific_tasks.md** | 🟡 中 | 是 D 路径的"散装入口"，应拆为多个 skill | 拆为 `aicc-design-thinking`、`aicc-mutual-review`、`aicc-doc-fallacy-fix` 等 |
+| **workflows/path_a_first_generation.md**（首次生成全流程） | 🟢 高 | 文件超 500 行，需拆 references | 自然映射为 `init` skill |
+| **workflows/path_b_health_check.md** | 🟢 高 | 健康检查模式 1/2/3 拆 references | 自然映射为 `health-check` |
+| **workflows/path_c_incremental_update.md + commit_guided_update.md + git_safety_workflow.md** | 🟢 高 | 三者合并为一个 skill；Git 操作要走 plugin 安全规范 | `incremental-update` |
+| **workflows/path_d_specific_tasks.md** | 🟡 中 | 是 D 路径的"散装入口"，应拆为多个 skill | 拆为 `design-thinking`、`mutual-review`、`doc-fallacy-fix` 等 |
 | **agents/runtime/\*.md**（commit_analyst、design_facilitator 等） | 🟢 高 | embed 到对应 skill 的 references/agents/ | 与 workflow 强耦合 |
-| **agents/development/\*.md**（frontend_expert 等） | 🟢 高 | 升格为 plugin agents/，作为 Claude Code subagent | 用户开发时使用 |
+| **agents/development/\*.md**（api_designer 等真实存在角色） | 🟢 高 | 选择性升格为 plugin agents/，作为 Claude Code subagent | 用户开发时使用；不得按计划虚构不存在角色 |
 | **tools/py/\*.py**（34 个 Python 脚本，含 commit / file / knowledge / content / summary / timestamp 等系列） | 🟢 高 | 全部移入 plugin scripts/，由 skill body 显式调用 | scripts 不进上下文，token 友好 |
 | **tools/js/\*.js**（34 个 Node.js 镜像 + 3 个 \*.test.js 回归测试） | 🟢 高 | 同样移入 plugin scripts/js/，作为 Python 不可用时的降级；测试文件用于 plugin 自检 | 保持 AICC 现有降级策略 |
 | **tools/fallback/\*.md** | 🟡 中 | 无运行时环境时使用，作为 plugin 一份独立 reference | 罕用，但保留 |
-| **tools/git-hooks/**（commit-guided 用 git hook 脚本） | 🟢 高 | 平移到 `plugin/hooks/git-hooks/` 或独立 scripts/hooks/ | aicc-incremental-update 引用 |
+| **tools/git-hooks/**（commit-guided 用 git hook 脚本） | 🟢 高 | 平移到 `plugin/hooks/git-hooks/` 或独立 scripts/hooks/ | incremental-update 引用 |
 | **tools/audit_complete_verification.sh**、**tools/CHANGELOG.md**、**tools/ROADMAP.md**、**tools/README.md** | ⚪ 不迁移 | 保留在框架仓库 tools/ 顶层，不进 plugin | 这些是 tools 自身的元信息/审计工具，与 plugin 用户场景无关 |
-| **templates/\*.md**（10+ 模板） | 🟢 高 | 按使用频度就近放进各 skill 的 references/templates/ | 主文档模板放 `aicc-init`；ADR 模板放 `aicc-adr` |
+| **templates/\*.md**（10+ 模板） | 🟢 高 | 按使用频度就近放进各 skill 的 references/templates/ | 主文档模板放 `init`；ADR 模板放 `adr`；需补 prompts/review/rules 子目录 |
 | **core/language_rules.md, security_rules.md, project_types.md** | 🟢 高 | 高频共享 → 提到 plugin 顶级 references/，由各 skill 引用 | 跨 skill 共享，不重复 |
 | **core/SUMMARY_FORMAT_SPEC.md** | 🟢 高 | 同上，作为顶级 reference | 摘要规范是底线规则 |
 | **core/framework_spec.md, design_decisions.md** | 🟡 中 | 偏框架自身设计文档，部分内容应内化到 plugin CLAUDE.md，部分留在框架仓库 dev/ | 见后文 §五 |
 | **config/user_config.md, CONFIG_TEMPLATE.md** | 🟡 中 | skill 模式下，框架级 config 已无意义；用户偏好走 Claude Code 自身 settings 或 dev_docs/configuration.md | 见 02-component-mapping §七 |
 | **guides/\*.md**（quick_start, language_support, ai_rules_maintenance 等） | 🟢 高 | 拆为：人类用户文档（plugin README.md）+ skill 内嵌内容 | 不再独立成 guides/ 目录 |
-| **dev/quality/**（V3.0+ 系统化文档审核） | 🟡 中 | 框架自身 dev 工具，继续留在 dev/，但其能力可 mirror 一份给用户作为 `aicc-systematic-review` | dogfood 边界，见 §五.3 |
+| **dev/quality/**（V3.0+ 系统化文档审核） | 🟡 中 | 框架自身 dev 工具，继续留在 dev/，但其能力可 mirror 一份给用户作为 `systematic-review` | dogfood 边界，见 §五.3 |
 
 **结论**：AICC 90% 以上能力可以 1:1 或 1:N 映射到 skill 体系；剩余 10% 是框架自身开发工作流（dev/），保持原样不动即可。
 
@@ -208,9 +208,9 @@ description: Use when a project does not yet have a dev_docs/AI_Coding_Context.m
 
 AICC 现有 `workflows/path_a_*.md` → `workflows/shared/failure_handling.md` → `core/security_rules.md` 是 3 层引用链。**必须拍平**：每个 skill 的 references 都直接由 SKILL.md 引用，不能 ref → ref。
 
-**应对**：plugin 顶级建立 `shared-references/` 区域承载跨 skill 共享内容（language_rules、security_rules、SUMMARY_FORMAT_SPEC），各 skill 的 SKILL.md 直接 `[详见 ../shared-references/security_rules.md](../shared-references/security_rules.md)`。
+**应对**：plugin 顶级建立 `references/` 区域承载跨 skill 共享内容（language_rules、security_rules、SUMMARY_FORMAT_SPEC），各 skill 的 SKILL.md 直接引用顶级 references；具体路径在 Phase 0a 实测后固化。
 
-> ⚠️ 待验证：Claude Code 是否允许 skill 跨目录引用 `../shared-references/`。若不允许，回退方案是每个 skill 内部复制一份；详见 `05-open-questions.md` Q3。
+> ⚠️ 待验证：Claude Code 是否允许 skill 跨目录引用 plugin 顶级 `references/`。若不允许，回退方案是每个 skill 内部复制一份；详见 `05-open-questions.md` Q3。
 
 #### 约束 4：AICC 当前 AI_ENTRY_POINT 的"路由代码"如何分布
 
@@ -240,14 +240,15 @@ AI_ENTRY_POINT.md 中有 100+ 行的路由决策表（`dev_docs/` 是否存在 �
 | 项 | 估算（人月） | 说明 |
 |---|---|---|
 | Phase 0：plugin 骨架 + 发布机制 | 0.5 | plugin.json、CI、releases 流程 |
-| Phase 1：3 个核心 skill MVP | 2.0 | aicc-init / health-check / incremental-update |
+| Phase 1：2 个低风险核心 skill MVP | 1.5 | init / health-check |
+| Phase 1.5：增量更新 skill | 0.75 | incremental-update / commit-guided / git-safety |
 | Phase 2：3 个 V3.0 高价值 skill | 1.5 | design-thinking / mutual-review / adr |
 | Phase 3：5 个剩余 V3.0 skill | 2.0 | complexity / fallacy-fix / systematic-review / doc-reading-habit / knowledge-reuse |
 | Phase 4：多平台扩展 | 0.5 | gemini-extension.json + 翻译 |
 | Phase 5：迁移指南 + clone 模式归档 | 0.5 | 文档 + 兼容测试 |
 | **合计** | **7.0 人月** | 约 6 个月并行推进 |
 
-**ROI**：单次 7 人月投入 vs 每年节省的累计用户成本 ≈ 第二年回本（按 100 新用户/年估算）。
+**ROI**：单次约 7.5 人月投入 vs 每年节省的累计用户成本 ≈ 第二年回本（按 100 新用户/年估算）。相比初版 7 人月，新增 0.5 人月主要用于 Phase 0a 技术验证、真实资产清单与增量更新拆分，目的是降低后期返工风险。
 
 ### 3.4 风险（高层）
 
@@ -265,7 +266,7 @@ AI_ENTRY_POINT.md 中有 100+ 行的路由决策表（`dev_docs/` 是否存在 �
 
 ## 四、整体架构设计
 
-### 4.1 选定方案：单 plugin × 多扁平 skill × 无总入口
+### 4.1 选定方案：单 plugin × 短名多 skill × 构建式发布层 × 无总入口
 
 ```
 aicc/                                 ← Claude Code plugin 根目录
@@ -273,7 +274,7 @@ aicc/                                 ← Claude Code plugin 根目录
 │   └── plugin.json                   ← plugin 元信息（Anthropic 标准）
 ├── README.md                         ← 人类用户的入门文档
 ├── CLAUDE.md                         ← AI 默认上下文（可选，承载 AICC 跨 skill 共识）
-├── shared-references/                ← 跨 skill 共享（language_rules、security_rules、SUMMARY_FORMAT_SPEC 等）
+├── references/                       ← 跨 skill 共享（language_rules、security_rules、SUMMARY_FORMAT_SPEC 等）
 │   ├── language_rules.md
 │   ├── security_rules.md
 │   ├── summary_format_spec.md
@@ -281,8 +282,8 @@ aicc/                                 ← Claude Code plugin 根目录
 │       ├── frontend.md
 │       ├── backend.md
 │       └── ...
-├── skills/                           ← 扁平 skill 命名空间，全部独立触发
-│   ├── aicc-init/
+├── skills/                           ← 扁平 skill 命名空间；Claude Code 会自动加 plugin namespace
+│   ├── init/                         ← 显式调用为 /aicc:init
 │   │   ├── SKILL.md
 │   │   └── references/
 │   │       ├── step_1_env_diagnosis.md
@@ -300,27 +301,26 @@ aicc/                                 ← Claude Code plugin 根目录
 │   │       └── agents/
 │   │           ├── design_facilitator.md
 │   │           └── summary_generator.md
-│   ├── aicc-health-check/
-│   ├── aicc-incremental-update/      ← 含 commit-guided + git-safety
-│   ├── aicc-design-thinking/
-│   ├── aicc-mutual-review/
-│   ├── aicc-adr/
-│   ├── aicc-complexity-dashboard/
-│   ├── aicc-doc-fallacy-fix/
-│   ├── aicc-systematic-review/
-│   ├── aicc-doc-reading-habit/
-│   └── aicc-knowledge-reuse/
+│   ├── health-check/
+│   ├── incremental-update/           ← 含 commit-guided + git-safety
+│   ├── design-thinking/
+│   ├── mutual-review/
+│   ├── adr/
+│   ├── complexity-dashboard/
+│   ├── doc-fallacy-fix/
+│   ├── systematic-review/
+│   ├── doc-reading-habit/
+│   └── knowledge-reuse/
 ├── agents/                           ← Claude Code subagent（development 角色）
-│   ├── aicc-frontend-expert.md
-│   ├── aicc-backend-expert.md
-│   ├── aicc-devops-expert.md
-│   ├── aicc-architect.md
+│   ├── api-designer.md
+│   ├── architecture-analyst.md
+│   ├── database-designer.md
+│   ├── product-manager.md
 │   └── ...
-├── commands/                         ← 显式 slash 命令，对应主要 skill
-│   ├── aicc-init.md
-│   ├── aicc-health.md
-│   ├── aicc-update.md
-│   └── ...
+├── bin/                              ← 包装命令，进入 Bash PATH
+│   ├── aicc-project-scan
+│   ├── aicc-doc-health
+│   └── aicc-git-diff
 ├── scripts/                          ← 脚本工具（执行而非读取）
 │   ├── py/
 │   │   ├── env_diagnosis.py
@@ -355,17 +355,27 @@ aicc/                                 ← Claude Code plugin 根目录
 │       └── windows_powershell.md
 ├── hooks/                            ← Claude Code 事件 hook（可选）
 │   └── on-session-start.json         ← 例如：在新项目自动 health-check
+├── plugin-manifest.generated.json    ← build 生成的资产清单，用于 CI 校验
 └── gemini-extension.json             ← Gemini CLI 兼容清单（Phase 4 添加）
 ```
+
+**2026-05-12 架构复检后的关键调整**：
+
+1. **Claude Code 主形态使用短 skill 名**：Claude Code plugin 会把 skill 自动命名空间化，例如 plugin `aicc` 下的 `skills/init/` 显式调用为 `/aicc:init`。因此 plugin 内不再使用 `skills/aicc-init/`，避免变成 `/aicc:aicc-init`。
+2. **flat skill 包由构建生成**：Codex/Copilot 等无 plugin namespace 的平台仍需要 `aicc-` 前缀，但这是发布适配问题，不应污染 Claude Code 主设计。构建时可输出 `flat-skills/aicc-init/` 等镜像包。
+3. **`bin/` 优先于长路径脚本调用**：Claude Code plugin 支持把 `bin/` 加入 Bash PATH。通过 `aicc-project-scan` 这类包装命令调用 `scripts/py/*.py`，比在 SKILL.md 中硬编码 `${CLAUDE_PLUGIN_ROOT}` 更稳定。
+4. **`commands/` 不进入 MVP**：官方文档将 `commands/` 视为 flat Markdown skills，并建议新 plugin 使用 `skills/`。MVP 先验证 model-invoked skills，避免两套路由。
+5. **发布层采用 build-time copy**：`plugin/` 是发布层源码，release artifact 由构建脚本复制必要资产并生成清单。不要把 symlink 当作发布机制，避免 Windows、zip artifact、marketplace 审核的不确定性。
 
 ### 4.2 备选方案对比与决策依据
 
 | 方案 | 形态 | 优点 | 缺点 | 决策 |
 |---|---|---|---|---|
-| **A. 单 plugin × 多扁平 skill** | 所有 skill 平铺在 plugin 内 | ✅ 与 document-skills/superpowers 一致<br>✅ 单次安装即获全部能力<br>✅ 每个 skill 独立触发 | plugin 体量大；发布更新粒度粗 | **✅ 选定** |
+| **A. 单 plugin × 短名多扁平 skill** | 所有 skill 平铺在 plugin 内，由 plugin namespace 解决冲突 | ✅ 与 Claude Code plugin namespace 机制一致<br>✅ 单次安装即获全部能力<br>✅ 每个 skill 独立触发<br>✅ 显式调用短：`/aicc:init` | plugin 体量大；发布更新粒度粗 | **✅ 选定** |
 | B. 多 plugin 拆分 | aicc-core / aicc-quality / aicc-architecture 三个 plugin | 用户按需装；发布粒度细 | plugin 间依赖复杂；用户认知成本高（要装哪几个？） | ❌ |
-| C. 单 skill `aicc` + 内部 references | 一个 skill 做"门面"，内部引用所有详细 workflow | 与现有 AI_ENTRY_POINT 心智模型一致；改动最小 | 放弃 skill 体系最有价值的"按描述自动触发多入口"；用户必须显式说"用 aicc" | ❌ |
+| C. 单 skill `overview` + 内部 references | 一个 skill 做"门面"，内部引用所有详细 workflow | 与现有 AI_ENTRY_POINT 心智模型一致；改动最小 | 放弃 skill 体系最有价值的"按描述自动触发多入口"；用户必须显式说"用 AICC" | ❌ |
 | D. 混合：单 plugin + 总入口 + 专项 skill | 既有 `aicc` 总入口 skill，也有专项 skill | 兼顾单入口便捷与多触发点 | writing-skills 警示"description 总结 workflow 会让 Claude 跳过实际 skill 内容"；总入口 description 写不好就成了陷阱 | ❌ |
+| E. plugin 内也使用 `aicc-*` skill 前缀 | 例如 `skills/aicc-init/` | 可直接复用到 flat 平台 | Claude Code 显式名变成 `/aicc:aicc-init`；用户体验冗余；把次级平台约束带入主平台 | ❌ |
 
 **为什么不要总入口 skill（详细论证）**：
 
@@ -380,9 +390,9 @@ aicc/                                 ← Claude Code plugin 根目录
 
 **硬性约束**：
 - body < 500 行（含示例代码）
-- frontmatter `name` 与目录名一致
+- frontmatter 字段以 Claude Code 实测结果为准；若官方仅要求 `description`，plugin 内不强行添加 `name`
 - frontmatter `description` < 1024 字符，第三人称，"Use when..." 起头，**不总结 workflow**
-- 内部引用只能指向同 skill 的 `references/`，或 plugin 顶级 `shared-references/`
+- 内部引用只能指向同 skill 的 `references/`，或 plugin 顶级 `references/`
 - 引用都必须用 forward slash
 - 不假设 Python/Node 已装，必须显式声明依赖与降级
 
@@ -390,7 +400,6 @@ aicc/                                 ← Claude Code plugin 根目录
 
 ```markdown
 ---
-name: aicc-init
 description: Use when ... (1-3 sentences of trigger conditions only)
 ---
 
@@ -422,8 +431,8 @@ description: Use when ... (1-3 sentences of trigger conditions only)
 - ...
 
 ## Related Skills
-- aicc-design-thinking（在 Step 5.5 调用）
-- aicc-mutual-review（在 Step 7 调用）
+- design-thinking（在 Step 5.5 调用）
+- mutual-review（在 Step 7 调用）
 ```
 
 ### 4.4 路由机制：description 字段如何替代 AI_ENTRY_POINT
@@ -440,35 +449,35 @@ description: Use when ... (1-3 sentences of trigger conditions only)
 **skill 化后的 description 草稿**（每条独立）：
 
 ```yaml
-# aicc-init
+# init
 description: Use when a project lacks any AI coding documentation (no dev_docs/AI_Coding_Context.md exists) and the user wants to set up AI assistance, generate project docs, or "initialize" their codebase for AI-assisted development. NOT for projects that already have dev_docs/.
 
-# aicc-health-check
+# health-check
 description: Use when a project already has dev_docs/AI_Coding_Context.md and the user wants to assess doc quality, detect drift, run a doc audit, or check whether docs are still in sync with code. NOT for first-time setup.
 
-# aicc-incremental-update
+# incremental-update
 description: Use when the user mentions @commit, references recent git commits, or asks to update docs after code changes. Also triggers on phrases like "sync the docs with my latest changes". NOT for first-time setup or full audits.
 
-# aicc-design-thinking
-description: Use when the user wants 5-Why analysis, multi-option comparison, risk assessment, or any structured "think before coding" guidance for a feature/architecture decision. Triggers on @think, "let's design", "compare options". Can also be invoked from inside aicc-init at Step 5.5.
+# design-thinking
+description: Use when the user wants 5-Why analysis, multi-option comparison, risk assessment, or any structured "think before coding" guidance for a feature/architecture decision. Triggers on @think, "let's design", "compare options". Can also be invoked from inside init at Step 5.5.
 
-# aicc-mutual-review
-description: Use when the user wants AI cross-review of a generated plan, doc, or proposal—particularly for trivial/simple/complex/critical change reviews. Triggers on @review, "review this plan", "double-check". Can also be invoked from inside aicc-init at Step 7.
+# mutual-review
+description: Use when the user wants AI cross-review of a generated plan, doc, or proposal—particularly for trivial/simple/complex/critical change reviews. Triggers on @review, "review this plan", "double-check". Can also be invoked from inside init at Step 7.
 ```
 
 **路由准确性的验证策略**：见 `03-implementation-roadmap.md` 的 Phase 1 baseline 测试。
 
 ### 4.5 跨 skill 协作：当一个 skill 需要另一个 skill 的能力时
 
-**场景**：`aicc-init` Step 5.5 需要 design-thinking 引导。
+**场景**：`init` Step 5.5 需要 design-thinking 引导。
 
 **三种实现策略**：
 
 | 策略 | 实现方式 | 优点 | 缺点 |
 |---|---|---|---|
-| **(a) Skill 互调用**（推荐） | aicc-init 的 SKILL.md 在 Step 5.5 处写"`Skill('aicc-design-thinking')`" 显式调用 | 复用充分，单一真理来源 | 待验证 Claude Code 是否允许 skill 内部直接调用 `Skill` 工具 |
-| (b) Subagent 调度 | aicc-init 在 Step 5.5 调用 `Agent({subagent_type: 'aicc-design-facilitator'})` | 已有 superpowers:subagent-driven-development 的成熟模式可参考 | 需要 development agent 而非 runtime；行为略不同 |
-| (c) 内嵌副本 | aicc-init 内部复制一份精简版 design-thinking 流程 | 简单可靠 | 重复维护；与独立的 aicc-design-thinking 可能漂移 |
+| **(a) Skill 互调用**（推荐） | `init` 的 SKILL.md 在 Step 5.5 处显式要求加载 `/aicc:design-thinking` | 复用充分，单一真理来源 | 待验证 Claude Code 是否允许 skill 内部直接触发另一个 skill |
+| (b) Subagent 调度 | `init` 在 Step 5.5 调用专用设计引导 subagent | 已有 superpowers:subagent-driven-development 的成熟模式可参考 | 需要 development agent 而非 runtime；行为略不同 |
+| (c) 内嵌副本 | `init` 内部复制一份精简版 design-thinking 流程 | 简单可靠 | 重复维护；与独立的 design-thinking 可能漂移 |
 
 **推荐**：MVP 阶段先用 (a)，验证可行；不行则降级 (b)；最差才用 (c)。详见 `05-open-questions.md` Q5。
 
@@ -495,13 +504,14 @@ ai_coding_context/                          ← 框架仓库
 │   ├── config/
 │   └── plugin/                             ← 🆕 skill plugin 源码（同步发布到 marketplace）
 │       ├── .claude-plugin/plugin.json
-│       ├── shared-references/              ← 跨 skill 共享（language_rules / security_rules / SUMMARY_FORMAT_SPEC / project_types/ ...）
-│       ├── skills/                         ← 11 个 aicc-* skill
-│       ├── agents/                         ← 7 个 development subagent
-│       ├── commands/                       ← 显式 slash 命令（可选）
+│       ├── references/                     ← 跨 skill 共享（language_rules / security_rules / SUMMARY_FORMAT_SPEC / project_types/ ...）
+│       ├── skills/                         ← 11 个短名 skill（init / health-check / ...）
+│       ├── agents/                         ← 真实 development subagent（以资产清单为准）
+│       ├── bin/                            ← 包装命令，进入 Bash PATH
 │       ├── scripts/                        ← 平移自上层 tools/（py/ + js/ + fallback/ + git-hooks/）
 │       ├── hooks/                          ← Claude Code 事件 hook（on-session-start 等）
 │       ├── tests/                          ← evaluation 体系（baseline eval JSON）
+│       ├── plugin-manifest.generated.json  ← build 生成的资产清单
 │       ├── CLAUDE.md                       ← 跨 skill 共识（精简版 framework_spec）
 │       ├── GEMINI.md                       ← Gemini CLI 兼容（Phase 4 添加）
 │       ├── gemini-extension.json           ← 同上
@@ -525,8 +535,8 @@ ai_coding_context/                          ← 框架仓库
 **关键原则**：
 - `plugin/` 是 main 分支可见的产物（与 release 一同发布）
 - 框架仓库内 `core/` `workflows/` `templates/` `agents/` `tools/` 是 clone 模式必需文件，**不删除**（双轨保留）
-- 但需要建立"single source of truth"：避免同样的内容在 `core/language_rules.md` 和 `plugin/shared-references/language_rules.md` 各维护一份漂移
-- **解决方案**：plugin/shared-references/ 内的文件用 symlink 指向上层 core/ 等（Linux/Mac）；Windows 用脚本同步。详见 `05-open-questions.md` Q9。
+- 但需要建立"single source of truth"：避免同样的内容在 `core/language_rules.md` 和 `plugin/references/language_rules.md` 各维护一份漂移
+- **解决方案**：源码层以 `core/`、`workflows/`、`templates/`、`agents/`、`tools/` 为主；发布层由 build-time copy 生成，并用 `plugin-manifest.generated.json` 校验引用完整性。symlink 仅可作为本地开发便利，不作为 release 机制。详见 `05-open-questions.md` Q9。
 
 ### 5.2 双轨并存策略
 
@@ -544,8 +554,8 @@ ai_coding_context/                          ← 框架仓库
 
 **答案**：不影响，但需要明确边界：
 - `dev/quality/` 是**框架自身**的复审工作流，目标是审查 `AI_ENTRY_POINT.md`、`README.md` 等顶层文档。这个工作流面向的"项目"是 AICC 框架仓库本身。
-- `aicc-systematic-review` skill 是**用户项目**的复审工作流，目标是审查用户项目的 `dev_docs/`。两者是同一种方法的两次实例化，不冲突。
-- AICC 团队可以选择 dogfood：用 `aicc-systematic-review` skill（在 plugin 装好后）来复审框架自身。但这是可选行为，不强制。
+- `systematic-review` skill 是**用户项目**的复审工作流，目标是审查用户项目的 `dev_docs/`。两者是同一种方法的两次实例化，不冲突。
+- AICC 团队可以选择 dogfood：用 `/aicc:systematic-review` skill（在 plugin 装好后）来复审框架自身。但这是可选行为，不强制。
 
 **dogfood 的边界声明**：
 - 框架仓库根目录的 `AI_ENTRY_POINT.md` 入口（clone 模式）始终保留
@@ -563,6 +573,6 @@ ai_coding_context/                          ← 框架仓库
 | 主要技术约束？ | 500 行 SKILL.md 上限（拆 references）；description 风格（重写）；reference 1 层深（拍平） |
 | 主要价值？ | 接入耗时 -85%；token 开销 -80%；用户工作区污染 -100%；自然语言触发率 0% → 90%+ |
 | 主要风险？ | description 误触发；skill 互调用机制不确定；Claude Code plugin API 演进 |
-| 投入预估？ | ≈ 7 人月，6 个月并行推进，分 6 个 Phase |
+| 投入预估？ | ≈ 7.5 人月，6-7 个月并行推进，分 8 个 Phase / checkpoint |
 
 **下一文档**：[`02-component-mapping.md`](./02-component-mapping.md) —— AICC 7 大组件 → plugin 的细粒度映射表。

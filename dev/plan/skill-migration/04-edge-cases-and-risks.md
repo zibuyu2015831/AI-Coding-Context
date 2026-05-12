@@ -59,7 +59,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 **缓解**：
 - 每个 skill 的 references/ 内文件**只能由 SKILL.md 直接引用**，不能 references 之间互引
-- 跨 skill 共享的内容统一上提到 `plugin/shared-references/`
+- 跨 skill 共享的内容统一上提到 `plugin/references/`
 - 长 reference（> 100 行）必须在文件头部加 TOC
 
 **Phase 覆盖**：✅ Phase 0（layout 规范）+ Phase 1-3（每 skill 验收）
@@ -76,11 +76,42 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 - description 模糊或重叠会导致触发冲突
 
 **缓解**：
-- 严格 `aicc-` 前缀，避免与其他 plugin 重名
-- description 中使用差异化关键词（如 aicc-mutual-review 限定 "for AICC-generated plans"，不与 superpowers:requesting-code-review 抢通用代码 review）
+- Claude Code plugin 内使用短 skill 名，并依赖 plugin namespace（如 `/aicc:init`）避免显式冲突
+- 面向无 namespace 平台的 flat 包构建时再添加 `aicc-` 前缀
+- description 中使用差异化关键词（如 `mutual-review` 限定 "for AICC-generated plans"，不与 superpowers:requesting-code-review 抢通用代码 review）
 - 每个 skill 的 description 中显式列 "NOT for X"
 
 **Phase 覆盖**：✅ Phase 0（命名规范）+ Phase 2（与 superpowers 兼容性测试）
+
+---
+
+### EC-1.5：Claude Code plugin namespace 与 `aicc-*` skill 前缀重复
+
+**现象**：Claude Code plugin 会把 skill 暴露为 `/plugin-name:skill-name`。如果 plugin 名为 `aicc` 且 skill 目录仍叫 `aicc-init`，用户显式调用会变成 `/aicc:aicc-init`。
+
+**影响**：资深用户使用时感到冗余；README、eval、跨平台文档会混淆；后续若再产出 flat skill 包，会难以区分"源码名"与"发布名"。
+
+**缓解**：
+- Claude Code plugin 内使用短名：`init`、`health-check`、`incremental-update`
+- 面向无 namespace 平台的 flat 包由 build 阶段生成 `aicc-init` 等前缀名
+- CI 检查 plugin 内不得出现 `skills/aicc-*` 目录
+
+**Phase 覆盖**：✅ Phase 0a（namespace 实测）+ Phase 0b（命名规范）
+
+---
+
+### EC-1.6：真实资产映射偏差
+
+**现象**：初版组件映射中出现了当前仓库不存在的 agent 名称（如 `frontend_expert`、`document_generator`、`auto_reviewer`），同时漏掉真实存在的 `templates/prompts/`、`templates/review/`、`workflows/review_standards/` 等目录。
+
+**影响**：如果直接按规划实施，会出现引用断裂、能力缺失或为了匹配计划而新造不必要资产。
+
+**缓解**：
+- Phase 0b 生成 `plugin-manifest.generated.json`
+- 每个 skill 的 references/scripts/templates/agents 必须来自真实资产清单
+- CI 校验所有引用目标存在，release artifact 排除缓存和开发产物
+
+**Phase 覆盖**：✅ Phase 0b（真实资产清单 + CI）
 
 ---
 
@@ -103,7 +134,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ### EC-2.2：误触发导致无谓加载
 
-**现象**：用户说"check this"，可能同时命中 aicc-health-check、aicc-mutual-review、aicc-doc-fallacy-fix 三个 skill 的 description。
+**现象**：用户说"check this"，可能同时命中 health-check、mutual-review、doc-fallacy-fix 三个 skill 的 description。
 
 **影响**：Claude 可能依次加载多个 skill 的 SKILL.md，浪费 token。
 
@@ -135,9 +166,9 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ### EC-3.1：`Skill` 工具能否在 skill body 内被调用
 
-**现象**：aicc-init Step 5.5 需要 design-thinking、Step 7 需要 mutual-review。当前不确定 skill A 内部能否 invoke skill B。
+**现象**：init Step 5.5 需要 design-thinking、Step 7 需要 mutual-review。当前不确定 skill A 内部能否 invoke skill B。
 
-**影响**：如不支持，aicc-init 无法委托给 aicc-design-thinking，必须在 init 内部嵌入简版（重复维护）。
+**影响**：如不支持，init 无法委托给 design-thinking，必须在 init 内部嵌入简版（重复维护）。
 
 **缓解**：
 - Phase 0 第 1 周即验证（用 superpowers 跑实验）
@@ -153,7 +184,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ### EC-3.2：循环触发风险
 
-**现象**：`aicc-init` 调用 `aicc-design-thinking`，`aicc-design-thinking` 又触发 `aicc-mutual-review`，`aicc-mutual-review` 又调用 `aicc-design-thinking`...
+**现象**：`init` 调用 `design-thinking`，`design-thinking` 又触发 `mutual-review`，`mutual-review` 又调用 `design-thinking`...
 
 **影响**：无限递归 / 循环 / token 爆炸。
 
@@ -168,13 +199,13 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ### EC-3.3：skill 上下文继承不一致
 
-**现象**：aicc-init 调用 aicc-design-thinking 时，design-thinking 是否能拿到 init 已收集的项目上下文？
+**现象**：init 调用 design-thinking 时，design-thinking 是否能拿到 init 已收集的项目上下文？
 
 **影响**：如不能继承，每次调用都要重新让 Claude 从用户对话历史中拼装上下文。
 
 **缓解**：
 - 在 SKILL.md 的"Related Skills"章节明确"调用前需要在对话中确认 X、Y、Z 已存在"
-- 用临时文件作为状态传递（aicc-init 写 `dev_docs/_analysis/in-flight.json`，aicc-design-thinking 读）
+- 用临时文件作为状态传递（init 写 `dev_docs/_analysis/in-flight.json`，design-thinking 读）
 - 在 Phase 2 测试场景观察 Claude 实际行为
 
 **Phase 覆盖**：⚠️ 部分（Phase 2 验证）；如发现严重问题，需补独立设计
@@ -192,7 +223,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 **缓解**：
 - 保留 `scripts/fallback/`（Bash / PowerShell 速查）
 - 每个 skill 的 SKILL.md 在"Required Tools"章节给出三级降级（py → js → fallback）
-- aicc-init 的 Step 1 "环境预检" 一开始就检测可用性，不可用时给用户明确提示
+- init 的 Step 1 "环境预检" 一开始就检测可用性，不可用时给用户明确提示
 
 **Phase 覆盖**：✅ Phase 1（init 验证）
 
@@ -212,6 +243,21 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ---
 
+### EC-4.2b：直接依赖 plugin root 环境变量导致脚本路径不稳
+
+**现象**：初版规划假设存在 `${CLAUDE_PLUGIN_ROOT}`，但该变量是否稳定、跨平台、跨安装方式一致尚未验证。
+
+**影响**：所有 skill 的脚本调用语句可能需要返工；用户在 git URL、zip artifact、本地 path 三种安装方式下行为可能不同。
+
+**缓解**：
+- 主方案改为 `bin/` 包装命令（如 `aicc-project-scan`），由 plugin 机制加入 PATH
+- Phase 0a 实测 `bin/`，不可用时再定义 `AICC_PLUGIN_ROOT` fallback
+- SKILL.md 不直接硬编码长路径，脚本路径细节集中在 `scripts-call-convention.md`
+
+**Phase 覆盖**：✅ Phase 0a + Phase 0b
+
+---
+
 ### EC-4.3：Windows 路径与 shell 差异
 
 **现象**：用户在 Windows 上跑 plugin，PowerShell vs Bash 命令差异。
@@ -222,7 +268,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 - 全部用 forward slash（已是 Anthropic 强制要求）
 - 脚本调用使用 `python` 命令而非 `python3`（兼容性）
 - env_diagnosis.py 自动检测平台并切换命令风格
-- shared-references/platform_compat/ 提供 Windows/Linux 命令对照表
+- references/platform_compat/ 提供 Windows/Linux 命令对照表
 
 **Phase 覆盖**：✅ Phase 1（env_diagnosis 已有逻辑）
 
@@ -249,11 +295,11 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 **现象**：用户之前用 clone 模式半途中断，dev_docs/ 只有主文档没有子文档。
 
-**影响**：aicc-init 不会触发（因为 dev_docs/ 已存在），但 aicc-health-check 会报告"严重不完整"。
+**影响**：init 不会触发（因为 dev_docs/ 已存在），但 health-check 会报告"严重不完整"。
 
 **缓解**：
-- aicc-health-check 检测到不完整时，handoff 给"修复"路径而非"重新生成"
-- 提供独立 skill `aicc-init` 的强制启动选项：用户说"reset and regenerate"
+- health-check 检测到不完整时，handoff 给"修复"路径而非"重新生成"
+- 提供独立 skill `init` 的强制启动选项：用户说"reset and regenerate"
 - 在 README 文档中说明这种边界
 
 **Phase 覆盖**：✅ Phase 1（handoff 网络）
@@ -281,7 +327,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 **影响**：单一 dev_docs/ 不足以描述 monorepo 内多个独立模块。
 
 **缓解**：
-- aicc-init 检测到 monorepo（package.json workspaces / lerna.json / turbo.json） → 询问用户
+- init 检测到 monorepo（package.json workspaces / lerna.json / turbo.json） → 询问用户
 - references/special_scenarios/monorepo.md 提供处理策略
 
 **Phase 覆盖**：✅ Phase 1（init special scenarios）
@@ -295,10 +341,10 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 **影响**：每个项目独立的 dev_docs/ 难以共享。
 
 **缓解**：
-- aicc-knowledge-reuse skill 专门解决此问题（V3.0 010）
+- knowledge-reuse skill 专门解决此问题（V3.0 010）
 - Phase 3 完成后此场景才完整支持
 
-**Phase 覆盖**：✅ Phase 3（aicc-knowledge-reuse）
+**Phase 覆盖**：✅ Phase 3（knowledge-reuse）
 
 ---
 
@@ -336,14 +382,14 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ### EC-6.3：应触发但没触发
 
-**现象**：用户说"我的 dev_docs 怎么有点乱"，本应触发 aicc-health-check 但没触发。
+**现象**：用户说"我的 dev_docs 怎么有点乱"，本应触发 health-check 但没触发。
 
 **影响**：用户体验劣化。
 
 **缓解**：
 - baseline eval 包含 30+ 自然语言变体测试
 - description 关键词覆盖中文与英文
-- 用户可显式 `/aicc-health` 触发（commands/ 兜底）
+- 用户可显式 `/aicc:health-check` 触发；commands/ 仅作为 Phase 1 后可选 shortcut
 
 **Phase 覆盖**：✅ Phase 1（commands + eval）
 
@@ -373,7 +419,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 **缓解**：
 - dev_docs/ 主文档 frontmatter 加 `aicc_version` 字段
-- aicc-health-check 检测到旧版本 → 触发自动 migration
+- health-check 检测到旧版本 → 触发自动 migration
 - 严格 SemVer：major 版本更新时提供 migration 脚本
 
 **Phase 覆盖**：✅ Phase 5（migration 脚本设计）
@@ -409,13 +455,43 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ---
 
+### EC-7.4：symlink 作为发布机制不可移植
+
+**现象**：初版规划考虑用 symlink 让 `plugin/references/` 指向上层 `core/`，但 release artifact、Windows、marketplace 审核和 zip 解压都可能破坏 symlink。
+
+**影响**：用户安装后 references 丢失或路径异常；CI 本地通过但发布包不可用。
+
+**缓解**：
+- symlink 仅允许作为本地开发便利，不作为 release 机制
+- 发布前统一 build-time copy 到 `plugin/references/`
+- 用 `plugin-manifest.generated.json` 校验复制结果
+
+**Phase 覆盖**：✅ Phase 0b
+
+---
+
+### EC-7.5：commands/ 与 skills/ 双路由混淆
+
+**现象**：如果同时提供 `commands/init.md` 和 `skills/init/SKILL.md`，用户和模型会面对两套入口。
+
+**影响**：文档重复、触发行为不一致、eval 难以判断失败归因。
+
+**缓解**：
+- MVP 不做 `commands/`
+- 只有当 Phase 1 用户反馈显示显式 shortcut 明显必要时，才补少量 commands
+- commands 必须只是薄封装，不能复制 skill workflow
+
+**Phase 覆盖**：✅ Phase 0b + Phase 1 用户反馈
+
+---
+
 ## 八、多平台相关
 
 ### EC-8.1：Gemini CLI 不支持 plugin commands/
 
 **现象**：commands/ 是 Claude Code 特有，Gemini 没有 slash command 体系。
 
-**影响**：`/aicc-init` 等命令在 Gemini 上不可用。
+**影响**：`/init` 等命令在 Gemini 上不可用。
 
 **缓解**：
 - skill 自动触发是主路径，commands/ 是兜底
@@ -457,29 +533,29 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 
 ## 九、dogfood 相关
 
-### EC-9.1：framework 自身的 dev/quality/ 与 aicc-systematic-review 边界
+### EC-9.1：framework 自身的 dev/quality/ 与 systematic-review 边界
 
-**现象**：dev/quality/ 是框架自审；aicc-systematic-review 是用户项目自审。两者用同一种方法论。
+**现象**：dev/quality/ 是框架自审；systematic-review 是用户项目自审。两者用同一种方法论。
 
 **影响**：可能让维护者混淆"我现在用的是哪一套"。
 
 **缓解**：
-- aicc-systematic-review SKILL.md 头部明确："for user projects only, NOT for the AICC framework's own development workflow"
+- systematic-review SKILL.md 头部明确："for user projects only, NOT for the AICC framework's own development workflow"
 - dev/quality/ 体系保持原样不动
-- 框架团队如想 dogfood，可在自己框架仓库运行 aicc-systematic-review，但这是可选行为
+- 框架团队如想 dogfood，可在自己框架仓库运行 systematic-review，但这是可选行为
 
-**Phase 覆盖**：✅ Phase 3（aicc-systematic-review SKILL.md 边界声明）
+**Phase 覆盖**：✅ Phase 3（systematic-review SKILL.md 边界声明）
 
 ---
 
-### EC-9.2：framework 自身的 ADR（dev/architecture/）vs aicc-adr skill
+### EC-9.2：framework 自身的 ADR（dev/architecture/）vs adr skill
 
-**现象**：dev/architecture/decisions/ 是框架自身 ADR；aicc-adr 是用户项目 ADR。
+**现象**：dev/architecture/decisions/ 是框架自身 ADR；adr 是用户项目 ADR。
 
 **影响**：同上，边界不清。
 
 **缓解**：
-- aicc-adr SKILL.md 头部声明 "for user projects"
+- adr SKILL.md 头部声明 "for user projects"
 - dev/architecture/ 保留原样
 
 **Phase 覆盖**：✅ Phase 2
@@ -509,6 +585,8 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 | EC-1.2（description 风格） | 中 | 高 | H | ✅ |
 | EC-1.3（reference 嵌套） | 中 | 中 | M | ✅ |
 | EC-1.4（命名空间污染） | 低 | 中 | L | ✅ |
+| EC-1.5（namespace 与前缀重复） | 中 | 中 | M | ✅ Phase 0a |
+| EC-1.6（真实资产映射偏差） | 中 | 高 | **H** | ✅ Phase 0b |
 | EC-2.1（base prompt 膨胀） | 中 | 中 | M | ✅ |
 | EC-2.2（误触发） | 中 | 中 | M | ✅ |
 | EC-2.3（references 加载顺序） | 中 | 低 | L | ✅ |
@@ -517,6 +595,7 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 | EC-3.3（上下文继承） | 中 | 中 | M | ⚠️ |
 | EC-4.1（无运行时） | 低 | 中 | L | ✅ |
 | EC-4.2（sandbox） | 中 | 中 | M | ⚠️ Phase 1 |
+| EC-4.2b（plugin root 路径） | 中 | 高 | **H** | ✅ Phase 0a |
 | EC-4.3（Windows） | 中 | 中 | M | ✅ |
 | EC-4.4（第三方库） | 中 | 高 | **H** | ⚠️ Phase 0 |
 | EC-5.1（不完整 dev_docs/） | 中 | 中 | M | ✅ |
@@ -530,6 +609,8 @@ path_a_first_generation.md → workflows/shared/failure_handling.md → core/sec
 | EC-7.1（升级不兼容） | 低 | 高 | M | ✅ Phase 5 |
 | EC-7.2（多版本并存） | 中 | 低 | L | ⚠️ |
 | EC-7.3（clone vs plugin 输出） | 中 | 中 | M | ✅ |
+| EC-7.4（symlink 发布风险） | 中 | 高 | **H** | ✅ Phase 0b |
+| EC-7.5（commands 双路由） | 中 | 中 | M | ✅ Phase 0b |
 | EC-8.1（Gemini commands） | 高 | 低 | M | ✅ Phase 4 |
 | EC-8.2（tool name 差异） | 高 | 中 | M | ✅ Phase 4 |
 | EC-8.3（Codex/Copilot） | 低 | 低 | L | 📋 backlog |
