@@ -57,6 +57,7 @@ const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const TOOLS_PY = path.join(ROOT, 'tools', 'py');
+const CONTRACTS_DIR = path.join(ROOT, 'core', 'contracts');
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -70,6 +71,9 @@ function parseArgs() {
       case '--check-file-paths': out.checkFilePaths = true; break;
       case '--check-code-samples': out.checkCodeSamples = true; break;
       case '--check-dependencies': out.checkDependencies = true; break;
+      case '--check-required-sections': out.checkRequiredSections = true; break;
+      case '--check-template-residue': out.checkTemplateResidue = true; break;
+      case '--check-run-record-integrity': out.checkRunRecordIntegrity = true; break;
       case '--full-check': out.fullCheck = true; break;
       case '--doc-dir': out.docDir = next; i++; break;
       case '--output': out.output = next; i++; break;
@@ -213,7 +217,10 @@ function checkDependencies(targets, projectRoot) {
 function checkFrontmatter(targets, timeoutSec) {
   if (!targets || targets.length === 0) return { checked: 0, issues: [] };
   const issues = [];
+  let checked = 0;
   for (const f of targets) {
+    if (f.split(path.sep).includes('_analysis')) continue;
+    checked++;
     const r = runPyTool(['summary_validator.py', '--file', f, '--strict'], timeoutSec);
     if (!r.stdout.trim()) {
       issues.push({ file: f, type: 'tool_error', message: (r.stderr || '').slice(0, 200) });
@@ -229,7 +236,140 @@ function checkFrontmatter(targets, timeoutSec) {
       for (const e of errors) issues.push({ file: f, type: 'frontmatter', message: e });
     }
   }
-  return { checked: targets.length, issues };
+  return { checked, issues };
+}
+
+function loadMainDocRequiredTitles() {
+  const contractPath = path.join(CONTRACTS_DIR, 'main_doc_contract.yaml');
+  if (!fs.existsSync(contractPath)) return [];
+  return fs.readFileSync(contractPath, 'utf8')
+    .split('\n')
+    .map((line) => {
+      const match = line.match(/^\s*title:\s*"?(.*?)"?\s*$/);
+      return match ? match[1] : null;
+    })
+    .filter(Boolean);
+}
+
+function loadRunRecordContract() {
+  const contractPath = path.join(CONTRACTS_DIR, 'run_record_contract.yaml');
+  const docs = { generation_plan: [], generation_progress: [] };
+  if (!fs.existsSync(contractPath)) return docs;
+  const lines = fs.readFileSync(contractPath, 'utf8').split('\n');
+  let currentDoc = null;
+  let currentKey = null;
+  for (const line of lines) {
+    const docMatch = line.match(/^\s{2}(generation_plan|generation_progress):\s*$/);
+    if (docMatch) {
+      currentDoc = docMatch[1];
+      currentKey = null;
+      continue;
+    }
+    const keyMatch = line.match(/^\s{4}(required_headings|required_fields):\s*$/);
+    if (keyMatch && currentDoc) {
+      currentKey = keyMatch[1];
+      continue;
+    }
+    const itemMatch = line.match(/^\s{6}-\s*"(.*?)"\s*$/);
+    if (itemMatch && currentDoc && currentKey) {
+      docs[currentDoc].push(itemMatch[1]);
+    }
+  }
+  return docs;
+}
+
+function extractH2Titles(text) {
+  const titles = [];
+  const re = /^##\s+(.+?)\s*$/gm;
+  let match;
+  while ((match = re.exec(text)) !== null) {
+    titles.push(match[1].trim());
+  }
+  return titles;
+}
+
+function checkRequiredSections(targets) {
+  const requiredTitles = loadMainDocRequiredTitles();
+  if (!targets || targets.length === 0 || requiredTitles.length === 0) {
+    return { checked: 0, issues: [] };
+  }
+  const issues = [];
+  let checked = 0;
+  for (const file of targets) {
+    if (path.basename(file) !== 'AI_Coding_Context.md' || !fs.existsSync(file)) continue;
+    checked++;
+    const headings = new Set(extractH2Titles(fs.readFileSync(file, 'utf8')));
+    for (const title of requiredTitles) {
+      if (!headings.has(title)) {
+        issues.push({ file, type: 'missing_required_section', section: title, message: `缺少必需章节: ${title}` });
+      }
+    }
+  }
+  return { checked, issues };
+}
+
+const RESIDUE_PATTERNS = [
+  { re: /\[填写\]/g, label: '[填写]' },
+  { re: /\[PROJECT_NAME\]/g, label: '[PROJECT_NAME]' },
+  { re: /\bTODO\b/g, label: 'TODO' },
+  { re: /^\|\s*\.\.\.\s*\|/gm, label: 'ellipsis_table_row' }
+];
+
+function checkTemplateResidue(targets) {
+  if (!targets || targets.length === 0) return { checked: 0, issues: [] };
+  const issues = [];
+  let checked = 0;
+  for (const file of targets) {
+    if (!fs.existsSync(file)) continue;
+    checked++;
+    const text = fs.readFileSync(file, 'utf8');
+    const lines = text.split('\n');
+    for (const { re, label } of RESIDUE_PATTERNS) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(text)) !== null) {
+        const line = text.slice(0, match.index).split('\n').length;
+        issues.push({ file, type: 'template_residue', marker: label, line, message: `检测到模板残留: ${label}` });
+      }
+    }
+    lines.forEach((line, index) => {
+      const stripped = line.trim();
+      if (stripped === '...' || stripped === '- ...') {
+        issues.push({ file, type: 'template_residue', marker: '...', line: index + 1, message: '检测到省略型占位符' });
+      }
+    });
+  }
+  return { checked, issues };
+}
+
+function checkRunRecordIntegrity(targets) {
+  const contracts = loadRunRecordContract();
+  if (!targets || targets.length === 0) return { checked: 0, issues: [] };
+  const issues = [];
+  let checked = 0;
+  for (const file of targets) {
+    const name = path.basename(file);
+    if (!['generation_plan.md', 'generation_progress.md'].includes(name) || !fs.existsSync(file)) continue;
+    checked++;
+    const text = fs.readFileSync(file, 'utf8');
+    const requiredItems = name === 'generation_plan.md' ? contracts.generation_plan : contracts.generation_progress;
+    requiredItems.forEach((item) => {
+      if (!text.includes(item)) {
+        issues.push({ file, type: 'run_record_integrity', missing: item, message: `运行记录缺少必需项: ${item}` });
+      }
+    });
+    const statusMatch = text.match(/\*\*当前状态\*\*:\s*([^\n]+)/);
+    const currentStatus = statusMatch ? statusMatch[1].trim() : '';
+    if (name === 'generation_progress.md' && currentStatus === '已完成' && !text.includes('health_check_report')) {
+      issues.push({
+        file,
+        type: 'run_record_integrity',
+        missing: 'health_check_report',
+        message: '进度记录声明已完成，但未见 health_check_report 留痕'
+      });
+    }
+  }
+  return { checked, issues };
 }
 
 function walkMd(dir) {
@@ -275,6 +415,7 @@ function showHelp() {
   node tools/js/doc_health_checker.js --file FILE
   node tools/js/doc_health_checker.js --mode quick|standard|deep
   node tools/js/doc_health_checker.js --check-file-paths | --check-code-samples | --check-dependencies
+  node tools/js/doc_health_checker.js --check-required-sections | --check-template-residue | --check-run-record-integrity
   node tools/js/doc_health_checker.js --full-check
   [--doc-dir DIR] [--output FILE] [--timeout SECONDS]
 `);
@@ -288,8 +429,11 @@ function main() {
   const doSamples = !!(args.checkCodeSamples || args.fullCheck || ['standard', 'deep'].includes(args.mode) || args.file);
   const doDeps = !!(args.checkDependencies || args.fullCheck || args.mode === 'deep');
   const doFm = !!(args.fullCheck || args.mode === 'deep' || args.file);
+  const doRequired = !!(args.checkRequiredSections || args.fullCheck || args.mode === 'deep');
+  const doResidue = !!(args.checkTemplateResidue || args.fullCheck || args.mode === 'deep');
+  const doRunRecords = !!(args.checkRunRecordIntegrity || args.fullCheck || args.mode === 'deep');
 
-  if (!(doPaths || doSamples || doDeps || doFm)) {
+  if (!(doPaths || doSamples || doDeps || doFm || doRequired || doResidue || doRunRecords)) {
     console.error('错误：请提供 --file / --mode / --check-* / --full-check 之一');
     process.exit(2);
   }
@@ -305,6 +449,9 @@ function main() {
   if (doSamples) checks.code_samples = checkCodeSamples(targets);
   if (doDeps) checks.dependencies = checkDependencies(targets);
   if (doFm) checks.frontmatter = checkFrontmatter(targets, args.timeout);
+  if (doRequired) checks.required_sections = checkRequiredSections(targets);
+  if (doResidue) checks.template_residue = checkTemplateResidue(targets);
+  if (doRunRecords) checks.run_record_integrity = checkRunRecordIntegrity(targets);
 
   const totalIssues = Object.values(checks).reduce((s, v) => s + v.issues.length, 0);
   const result = {

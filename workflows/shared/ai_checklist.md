@@ -114,6 +114,17 @@ verified_at: 2026-05-05
   - 更新进度计数（X/N）
   - 记录完成时间
 
+### 首版验收
+
+- [ ] **完成语义正确：文档写完不等于任务完成** ⭐
+  - 只有 `文档生成完成 + 验收通过 + health_check_report.md 落盘` 才能写 `已完成`
+  - 验收未通过时，状态必须保持在 `首版验收中` 或 `已阻塞`
+
+- [ ] **已执行结构健康检查与语义复查** ⭐
+  - 至少运行一次 `doc_health_checker --full-check`
+  - 首版交付前补跑 `semantic_review_checker --full-check`
+  - 将关键结果写入 `dev_docs/_analysis/health_check_report.md`
+
 ### 偏离处理
 
 - [ ] **如偏离方案，先说明原因**

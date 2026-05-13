@@ -1,0 +1,20 @@
+contract_version: 1
+documents:
+  generation_plan:
+    required_headings:
+      - "🎯 任务复杂度评估 (Complexity Assessment)"
+      - "⚠️ 风险点与注意事项"
+      - "🤝 交互策略 (Interaction Strategy)"
+      - "📚 第三阶段：子文档规划（待审核）"
+      - "📊 质量保证措施"
+      - "🧾 证据与验证记录"
+  generation_progress:
+    required_fields:
+      - "开始时间"
+      - "最后更新"
+      - "当前状态"
+      - "总体步骤进度"
+      - "逐文档完成状态"
+      - "总任务数"
+      - "已完成数"
+      - "下一步"

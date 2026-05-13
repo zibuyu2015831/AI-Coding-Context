@@ -624,9 +624,11 @@ README.md 包含：
 
 ---
 
-### 步骤 2.5: 创建 review/ 目录 ⭐ (V3.0) `[MUST]`
+### 步骤 2.5: 创建 review/ 目录 ⭐ (V3.0) `[OPTIONAL]`
 
-**目的**: 为项目建立系统化文档审核体系，生成项目专属的审核规程和原则文档，确保文档体系可以周期性被审核和维护。
+**目的**: 如用户明确需要周期性复审体系，可为项目建立额外的文档审核子系统。
+
+> ⚠️ `dev_docs/review/` 不属于 `core/framework_spec.md` 定义的标准首版产物路径。只有在用户明确需要复审体系时才创建，不要把它当成首版生成的必需目录。
 
 **AI 指令模板**:
 
@@ -819,10 +821,38 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 - [ ] `plans/` 目录创建完成
 - [ ] `knowledge/` 目录创建完成
-- [ ] `review/` 目录创建完成（含 sys_review_plan.md、sys_review_principles.md、REVIEW_LOG.md、rounds/.gitkeep）
 - [ ] README 文件齐全
 
 ---
+
+### 步骤 3.1A: 首版质量验收 gate
+
+首版生成完成后，必须执行质量验收，不能以“文件已写完”替代“任务已完成”。
+
+**最小要求**:
+
+- [ ] 运行 `doc_health_checker`
+- [ ] 运行 `semantic_review_checker`
+- [ ] 主文档必需章节检查通过
+- [ ] 运行记录完整性检查通过
+- [ ] 模板残留/占位符检查通过
+- [ ] 量化声明 / 测试资产拓扑 / 事实冲突结果已记录
+- [ ] 生成 `dev_docs/_analysis/health_check_report.md`
+- [ ] 只有 verdict = `PASS` 才能将 `generation_progress.md` 标记为 `已完成`
+
+**推荐命令**:
+
+```bash
+python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs
+node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
+```
+
+**阻断规则**:
+
+- 任一关键检查失败时，状态必须保持在 `首版验收中` 或 `已阻塞`
+- 不允许将“文档已生成”直接表述为“任务已完成”
 
 
 ### 步骤 3.2: AI 自测
@@ -988,6 +1018,12 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 **合格线**: 总分 ≥ 80 分
 
+**额外硬性要求**:
+
+- `业务模块映射` 与 `常见任务速查` 必须作为主干章节存在
+- 高信任代码示例必须带来源标注
+- 不得保留明显模板占位符
+
 ---
 
 ### 子文档质量检查
@@ -1085,7 +1121,7 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 # 阶段4: 创建目录结构
 创建 dev_docs/plans/ 目录（含README和子目录）
 创建 dev_docs/knowledge/ 目录（含README和子目录）
-创建 dev_docs/review/ 目录（含 sys_review_plan.md、sys_review_principles.md、REVIEW_LOG.md、rounds/.gitkeep）
+如用户明确要求复审体系，再单独创建可选的 dev_docs/review/ 子系统
 
 # 阶段5: 质量检查
 进行AI自测（5个场景）

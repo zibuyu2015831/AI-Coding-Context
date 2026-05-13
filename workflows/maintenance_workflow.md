@@ -238,6 +238,34 @@ python tools/py/doc_health_checker.py --check-dependencies
 
 ---
 
+#### 5. 契约漂移与语义风险
+
+**检查内容**:
+
+- [ ] 模板与 workflow 是否仍满足框架契约
+- [ ] 首版文档是否存在事实源冲突
+- [ ] 量化声明是否与实际目录统计一致
+- [ ] `examples/**/tests/` 等测试资产是否被文档覆盖
+
+**检查方法**:
+
+```bash
+# 框架自身契约自检
+python3 tools/py/framework_contract_checker.py --self-check
+node tools/js/framework_contract_checker.js --self-check
+
+# 对目标 dev_docs 执行半自动语义复查
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
+```
+
+**处理原则**:
+
+- 契约漂移优先修框架
+- 语义复查命中后，先判断是文档问题、源码事实变化，还是规则过严
+
+---
+
 ### 健康度评分
 
 **综合评分公式**:
@@ -417,10 +445,18 @@ graph TD
 
 ```bash
 # 运行健康检查
-python tools/py/doc_health_checker.py --full-check
+python3 tools/py/doc_health_checker.py --full-check
 
 # 验证摘要格式
-python tools/py/summary_validator.py --dir dev_docs/
+python3 tools/py/summary_validator.py --dir dev_docs/
+
+# 框架契约自检
+python3 tools/py/framework_contract_checker.py --self-check
+node tools/js/framework_contract_checker.js --self-check
+
+# 语义复查
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
 ```
 
 ---
@@ -474,13 +510,19 @@ python tools/py/summary_validator.py --dir dev_docs/
 
 ```bash
 # 快速检查
-python tools/py/doc_health_checker.py --mode quick
+python3 tools/py/doc_health_checker.py --mode quick
 
 # 标准检查
-python tools/py/doc_health_checker.py --mode standard
+python3 tools/py/doc_health_checker.py --mode standard
 
 # 深度检查
-python tools/py/doc_health_checker.py --mode deep
+python3 tools/py/doc_health_checker.py --mode deep
+
+# 框架契约自检
+python3 tools/py/framework_contract_checker.py --self-check
+
+# 语义复查
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
 ```
 
 **Node.js 版本**:
@@ -488,6 +530,12 @@ python tools/py/doc_health_checker.py --mode deep
 ```bash
 # 快速检查
 node tools/js/doc_health_checker.js --mode quick
+
+# 框架契约自检
+node tools/js/framework_contract_checker.js --self-check
+
+# 语义复查
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
 ```
 
 ---

@@ -72,6 +72,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS_PY = ROOT / "tools" / "py"
+CONTRACTS_DIR = ROOT / "core" / "contracts"
 
 
 def _run_tool(args, timeout=30):
@@ -219,7 +220,12 @@ def check_frontmatter(targets, timeout=30):
     if not targets:
         return {"checked": 0, "issues": []}
     issues = []
+    checked = 0
     for f in targets:
+        path = Path(f)
+        if "_analysis" in path.parts:
+            continue
+        checked += 1
         code, out, err = _run_tool([
             str(TOOLS_PY / "summary_validator.py"),
             "--file", f, "--strict"
@@ -235,7 +241,167 @@ def check_frontmatter(targets, timeout=30):
         if not data.get("data", {}).get("valid"):
             for e in data.get("data", {}).get("errors", []):
                 issues.append({"file": f, "type": "frontmatter", "message": e})
-    return {"checked": len(targets), "issues": issues}
+    return {"checked": checked, "issues": issues}
+
+
+def _extract_yaml_list_items(lines, anchor):
+    items = []
+    capture = False
+    base_indent = None
+    for line in lines:
+        if not capture:
+            if line.strip() == anchor:
+                capture = True
+            continue
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        if base_indent is None and line.lstrip().startswith("- "):
+            base_indent = indent
+        if base_indent is not None and indent < base_indent:
+            break
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            items.append(stripped[2:].strip().strip('"'))
+    return items
+
+
+def _load_main_doc_required_titles():
+    contract_path = CONTRACTS_DIR / "main_doc_contract.yaml"
+    if not contract_path.exists():
+        return []
+    titles = []
+    for line in contract_path.read_text(encoding="utf-8").splitlines():
+        m = re.match(r'\s*title:\s*"?(.*?)"?\s*$', line)
+        if m:
+            titles.append(m.group(1))
+    return titles
+
+
+def _load_run_record_contract():
+    contract_path = CONTRACTS_DIR / "run_record_contract.yaml"
+    if not contract_path.exists():
+        return {"generation_plan": [], "generation_progress": []}
+    lines = contract_path.read_text(encoding="utf-8").splitlines()
+    docs = {"generation_plan": [], "generation_progress": []}
+    current_doc = None
+    current_key = None
+    for line in lines:
+        doc_match = re.match(r"\s{2}(generation_plan|generation_progress):\s*$", line)
+        if doc_match:
+            current_doc = doc_match.group(1)
+            current_key = None
+            continue
+        key_match = re.match(r"\s{4}(required_headings|required_fields):\s*$", line)
+        if key_match and current_doc:
+            current_key = key_match.group(1)
+            continue
+        item_match = re.match(r'\s{6}-\s*"(.*?)"\s*$', line)
+        if item_match and current_doc and current_key:
+            docs[current_doc].append(item_match.group(1))
+    return docs
+
+
+def _extract_h2_titles(text):
+    return [m.group(1).strip() for m in re.finditer(r"^##\s+(.+?)\s*$", text, flags=re.MULTILINE)]
+
+
+def check_required_sections(targets):
+    required_titles = _load_main_doc_required_titles()
+    if not targets or not required_titles:
+        return {"checked": 0, "issues": []}
+    issues = []
+    checked = 0
+    for f in targets:
+        if Path(f).name != "AI_Coding_Context.md" or not Path(f).exists():
+            continue
+        checked += 1
+        text = Path(f).read_text(encoding="utf-8", errors="ignore")
+        headings = set(_extract_h2_titles(text))
+        for title in required_titles:
+            if title not in headings:
+                issues.append({
+                    "file": f,
+                    "type": "missing_required_section",
+                    "section": title,
+                    "message": f"缺少必需章节: {title}",
+                })
+    return {"checked": checked, "issues": issues}
+
+
+_RESIDUE_PATTERNS = [
+    (re.compile(r"\[填写\]"), "[填写]"),
+    (re.compile(r"\[PROJECT_NAME\]"), "[PROJECT_NAME]"),
+    (re.compile(r"\bTODO\b"), "TODO"),
+    (re.compile(r"^\|\s*\.\.\.\s*\|", re.MULTILINE), "ellipsis_table_row"),
+]
+
+
+def check_template_residue(targets):
+    if not targets:
+        return {"checked": 0, "issues": []}
+    issues = []
+    checked = 0
+    for f in targets:
+        if not Path(f).exists():
+            continue
+        checked += 1
+        text = Path(f).read_text(encoding="utf-8", errors="ignore")
+        lines = text.splitlines()
+        for pattern, label in _RESIDUE_PATTERNS:
+            for match in pattern.finditer(text):
+                lineno = text[:match.start()].count("\n") + 1
+                issues.append({
+                    "file": f,
+                    "type": "template_residue",
+                    "marker": label,
+                    "line": lineno,
+                    "message": f"检测到模板残留: {label}",
+                })
+        for idx, line in enumerate(lines, 1):
+            stripped = line.strip()
+            if stripped == "..." or stripped == "- ...":
+                issues.append({
+                    "file": f,
+                    "type": "template_residue",
+                    "marker": "...",
+                    "line": idx,
+                    "message": "检测到省略型占位符",
+                })
+    return {"checked": checked, "issues": issues}
+
+
+def check_run_record_integrity(targets):
+    contracts = _load_run_record_contract()
+    if not targets:
+        return {"checked": 0, "issues": []}
+    issues = []
+    checked = 0
+    for f in targets:
+        path = Path(f)
+        if path.name not in ("generation_plan.md", "generation_progress.md") or not path.exists():
+            continue
+        checked += 1
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        required_items = contracts["generation_plan"] if path.name == "generation_plan.md" else contracts["generation_progress"]
+        for item in required_items:
+            if item not in text:
+                issues.append({
+                    "file": f,
+                    "type": "run_record_integrity",
+                    "missing": item,
+                    "message": f"运行记录缺少必需项: {item}",
+                })
+        current_status_match = re.search(r"\*\*当前状态\*\*:\s*([^\n]+)", text)
+        current_status = current_status_match.group(1).strip() if current_status_match else ""
+        if path.name == "generation_progress.md" and current_status == "已完成" and "health_check_report" not in text:
+            issues.append({
+                "file": f,
+                "type": "run_record_integrity",
+                "missing": "health_check_report",
+                "message": "进度记录声明已完成，但未见 health_check_report 留痕",
+            })
+    return {"checked": checked, "issues": issues}
 
 
 def _collect_targets(args):
@@ -266,6 +432,9 @@ def main():
     p.add_argument("--check-file-paths", action="store_true")
     p.add_argument("--check-code-samples", action="store_true")
     p.add_argument("--check-dependencies", action="store_true")
+    p.add_argument("--check-required-sections", action="store_true")
+    p.add_argument("--check-template-residue", action="store_true")
+    p.add_argument("--check-run-record-integrity", action="store_true")
     p.add_argument("--full-check", action="store_true", help="综合检查（mode deep × 全文档目录）")
     p.add_argument("--doc-dir", help="文档目录（默认 dev_docs/）")
     p.add_argument("--output", help="JSON 输出文件")
@@ -277,8 +446,11 @@ def main():
     do_samples = bool(args.check_code_samples or args.full_check or args.mode in ("standard", "deep") or args.file)
     do_deps = bool(args.check_dependencies or args.full_check or args.mode == "deep")
     do_fm = bool(args.full_check or args.mode == "deep" or args.file)
+    do_required = bool(args.check_required_sections or args.full_check or args.mode == "deep")
+    do_residue = bool(args.check_template_residue or args.full_check or args.mode == "deep")
+    do_run_records = bool(args.check_run_record_integrity or args.full_check or args.mode == "deep")
 
-    if not any([do_paths, do_samples, do_deps, do_fm]):
+    if not any([do_paths, do_samples, do_deps, do_fm, do_required, do_residue, do_run_records]):
         p.error("请提供 --file / --mode / --check-* / --full-check 之一")
 
     targets = _collect_targets(args)
@@ -295,6 +467,12 @@ def main():
         checks["dependencies"] = check_dependencies(targets)
     if do_fm:
         checks["frontmatter"] = check_frontmatter(targets, timeout=args.timeout)
+    if do_required:
+        checks["required_sections"] = check_required_sections(targets)
+    if do_residue:
+        checks["template_residue"] = check_template_residue(targets)
+    if do_run_records:
+        checks["run_record_integrity"] = check_run_record_integrity(targets)
 
     total_issues = sum(len(v["issues"]) for v in checks.values())
     summary = {

@@ -1,0 +1,23 @@
+contract_version: 1
+document: AI_Coding_Context
+required_sections:
+  - id: project_overview
+    title: "📊 项目概览"
+  - id: key_directories
+    title: "📂 关键目录速查"
+  - id: scenario_navigation
+    title: "🎯 场景快速导航"
+  - id: document_index
+    title: "🚀 文档索引"
+  - id: core_patterns
+    title: "💻 核心代码模式"
+  - id: development_workflow
+    title: "🛠️ 开发流程规范"
+  - id: naming_rules
+    title: "📋 命名规范"
+  - id: business_modules
+    title: "🏢 业务模块映射"
+  - id: ai_taboo
+    title: "⚠️ AI 编码禁忌"
+  - id: common_tasks
+    title: "🔧 常见任务速查"

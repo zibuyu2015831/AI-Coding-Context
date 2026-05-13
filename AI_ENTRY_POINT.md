@@ -354,6 +354,10 @@ git add ai_coding_context/
 | 复杂度通知     | `tools/py/notifier.py`                | Slack / Email 阈值告警（005 优化点）|
 | 文档健康检查   | `tools/py/doc_health_checker.py`      | 文档健康编排：链接 / 代码示例 / 依赖 / frontmatter（B4#017）|
 | 文档健康检查   | `tools/js/doc_health_checker.js`      | Node.js 镜像（B4#017）|
+| 契约漂移自检   | `tools/py/framework_contract_checker.py` | 检查模板/工作流是否与框架契约和 SSOT 路径漂移 |
+| 契约漂移自检   | `tools/js/framework_contract_checker.js` | Node.js 镜像 |
+| 语义复查       | `tools/py/semantic_review_checker.py` | 半自动检查事实冲突、量化声明和测试资产拓扑 |
+| 语义复查       | `tools/js/semantic_review_checker.js` | Node.js 镜像 |
 
 
 ### 框架边界术语

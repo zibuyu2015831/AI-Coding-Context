@@ -19,3 +19,11 @@ verified_at: 2026-05-12
 - [项目分析报告模板](./PROJECT_ANALYSIS_REPORT_TEMPLATE.md)
 - [计划模板](./PLAN_TEMPLATE.md)
 - [进度跟踪模板](./PROGRESS_TRACKING_TEMPLATE.md)
+- [健康检查报告模板](./HEALTH_CHECK_REPORT_TEMPLATE.md)
+
+## 与模板配套的测试样本
+
+- [tools/testdata/README.md](../tools/testdata/README.md)
+- [framework_contracts](../tools/testdata/framework_contracts/README.md)
+- [semantic_review](../tools/testdata/semantic_review/README.md)
+- [doc_health](../tools/testdata/doc_health/README.md)

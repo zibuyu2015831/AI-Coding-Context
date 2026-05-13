@@ -82,6 +82,16 @@ project_root/
 - ❌ `dev_docs/AI_RULES.md`（缺 rules/combined/ 子路径）
 - ❌ `ai_coding_context.md`（小写主文档）
 
+### 规范文档与契约文件
+
+- `core/framework_spec.md` 继续作为面向人类的 Public 规范说明
+- `core/contracts/main_doc_contract.yaml` 是主文档必需章节的机器执行契约
+- `core/contracts/run_record_contract.yaml` 是首版生成运行记录最低字段的机器执行契约
+- `tools/py/framework_contract_checker.py` / `tools/js/framework_contract_checker.js` 用于框架自身的契约漂移自检
+- `tools/py/semantic_review_checker.py` / `tools/js/semantic_review_checker.js` 用于首版交付与健康检查时的半自动语义复查
+- workflow、template、checker 引用规则时，必须优先与上述契约文件保持一致
+- 若 Public 规范与契约文件出现漂移，必须尽快修正，不允许长期分叉
+
 ### 必需章节
 
 1. **📊 项目概览**

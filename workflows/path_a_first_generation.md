@@ -621,6 +621,14 @@ design_thinking:
 审核通过后，请告诉我"方案审核通过"，我将开始生成文档体系。
 ```
 
+同时，必须更新 `dev_docs/_analysis/generation_progress.md`，至少补全以下字段：
+
+- **当前状态**: `等待人工审核`
+- **本步结果**: 已生成 `generation_plan.md` 与 `project_analysis_report.md`
+- **下一步**: 等待用户确认后开始正式生成
+- **最后更新**: 当前时间
+- **阻塞原因**: 无
+
 **⏸️ 暂停执行，等待用户确认**
 
 ---
@@ -639,7 +647,8 @@ design_thinking:
 1. 复制模板到目标路径
 2. 填写项目基本信息（规模、策略、子文档清单）
 3. 初始化进度状态（0/N 完成）
-4. 记录开始时间
+4. 记录当前状态、下一步和状态变更记录
+5. 记录开始时间
 
 **详细说明**: 参见 [workflows/progress_tracking.md](./progress_tracking.md)
 
@@ -654,8 +663,9 @@ design_thinking:
 1. ✅ 创建进度文件（初始状态：0/N）
 2. ✅ 开始生成所有文档
 3. ✅ 每完成一个文档，更新进度（X/N）
-4. ✅ 全部完成后，更新为完成状态（N/N）
-5. ✅ 记录完成时间和总耗时
+4. ✅ 文档全部写完后，更新为“首版验收中”
+5. ✅ 验收通过并生成 `health_check_report.md` 后，才能更新为“已完成”
+6. ✅ 记录完成时间和总耗时
 
 **示例进度更新**:
 
@@ -668,9 +678,10 @@ design_thinking:
 - [x] testing_guide.md (4/5)
 - [x] deployment_guide.md (5/5)
 
-**状态**: ✅ 已完成
+**状态**: 🧪 首版验收中
 **开始时间**: 2025-12-19 10:00
-**完成时间**: 2025-12-19 12:30
+**下一步**: 运行 `doc_health_checker` + `semantic_review_checker` 并生成 `health_check_report.md`
+**完成时间**: 待验收通过后填写
 **总耗时**: 2.5 小时
 ```
 
@@ -686,7 +697,8 @@ design_thinking:
 2. ✅ 每批开始前，标记当前批次
 3. ✅ 每完成一个文档，更新进度
 4. ✅ 每批完成后，询问用户是否继续
-5. ✅ 全部完成后，更新为完成状态
+5. ✅ 文档全部生成后，进入“首版验收中”
+6. ✅ 验收通过并落盘报告后，更新为完成状态
 
 **示例进度更新**:
 
@@ -715,7 +727,8 @@ design_thinking:
 - [x] troubleshooting.md (10/10)
       **批次状态**: ✅ 已完成 (2025-12-19 16:00)
 
-**总体状态**: ✅ 已完成
+**总体状态**: 🧪 首版验收中
+**下一步**: 汇总各批次结果，执行结构检查与语义复查，并生成 `health_check_report.md`
 **总耗时**: 6 小时
 ```
 
@@ -760,8 +773,41 @@ design_thinking:
 4. 可选子文档（按需求）
 5. `plans/` 和 `knowledge/` 目录结构
 6. **AI Rules 文件** `dev_docs/rules/combined/AI_RULES.md`
+7. **首版质量验收与报告落盘**
 
-### 8.4 生成 AI Rules 文件
+### 8.4 完成状态的严格定义
+
+- `文档已生成` 不等于 `任务已完成`
+- 只有 `文档生成完成 + 必需检查通过 + health_check_report.md 落盘` 才能写 `已完成`
+- 若验收未通过，`generation_progress.md` 必须保持在 `首版验收中` 或 `已阻塞`
+
+### 8.5 首版质量验收（必须执行）
+
+**必做动作**:
+
+1. 运行 `doc_health_checker`
+2. 运行 `semantic_review_checker`
+3. 记录主文档必需章节检查结果
+4. 记录运行记录完整性检查结果
+5. 记录量化声明、测试资产拓扑和事实源冲突结果
+6. 生成 `dev_docs/_analysis/health_check_report.md`
+7. 仅在最终 verdict = `PASS` 时将 `generation_progress.md` 更新为 `已完成`
+
+**推荐命令**:
+
+```bash
+python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs
+node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
+```
+
+**失败处理**:
+
+- 任一关键检查失败，不得宣称“已完成”
+- 必须在 `generation_progress.md` 中记录失败项、当前状态和下一步修复动作
+
+### 8.6 生成 AI Rules 文件
 
 **位置**: `dev_docs/rules/combined/AI_RULES.md`（详见 [`core/framework_spec.md` "标准产物路径"章节](../core/framework_spec.md#标准产物路径ssot)）
 
@@ -902,6 +948,8 @@ design_thinking:
 - [ ] **关联检查**: `related_files` 字段准确无误
 - [ ] **进度记录**: 已创建并持续更新 generation_progress.md ⭐
 - [ ] **进度同步**: 每完成一个文档立即更新进度状态 ⭐
+- [ ] **首版验收**: 已执行质量验收并生成 `health_check_report.md` ⭐
+- [ ] **完成语义**: 只有在验收通过后才写“已完成” ⭐
 
 ---
 
@@ -921,6 +969,8 @@ design_thinking:
 - ✅ 文档结构完整
 - ✅ 代码示例真实
 - ✅ 数据准确可验证
+- ✅ 首版验收通过
+- ✅ `health_check_report.md` 已落盘
 - ✅ 用户确认满意
 
 ---

@@ -3,7 +3,7 @@ title: 路径 B 文档健康度检查
 summary: 定义在项目已存在 dev_docs 文档体系时，AI 如何以快速、标准或深度模式评估现有文档的健康状态，并据此决定是否需要更新或重建文档。
 keywords: path-b | health-check | workflow | dev-docs | assessment | aicc
 scope: 已有文档体系的健康度检查与后续动作决策
-related_files: tools/py/doc_health_checker.py | tools/js/doc_health_checker.js
+related_files: tools/py/doc_health_checker.py | tools/js/doc_health_checker.js | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js
 dependencies: AI_ENTRY_POINT.md | workflows/document_health_check.md | core/framework_spec.md
 verified_at: 2026-05-05
 ---
@@ -42,6 +42,8 @@ verified_at: 2026-05-05
 ---
 
 ## 🚀 执行流程
+
+> **P1 增强说明**: 当用户选择模式 2（标准检查）或模式 3（深度分析）时，除 `doc_health_checker` 外，建议追加执行 `semantic_review_checker`，用于发现量化声明失真、测试资产漏覆盖和事实源冲突。
 
 ### 默认行为
 
