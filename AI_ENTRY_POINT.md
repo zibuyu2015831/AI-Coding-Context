@@ -421,7 +421,8 @@ graph TD
         S55 --> S6[Step 6: 生成分析方案与问题报告]
 
         S6 --> S7[Step 7: AI 内部互审<br/>Mutual Review]
-        S7 --> S75{<b>Step 7.5: 等待人工审核</b>}
+        S7 --> S74[<b>Step 7.4: Phase 1 方案复查门</b><br/>generation_plan Review Gate]
+        S74 --> S75{<b>Step 7.5: 等待人工审核</b>}
 
         %% 执行与进度记录
         S75 -- 审核通过 --> S8[Step 8: 执行文档生成]
@@ -451,9 +452,39 @@ graph TD
     class Start init;
     class D1,S75,GitSafety decision;
     class S55,S8,Progress loop;
-    class S0,S1,S3,CommitAnalyze process;
+    class S0,S1,S3,S74,CommitAnalyze process;
     class Fallback critical;
 ```
+
+---
+
+## 🔎 Phase 1 方案复查请求路由
+
+当用户携带 `AI_ENTRY_POINT.md`，并要求“审核 `dev_docs/_analysis`”“判断 Phase 1 是否通过”“检查方案是否可以进入正式文档生成”“复查 `generation_plan.md`”或类似短指令时，AI 必须进入 **Phase 1 generation_plan Review Gate**，而不是直接生成正式文档，也不是只运行普通健康检查。
+
+### 必须读取
+
+- `workflows/path_a_first_generation.md` 的 Step 7.4 与 Step 7.5。
+- `workflows/generation_workflow.md` 的步骤 3.1B。
+- `templates/GENERATION_PLAN_TEMPLATE.md` 的 `Phase 1 方案复查清单`。
+- `templates/PROGRESS_TEMPLATE.md` 的 `Phase 1 方案复查记录`。
+
+### 必须执行
+
+1. 复查 `_analysis` 三件套：`generation_plan.md`、`project_analysis_report.md`、`generation_progress.md`。
+2. 如发现事实、证据等级、待确认边界、项目定位覆盖或状态表达问题，直接回写对应 `_analysis` 文件。
+3. 在 `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含触发来源、工具结果、人工语义复查摘要、回写摘要、blocker/warning/waived 统计和用户确认状态。
+4. 运行 `doc_health_checker --full-check` 与 `semantic_review_checker --full-check`；工具不可用时必须记录 `UNAVAILABLE`、原因和替代复核。
+5. 最终回复只能使用以下结论之一：
+   - `需修正，已回写 _analysis`
+   - `建议通过，等待用户确认`
+   - `需人工确认，禁止正式生成`
+
+### 禁止事项
+
+- 禁止用户确认前写“Phase 1 PASS，可进入正式文档生成”。
+- 禁止只更新 `generation_progress.md` 而不复查 `generation_plan.md` 与 `project_analysis_report.md`。
+- 禁止把可由代码、配置、锁文件、README 或现有项目文档确认的事实放入用户确认项。
 
 ---
 

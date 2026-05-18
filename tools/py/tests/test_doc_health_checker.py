@@ -48,6 +48,8 @@ GENERATION_PLAN_BASE = """# 文档生成方案模板
 ## 📊 质量保证措施
 
 ## 🧾 证据与验证记录
+
+## 🔎 Phase 1 方案复查清单
 """
 
 GENERATION_PROGRESS_BASE = """# 文档生成进度记录
@@ -166,6 +168,64 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
         self.assertIn("run_record_integrity", issue_types)
+
+    def test_phase1_pass_requires_plan_review_record(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE.replace(
+            "> **当前状态**: 生成中",
+            "> **当前状态**: 等待人工审核",
+        ).replace(
+            "> **下一步动作**: 继续生成",
+            "> **下一步动作**: Phase 1 PASS，可进入正式文档生成",
+        )
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("phase1_pass_without_plan_review_record", issue_types)
+        self.assertIn("phase1_pass_before_user_confirmation", issue_types)
+
+    def test_phase1_review_record_requires_writeback_summary(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE.replace(
+            "> **当前状态**: 生成中",
+            "> **当前状态**: 等待人工审核",
+        ).replace(
+            "> **下一步动作**: 继续生成",
+            "> **下一步动作**: Phase 1 建议通过，等待用户确认",
+        ) + """
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **machine_checks**: doc_health_checker=PASS, semantic_review_checker=PASS
+- **manual_review_summary**: 已复查
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+"""
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("phase1_plan_review_writeback_missing", issue_types)
 
     def test_progress_duplicate_last_updated_is_reported(self):
         self._write_valid_bundle()

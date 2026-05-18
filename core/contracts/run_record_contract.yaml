@@ -8,6 +8,7 @@ documents:
       - "📚 第三阶段：子文档规划（待审核）"
       - "📊 质量保证措施"
       - "🧾 证据与验证记录"
+      - "🔎 Phase 1 方案复查清单"
   generation_progress:
     required_fields:
       - "开始时间"
@@ -21,3 +22,19 @@ documents:
       - "总任务数"
       - "已完成数"
       - "下一步动作"
+    conditional_phase1_review_fields:
+      trigger: "当 generation_progress.md 声明 Phase 1 PASS、建议通过或可进入正式文档生成时"
+      required_fields:
+        - "Phase 1 方案复查记录"
+        - "review_trigger"
+        - "review_started_at"
+        - "review_completed_at"
+        - "reviewed_files"
+        - "machine_checks"
+        - "manual_review_summary"
+        - "writeback_summary"
+        - "blocker_count"
+        - "warning_count"
+        - "waived_issue_count"
+        - "phase1_recommendation"
+        - "user_confirmation_status"

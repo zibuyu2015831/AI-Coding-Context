@@ -107,6 +107,33 @@ function runTests() {
     assert.ok(issueTypes.has('invalid_evidence_path'));
   });
 
+  test('LinguaCafe Phase 1 progress-only case is blocked', () => {
+    const caseRoot = path.join(SEMANTIC_ROOT, 'linguacafe_phase1_progress_only_case');
+    const { result, payload } = runJson([
+      '--doc-dir', path.join(caseRoot, 'dev_docs'),
+      '--repo-root', caseRoot,
+      '--full-check',
+    ]);
+    assert.strictEqual(result.status, 1);
+    const issueTypes = new Set(Object.values(payload.checks).flat().map((issue) => issue.type));
+    assert.ok(issueTypes.has('evidence_level_completeness'));
+    assert.ok(issueTypes.has('project_analysis_issue_status_missing'));
+    assert.ok(issueTypes.has('phase1_progress_only_review'));
+    assert.ok(issueTypes.has('confirmable_fact_misclassified'));
+    assert.ok(issueTypes.has('project_positioning_coverage_missing'));
+  });
+
+  test('LinguaCafe Phase 1 reviewed case passes', () => {
+    const caseRoot = path.join(SEMANTIC_ROOT, 'linguacafe_phase1_reviewed_case');
+    const { result, payload } = runJson([
+      '--doc-dir', path.join(caseRoot, 'dev_docs'),
+      '--repo-root', caseRoot,
+      '--full-check',
+    ]);
+    assert.strictEqual(result.status, 0);
+    assert.strictEqual(payload.summary.passed, true);
+  });
+
   console.log(`测试完成: ${passed} 通过, ${failed} 失败`);
   if (failed > 0) {
     process.exit(1);

@@ -591,11 +591,24 @@ design_thinking:
 
 Phase 1 自检只检查方案阶段产物，不要求 `AI_Coding_Context.md`、子文档、AI Rules 或 `health_check_report.md` 已经存在。
 
+当用户在首次生成后再次要求“审核 `_analysis` / 判断 Phase 1 是否通过 / 复查 `generation_plan.md`”时，也必须回到本 gate。此时不得生成正式文档，只能复查和必要回写 `_analysis` 三件套。
+
+### 三件套权责
+
+| 文件 | 职责 | 复查时必须回写的内容 |
+| ---- | ---- | -------------------- |
+| `generation_plan.md` | 文档体系生成策略、子文档清单、批次计划、质量门禁和准入条件 | 子文档规划、证据等级、待确认准入、下一步动作 |
+| `project_analysis_report.md` | 风险、疑问、警告、建议、用户确认项和项目定位触发项 | 证据等级、当前状态、`blocks_phase1`、回写目标 |
+| `generation_progress.md` | 流程状态、工具结果、复查记录、回写摘要、用户确认状态和恢复入口 | `Phase 1 方案复查记录`、blocker/warning 统计、输出建议 |
+
 ### 必做检查
 
 - `dev_docs/_analysis/generation_plan.md` 不得包含模板残留、旧结论残留或未标注来源的关键事实。
 - `dev_docs/_analysis/project_analysis_report.md` 中的疑问、风险和强结论必须有当前状态与证据等级。
 - `dev_docs/_analysis/generation_progress.md` 必须区分流程阶段进度与产物完成度，并记录当前 gate。
+- `generation_progress.md` 若声明 Phase 1 PASS、建议通过或可进入正式生成，必须包含 `Phase 1 方案复查记录` 和 `writeback_summary`。
+- `generation_plan.md` 的 `证据与验证记录` 必须包含 `证据等级`，项目定位触发项必须影响子文档规划或说明合并覆盖位置。
+- `project_analysis_report.md` 的警告、疑问和建议必须包含证据等级、当前状态、`blocks_phase1` 和回写目标。
 - 若 AI 互审改变了事实状态，必须同步回写摘要、正文、表格、待确认清单、行动计划和进度记录，禁止只在文末追加复查记录。
 
 ### 推荐命令
@@ -611,6 +624,13 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 - 结构检查、运行记录检查或复查后全文一致性检查失败时，不得进入“等待人工审核”输出。
 - Swift/Xcode 测试拓扑等已知工具适配缺口可人工复核，但必须在 `generation_progress.md` 中记录真实命令、issue 数量、人工判定和下一步动作。
+- 用户确认前只能输出“建议通过，等待用户确认”；禁止输出“Phase 1 PASS，可进入正式文档生成”。
+
+### 输出协议
+
+- `需修正，已回写 _analysis`: 仍有 blocker，说明已回写文件和剩余问题。
+- `建议通过，等待用户确认`: 无 blocker，但正式生成仍需用户明确确认。
+- `需人工确认，禁止正式生成`: 存在代码和仓库文档无法判断的产品、策略或业务问题。
 
 ---
 

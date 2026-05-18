@@ -342,6 +342,66 @@ function checkTemplateResidue(targets) {
   return { checked, issues };
 }
 
+const PHASE1_REVIEW_FIELDS = [
+  'review_trigger',
+  'review_started_at',
+  'review_completed_at',
+  'reviewed_files',
+  'machine_checks',
+  'manual_review_summary',
+  'writeback_summary',
+  'blocker_count',
+  'warning_count',
+  'waived_issue_count',
+  'phase1_recommendation',
+  'user_confirmation_status',
+];
+
+function isPhase1PassOrRecommendation(text) {
+  if (!text.includes('Phase 1') && !text.toLowerCase().includes('phase1')) return false;
+  return /\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成/i.test(text);
+}
+
+function hasUserConfirmation(text) {
+  return /当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)/i.test(text);
+}
+
+function checkPhase1ReviewRecord(file, text) {
+  const issues = [];
+  const phase1Pass = isPhase1PassOrRecommendation(text);
+  const hasRecord = text.includes('Phase 1 方案复查记录');
+  if (phase1Pass && !hasRecord) {
+    issues.push({
+      file,
+      type: 'phase1_pass_without_plan_review_record',
+      severity: 'blocker',
+      message: '进度记录声明 Phase 1 PASS/建议通过，但缺少 Phase 1 方案复查记录',
+    });
+  }
+  if (hasRecord) {
+    PHASE1_REVIEW_FIELDS.forEach((field) => {
+      if (!text.includes(field)) {
+        issues.push({
+          file,
+          type: field === 'writeback_summary' ? 'phase1_plan_review_writeback_missing' : 'phase1_plan_review_record_missing',
+          severity: phase1Pass ? 'blocker' : 'warning',
+          missing: field,
+          message: `Phase 1 方案复查记录缺少字段: ${field}`,
+        });
+      }
+    });
+  }
+  if (phase1Pass && text.includes('可进入正式文档生成') && !hasUserConfirmation(text)) {
+    issues.push({
+      file,
+      type: 'phase1_pass_before_user_confirmation',
+      severity: 'blocker',
+      message: '用户确认前不得将 Phase 1 建议通过表述为可进入正式文档生成',
+    });
+  }
+  return issues;
+}
+
 function checkRunRecordIntegrity(targets) {
   const contracts = loadRunRecordContract();
   if (!targets || targets.length === 0) return { checked: 0, issues: [] };
@@ -369,6 +429,7 @@ function checkRunRecordIntegrity(targets) {
       });
     }
     if (name === 'generation_progress.md') {
+      issues.push(...checkPhase1ReviewRecord(file, text));
       const lastUpdates = Array.from(text.matchAll(/\*\*最后更新\*\*:\s*([^\n]+)/g)).map((match) => match[1].trim());
       const uniqueLastUpdates = Array.from(new Set(lastUpdates)).sort();
       if (uniqueLastUpdates.length > 1) {

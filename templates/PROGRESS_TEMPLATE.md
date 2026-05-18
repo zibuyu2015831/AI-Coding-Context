@@ -107,6 +107,31 @@ verified_at: 2026-05-05
 
 ---
 
+## 🔎 Phase 1 方案复查记录
+
+> 本节只记录方案阶段复查，不替代首版质量验收。用户确认前只能写“建议通过，等待用户确认”，不得写“可进入正式文档生成”。
+
+- **review_trigger**: [首次生成自检/用户要求审核 _analysis/其他]
+- **review_started_at**: YYYY-MM-DD HH:mm
+- **review_completed_at**: YYYY-MM-DD HH:mm
+- **reviewed_files**: `generation_plan.md`, `project_analysis_report.md`, `generation_progress.md`
+- **machine_checks**: [命令、退出码、issue 数量；工具不可用时写 UNAVAILABLE 并说明替代复核]
+- **manual_review_summary**: [人工语义复查结论，包含事实、证据、待确认边界和项目定位覆盖]
+- **writeback_summary**: [已回写文件；无需回写的文件必须写明“已检查，无需回写”及原因]
+- **blocker_count**: [数量]
+- **warning_count**: [数量]
+- **waived_issue_count**: [数量，含豁免理由]
+- **phase1_recommendation**: [需修正，已回写 _analysis/建议通过，等待用户确认/需人工确认，禁止正式生成]
+- **user_confirmation_status**: [pending/confirmed/rejected]
+
+### 复查输出协议
+
+- `需修正，已回写 _analysis`: 仍有 blocker 或三件套不一致，禁止请求用户通过。
+- `建议通过，等待用户确认`: 无 blocker，但正式生成仍需用户明确确认。
+- `需人工确认，禁止正式生成`: 存在代码和仓库文档无法回答的策略/业务问题。
+
+---
+
 ## 📌 状态变更记录
 
 | 时间 | 当前状态 | 本步结果 | 下一步 | 备注 |

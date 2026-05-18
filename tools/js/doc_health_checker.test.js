@@ -44,6 +44,8 @@ const GENERATION_PLAN_BASE = `# 文档生成方案模板
 ## 📊 质量保证措施
 
 ## 🧾 证据与验证记录
+
+## 🔎 Phase 1 方案复查清单
 `;
 
 const GENERATION_PROGRESS_BASE = `# 文档生成进度记录
@@ -139,6 +141,53 @@ function runTests() {
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
       assert.strictEqual(result.status, 1);
       assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'run_record_integrity'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('Phase 1 PASS requires review record and user confirmation boundary', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const progress = GENERATION_PROGRESS_BASE
+        .replace('> **当前状态**: 生成中', '> **当前状态**: 等待人工审核')
+        .replace('> **下一步动作**: 继续生成', '> **下一步动作**: Phase 1 PASS，可进入正式文档生成');
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('phase1_pass_without_plan_review_record'));
+      assert.ok(issueTypes.has('phase1_pass_before_user_confirmation'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('Phase 1 review record requires writeback summary', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const progress = `${GENERATION_PROGRESS_BASE
+        .replace('> **当前状态**: 生成中', '> **当前状态**: 等待人工审核')
+        .replace('> **下一步动作**: 继续生成', '> **下一步动作**: Phase 1 建议通过，等待用户确认')}
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **machine_checks**: doc_health_checker=PASS, semantic_review_checker=PASS
+- **manual_review_summary**: 已复查
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+`;
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'phase1_plan_review_writeback_missing'));
     } finally {
       cleanup(base);
     }

@@ -107,6 +107,34 @@ class TestSemanticReviewCheckerPython(unittest.TestCase):
         self.assertIn("unevidenced_strong_conclusion", issue_types)
         self.assertIn("invalid_evidence_path", issue_types)
 
+    def test_linguacafe_phase1_progress_only_case_is_blocked(self):
+        case_root = SEMANTIC_ROOT / "linguacafe_phase1_progress_only_case"
+        result, payload = run_json([
+            "--doc-dir", str(case_root / "dev_docs"),
+            "--repo-root", str(case_root),
+            "--full-check",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issues = []
+        for check_issues in payload["checks"].values():
+            issues.extend(check_issues)
+        issue_types = {issue["type"] for issue in issues}
+        self.assertIn("evidence_level_completeness", issue_types)
+        self.assertIn("project_analysis_issue_status_missing", issue_types)
+        self.assertIn("phase1_progress_only_review", issue_types)
+        self.assertIn("confirmable_fact_misclassified", issue_types)
+        self.assertIn("project_positioning_coverage_missing", issue_types)
+
+    def test_linguacafe_phase1_reviewed_case_passes(self):
+        case_root = SEMANTIC_ROOT / "linguacafe_phase1_reviewed_case"
+        result, payload = run_json([
+            "--doc-dir", str(case_root / "dev_docs"),
+            "--repo-root", str(case_root),
+            "--full-check",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(payload["summary"]["passed"])
+
 
 if __name__ == "__main__":
     unittest.main()

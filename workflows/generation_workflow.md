@@ -858,6 +858,8 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 首次运行在提交 `generation_plan.md`、`project_analysis_report.md` 和 `generation_progress.md` 给用户审核前，必须先执行 Phase 1 自检。该 gate 不要求主文档、子文档、AI Rules 或 `health_check_report.md` 已存在；它只保证方案阶段产物可审核、可追溯、没有明显事实漂移。
 
+如果用户后续要求“审核 `_analysis`”“判断 Phase 1 是否通过”“复查 `generation_plan.md`”，也执行本 gate。此类请求只允许复查和回写 `_analysis` 三件套，不得开始正式文档生成。
+
 **最小要求**:
 
 - [ ] `_analysis` 产物无模板残留。
@@ -865,6 +867,9 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 - [ ] 可由代码、配置或锁文件确认的事实没有进入用户确认清单。
 - [ ] 复查改变事实状态后，摘要、正文、表格、待确认清单、行动计划和进度记录已同步回写。
 - [ ] `generation_progress.md` 同时记录流程阶段进度、产物完成度、当前 gate 和下一步动作。
+- [ ] `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含 `review_trigger`、`machine_checks`、`manual_review_summary`、`writeback_summary`、`phase1_recommendation` 和 `user_confirmation_status`。
+- [ ] `project_analysis_report.md` 的警告、疑问和建议包含证据等级、当前状态、`blocks_phase1` 和回写目标。
+- [ ] 项目定位触发项（开源维护、用户手册、自托管运维、外部 API/数据授权等）已进入子文档规划，或说明已合并覆盖/不适用。
 
 **推荐命令**:
 
@@ -879,6 +884,14 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 - 结构检查、运行记录检查或复查后全文一致性检查失败时，不得请求用户审核通过方案。
 - 工具存在项目类型适配限制时，可以人工复核，但必须记录命令、真实 issue 数量、人工判定和下一步修复方向。
+- progress-only PASS、用户确认前写“可进入正式文档生成”、关键事实缺证据等级、可由代码确认的事实进入用户确认项，均为 blocker。
+- 历史 `_analysis` 缺少新字段但没有声明 Phase 1 PASS 时，可降级为 warning/info；一旦声明建议通过，必须补齐复查记录。
+
+**输出协议**:
+
+- `需修正，已回写 _analysis`
+- `建议通过，等待用户确认`
+- `需人工确认，禁止正式生成`
 
 
 ### 步骤 3.2: AI 自测

@@ -298,6 +298,136 @@ function checkReviewConsistency(docDir, repoRoot) {
   return issues;
 }
 
+function analysisFile(docDir, name) {
+  return path.join(docDir, '_analysis', name);
+}
+
+function readIfExists(file) {
+  return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+}
+
+function isPhase1PassOrRecommendation(text) {
+  if (!text.includes('Phase 1') && !text.toLowerCase().includes('phase1')) return false;
+  return /\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成/i.test(text);
+}
+
+function repoHasAny(repoRoot, names) {
+  return names.some((name) => fs.existsSync(path.join(repoRoot, name)));
+}
+
+function repoTextSignals(repoRoot) {
+  const chunks = [];
+  ['README.md', 'CONTRIBUTING.md'].forEach((rel) => {
+    const file = path.join(repoRoot, rel);
+    if (fs.existsSync(file)) chunks.push(fs.readFileSync(file, 'utf8'));
+  });
+  const manual = path.join(repoRoot, 'manual');
+  if (fs.existsSync(manual)) {
+    walkFiles(manual, (file) => file.endsWith('.md')).forEach((file) => chunks.push(fs.readFileSync(file, 'utf8')));
+  }
+  return chunks.join('\n');
+}
+
+function checkPhase1AnalysisGate(docDir, repoRoot) {
+  const issues = [];
+  const planPath = analysisFile(docDir, 'generation_plan.md');
+  const reportPath = analysisFile(docDir, 'project_analysis_report.md');
+  const progressPath = analysisFile(docDir, 'generation_progress.md');
+  const plan = readIfExists(planPath);
+  const report = readIfExists(reportPath);
+  const progress = readIfExists(progressPath);
+  const phase1Pass = isPhase1PassOrRecommendation(progress);
+  const strictPhase1Review = phase1Pass || progress.includes('Phase 1 方案复查记录') || plan.includes('Phase 1 方案复查清单');
+
+  if (strictPhase1Review && plan && plan.includes('证据与验证记录') && !plan.includes('证据等级')) {
+    issues.push({
+      type: 'evidence_level_completeness',
+      severity: 'blocker',
+      file: planPath,
+      message: 'generation_plan.md 的证据与验证记录缺少证据等级',
+    });
+  }
+
+  const reportHasIssues = ['严重问题', '警告', '疑问', '优化建议', '建议'].some((marker) => report.includes(marker));
+  if (strictPhase1Review && report && reportHasIssues) {
+    const missing = ['证据等级', '当前状态', 'blocks_phase1', '回写目标'].filter((field) => !report.includes(field));
+    if (missing.length > 0) {
+      issues.push({
+        type: 'project_analysis_issue_status_missing',
+        severity: 'blocker',
+        file: reportPath,
+        missing,
+        message: 'project_analysis_report.md 的问题项缺少证据等级、状态、阻断标记或回写目标',
+      });
+    }
+  }
+
+  if (phase1Pass) {
+    if (!progress.includes('Phase 1 方案复查记录') || !progress.includes('writeback_summary')) {
+      issues.push({
+        type: 'phase1_progress_only_review',
+        severity: 'blocker',
+        file: progressPath,
+        message: 'generation_progress.md 声明 Phase 1 PASS/建议通过，但缺少可审计复查记录或回写摘要',
+      });
+    }
+    if (fs.existsSync(reportPath) && !report.includes('证据等级')) {
+      issues.push({
+        type: 'phase1_progress_only_review',
+        severity: 'blocker',
+        file: reportPath,
+        message: 'progress 声明 Phase 1 PASS/建议通过，但 project_analysis_report.md 未同步补齐证据等级',
+      });
+    }
+  }
+
+  const combinedAnalysis = `${plan}\n${report}`;
+  [
+    { marker: '贡献者指南', evidence: 'CONTRIBUTING.md', file: path.join(repoRoot, 'CONTRIBUTING.md') },
+    { marker: 'Docker', evidence: 'docker-compose.yml', file: path.join(repoRoot, 'docker-compose.yml') },
+  ].forEach(({ marker, evidence, file }) => {
+    const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const questionRe = new RegExp(`(待确认|需确认|是否).*${escapedMarker}|${escapedMarker}.*(待确认|需确认|是否)`);
+    if (strictPhase1Review && fs.existsSync(file) && combinedAnalysis.includes(marker) && questionRe.test(combinedAnalysis)) {
+      issues.push({
+        type: 'confirmable_fact_misclassified',
+        severity: 'blocker',
+        file: report.includes(marker) ? reportPath : planPath,
+        fact: marker,
+        evidence,
+        message: `可由仓库文件确认的事实被放入用户确认项: ${marker}`,
+      });
+    }
+  });
+
+  const positioningRequirements = [];
+  if (fs.existsSync(path.join(repoRoot, 'CONTRIBUTING.md'))) {
+    positioningRequirements.push({ signal: 'open_source_maintenance', keywords: ['贡献', '维护', '开源'] });
+  }
+  if (fs.existsSync(path.join(repoRoot, 'manual'))) {
+    positioningRequirements.push({ signal: 'user_manual', keywords: ['用户手册', 'manual', '使用指南', '使用'] });
+  }
+  if (repoHasAny(repoRoot, ['docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml'])) {
+    positioningRequirements.push({ signal: 'self_hosted_ops', keywords: ['Docker', '部署', '运维', '自托管'] });
+  }
+  const signals = repoTextSignals(repoRoot).toLowerCase();
+  if (['deepl', 'anki', 'jellyfin', 'dictionary', 'external api'].some((signal) => signals.includes(signal))) {
+    positioningRequirements.push({ signal: 'external_data_api', keywords: ['外部', 'API', '授权', '集成', 'DeepL', 'Anki', 'Jellyfin', 'dictionary'] });
+  }
+  positioningRequirements.forEach(({ signal, keywords }) => {
+    if (strictPhase1Review && !keywords.some((keyword) => plan.includes(keyword))) {
+      issues.push({
+        type: 'project_positioning_coverage_missing',
+        severity: 'warning',
+        file: planPath,
+        signal,
+        message: `项目定位触发项未进入 generation_plan.md 子文档规划: ${signal}`,
+      });
+    }
+  });
+  return issues;
+}
+
 function renderText(payload) {
   const status = payload.summary.passed ? 'PASS' : 'FAIL';
   return `${status}: semantic_review_checker\n${Object.entries(payload.checks).map(([name, issues]) => `- ${name}: ${issues.length} issue(s)`).join('\n')}\n`;
@@ -316,7 +446,7 @@ function main() {
 
   const docDir = path.resolve(args.docDir);
   const repoRoot = path.resolve(args.repoRoot);
-  const checks = { fact_conflicts: [], metrics: [], test_topology: [], review_consistency: [] };
+  const checks = { fact_conflicts: [], metrics: [], test_topology: [], review_consistency: [], phase1_analysis_gate: [] };
   if (args.fullCheck || args.checkFactConflicts) {
     checks.fact_conflicts = checkFactConflicts(docDir, repoRoot);
   }
@@ -328,6 +458,7 @@ function main() {
   }
   if (args.fullCheck) {
     checks.review_consistency = checkReviewConsistency(docDir, repoRoot);
+    checks.phase1_analysis_gate = checkPhase1AnalysisGate(docDir, repoRoot);
   }
   if (!(args.fullCheck || args.checkFactConflicts || args.checkMetrics || args.checkTestTopology)) {
     process.stdout.write('Usage: semantic_review_checker --doc-dir DIR [--repo-root DIR] [--check-fact-conflicts] [--check-metrics] [--check-test-topology] [--full-check] [--format json|text]\n');

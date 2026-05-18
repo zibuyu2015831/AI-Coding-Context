@@ -371,6 +371,64 @@ def check_template_residue(targets):
     return {"checked": checked, "issues": issues}
 
 
+PHASE1_REVIEW_FIELDS = [
+    "review_trigger",
+    "review_started_at",
+    "review_completed_at",
+    "reviewed_files",
+    "machine_checks",
+    "manual_review_summary",
+    "writeback_summary",
+    "blocker_count",
+    "warning_count",
+    "waived_issue_count",
+    "phase1_recommendation",
+    "user_confirmation_status",
+]
+
+
+def _is_phase1_pass_or_recommendation(text):
+    if "Phase 1" not in text and "phase1" not in text.lower():
+        return False
+    return bool(re.search(r"\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成", text, flags=re.IGNORECASE))
+
+
+def _has_user_confirmation(text):
+    return bool(re.search(r"当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)", text, flags=re.IGNORECASE))
+
+
+def _check_phase1_review_record(path, text):
+    issues = []
+    phase1_pass = _is_phase1_pass_or_recommendation(text)
+    has_record = "Phase 1 方案复查记录" in text
+    if phase1_pass and not has_record:
+        issues.append({
+            "file": str(path),
+            "type": "phase1_pass_without_plan_review_record",
+            "severity": "blocker",
+            "message": "进度记录声明 Phase 1 PASS/建议通过，但缺少 Phase 1 方案复查记录",
+        })
+    if has_record:
+        for field in PHASE1_REVIEW_FIELDS:
+            if field not in text:
+                issue_type = "phase1_plan_review_writeback_missing" if field == "writeback_summary" else "phase1_plan_review_record_missing"
+                issues.append({
+                    "file": str(path),
+                    "type": issue_type,
+                    "severity": "blocker" if phase1_pass else "warning",
+                    "missing": field,
+                    "message": f"Phase 1 方案复查记录缺少字段: {field}",
+                })
+    if phase1_pass and "可进入正式文档生成" in text and not _has_user_confirmation(text):
+        issues.append({
+            "file": str(path),
+            "type": "phase1_pass_before_user_confirmation",
+            "severity": "blocker",
+            "message": "用户确认前不得将 Phase 1 建议通过表述为可进入正式文档生成",
+        })
+    return issues
+
+
 def check_run_record_integrity(targets):
     contracts = _load_run_record_contract()
     if not targets:
@@ -402,6 +460,7 @@ def check_run_record_integrity(targets):
                 "message": "进度记录声明已完成，但未见 health_check_report 留痕",
             })
         if path.name == "generation_progress.md":
+            issues.extend(_check_phase1_review_record(path, text))
             last_updates = re.findall(r"\*\*最后更新\*\*:\s*([^\n]+)", text)
             if len(set(last_updates)) > 1:
                 issues.append({

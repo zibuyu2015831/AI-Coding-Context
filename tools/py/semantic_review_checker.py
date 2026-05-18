@@ -281,6 +281,125 @@ def check_review_consistency(doc_dir, repo_root):
     return issues
 
 
+def _analysis_file(doc_dir, name):
+    return doc_dir / "_analysis" / name
+
+
+def _read_if_exists(path):
+    if path.exists():
+        return path.read_text(encoding="utf-8", errors="ignore")
+    return ""
+
+
+def _is_phase1_pass_or_recommendation(text):
+    if "Phase 1" not in text and "phase1" not in text.lower():
+        return False
+    return bool(re.search(r"\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成", text, flags=re.IGNORECASE))
+
+
+def _repo_has_any(repo_root, names):
+    return any((repo_root / name).exists() for name in names)
+
+
+def _repo_text_signals(repo_root):
+    chunks = []
+    for rel in ("README.md", "CONTRIBUTING.md"):
+        path = repo_root / rel
+        if path.exists():
+            chunks.append(path.read_text(encoding="utf-8", errors="ignore"))
+    manual = repo_root / "manual"
+    if manual.exists():
+        for path in manual.rglob("*.md"):
+            chunks.append(path.read_text(encoding="utf-8", errors="ignore"))
+    return "\n".join(chunks)
+
+
+def check_phase1_analysis_gate(doc_dir, repo_root):
+    issues = []
+    plan_path = _analysis_file(doc_dir, "generation_plan.md")
+    report_path = _analysis_file(doc_dir, "project_analysis_report.md")
+    progress_path = _analysis_file(doc_dir, "generation_progress.md")
+    plan = _read_if_exists(plan_path)
+    report = _read_if_exists(report_path)
+    progress = _read_if_exists(progress_path)
+    phase1_pass = _is_phase1_pass_or_recommendation(progress)
+    strict_phase1_review = phase1_pass or "Phase 1 方案复查记录" in progress or "Phase 1 方案复查清单" in plan
+
+    if strict_phase1_review and plan and "证据与验证记录" in plan and "证据等级" not in plan:
+        issues.append({
+            "type": "evidence_level_completeness",
+            "severity": "blocker",
+            "file": str(plan_path),
+            "message": "generation_plan.md 的证据与验证记录缺少证据等级",
+        })
+
+    report_has_issues = any(marker in report for marker in ("严重问题", "警告", "疑问", "优化建议", "建议"))
+    if strict_phase1_review and report and report_has_issues:
+        missing = [field for field in ("证据等级", "当前状态", "blocks_phase1", "回写目标") if field not in report]
+        if missing:
+            issues.append({
+                "type": "project_analysis_issue_status_missing",
+                "severity": "blocker",
+                "file": str(report_path),
+                "missing": missing,
+                "message": "project_analysis_report.md 的问题项缺少证据等级、状态、阻断标记或回写目标",
+            })
+
+    if phase1_pass:
+        if "Phase 1 方案复查记录" not in progress or "writeback_summary" not in progress:
+            issues.append({
+                "type": "phase1_progress_only_review",
+                "severity": "blocker",
+                "file": str(progress_path),
+                "message": "generation_progress.md 声明 Phase 1 PASS/建议通过，但缺少可审计复查记录或回写摘要",
+            })
+        if report_path.exists() and "证据等级" not in report:
+            issues.append({
+                "type": "phase1_progress_only_review",
+                "severity": "blocker",
+                "file": str(report_path),
+                "message": "progress 声明 Phase 1 PASS/建议通过，但 project_analysis_report.md 未同步补齐证据等级",
+            })
+
+    confirmable_markers = [
+        ("贡献者指南", "CONTRIBUTING.md", repo_root / "CONTRIBUTING.md"),
+        ("Docker", "docker-compose.yml", repo_root / "docker-compose.yml"),
+    ]
+    combined_analysis = f"{plan}\n{report}"
+    for marker, evidence, path in confirmable_markers:
+        if strict_phase1_review and path.exists() and marker in combined_analysis and re.search(rf"(待确认|需确认|是否).*{re.escape(marker)}|{re.escape(marker)}.*(待确认|需确认|是否)", combined_analysis):
+            issues.append({
+                "type": "confirmable_fact_misclassified",
+                "severity": "blocker",
+                "file": str(report_path if marker in report else plan_path),
+                "fact": marker,
+                "evidence": evidence,
+                "message": f"可由仓库文件确认的事实被放入用户确认项: {marker}",
+            })
+
+    positioning_requirements = []
+    if (repo_root / "CONTRIBUTING.md").exists():
+        positioning_requirements.append(("open_source_maintenance", ["贡献", "维护", "开源"]))
+    if (repo_root / "manual").exists():
+        positioning_requirements.append(("user_manual", ["用户手册", "manual", "使用指南", "使用"]))
+    if _repo_has_any(repo_root, ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]):
+        positioning_requirements.append(("self_hosted_ops", ["Docker", "部署", "运维", "自托管"]))
+    repo_signals = _repo_text_signals(repo_root)
+    if any(signal.lower() in repo_signals.lower() for signal in ("deepl", "anki", "jellyfin", "dictionary", "external api")):
+        positioning_requirements.append(("external_data_api", ["外部", "API", "授权", "集成", "DeepL", "Anki", "Jellyfin", "dictionary"]))
+    for signal, keywords in positioning_requirements:
+        if strict_phase1_review and not any(keyword in plan for keyword in keywords):
+            issues.append({
+                "type": "project_positioning_coverage_missing",
+                "severity": "warning",
+                "file": str(plan_path),
+                "signal": signal,
+                "message": f"项目定位触发项未进入 generation_plan.md 子文档规划: {signal}",
+            })
+
+    return issues
+
+
 def render_text(payload):
     status = "PASS" if payload["summary"]["passed"] else "FAIL"
     lines = [f"{status}: semantic_review_checker"]
@@ -307,6 +426,7 @@ def main():
         "metrics": [],
         "test_topology": [],
         "review_consistency": [],
+        "phase1_analysis_gate": [],
     }
 
     if args.full_check or args.check_fact_conflicts:
@@ -317,6 +437,7 @@ def main():
         checks["test_topology"] = check_test_topology(doc_dir, repo_root)
     if args.full_check:
         checks["review_consistency"] = check_review_consistency(doc_dir, repo_root)
+        checks["phase1_analysis_gate"] = check_phase1_analysis_gate(doc_dir, repo_root)
 
     if not any([args.full_check, args.check_fact_conflicts, args.check_metrics, args.check_test_topology]):
         parser.print_help()
