@@ -19,3 +19,5 @@ verified_at: 2026-05-12
 - [AICC Phase 1 审核机制二次改进计划](./linguacafe-phase1-aicc-improvement-plan.md)
 - [AICC Phase 1 审核门落地实施计划](./aicc-phase1-review-gate-implementation-plan.md)
 - [AICC generation_plan 复查流程缺口记录与优化方案](./aicc-generation-plan-review-process-gap-plan.md)
+- [AICC Phase 1 审核门复测后续优化方案](./aicc-phase1-review-gate-followup-plan.md)
+- [AICC 首版验收门禁可信度优化方案](./aicc-first-release-acceptance-gate-improvement-plan.md)

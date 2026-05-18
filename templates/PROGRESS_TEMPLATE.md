@@ -99,11 +99,13 @@ verified_at: 2026-05-05
 ## 🧪 验收进度
 
 - [ ] `doc_health_checker` 已执行
+- [ ] Python/JS 两套 `doc_health_checker` 均已执行
 - [ ] 必需章节检查通过
 - [ ] 运行记录完整性检查通过
 - [ ] 模板残留/占位符检查通过
-- [ ] `health_check_report.md` 已落盘
-- [ ] 最终 verdict = PASS
+- [ ] Python/JS 两套 `semantic_review_checker` 均已执行
+- [ ] `health_check_report.md` 已落盘并通过自身检查
+- [ ] 最终 verdict = PASS 或 PASS_WITH_ACCEPTED_ISSUES
 
 ---
 
@@ -115,7 +117,6 @@ verified_at: 2026-05-05
 - **review_started_at**: YYYY-MM-DD HH:mm
 - **review_completed_at**: YYYY-MM-DD HH:mm
 - **reviewed_files**: `generation_plan.md`, `project_analysis_report.md`, `generation_progress.md`
-- **machine_checks**: [命令、退出码、issue 数量；工具不可用时写 UNAVAILABLE 并说明替代复核]
 - **manual_review_summary**: [人工语义复查结论，包含事实、证据、待确认边界和项目定位覆盖]
 - **writeback_summary**: [已回写文件；无需回写的文件必须写明“已检查，无需回写”及原因]
 - **blocker_count**: [数量]
@@ -124,11 +125,48 @@ verified_at: 2026-05-05
 - **phase1_recommendation**: [需修正，已回写 _analysis/建议通过，等待用户确认/需人工确认，禁止正式生成]
 - **user_confirmation_status**: [pending/confirmed/rejected]
 
+### machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| ----- | ---- | -------------- | ------- | --------- | ----------- | ------ | ----------- |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [fixed/accepted/waived/原因] |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [fixed/accepted/waived/原因] |
+
 ### 复查输出协议
 
 - `需修正，已回写 _analysis`: 仍有 blocker 或三件套不一致，禁止请求用户通过。
 - `建议通过，等待用户确认`: 无 blocker，但正式生成仍需用户明确确认。
 - `需人工确认，禁止正式生成`: 存在代码和仓库文档无法回答的策略/业务问题。
+
+## 🔎 首版质量验收记录
+
+> 本节只记录正式文档首版生成后的质量验收。工具失败、健康报告缺失、健康报告自身未通过检查、AI Rules 与源码事实冲突、敏感值泄露或核心架构事实冲突时，不得写“已完成”。
+
+- **review_trigger**: 全部正式文档生成完成，进入首版验收
+- **review_started_at**: YYYY-MM-DD HH:mm
+- **review_completed_at**: YYYY-MM-DD HH:mm
+- **reviewed_files**: 全部正式文档 + `_analysis` 运行记录
+- **health_report**: `dev_docs/_analysis/health_check_report.md`
+- **final_verdict**: PASS / PASS_WITH_ACCEPTED_ISSUES / FAIL
+- **blocker_count**: [数量]
+- **accepted_issue_count**: [数量]
+- **writeback_summary**: [已回写文件；无需回写的文件必须写明原因]
+- **user_confirmation_status**: pending / confirmed / rejected
+
+### machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| ----- | ---- | -------------- | ------- | --------- | ----------- | ------ | ----------- |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [verified/fixed/accepted/原因] |
+| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [verified/fixed/accepted/原因] |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [verified/fixed/accepted/原因] |
+| 1 | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [verified/fixed/accepted/原因] |
+
+### accepted_issues
+
+无 accepted issue
+
+如存在 accepted issue，必须逐项记录 issue_id、tool、implementation、file、issue_type、original_status、accepted_reason、residual_risk 和 follow_up；不得豁免敏感值泄露、AI Rules 冲突、核心运行架构冲突、必需文档缺失或健康报告自身失败。
 
 ---
 

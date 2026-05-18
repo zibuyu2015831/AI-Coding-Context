@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
@@ -30,6 +32,20 @@ function runTests() {
     assert.ok(data.xcode_project_files.includes('Dayflow/Dayflow.xcodeproj/project.pbxproj'));
     assert.ok(data.platform_config_files.includes('Dayflow/Dayflow/Info.plist'));
     assert.ok(data.platform_config_files.includes('Dayflow/Dayflow/Dayflow.entitlements'));
+  });
+
+  test('standard exclude skips embedded AICC symlink', () => {
+    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'project-scanner-aicc-js-'));
+    try {
+      fs.writeFileSync(path.join(tmpdir, 'app.txt'), 'app\n', 'utf8');
+      fs.symlinkSync(ROOT, path.join(tmpdir, 'AI-Coding-Context'), 'dir');
+      const result = spawnSync('node', [SCANNER, '--path', tmpdir, '--format', 'json', '--exclude-standard', '--follow-symlinks'], { cwd: ROOT, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0);
+      assert.ok(result.stdout.includes('app.txt'));
+      assert.ok(!result.stdout.includes('AI_ENTRY_POINT.md'));
+    } finally {
+      fs.rmSync(tmpdir, { recursive: true, force: true });
+    }
   });
 
   console.log(`测试完成: ${passed} 通过, ${failed} 失败`);

@@ -831,14 +831,15 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 
 **最小要求**:
 
-- [ ] 运行 `doc_health_checker`
-- [ ] 运行 `semantic_review_checker`
+- [ ] 运行 Python/JS 两套 `doc_health_checker`
+- [ ] 运行 Python/JS 两套 `semantic_review_checker`
 - [ ] 主文档必需章节检查通过
 - [ ] 运行记录完整性检查通过
 - [ ] 模板残留/占位符检查通过
-- [ ] 量化声明 / 测试资产拓扑 / 事实冲突结果已记录
+- [ ] 量化声明 / 测试资产拓扑 / 事实冲突 / AI Rules 一致性 / 敏感值扫描结果已记录
 - [ ] 生成 `dev_docs/_analysis/health_check_report.md`
-- [ ] 只有 verdict = `PASS` 才能将 `generation_progress.md` 标记为 `已完成`
+- [ ] `health_check_report.md` 必须包含结构化 `machine_checks` 与 `accepted_issues`
+- [ ] 只有 verdict = `PASS` 或 `PASS_WITH_ACCEPTED_ISSUES` 且用户确认后，才能将 `generation_progress.md` 标记为 `已完成`
 
 **推荐命令**:
 
@@ -852,6 +853,8 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 **阻断规则**:
 
 - 任一关键检查失败时，状态必须保持在 `首版验收中` 或 `已阻塞`
+- 存在 accepted issue 时不得写裸 `PASS`，必须逐项记录 accepted_reason、residual_risk 和 follow_up
+- 敏感值泄露、AI Rules 与源码冲突、核心运行架构冲突、必需文档缺失、健康报告自身失败不得 accepted
 - 不允许将“文档已生成”直接表述为“任务已完成”
 
 ### 步骤 3.1B: Phase 1 方案自检 gate
@@ -865,10 +868,12 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 - [ ] `_analysis` 产物无模板残留。
 - [ ] 关键技术事实有证据等级和来源。
 - [ ] 可由代码、配置或锁文件确认的事实没有进入用户确认清单。
+- [ ] 每个待用户确认项都包含 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
 - [ ] 复查改变事实状态后，摘要、正文、表格、待确认清单、行动计划和进度记录已同步回写。
 - [ ] `generation_progress.md` 同时记录流程阶段进度、产物完成度、当前 gate 和下一步动作。
-- [ ] `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含 `review_trigger`、`machine_checks`、`manual_review_summary`、`writeback_summary`、`phase1_recommendation` 和 `user_confirmation_status`。
+- [ ] `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含 `review_trigger`、结构化 `machine_checks` 表、`manual_review_summary`、`writeback_summary`、`phase1_recommendation` 和 `user_confirmation_status`。
 - [ ] `project_analysis_report.md` 的警告、疑问和建议包含证据等级、当前状态、`blocks_phase1` 和回写目标。
+- [ ] `CONTRIBUTING.md`、README 贡献规则、PR 规则、测试策略和格式化规则已作为治理约束事实源检查，建议没有与维护者规则冲突。
 - [ ] 项目定位触发项（开源维护、用户手册、自托管运维、外部 API/数据授权等）已进入子文档规划，或说明已合并覆盖/不适用。
 
 **推荐命令**:

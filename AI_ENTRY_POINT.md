@@ -473,9 +473,10 @@ graph TD
 
 1. 复查 `_analysis` 三件套：`generation_plan.md`、`project_analysis_report.md`、`generation_progress.md`。
 2. 如发现事实、证据等级、待确认边界、项目定位覆盖或状态表达问题，直接回写对应 `_analysis` 文件。
-3. 在 `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含触发来源、工具结果、人工语义复查摘要、回写摘要、blocker/warning/waived 统计和用户确认状态。
-4. 运行 `doc_health_checker --full-check` 与 `semantic_review_checker --full-check`；工具不可用时必须记录 `UNAVAILABLE`、原因和替代复核。
-5. 最终回复只能使用以下结论之一：
+3. 在 `generation_plan.md` 的待确认项中逐项写明 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
+4. 在 `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含触发来源、结构化 `machine_checks` 表、人工语义复查摘要、回写摘要、blocker/warning/waived 统计和用户确认状态。
+5. 运行 Python 与 JS 两套 `doc_health_checker --full-check`、`semantic_review_checker --full-check`；若两套结果不一致，必须先修正或记录为 blocker，不得直接建议通过。工具不可用时必须记录 `UNAVAILABLE`、原因和替代复核。
+6. 最终回复只能使用以下结论之一：
    - `需修正，已回写 _analysis`
    - `建议通过，等待用户确认`
    - `需人工确认，禁止正式生成`
@@ -485,6 +486,27 @@ graph TD
 - 禁止用户确认前写“Phase 1 PASS，可进入正式文档生成”。
 - 禁止只更新 `generation_progress.md` 而不复查 `generation_plan.md` 与 `project_analysis_report.md`。
 - 禁止把可由代码、配置、锁文件、README 或现有项目文档确认的事实放入用户确认项。
+
+---
+
+## 🧪 首版正式文档验收请求路由
+
+当正式 `dev_docs/` 文档已经生成，用户要求“审核文档体系”“判断首版是否通过”“评估是否可以完成”“阅读正式文档并验收”或类似短指令时，AI 必须进入 **First Release Acceptance Gate**。
+
+### 必须执行
+
+1. 运行 Python/JS 两套 `doc_health_checker --full-check --doc-dir dev_docs`。
+2. 运行 Python/JS 两套 `semantic_review_checker --full-check --doc-dir dev_docs --repo-root .`。
+3. 生成或更新 `dev_docs/_analysis/health_check_report.md`，并写入结构化 `machine_checks` 与 `accepted_issues`。
+4. 复跑检查，确认健康报告自身不会触发模板残留、verdict 冲突、accepted issue 缺字段或产物计数不一致。
+5. 同步更新 `generation_progress.md` 的“首版质量验收记录”。
+
+### verdict 规则
+
+- 任一必需 checker 失败且未修复时，最终 verdict 必须为 `FAIL`。
+- 存在 accepted issue 时，不得写裸 `PASS`，必须写 `PASS_WITH_ACCEPTED_ISSUES` 或“建议通过，含已接受问题”。
+- 敏感值泄露、AI Rules 与源码事实冲突、核心运行架构冲突、必需文档缺失、健康报告自身失败不得 accepted。
+- 用户确认前不得把 `generation_progress.md` 标记为 `已完成`。
 
 ---
 

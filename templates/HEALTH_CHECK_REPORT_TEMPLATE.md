@@ -31,16 +31,42 @@ verified_at: 2026-05-05
 ## ✅ 首版交付验收版
 
 **适用**: Path A 首版生成完成后的质量验收
+**硬性规则**:
+
+- 任一必需 checker 未运行、失败且未修复时，最终 verdict 必须为 `FAIL`。
+- 存在 accepted issue 时，最终 verdict 不得写裸 `PASS`，必须写 `PASS_WITH_ACCEPTED_ISSUES` 或“建议通过，含已接受问题”。
+- `accepted_issues` 必须逐项记录，不能只写“误报若干”。
+- 敏感值泄露、AI Rules 与源码冲突、核心运行架构冲突、必需文档缺失、健康报告自身检查失败不得被 accepted。
+- 本报告落盘后必须再次被 Python/JS `doc_health_checker --full-check` 检查。
 
 ```markdown
 # 首版文档质量验收报告
 
-## 📊 总体结论
+## 总体结论
 
 - 检查时间: YYYY-MM-DD HH:mm
 - 检查范围: `dev_docs/`
-- 最终 verdict: PASS / FAIL
-- 结论说明: [一句话说明]
+- 最终 verdict: PASS / PASS_WITH_ACCEPTED_ISSUES / FAIL
+- 结论说明: 用一句话说明是否建议通过、是否包含 accepted issue、是否等待用户确认
+
+## machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | ---: | ---: | --- | --- |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
+| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
+
+## accepted_issues
+
+无 accepted issue
+
+如存在 accepted issue，必须改用下表：
+
+| issue_id | tool | implementation | file | issue_type | original_status | accepted_reason | residual_risk | follow_up |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| js-esm-example | doc_health_checker | js | dev_docs/frontend_architecture.md | js_esm_parse_false_positive | FAIL | 检查器按 CJS 解析 ESM 示例导致误报 | 低，代码示例已由人工确认 | 修复 JS 代码块 parser |
 
 ## 1. 结构检查结果
 
@@ -69,14 +95,19 @@ verified_at: 2026-05-05
 ## 5. 事实源冲突摘要
 
 - 结果: [无 / 存在风险]
-- 风险说明: [如无则写“无”]
+- 风险说明: 如无则写“无”
 
-## 6. 必须修复项
+## 6. 敏感值扫描摘要
 
-1. [问题 1]
-2. [问题 2]
+- Phase 1 是否声明脱敏要求: 是 / 否
+- 结果: PASS / FAIL
+- 风险说明: 如无则写“无”
 
-## 7. 后续动作
+## 7. 必须修复项
+
+1. 如无必须修复项，写“无”
+
+## 8. 后续动作
 
 - [下一步 1]
 - [下一步 2]

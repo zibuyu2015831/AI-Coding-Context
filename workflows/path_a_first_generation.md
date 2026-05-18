@@ -608,7 +608,10 @@ Phase 1 自检只检查方案阶段产物，不要求 `AI_Coding_Context.md`、�
 - `dev_docs/_analysis/generation_progress.md` 必须区分流程阶段进度与产物完成度，并记录当前 gate。
 - `generation_progress.md` 若声明 Phase 1 PASS、建议通过或可进入正式生成，必须包含 `Phase 1 方案复查记录` 和 `writeback_summary`。
 - `generation_plan.md` 的 `证据与验证记录` 必须包含 `证据等级`，项目定位触发项必须影响子文档规划或说明合并覆盖位置。
+- `generation_plan.md` 的每个待确认项必须包含 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
+- `generation_progress.md` 的 `machine_checks` 必须使用结构化表格记录 tool、implementation、command、exit_code、issue_count、status 和 disposition。
 - `project_analysis_report.md` 的警告、疑问和建议必须包含证据等级、当前状态、`blocks_phase1` 和回写目标。
+- `CONTRIBUTING.md`、README 贡献规则、PR 规则、测试策略和格式化规则属于治理约束事实源；测试、分支、PR、格式化建议不得与其冲突。
 - 若 AI 互审改变了事实状态，必须同步回写摘要、正文、表格、待确认清单、行动计划和进度记录，禁止只在文末追加复查记录。
 
 ### 推荐命令
@@ -830,20 +833,21 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 ### 8.4 完成状态的严格定义
 
 - `文档已生成` 不等于 `任务已完成`
-- 只有 `文档生成完成 + 必需检查通过 + health_check_report.md 落盘` 才能写 `已完成`
+- 只有 `文档生成完成 + 必需检查通过 + health_check_report.md 落盘且自身通过检查 + 用户确认` 才能写 `已完成`
 - 若验收未通过，`generation_progress.md` 必须保持在 `首版验收中` 或 `已阻塞`
 
 ### 8.5 首版质量验收（必须执行）
 
 **必做动作**:
 
-1. 运行 `doc_health_checker`
-2. 运行 `semantic_review_checker`
+1. 运行 Python/JS 两套 `doc_health_checker`
+2. 运行 Python/JS 两套 `semantic_review_checker`
 3. 记录主文档必需章节检查结果
 4. 记录运行记录完整性检查结果
-5. 记录量化声明、测试资产拓扑和事实源冲突结果
+5. 记录量化声明、测试资产拓扑、事实源冲突、AI Rules 一致性和敏感值扫描结果
 6. 生成 `dev_docs/_analysis/health_check_report.md`
-7. 仅在最终 verdict = `PASS` 时将 `generation_progress.md` 更新为 `已完成`
+7. 在 `health_check_report.md` 写入结构化 `machine_checks` 与 `accepted_issues`
+8. 仅在最终 verdict = `PASS` 或 `PASS_WITH_ACCEPTED_ISSUES` 且用户确认后，将 `generation_progress.md` 更新为 `已完成`
 
 **推荐命令**:
 
@@ -858,6 +862,7 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 - 任一关键检查失败，不得宣称“已完成”
 - 必须在 `generation_progress.md` 中记录失败项、当前状态和下一步修复动作
+- accepted issue 必须逐项记录原因、残余风险和 follow-up；敏感值泄露、AI Rules 冲突、核心运行架构冲突、必需文档缺失和健康报告自身失败不得 accepted
 
 ### 8.6 生成 AI Rules 文件
 

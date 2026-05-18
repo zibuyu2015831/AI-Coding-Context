@@ -287,6 +287,11 @@ def _load_run_record_contract():
     current_doc = None
     current_key = None
     for line in lines:
+        any_doc_match = re.match(r"\s{2}([A-Za-z0-9_]+):\s*$", line)
+        if any_doc_match and any_doc_match.group(1) not in docs:
+            current_doc = None
+            current_key = None
+            continue
         doc_match = re.match(r"\s{2}(generation_plan|generation_progress):\s*$", line)
         if doc_match:
             current_doc = doc_match.group(1)
@@ -386,6 +391,35 @@ PHASE1_REVIEW_FIELDS = [
     "user_confirmation_status",
 ]
 
+HEALTH_CHECK_REQUIRED_TOOLS = {
+    ("doc_health_checker", "python"),
+    ("doc_health_checker", "js"),
+    ("semantic_review_checker", "python"),
+    ("semantic_review_checker", "js"),
+}
+
+ACCEPTED_ISSUE_REQUIRED_FIELDS = [
+    "issue_id",
+    "tool",
+    "implementation",
+    "file",
+    "issue_type",
+    "original_status",
+    "accepted_reason",
+    "residual_risk",
+    "follow_up",
+]
+
+NON_WAIVABLE_ACCEPTED_ISSUE_TYPES = (
+    "sensitive",
+    "secret",
+    "ai_rules",
+    "runtime_stack",
+    "required_doc",
+    "doc_missing",
+    "health_report",
+)
+
 
 def _is_phase1_pass_or_recommendation(text):
     if "Phase 1" not in text and "phase1" not in text.lower():
@@ -395,6 +429,284 @@ def _is_phase1_pass_or_recommendation(text):
 
 def _has_user_confirmation(text):
     return bool(re.search(r"当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)", text, flags=re.IGNORECASE))
+
+
+def _extract_section_after_heading(text, heading):
+    match = re.search(rf"^##+\s+{re.escape(heading)}\s*$", text, flags=re.MULTILINE | re.IGNORECASE)
+    if not match:
+        return ""
+    next_match = re.search(r"^##+\s+", text[match.end():], flags=re.MULTILINE)
+    end = match.end() + next_match.start() if next_match else len(text)
+    return text[match.end():end]
+
+
+def _parse_first_markdown_table(section):
+    rows = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("|") and stripped.endswith("|"):
+            rows.append(stripped)
+        elif rows:
+            break
+    if len(rows) < 2:
+        return [], []
+    headers = [cell.strip() for cell in rows[0].strip("|").split("|")]
+    body = []
+    for row in rows[2:]:
+        if re.match(r"^\|\s*-+", row):
+            continue
+        body.append([cell.strip() for cell in row.strip("|").split("|")])
+    return headers, body
+
+
+def _table_rows_as_dicts(headers, rows):
+    return [
+        {header: row[index] if index < len(row) else "" for index, header in enumerate(headers)}
+        for row in rows
+    ]
+
+
+def _extract_final_verdict(text):
+    match = re.search(r"(?:最终\s*)?verdict\*\*?\s*[:：]\s*\*{0,2}([A-Z_]+)", text, flags=re.IGNORECASE)
+    if not match:
+        match = re.search(r"(?:最终\s*)?verdict\s*=\s*([A-Z_]+)", text, flags=re.IGNORECASE)
+    if not match:
+        return ""
+    return match.group(1).upper()
+
+
+def _check_health_report_self_residue(path, text):
+    issues = []
+    for pattern, label in _RESIDUE_PATTERNS:
+        for match in pattern.finditer(text):
+            issues.append({
+                "file": str(path),
+                "type": "health_report_self_template_residue",
+                "severity": "blocker",
+                "marker": label,
+                "line": _line_number(text, match.start()) if "_line_number" in globals() else text[:match.start()].count("\n") + 1,
+                "message": f"健康报告自身包含模板残留: {label}",
+            })
+    return issues
+
+
+def _check_accepted_issues_table(path, text, has_accepted_machine_check):
+    issues = []
+    section = _extract_section_after_heading(text, "accepted_issues")
+    if not section:
+        if has_accepted_machine_check or "accepted" in text.lower():
+            issues.append({
+                "file": str(path),
+                "type": "health_report_accepted_issue_missing_detail",
+                "severity": "blocker",
+                "message": "存在 accepted issue，但缺少 accepted_issues 结构化章节",
+            })
+        return issues
+    if "无 accepted issue" in section and not has_accepted_machine_check:
+        return issues
+    headers, rows = _parse_first_markdown_table(section)
+    if not headers:
+        if has_accepted_machine_check:
+            issues.append({
+                "file": str(path),
+                "type": "health_report_accepted_issue_missing_detail",
+                "severity": "blocker",
+                "message": "accepted_issues 必须使用可解析表格逐项记录",
+            })
+        return issues
+    missing = [field for field in ACCEPTED_ISSUE_REQUIRED_FIELDS if field not in headers]
+    if missing:
+        issues.append({
+            "file": str(path),
+            "type": "health_report_accepted_issue_missing_detail",
+            "severity": "blocker",
+            "missing": missing,
+            "message": "accepted_issues 表缺少必填列",
+        })
+        return issues
+    for row in _table_rows_as_dicts(headers, rows):
+        empty_fields = [field for field in ACCEPTED_ISSUE_REQUIRED_FIELDS if not row.get(field)]
+        if empty_fields:
+            issues.append({
+                "file": str(path),
+                "type": "health_report_accepted_issue_missing_detail",
+                "severity": "blocker",
+                "issue_id": row.get("issue_id"),
+                "missing": empty_fields,
+                "message": "accepted issue 缺少原因、残余风险或 follow-up 等必填信息",
+            })
+        issue_type = row.get("issue_type", "").lower()
+        if any(marker in issue_type for marker in NON_WAIVABLE_ACCEPTED_ISSUE_TYPES):
+            issues.append({
+                "file": str(path),
+                "type": "health_report_accepted_issue_not_allowed",
+                "severity": "blocker",
+                "issue_id": row.get("issue_id"),
+                "issue_type": row.get("issue_type"),
+                "message": "该类型问题不得通过 accepted issue 豁免",
+            })
+    return issues
+
+
+def _check_health_report(path, text, target_count):
+    issues = []
+    verdict = _extract_final_verdict(text)
+    section = _extract_section_after_heading(text, "machine_checks")
+    headers, rows = _parse_first_markdown_table(section)
+    if not headers:
+        issues.append({
+            "file": str(path),
+            "type": "health_report_machine_checks_missing",
+            "severity": "blocker",
+            "message": "health_check_report.md 缺少结构化 machine_checks 表",
+        })
+        return issues
+    required = ["round", "tool", "implementation", "command", "exit_code", "issue_count", "status", "disposition"]
+    missing = [field for field in required if field not in headers]
+    if missing:
+        issues.append({
+            "file": str(path),
+            "type": "health_report_machine_checks_missing",
+            "severity": "blocker",
+            "missing": missing,
+            "message": "health_check_report.md 的 machine_checks 表缺少必需列",
+        })
+        return issues
+    machine_rows = _table_rows_as_dicts(headers, rows)
+    seen = {(row.get("tool"), row.get("implementation")) for row in machine_rows}
+    for tool, implementation in sorted(HEALTH_CHECK_REQUIRED_TOOLS):
+        if (tool, implementation) not in seen:
+            issues.append({
+                "file": str(path),
+                "type": "health_report_machine_checks_missing",
+                "severity": "blocker",
+                "tool": tool,
+                "implementation": implementation,
+                "message": f"health_check_report.md 缺少 {implementation} {tool} 运行记录",
+            })
+    has_failed = False
+    has_accepted = False
+    has_unaccepted_failure = False
+    for row in machine_rows:
+        exit_code_text = row.get("exit_code", "")
+        issue_count_text = row.get("issue_count", "")
+        status = row.get("status", "").upper()
+        disposition = row.get("disposition", "").lower()
+        if not re.fullmatch(r"\d+", exit_code_text) or not re.fullmatch(r"\d+", issue_count_text):
+            issues.append({
+                "file": str(path),
+                "type": "health_report_machine_checks_missing",
+                "severity": "blocker",
+                "message": "machine_checks exit_code 与 issue_count 必须为数字",
+            })
+            continue
+        failed = int(exit_code_text) != 0 or int(issue_count_text) != 0 or status in {"FAIL", "ERROR"}
+        if failed:
+            has_failed = True
+            if disposition == "accepted":
+                has_accepted = True
+            elif disposition not in {"fixed", "verified"}:
+                has_unaccepted_failure = True
+    if verdict == "PASS" and (has_failed or has_accepted):
+        issues.append({
+            "file": str(path),
+            "type": "health_report_verdict_conflicts_with_checks",
+            "severity": "blocker",
+            "message": "health_check_report.md 写 PASS，但 machine_checks 存在失败或 accepted issue",
+        })
+    if verdict in {"PASS", "PASS_WITH_ACCEPTED_ISSUES", "建议通过"} and has_unaccepted_failure:
+        issues.append({
+            "file": str(path),
+            "type": "health_report_verdict_conflicts_with_checks",
+            "severity": "blocker",
+            "message": "health_check_report.md 存在未修复/未豁免的失败检查",
+        })
+    if has_accepted and verdict == "PASS":
+        issues.append({
+            "file": str(path),
+            "type": "health_report_verdict_conflicts_with_checks",
+            "severity": "blocker",
+            "message": "存在 accepted issue 时最终结论不得写裸 PASS",
+        })
+    issues.extend(_check_accepted_issues_table(path, text, has_accepted))
+    issues.extend(_check_health_report_self_residue(path, text))
+    for match in re.finditer(r"全部\s*(\d+)\s*个(?:产物|文档)|已完成\s*(\d+)\s*/\s*(\d+)\s*个产物|总文件数\s*(\d+)", text):
+        expected = int(match.group(1) or match.group(3) or match.group(4))
+        if expected != target_count:
+            issues.append({
+                "file": str(path),
+                "type": "artifact_count_mismatch",
+                "severity": "blocker",
+                "expected": expected,
+                "actual": target_count,
+                "message": "健康报告或进度记录中的产物数量与实际 Markdown 文件数量不一致",
+            })
+    return issues
+
+
+def _check_machine_checks_table(path, text, phase1_pass):
+    issues = []
+    if not phase1_pass:
+        return issues
+    section = _extract_section_after_heading(text, "machine_checks")
+    headers, rows = _parse_first_markdown_table(section)
+    if not headers:
+        issues.append({
+            "file": str(path),
+            "type": "machine_check_table_missing",
+            "severity": "blocker",
+            "message": "Phase 1 建议通过时必须用可解析表格记录 machine_checks",
+        })
+        return issues
+    required = ["round", "tool", "implementation", "command", "exit_code", "issue_count", "status", "disposition"]
+    missing = [field for field in required if field not in headers]
+    if missing:
+        issues.append({
+            "file": str(path),
+            "type": "machine_check_table_column_missing",
+            "severity": "blocker",
+            "missing": missing,
+            "message": "machine_checks 表缺少必需列",
+        })
+        return issues
+    index = {header: headers.index(header) for header in headers}
+    tools = {row[index["tool"]] for row in rows if len(row) > index["tool"]}
+    for required_tool in ("doc_health_checker", "semantic_review_checker"):
+        if required_tool not in tools:
+            issues.append({
+                "file": str(path),
+                "type": "machine_check_required_tool_missing",
+                "severity": "blocker",
+                "tool": required_tool,
+                "message": f"machine_checks 缺少工具运行记录: {required_tool}",
+            })
+    for row in rows:
+        if len(row) < len(headers):
+            continue
+        if not re.fullmatch(r"\d+", row[index["exit_code"]]):
+            issues.append({
+                "file": str(path),
+                "type": "machine_check_exit_code_missing",
+                "severity": "blocker",
+                "message": "machine_checks exit_code 必须为数字",
+            })
+        if not re.fullmatch(r"\d+", row[index["issue_count"]]):
+            issues.append({
+                "file": str(path),
+                "type": "machine_check_issue_count_mismatch",
+                "severity": "blocker",
+                "message": "machine_checks issue_count 必须为数字",
+            })
+        status = row[index["status"]].upper()
+        disposition = row[index["disposition"]]
+        if status in {"FAIL", "ERROR"} and not disposition:
+            issues.append({
+                "file": str(path),
+                "type": "machine_check_unresolved_failure",
+                "severity": "blocker",
+                "message": "失败的 machine_checks 行必须说明 disposition",
+            })
+    return issues
 
 
 def _check_phase1_review_record(path, text):
@@ -419,6 +731,7 @@ def _check_phase1_review_record(path, text):
                     "missing": field,
                     "message": f"Phase 1 方案复查记录缺少字段: {field}",
                 })
+        issues.extend(_check_machine_checks_table(path, text, phase1_pass))
     if phase1_pass and "可进入正式文档生成" in text and not _has_user_confirmation(text):
         issues.append({
             "file": str(path),
@@ -435,6 +748,17 @@ def check_run_record_integrity(targets):
         return {"checked": 0, "issues": []}
     issues = []
     checked = 0
+    target_count = len([target for target in targets if Path(target).exists() and Path(target).suffix == ".md"])
+    target_by_name = {Path(target).name: Path(target) for target in targets if Path(target).exists()}
+    health_report_path = target_by_name.get("health_check_report.md")
+    health_report_issues = []
+    health_report_verdict = ""
+    if health_report_path:
+        checked += 1
+        health_text = health_report_path.read_text(encoding="utf-8", errors="ignore")
+        health_report_verdict = _extract_final_verdict(health_text)
+        health_report_issues = _check_health_report(health_report_path, health_text, target_count)
+        issues.extend(health_report_issues)
     for f in targets:
         path = Path(f)
         if path.name not in ("generation_plan.md", "generation_progress.md") or not path.exists():
@@ -460,6 +784,32 @@ def check_run_record_integrity(targets):
                 "message": "进度记录声明已完成，但未见 health_check_report 留痕",
             })
         if path.name == "generation_progress.md":
+            first_release_done = any(marker in text for marker in ("首版建议通过", "首版验收 verdict = PASS", "首版验收完成", "Step 9/9 已完成"))
+            if first_release_done and not health_report_path:
+                issues.append({
+                    "file": f,
+                    "type": "progress_completion_without_valid_health_report",
+                    "severity": "blocker",
+                    "message": "进度记录声明首版完成或建议通过，但缺少 health_check_report.md",
+                })
+            if first_release_done and health_report_path and (health_report_issues or health_report_verdict in {"FAIL", ""}):
+                issues.append({
+                    "file": f,
+                    "type": "progress_completion_without_valid_health_report",
+                    "severity": "blocker",
+                    "message": "进度记录声明首版完成或建议通过，但健康报告未通过结构化验收",
+                })
+            for match in re.finditer(r"全部\s*(\d+)\s*个(?:产物|文档)|已完成\s*(\d+)\s*/\s*(\d+)\s*个产物|总文件数\s*(\d+)", text):
+                expected = int(match.group(1) or match.group(3) or match.group(4))
+                if expected != target_count:
+                    issues.append({
+                        "file": f,
+                        "type": "artifact_count_mismatch",
+                        "severity": "blocker",
+                        "expected": expected,
+                        "actual": target_count,
+                        "message": "进度记录中的产物数量与实际 Markdown 文件数量不一致",
+                    })
             issues.extend(_check_phase1_review_record(path, text))
             last_updates = re.findall(r"\*\*最后更新\*\*:\s*([^\n]+)", text)
             if len(set(last_updates)) > 1:

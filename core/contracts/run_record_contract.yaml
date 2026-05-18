@@ -38,3 +38,62 @@ documents:
         - "waived_issue_count"
         - "phase1_recommendation"
         - "user_confirmation_status"
+      machine_checks_table:
+        heading: "machine_checks"
+        required_columns:
+          - "round"
+          - "tool"
+          - "implementation"
+          - "command"
+          - "exit_code"
+          - "issue_count"
+          - "status"
+          - "disposition"
+        required_tools:
+          - "doc_health_checker"
+          - "semantic_review_checker"
+  health_check_report:
+    required_headings:
+      - "总体结论"
+      - "machine_checks"
+      - "accepted_issues"
+    verdict_values:
+      - "PASS"
+      - "PASS_WITH_ACCEPTED_ISSUES"
+      - "FAIL"
+    machine_checks_table:
+      heading: "machine_checks"
+      required_columns:
+        - "round"
+        - "tool"
+        - "implementation"
+        - "command"
+        - "exit_code"
+        - "issue_count"
+        - "status"
+        - "disposition"
+      required_tool_implementations:
+        - "doc_health_checker:python"
+        - "doc_health_checker:js"
+        - "semantic_review_checker:python"
+        - "semantic_review_checker:js"
+    accepted_issues_table:
+      heading: "accepted_issues"
+      required_columns:
+        - "issue_id"
+        - "tool"
+        - "implementation"
+        - "file"
+        - "issue_type"
+        - "original_status"
+        - "accepted_reason"
+        - "residual_risk"
+        - "follow_up"
+      non_waivable_issue_type_prefixes:
+        - "sensitive"
+        - "secret"
+        - "ai_rules"
+        - "runtime_stack"
+        - "required_doc"
+        - "doc_missing"
+        - "health_report"

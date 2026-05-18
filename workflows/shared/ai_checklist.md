@@ -117,13 +117,14 @@ verified_at: 2026-05-05
 ### 首版验收
 
 - [ ] **完成语义正确：文档写完不等于任务完成** ⭐
-  - 只有 `文档生成完成 + 验收通过 + health_check_report.md 落盘` 才能写 `已完成`
+  - 只有 `文档生成完成 + 验收通过 + health_check_report.md 落盘且自身通过检查 + 用户确认` 才能写 `已完成`
   - 验收未通过时，状态必须保持在 `首版验收中` 或 `已阻塞`
 
 - [ ] **已执行结构健康检查与语义复查** ⭐
-  - 至少运行一次 `doc_health_checker --full-check`
-  - 首版交付前补跑 `semantic_review_checker --full-check`
-  - 将关键结果写入 `dev_docs/_analysis/health_check_report.md`
+  - 运行 Python/JS 两套 `doc_health_checker --full-check`
+  - 运行 Python/JS 两套 `semantic_review_checker --full-check`
+  - 将关键结果写入 `dev_docs/_analysis/health_check_report.md` 的结构化 `machine_checks`
+  - 若存在 accepted issue，必须写入结构化 `accepted_issues`，且不得豁免敏感值泄露、AI Rules 冲突、核心运行架构冲突、必需文档缺失或健康报告自身失败
 
 ### 偏离处理
 

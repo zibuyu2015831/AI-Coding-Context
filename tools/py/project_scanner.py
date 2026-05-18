@@ -184,7 +184,7 @@ def detect_framework_dir(root_dir, script_file=None):
             pass
     
     # 策略 2：检查常见位置名称
-    common_names = ['ai_coding_context', '.ai', 'docs/ai_context']
+    common_names = ['AI-Coding-Context', 'ai_coding_context', 'ai-coding-context', '.ai', 'docs/ai_context']
     for name in common_names:
         entry_point = os.path.join(root_dir, name, 'AI_ENTRY_POINT.md')
         if os.path.exists(entry_point):
@@ -216,7 +216,7 @@ def get_standard_exclude_patterns(root_dir, script_file=None):
         patterns.append((f"{framework_dir}/", f'framework auto-detected: {framework_dir}'))
     else:
         # Fallback 模式
-        patterns.extend(['ai_coding_context/', '.ai/', 'docs/ai_context/'])
+        patterns.extend(['AI-Coding-Context/', 'ai_coding_context/', 'ai-coding-context/', '.ai/', 'docs/ai_context/'])
     
     # 2. 依赖与构建产物
     patterns.extend([

@@ -159,6 +159,7 @@ function detectFrameworkDir(rootDir, scriptFile = null) {
     }
     
     const commonNames = [
+        'AI-Coding-Context',
         'ai_coding_context',
         '.ai_coding_context',
         'ai-coding-context',
@@ -200,6 +201,7 @@ function getStandardExcludePatterns(rootDir, scriptFile = null) {
     const frameworkDir = detectFrameworkDir(rootDir, scriptFile);
     if (frameworkDir) {
         patterns.unshift([frameworkDir + '/', 'framework']);
+        patterns.unshift(['AI-Coding-Context/', 'framework']);
         patterns.unshift(['.ai/', 'ai workspace']);
         patterns.unshift(['docs/ai_context/', 'ai docs']);
     }

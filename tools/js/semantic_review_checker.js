@@ -9,6 +9,8 @@ const path = require('path');
 const POSITIVE_KEYWORDS = ['推荐', '必须', '优先', '建议', 'should', 'recommended', 'prefer', '需要'];
 const NEGATIVE_KEYWORDS = ['不建议', '不要', '禁止', 'deprecated', '废弃', 'avoid', 'do not', '不需要', '无需'];
 const SOURCE_SUFFIXES = new Set(['.md', '.py', '.js', '.ts', '.tsx', '.swift']);
+const FRAMEWORK_ROOT = path.resolve(__dirname, '..', '..');
+const FRAMEWORK_DIR_NAMES = new Set(['AI-Coding-Context', 'ai_coding_context', 'ai-coding-context', '.ai', '.git', 'node_modules', 'vendor', 'storage']);
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -31,10 +33,36 @@ function parseArgs() {
   return out;
 }
 
-function walkFiles(root, predicate) {
+function isInside(child, parent) {
+  const rel = path.relative(parent, child);
+  return rel === '' || (!!rel && !rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+function isProjectScanExcluded(current, repoRoot, docDir) {
+  const relative = path.relative(repoRoot, current);
+  const relParts = relative && !relative.startsWith('..') ? relative.split(path.sep).filter(Boolean) : current.split(path.sep).filter(Boolean);
+  if (relParts.length > 0 && FRAMEWORK_DIR_NAMES.has(relParts[0])) return true;
+  if (relParts.includes('bootstrap') && relParts.includes('cache')) return true;
+  let real = current;
+  try { real = fs.realpathSync(current); } catch (e) { /* ignore */ }
+  const repoReal = fs.realpathSync(repoRoot);
+  const fixtureRoot = path.join(FRAMEWORK_ROOT, 'tools', 'testdata');
+  if (docDir) {
+    let docReal = docDir;
+    try { docReal = fs.realpathSync(docDir); } catch (e) { /* ignore */ }
+    if (isInside(real, docReal)) return true;
+  }
+  if (isInside(real, FRAMEWORK_ROOT) && repoReal !== FRAMEWORK_ROOT && !isInside(repoReal, fixtureRoot)) return true;
+  if (repoReal === FRAMEWORK_ROOT && isInside(real, fixtureRoot)) return true;
+  return false;
+}
+
+function walkFiles(root, predicate, options = {}) {
   const results = [];
   function visit(current) {
-    const stat = fs.statSync(current);
+    if (options.projectScan && isProjectScanExcluded(current, options.repoRoot || root, options.docDir)) return;
+    const lstat = fs.lstatSync(current);
+    const stat = lstat.isSymbolicLink() ? fs.statSync(current) : lstat;
     if (stat.isFile()) {
       if (!predicate || predicate(current)) results.push(current);
       return;
@@ -55,9 +83,9 @@ function iterAuthorityFiles(repoRoot, docDir) {
   if (fs.existsSync(readme)) files.push(readme);
   const docsDir = path.join(repoRoot, 'docs');
   if (fs.existsSync(docsDir)) {
-    files.push(...walkFiles(docsDir, (file) => SOURCE_SUFFIXES.has(path.extname(file))));
+    files.push(...walkFiles(docsDir, (file) => SOURCE_SUFFIXES.has(path.extname(file)), { projectScan: true, repoRoot, docDir }));
   }
-  walkFiles(repoRoot, (file) => SOURCE_SUFFIXES.has(path.extname(file))).forEach((file) => {
+  walkFiles(repoRoot, (file) => SOURCE_SUFFIXES.has(path.extname(file)), { projectScan: true, repoRoot, docDir }).forEach((file) => {
     if (file.startsWith(docDir + path.sep)) return;
     if (!files.includes(file)) files.push(file);
   });
@@ -67,18 +95,20 @@ function iterAuthorityFiles(repoRoot, docDir) {
 function scanTestTopology(repoRoot) {
   const topology = [];
   function visit(current) {
-    const stat = fs.statSync(current);
+    if (isProjectScanExcluded(current, repoRoot)) return;
+    const lstat = fs.lstatSync(current);
+    const stat = lstat.isSymbolicLink() ? fs.statSync(current) : lstat;
     if (!stat.isDirectory()) return;
     const name = path.basename(current);
     const isStandardTestDir = name === 'tests' || name === 'test';
     const isXcodeTestDir = name.endsWith('Tests') || name.endsWith('UITests');
     if (isStandardTestDir || isXcodeTestDir) {
       const swiftTestFileCount = isXcodeTestDir
-        ? walkFiles(current, (file) => file.endsWith('Tests.swift') || file.endsWith('UITests.swift')).length
+        ? walkFiles(current, (file) => file.endsWith('Tests.swift') || file.endsWith('UITests.swift'), { projectScan: true, repoRoot }).length
         : 0;
       const fileCount = isXcodeTestDir && swiftTestFileCount > 0
         ? swiftTestFileCount
-        : walkFiles(current, () => true).length;
+        : walkFiles(current, () => true, { projectScan: true, repoRoot }).length;
       topology.push({
         path: `${path.relative(repoRoot, current).replace(/\\/g, '/')}/`,
         file_count: fileCount,
@@ -86,7 +116,8 @@ function scanTestTopology(repoRoot) {
     }
     fs.readdirSync(current).forEach((entry) => {
       const child = path.join(current, entry);
-      if (fs.statSync(child).isDirectory()) visit(child);
+      const childStat = fs.lstatSync(child);
+      if ((childStat.isSymbolicLink() ? fs.statSync(child) : childStat).isDirectory()) visit(child);
     });
   }
   visit(repoRoot);
@@ -96,8 +127,9 @@ function scanTestTopology(repoRoot) {
 function countFilesUnder(repoRoot, relativePath) {
   const target = path.join(repoRoot, relativePath);
   if (!fs.existsSync(target)) return null;
+  if (isProjectScanExcluded(target, repoRoot)) return null;
   if (fs.statSync(target).isFile()) return 1;
-  return walkFiles(target, () => true).length;
+  return walkFiles(target, () => true, { projectScan: true, repoRoot }).length;
 }
 
 function checkMetrics(docDir, repoRoot) {
@@ -306,6 +338,138 @@ function readIfExists(file) {
   return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
 }
 
+function loadPackageDeps(repoRoot) {
+  const file = path.join(repoRoot, 'package.json');
+  if (!fs.existsSync(file)) return {};
+  try {
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return { ...(data.dependencies || {}), ...(data.devDependencies || {}) };
+  } catch (error) {
+    return {};
+  }
+}
+
+function majorVersion(version) {
+  const match = String(version || '').match(/(\d+)/);
+  return match ? Number(match[1]) : null;
+}
+
+function repoUsesApache(repoRoot) {
+  const chunks = [];
+  walkFiles(repoRoot, (file) => file.includes('Dockerfile'), { projectScan: true, repoRoot }).forEach((file) => {
+    chunks.push(fs.readFileSync(file, 'utf8'));
+  });
+  ['Dockerfile', 'docker-compose.yml', 'docker-compose.yaml', 'compose.yml', 'compose.yaml', 'config/supervisord.conf'].forEach((rel) => {
+    const file = path.join(repoRoot, rel);
+    if (fs.existsSync(file) && !isProjectScanExcluded(file, repoRoot)) chunks.push(fs.readFileSync(file, 'utf8'));
+  });
+  const combined = chunks.join('\n').toLowerCase();
+  return combined.includes('apache') || combined.includes('apache2-foreground');
+}
+
+function docMentionsNginxPhpFpm(text) {
+  return /Nginx\s*\/\s*PHP-FPM|PHP-FPM\s*\+\s*Nginx|Nginx[\s\S]*FastCGI/i.test(text);
+}
+
+function formalMarkdownFiles(docDir) {
+  return iterMarkdownFiles(docDir).filter((file) => !file.split(path.sep).includes('_analysis'));
+}
+
+function vuexModuleNames(repoRoot) {
+  const vuexDir = path.join(repoRoot, 'resources', 'js', 'vuex');
+  if (!fs.existsSync(vuexDir)) return new Set();
+  const names = new Set();
+  fs.readdirSync(vuexDir).filter((name) => name.endsWith('.js')).forEach((name) => {
+    const stem = path.basename(name, '.js');
+    names.add(stem);
+    names.add(stem.charAt(0).toLowerCase() + stem.slice(1));
+    names.add(stem.toLowerCase());
+  });
+  return names;
+}
+
+function declaresRedactionPolicy(docDir) {
+  const analysisDir = path.join(docDir, '_analysis');
+  if (!fs.existsSync(analysisDir)) return false;
+  const text = iterMarkdownFiles(analysisDir).map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+  return ['脱敏', '不复述密码', '不复述', 'Token', '密钥', '敏感'].some((marker) => text.includes(marker));
+}
+
+function isPlaceholderValue(value) {
+  const stripped = String(value || '').trim().replace(/^`|`$/g, '');
+  return !stripped || stripped.startsWith('<') || stripped.startsWith('${') || ['DB_PASSWORD', 'PUSHER_APP_KEY', 'REVERB_APP_KEY', 'TOKEN', 'PASSWORD'].includes(stripped.toUpperCase());
+}
+
+function checkFirstReleaseAcceptance(docDir, repoRoot) {
+  const issues = [];
+  const deps = loadPackageDeps(repoRoot);
+  const vueMajor = majorVersion(deps.vue);
+  const vuexMajor = majorVersion(deps.vuex);
+  const usesApache = repoUsesApache(repoRoot);
+  const formalDocs = formalMarkdownFiles(docDir).map((file) => ({ file, text: fs.readFileSync(file, 'utf8') }));
+  const aiRulesPath = path.join(docDir, 'rules', 'combined', 'AI_RULES.md');
+  const aiRules = readIfExists(aiRulesPath);
+
+  if (usesApache) {
+    formalDocs.forEach(({ file, text }) => {
+      if (docMentionsNginxPhpFpm(text)) {
+        issues.push({ type: 'runtime_stack_conflict', severity: 'blocker', file, message: '仓库 Docker/Supervisor 事实显示使用 Apache，但正式文档写成 Nginx/PHP-FPM' });
+      }
+    });
+    if (aiRules && docMentionsNginxPhpFpm(aiRules)) {
+      issues.push({ type: 'ai_rules_runtime_stack_conflict', severity: 'blocker', file: aiRulesPath, message: 'AI_RULES.md 的运行栈与 Dockerfile / Compose 事实冲突' });
+    }
+  }
+
+  if (aiRules) {
+    if (vuexMajor && /Vuex\s*4\b/i.test(aiRules) && vuexMajor !== 4) {
+      issues.push({ type: 'ai_rules_dependency_version_conflict', severity: 'blocker', file: aiRulesPath, package: 'vuex', doc_says: 'Vuex 4', manifest_says: deps.vuex, message: 'AI_RULES.md 写的 Vuex 版本与 package.json 冲突' });
+    }
+    if (vueMajor && /Vue\s*3\b|Vue\s*2\.7\b/i.test(aiRules) && vueMajor === 2 && !aiRules.includes('Vue 2 + Vuex')) {
+      issues.push({ type: 'ai_rules_dependency_version_conflict', severity: 'blocker', file: aiRulesPath, package: 'vue', manifest_says: deps.vue, message: 'AI_RULES.md 写的 Vue 版本与 package.json 冲突' });
+    }
+    const moduleNames = vuexModuleNames(repoRoot);
+    if (moduleNames.size > 0) {
+      const moduleLine = aiRules.match(/(?:状态管理模块|按模块组织)[:：]\s*([^\n]+)/);
+      const moduleText = moduleLine ? moduleLine[1] : aiRules;
+      const mentioned = new Set(Array.from(moduleText.matchAll(/`([^`]+)`/g), (match) => match[1]));
+      Array.from(moduleText.matchAll(/\b(user_storage|theme)\b/g), (match) => match[1]).forEach((name) => mentioned.add(name));
+      Array.from(mentioned).filter((name) => !moduleNames.has(name) && !name.includes('/') && !name.includes('.')).sort().forEach((name) => {
+        issues.push({ type: 'ai_rules_state_module_conflict', severity: 'blocker', file: aiRulesPath, module: name, message: 'AI_RULES.md 写了源码中不存在的状态管理模块' });
+      });
+    }
+    const contributing = readIfExists(path.join(repoRoot, 'CONTRIBUTING.md')).toLowerCase();
+    if (contributing.includes('please do not write any') && contributing.includes('test') && /(补|新增|增加|默认).{0,12}(测试|test)/i.test(aiRules)) {
+      issues.push({ type: 'ai_rules_test_policy_conflict', severity: 'blocker', file: aiRulesPath, message: 'AI_RULES.md 的测试建议与 CONTRIBUTING.md 冲突' });
+    }
+  }
+
+  const redactionDeclared = declaresRedactionPolicy(docDir);
+  const sensitiveLinePattern = /\b[A-Z0-9_]*(?:PASSWORD|TOKEN|SECRET|KEY)[A-Z0-9_]*\b[^`\n]{0,80}`([^`]+)`/g;
+  const secretLikePattern = /`([A-Za-z0-9_-]{16,})`/g;
+  formalDocs.forEach(({ file, text }) => {
+    text.split('\n').forEach((line, index) => {
+      if (line.includes('只列变量名') || (line.includes('变量名') && !['默认值', '值为', '密码为', 'key 为', 'KEY 为'].some((marker) => line.includes(marker)))) return;
+      let match;
+      sensitiveLinePattern.lastIndex = 0;
+      while ((match = sensitiveLinePattern.exec(line)) !== null) {
+        const value = match[1];
+        if (isPlaceholderValue(value)) continue;
+        issues.push({ type: redactionDeclared ? 'sensitive_policy_declared_but_violated' : 'sensitive_default_value_repeated', severity: 'blocker', file, line: index + 1, message: '正式文档复述了密码、Token、key 或默认敏感值' });
+      }
+      secretLikePattern.lastIndex = 0;
+      while ((match = secretLikePattern.exec(line)) !== null) {
+        const value = match[1];
+        if (isPlaceholderValue(value) || value.toUpperCase().endsWith('_KEY')) continue;
+        if (/\b[A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\b|Pusher|Reverb|PUSHER|REVERB/.test(line)) {
+          issues.push({ type: 'secret_like_value_in_docs', severity: 'blocker', file, line: index + 1, message: '正式文档出现疑似 token/key/password 具体值' });
+        }
+      }
+    });
+  });
+  return issues;
+}
+
 function isPhase1PassOrRecommendation(text) {
   if (!text.includes('Phase 1') && !text.toLowerCase().includes('phase1')) return false;
   return /\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成/i.test(text);
@@ -328,6 +492,150 @@ function repoTextSignals(repoRoot) {
   return chunks.join('\n');
 }
 
+function sectionText(text, heading) {
+  const lines = text.split('\n');
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^##+\s+/.test(lines[i]) && lines[i].includes(heading)) {
+      start = i + 1;
+      break;
+    }
+  }
+  if (start < 0) return '';
+  let end = lines.length;
+  for (let i = start; i < lines.length; i++) {
+    if (/^##\s+/.test(lines[i])) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).join('\n');
+}
+
+function markdownTables(section) {
+  const tables = [];
+  let current = [];
+  section.split('\n').forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      current.push(trimmed);
+    } else if (current.length > 0) {
+      tables.push(current);
+      current = [];
+    }
+  });
+  if (current.length > 0) tables.push(current);
+  return tables;
+}
+
+function tableCells(row) {
+  return row.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim().replace(/`/g, ''));
+}
+
+function checkEvidenceTable(planPath, plan) {
+  const issues = [];
+  const section = sectionText(plan, '证据与验证记录');
+  if (!section) return issues;
+  const evidenceTables = markdownTables(section)
+    .filter((table) => table.length >= 2)
+    .map((table) => ({ headers: tableCells(table[0]), rows: table.slice(2) }))
+    .filter(({ headers }) => headers.some((header) => header.includes('结论')) && headers.some((header) => header.includes('证据')));
+  if (evidenceTables.length === 0) return issues;
+  evidenceTables.forEach(({ headers, rows }) => {
+    const levelIndex = headers.findIndex((header) => header.includes('证据等级'));
+    if (levelIndex < 0) {
+      issues.push({
+        type: 'evidence_table_level_column_missing',
+        severity: 'blocker',
+        file: planPath,
+        message: '证据与验证记录表缺少 `证据等级` 列',
+      });
+      if (plan.includes('证据等级')) {
+        issues.push({
+          type: 'evidence_table_claim_mismatch',
+          severity: 'blocker',
+          file: planPath,
+          message: '复查清单声称证据表包含证据等级，但实际表格缺少该列',
+        });
+      }
+      return;
+    }
+    rows.forEach((row) => {
+      if (/^\|\s*-+/.test(row)) return;
+      const cells = tableCells(row);
+      const value = cells[levelIndex] || '';
+      if (!/^E[1-4]$/.test(value)) {
+        issues.push({
+          type: 'evidence_table_level_value_invalid',
+          severity: 'blocker',
+          file: planPath,
+          value,
+          message: '证据等级必须为 E1/E2/E3/E4',
+        });
+      }
+    });
+  });
+  return issues;
+}
+
+function questionBlocks(section) {
+  const blocks = [];
+  let current = [];
+  section.split('\n').forEach((line) => {
+    if (/^\s*\d+[\.\)、]/.test(line)) {
+      if (current.length > 0) blocks.push(current.join('\n'));
+      current = [line];
+    } else if (current.length > 0) {
+      current.push(line);
+    }
+  });
+  if (current.length > 0) blocks.push(current.join('\n'));
+  return blocks.filter((block) => block.trim());
+}
+
+function checkUserConfirmationItems(planPath, plan) {
+  const issues = [];
+  const section = sectionText(plan, '等待用户审核的问题') || sectionText(plan, '待用户确认') || sectionText(plan, '需要人工确认') || sectionText(plan, '用户确认');
+  if (!section) return issues;
+  const requirements = [
+    ['当前保守结论', 'user_confirmation_default_missing', '待确认项缺少当前保守结论'],
+    ['已检查证据', 'user_confirmation_evidence_missing', '待确认项缺少已检查证据'],
+    ['为什么代码或仓库文档无法回答', 'user_confirmation_rationale_missing', '待确认项缺少为何代码或仓库文档无法回答'],
+    ['blocks_phase1', 'user_confirmation_blocks_phase1_missing', '待确认项缺少 blocks_phase1 标记'],
+    ['回写目标', 'user_confirmation_writeback_missing', '待确认项缺少回写目标'],
+  ];
+  questionBlocks(section).forEach((block, index) => {
+    requirements.forEach(([marker, type, message]) => {
+      if (!block.includes(marker)) {
+        issues.push({ type, severity: 'blocker', file: planPath, question_index: index + 1, message });
+      }
+    });
+  });
+  return issues;
+}
+
+function checkMaintainerRuleConflicts(repoRoot, plan, report, reportPath) {
+  const issues = [];
+  const contributing = path.join(repoRoot, 'CONTRIBUTING.md');
+  if (!fs.existsSync(contributing)) return issues;
+  const text = fs.readFileSync(contributing, 'utf8').toLowerCase();
+  const noTests = ['do not write any', "don't use tests", 'dont use tests', 'please do not write any', '不要写测试', '不写测试']
+    .some((marker) => text.includes(marker)) && text.includes('test');
+  if (!noTests) return issues;
+  const analysis = `${plan}\n${report}`;
+  const recommendsTests = /(优先|建议|需要|补|增加|新增).{0,12}(测试|回归测试)|回归测试/.test(analysis);
+  const acknowledgesRule = ['维护者规则', 'CONTRIBUTING', '不直接新增测试', '不写测试'].some((marker) => analysis.includes(marker));
+  if (recommendsTests && !acknowledgesRule) {
+    issues.push({
+      type: 'test_recommendation_conflicts_with_contributing',
+      severity: 'blocker',
+      file: reportPath,
+      message: '分析文档建议补测试，但 CONTRIBUTING 明确限制 PR 新增测试，需改为先记录维护者规则或提出非阻断建议',
+    });
+  }
+  return issues;
+}
+
 function checkPhase1AnalysisGate(docDir, repoRoot) {
   const issues = [];
   const planPath = analysisFile(docDir, 'generation_plan.md');
@@ -339,13 +647,18 @@ function checkPhase1AnalysisGate(docDir, repoRoot) {
   const phase1Pass = isPhase1PassOrRecommendation(progress);
   const strictPhase1Review = phase1Pass || progress.includes('Phase 1 方案复查记录') || plan.includes('Phase 1 方案复查清单');
 
-  if (strictPhase1Review && plan && plan.includes('证据与验证记录') && !plan.includes('证据等级')) {
-    issues.push({
-      type: 'evidence_level_completeness',
-      severity: 'blocker',
-      file: planPath,
-      message: 'generation_plan.md 的证据与验证记录缺少证据等级',
-    });
+  if (strictPhase1Review && plan && plan.includes('证据与验证记录')) {
+    const tableIssues = checkEvidenceTable(planPath, plan);
+    if (tableIssues.length > 0) {
+      issues.push(...tableIssues);
+    } else if (!plan.includes('证据等级')) {
+      issues.push({
+        type: 'evidence_level_completeness',
+        severity: 'blocker',
+        file: planPath,
+        message: 'generation_plan.md 的证据与验证记录缺少证据等级',
+      });
+    }
   }
 
   const reportHasIssues = ['严重问题', '警告', '疑问', '优化建议', '建议'].some((marker) => report.includes(marker));
@@ -379,6 +692,11 @@ function checkPhase1AnalysisGate(docDir, repoRoot) {
         message: 'progress 声明 Phase 1 PASS/建议通过，但 project_analysis_report.md 未同步补齐证据等级',
       });
     }
+  }
+
+  if (strictPhase1Review) {
+    issues.push(...checkUserConfirmationItems(planPath, plan));
+    issues.push(...checkMaintainerRuleConflicts(repoRoot, plan, report, reportPath));
   }
 
   const combinedAnalysis = `${plan}\n${report}`;
@@ -446,7 +764,7 @@ function main() {
 
   const docDir = path.resolve(args.docDir);
   const repoRoot = path.resolve(args.repoRoot);
-  const checks = { fact_conflicts: [], metrics: [], test_topology: [], review_consistency: [], phase1_analysis_gate: [] };
+  const checks = { fact_conflicts: [], metrics: [], test_topology: [], review_consistency: [], phase1_analysis_gate: [], first_release_acceptance: [] };
   if (args.fullCheck || args.checkFactConflicts) {
     checks.fact_conflicts = checkFactConflicts(docDir, repoRoot);
   }
@@ -459,6 +777,7 @@ function main() {
   if (args.fullCheck) {
     checks.review_consistency = checkReviewConsistency(docDir, repoRoot);
     checks.phase1_analysis_gate = checkPhase1AnalysisGate(docDir, repoRoot);
+    checks.first_release_acceptance = checkFirstReleaseAcceptance(docDir, repoRoot);
   }
   if (!(args.fullCheck || args.checkFactConflicts || args.checkMetrics || args.checkTestTopology)) {
     process.stdout.write('Usage: semantic_review_checker --doc-dir DIR [--repo-root DIR] [--check-fact-conflicts] [--check-metrics] [--check-test-topology] [--full-check] [--format json|text]\n');

@@ -72,6 +72,26 @@ GENERATION_PROGRESS_BASE = """# 文档生成进度记录
 - **已完成数**: 1
 """
 
+HEALTH_REPORT_BASE = """# 首版文档质量验收报告
+
+## 总体结论
+
+- **最终 verdict**: PASS
+
+## machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
+| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
+
+## accepted_issues
+
+无 accepted issue
+"""
+
 
 def _run_json(cmd):
     result = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
@@ -92,6 +112,24 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         (self.dev_docs / "AI_Coding_Context.md").write_text(MAIN_DOC_BASE, encoding="utf-8")
         (self.dev_docs / "_analysis" / "generation_plan.md").write_text(GENERATION_PLAN_BASE, encoding="utf-8")
         (self.dev_docs / "_analysis" / "generation_progress.md").write_text(GENERATION_PROGRESS_BASE, encoding="utf-8")
+
+    def _write_valid_first_release_bundle(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE.replace(
+            "> **当前状态**: 生成中",
+            "> **当前状态**: 首版建议通过",
+        ).replace(
+            "> **产物完成度**: 1/3，已完成部分 _analysis 产物",
+            "> **产物完成度**: 正式文档 1/1，_analysis 产物 4/4，总文件数 4",
+        ).replace(
+            "> **当前 gate**: Phase 1 自检",
+            "> **当前 gate**: 首版质量验收",
+        ).replace(
+            "> **下一步动作**: 继续生成",
+            "> **下一步动作**: 等待用户确认首版验收",
+        ) + "\n## 🔎 首版质量验收记录\n\n首版验收 verdict = PASS\n"
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        (self.dev_docs / "_analysis" / "health_check_report.md").write_text(HEALTH_REPORT_BASE, encoding="utf-8")
 
     def test_help_mentions_new_checks_python(self):
         result = subprocess.run(
@@ -227,6 +265,85 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
         self.assertIn("phase1_plan_review_writeback_missing", issue_types)
 
+    def test_phase1_review_record_requires_structured_machine_checks(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE.replace(
+            "> **当前状态**: 生成中",
+            "> **当前状态**: 等待人工审核",
+        ).replace(
+            "> **下一步动作**: 继续生成",
+            "> **下一步动作**: Phase 1 建议通过，等待用户确认",
+        ) + """
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **machine_checks**: doc_health_checker=PASS, semantic_review_checker=PASS
+- **manual_review_summary**: 已复查
+- **writeback_summary**: 已更新 generation_plan.md
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+"""
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("machine_check_table_missing", issue_types)
+
+    def test_phase1_review_record_accepts_structured_machine_checks(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE.replace(
+            "> **当前状态**: 生成中",
+            "> **当前状态**: 等待人工审核",
+        ).replace(
+            "> **下一步动作**: 继续生成",
+            "> **下一步动作**: Phase 1 建议通过，等待用户确认",
+        ) + """
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **manual_review_summary**: 已复查
+- **writeback_summary**: 已更新 generation_plan.md
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+
+### machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | 无需处理 |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | 无需处理 |
+"""
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(payload["checks"]["run_record_integrity"]["issues"], [])
+
     def test_progress_duplicate_last_updated_is_reported(self):
         self._write_valid_bundle()
         broken_progress = GENERATION_PROGRESS_BASE + "\n**最后更新**: 2026-05-12 11:00\n"
@@ -316,6 +433,102 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         self.assertIn(result.returncode, (0, 1))
         payload = json.loads(result.stdout)
         self.assertIn("file_paths", payload["checks"])
+
+    def test_health_report_pass_conflicting_with_machine_check_failure_is_reported(self):
+        self._write_valid_first_release_bundle()
+        report = HEALTH_REPORT_BASE.replace(
+            "| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |",
+            "| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 1 | 6 | FAIL | accepted |",
+        )
+        (self.dev_docs / "_analysis" / "health_check_report.md").write_text(report, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("health_report_verdict_conflicts_with_checks", issue_types)
+        self.assertIn("health_report_accepted_issue_missing_detail", issue_types)
+
+    def test_health_report_accepted_issue_requires_detail(self):
+        self._write_valid_first_release_bundle()
+        report = HEALTH_REPORT_BASE.replace(
+            "无 accepted issue",
+            """| issue_id | tool | implementation | file | issue_type | original_status | accepted_reason | residual_risk | follow_up |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| js-esm-1 | doc_health_checker | js | frontend.md | js_esm_parse_false_positive | FAIL | 解析器误报 |  | 修复 JS parser |""",
+        ).replace("PASS\n\n## machine_checks", "PASS_WITH_ACCEPTED_ISSUES\n\n## machine_checks")
+        (self.dev_docs / "_analysis" / "health_check_report.md").write_text(report, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("health_report_accepted_issue_missing_detail", issue_types)
+
+    def test_health_report_disallows_accepted_sensitive_issue(self):
+        self._write_valid_first_release_bundle()
+        report = HEALTH_REPORT_BASE.replace(
+            "| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |",
+            "| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 1 | 1 | FAIL | accepted |",
+        ).replace(
+            "无 accepted issue",
+            """| issue_id | tool | implementation | file | issue_type | original_status | accepted_reason | residual_risk | follow_up |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| secret-1 | semantic_review_checker | python | deployment.md | sensitive_default_value_repeated | FAIL | 开源默认值 | 低 | 无 |""",
+        ).replace("PASS\n\n## machine_checks", "PASS_WITH_ACCEPTED_ISSUES\n\n## machine_checks")
+        (self.dev_docs / "_analysis" / "health_check_report.md").write_text(report, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("health_report_accepted_issue_not_allowed", issue_types)
+
+    def test_artifact_count_mismatch_is_reported(self):
+        self._write_valid_first_release_bundle()
+        report = HEALTH_REPORT_BASE.replace("## 总体结论", "## 总体结论\n\n- **检查范围**: 全部 3 个产物")
+        (self.dev_docs / "_analysis" / "health_check_report.md").write_text(report, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("artifact_count_mismatch", issue_types)
+
+    def test_javascript_esm_code_samples_are_accepted_by_js_checker(self):
+        self._write_valid_bundle()
+        (self.dev_docs / "AI_Coding_Context.md").write_text(MAIN_DOC_BASE + """
+```javascript
+import { defineConfig } from "vite";
+export default defineConfig({});
+```
+""", encoding="utf-8")
+        result = subprocess.run(
+            ["node", str(JS_CHECKER), "--doc-dir", str(self.dev_docs), "--check-code-samples"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        payload = json.loads(result.stdout)
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertEqual(payload["checks"]["code_samples"]["issues"], [])
 
 
 class TestDocHealthCheckerJSSmoke(unittest.TestCase):

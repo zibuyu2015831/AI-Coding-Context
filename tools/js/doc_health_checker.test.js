@@ -68,6 +68,26 @@ const GENERATION_PROGRESS_BASE = `# 文档生成进度记录
 - **已完成数**: 1
 `;
 
+const HEALTH_REPORT_BASE = `# 首版文档质量验收报告
+
+## 总体结论
+
+- **最终 verdict**: PASS
+
+## machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | doc_health_checker | python | \`python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | verified |
+| 1 | doc_health_checker | js | \`node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | python | \`python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | js | \`node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | verified |
+
+## accepted_issues
+
+无 accepted issue
+`;
+
 function makeTempDevDocs() {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-health-js-'));
   const devDocs = path.join(base, 'dev_docs');
@@ -76,6 +96,23 @@ function makeTempDevDocs() {
   fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_plan.md'), GENERATION_PLAN_BASE, 'utf8');
   fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), GENERATION_PROGRESS_BASE, 'utf8');
   return { base, devDocs };
+}
+
+function makeFirstReleaseDevDocs() {
+  const bundle = makeTempDevDocs();
+  const progress = `${GENERATION_PROGRESS_BASE
+    .replace('> **当前状态**: 生成中', '> **当前状态**: 首版建议通过')
+    .replace('> **产物完成度**: 1/3，已完成部分 _analysis 产物', '> **产物完成度**: 正式文档 1/1，_analysis 产物 4/4，总文件数 4')
+    .replace('> **当前 gate**: Phase 1 自检', '> **当前 gate**: 首版质量验收')
+    .replace('> **下一步动作**: 继续生成', '> **下一步动作**: 等待用户确认首版验收')}
+
+## 🔎 首版质量验收记录
+
+首版验收 verdict = PASS
+`;
+  fs.writeFileSync(path.join(bundle.devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
+  fs.writeFileSync(path.join(bundle.devDocs, '_analysis', 'health_check_report.md'), HEALTH_REPORT_BASE, 'utf8');
+  return bundle;
 }
 
 function runJson(args) {
@@ -193,6 +230,75 @@ function runTests() {
     }
   });
 
+  test('Phase 1 review record requires structured machine checks', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const progress = `${GENERATION_PROGRESS_BASE
+        .replace('> **当前状态**: 生成中', '> **当前状态**: 等待人工审核')
+        .replace('> **下一步动作**: 继续生成', '> **下一步动作**: Phase 1 建议通过，等待用户确认')}
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **machine_checks**: doc_health_checker=PASS, semantic_review_checker=PASS
+- **manual_review_summary**: 已复查
+- **writeback_summary**: 已更新 generation_plan.md
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+`;
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('machine_check_table_missing'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('Phase 1 review record accepts structured machine checks', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const progress = `${GENERATION_PROGRESS_BASE
+        .replace('> **当前状态**: 生成中', '> **当前状态**: 等待人工审核')
+        .replace('> **下一步动作**: 继续生成', '> **下一步动作**: Phase 1 建议通过，等待用户确认')}
+
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **manual_review_summary**: 已复查
+- **writeback_summary**: 已更新 generation_plan.md
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过，等待用户确认
+- **user_confirmation_status**: pending
+
+### machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | doc_health_checker | js | \`node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | 无需处理 |
+| 1 | semantic_review_checker | js | \`node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | 无需处理 |
+`;
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 0);
+      assert.deepStrictEqual(payload.checks.run_record_integrity.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
   test('duplicate last updated values are reported', () => {
     const { base, devDocs } = makeTempDevDocs();
     try {
@@ -269,6 +375,91 @@ function runTests() {
       const { result, payload } = runJson(['--doc-dir', devDocs, '--mode', 'quick']);
       assert.ok([0, 1].includes(result.status));
       assert.ok(payload.checks.file_paths);
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('health report PASS conflicting with machine check failure is reported', () => {
+    const { base, devDocs } = makeFirstReleaseDevDocs();
+    try {
+      const report = HEALTH_REPORT_BASE.replace(
+        '| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |',
+        '| 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 1 | 6 | FAIL | accepted |',
+      );
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'health_check_report.md'), report, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('health_report_verdict_conflicts_with_checks'));
+      assert.ok(issueTypes.has('health_report_accepted_issue_missing_detail'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('accepted issue requires residual risk and follow-up details', () => {
+    const { base, devDocs } = makeFirstReleaseDevDocs();
+    try {
+      const report = HEALTH_REPORT_BASE
+        .replace('PASS\n\n## machine_checks', 'PASS_WITH_ACCEPTED_ISSUES\n\n## machine_checks')
+        .replace('无 accepted issue', `| issue_id | tool | implementation | file | issue_type | original_status | accepted_reason | residual_risk | follow_up |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| js-esm-1 | doc_health_checker | js | frontend.md | js_esm_parse_false_positive | FAIL | 解析器误报 |  | 修复 JS parser |`);
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'health_check_report.md'), report, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'health_report_accepted_issue_missing_detail'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('accepted issue cannot waive sensitive findings', () => {
+    const { base, devDocs } = makeFirstReleaseDevDocs();
+    try {
+      const report = HEALTH_REPORT_BASE
+        .replace('| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |', '| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 1 | 1 | FAIL | accepted |')
+        .replace('PASS\n\n## machine_checks', 'PASS_WITH_ACCEPTED_ISSUES\n\n## machine_checks')
+        .replace('无 accepted issue', `| issue_id | tool | implementation | file | issue_type | original_status | accepted_reason | residual_risk | follow_up |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| secret-1 | semantic_review_checker | python | deployment.md | sensitive_default_value_repeated | FAIL | 开源默认值 | 低 | 无 |`);
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'health_check_report.md'), report, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'health_report_accepted_issue_not_allowed'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('artifact count mismatch is reported', () => {
+    const { base, devDocs } = makeFirstReleaseDevDocs();
+    try {
+      const report = HEALTH_REPORT_BASE.replace('## 总体结论', '## 总体结论\n\n- **检查范围**: 全部 3 个产物');
+      fs.writeFileSync(path.join(devDocs, '_analysis', 'health_check_report.md'), report, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'artifact_count_mismatch'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('ESM JavaScript code samples are accepted', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(path.join(devDocs, 'AI_Coding_Context.md'), `${MAIN_DOC_BASE}
+\`\`\`javascript
+import { defineConfig } from "vite";
+export default defineConfig({
+  base: import.meta.env.BASE_URL,
+});
+\`\`\`
+`, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-code-samples']);
+      assert.strictEqual(result.status, 0);
+      assert.deepStrictEqual(payload.checks.code_samples.issues, []);
     } finally {
       cleanup(base);
     }

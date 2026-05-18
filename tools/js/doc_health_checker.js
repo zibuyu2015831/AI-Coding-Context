@@ -128,8 +128,13 @@ function extractCodeBlocks(text) {
 
 function checkJsBlock(code) {
   // 最小语法检查：尝试 Function 构造（不执行）
+  const transformed = code
+    .replace(/^\s*import\s+[^;\n]+;?\s*$/gm, '')
+    .replace(/^\s*export\s+default\s+/gm, 'const __default__ = ')
+    .replace(/^\s*export\s+(const|let|var|function|class)\s+/gm, '$1 ')
+    .replace(/\bimport\.meta\b/g, '({})');
   try {
-    new Function(code);
+    new Function(transformed);
     return null;
   } catch (e) {
     return `SyntaxError: ${e.message}`;
@@ -259,6 +264,12 @@ function loadRunRecordContract() {
   let currentDoc = null;
   let currentKey = null;
   for (const line of lines) {
+    const anyDocMatch = line.match(/^\s{2}([A-Za-z0-9_]+):\s*$/);
+    if (anyDocMatch && !Object.prototype.hasOwnProperty.call(docs, anyDocMatch[1])) {
+      currentDoc = null;
+      currentKey = null;
+      continue;
+    }
     const docMatch = line.match(/^\s{2}(generation_plan|generation_progress):\s*$/);
     if (docMatch) {
       currentDoc = docMatch[1];
@@ -357,6 +368,35 @@ const PHASE1_REVIEW_FIELDS = [
   'user_confirmation_status',
 ];
 
+const HEALTH_CHECK_REQUIRED_TOOLS = new Set([
+  'doc_health_checker|python',
+  'doc_health_checker|js',
+  'semantic_review_checker|python',
+  'semantic_review_checker|js',
+]);
+
+const ACCEPTED_ISSUE_REQUIRED_FIELDS = [
+  'issue_id',
+  'tool',
+  'implementation',
+  'file',
+  'issue_type',
+  'original_status',
+  'accepted_reason',
+  'residual_risk',
+  'follow_up',
+];
+
+const NON_WAIVABLE_ACCEPTED_ISSUE_TYPES = [
+  'sensitive',
+  'secret',
+  'ai_rules',
+  'runtime_stack',
+  'required_doc',
+  'doc_missing',
+  'health_report',
+];
+
 function isPhase1PassOrRecommendation(text) {
   if (!text.includes('Phase 1') && !text.toLowerCase().includes('phase1')) return false;
   return /\bPASS\b|verdict\s*=\s*PASS|建议通过|可进入正式文档生成/i.test(text);
@@ -364,6 +404,200 @@ function isPhase1PassOrRecommendation(text) {
 
 function hasUserConfirmation(text) {
   return /当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)/i.test(text);
+}
+
+function extractSectionAfterHeading(text, heading) {
+  const lines = text.split('\n');
+  let start = -1;
+  const headingRe = new RegExp(`^##+\\s+${heading}\\s*$`, 'i');
+  for (let i = 0; i < lines.length; i++) {
+    if (headingRe.test(lines[i])) {
+      start = i + 1;
+      break;
+    }
+  }
+  if (start < 0) return '';
+  let end = lines.length;
+  for (let i = start; i < lines.length; i++) {
+    if (/^##+\s+/.test(lines[i])) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).join('\n');
+}
+
+function parseFirstMarkdownTable(section) {
+  const rows = [];
+  section.split('\n').forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) rows.push(trimmed);
+  });
+  if (rows.length < 2) return { headers: [], body: [] };
+  const cells = (row) => row.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+  return {
+    headers: cells(rows[0]),
+    body: rows.slice(2).filter((row) => !/^\|\s*-+/.test(row)).map(cells),
+  };
+}
+
+function tableRowsAsDicts(headers, rows) {
+  return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ''])));
+}
+
+function extractFinalVerdict(text) {
+  const match = text.match(/(?:最终\s*)?verdict\*\*?\s*[:：]\s*\*{0,2}([A-Z_]+)/i) || text.match(/(?:最终\s*)?verdict\s*=\s*([A-Z_]+)/i);
+  return match ? match[1].toUpperCase() : '';
+}
+
+function checkHealthReportSelfResidue(file, text) {
+  const issues = [];
+  RESIDUE_PATTERNS.forEach(({ re, label }) => {
+    re.lastIndex = 0;
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      const line = text.slice(0, match.index).split('\n').length;
+      issues.push({ file, type: 'health_report_self_template_residue', severity: 'blocker', marker: label, line, message: `健康报告自身包含模板残留: ${label}` });
+    }
+  });
+  return issues;
+}
+
+function checkAcceptedIssuesTable(file, text, hasAcceptedMachineCheck) {
+  const issues = [];
+  const section = extractSectionAfterHeading(text, 'accepted_issues');
+  if (!section) {
+    if (hasAcceptedMachineCheck || text.toLowerCase().includes('accepted')) {
+      issues.push({ file, type: 'health_report_accepted_issue_missing_detail', severity: 'blocker', message: '存在 accepted issue，但缺少 accepted_issues 结构化章节' });
+    }
+    return issues;
+  }
+  if (section.includes('无 accepted issue') && !hasAcceptedMachineCheck) return issues;
+  const { headers, body } = parseFirstMarkdownTable(section);
+  if (headers.length === 0) {
+    if (hasAcceptedMachineCheck) {
+      issues.push({ file, type: 'health_report_accepted_issue_missing_detail', severity: 'blocker', message: 'accepted_issues 必须使用可解析表格逐项记录' });
+    }
+    return issues;
+  }
+  const missing = ACCEPTED_ISSUE_REQUIRED_FIELDS.filter((field) => !headers.includes(field));
+  if (missing.length > 0) {
+    issues.push({ file, type: 'health_report_accepted_issue_missing_detail', severity: 'blocker', missing, message: 'accepted_issues 表缺少必填列' });
+    return issues;
+  }
+  tableRowsAsDicts(headers, body).forEach((row) => {
+    const emptyFields = ACCEPTED_ISSUE_REQUIRED_FIELDS.filter((field) => !row[field]);
+    if (emptyFields.length > 0) {
+      issues.push({ file, type: 'health_report_accepted_issue_missing_detail', severity: 'blocker', issue_id: row.issue_id, missing: emptyFields, message: 'accepted issue 缺少原因、残余风险或 follow-up 等必填信息' });
+    }
+    const issueType = (row.issue_type || '').toLowerCase();
+    if (NON_WAIVABLE_ACCEPTED_ISSUE_TYPES.some((marker) => issueType.includes(marker))) {
+      issues.push({ file, type: 'health_report_accepted_issue_not_allowed', severity: 'blocker', issue_id: row.issue_id, issue_type: row.issue_type, message: '该类型问题不得通过 accepted issue 豁免' });
+    }
+  });
+  return issues;
+}
+
+function checkHealthReport(file, text, targetCount) {
+  const issues = [];
+  const verdict = extractFinalVerdict(text);
+  const { headers, body } = parseFirstMarkdownTable(extractSectionAfterHeading(text, 'machine_checks'));
+  if (headers.length === 0) {
+    issues.push({ file, type: 'health_report_machine_checks_missing', severity: 'blocker', message: 'health_check_report.md 缺少结构化 machine_checks 表' });
+    return { issues, verdict };
+  }
+  const required = ['round', 'tool', 'implementation', 'command', 'exit_code', 'issue_count', 'status', 'disposition'];
+  const missing = required.filter((field) => !headers.includes(field));
+  if (missing.length > 0) {
+    issues.push({ file, type: 'health_report_machine_checks_missing', severity: 'blocker', missing, message: 'health_check_report.md 的 machine_checks 表缺少必需列' });
+    return { issues, verdict };
+  }
+  const rows = tableRowsAsDicts(headers, body);
+  const seen = new Set(rows.map((row) => `${row.tool}|${row.implementation}`));
+  HEALTH_CHECK_REQUIRED_TOOLS.forEach((key) => {
+    if (!seen.has(key)) {
+      const [tool, implementation] = key.split('|');
+      issues.push({ file, type: 'health_report_machine_checks_missing', severity: 'blocker', tool, implementation, message: `health_check_report.md 缺少 ${implementation} ${tool} 运行记录` });
+    }
+  });
+  let hasFailed = false;
+  let hasAccepted = false;
+  let hasUnacceptedFailure = false;
+  rows.forEach((row) => {
+    if (!/^\d+$/.test(row.exit_code || '') || !/^\d+$/.test(row.issue_count || '')) {
+      issues.push({ file, type: 'health_report_machine_checks_missing', severity: 'blocker', message: 'machine_checks exit_code 与 issue_count 必须为数字' });
+      return;
+    }
+    const failed = Number(row.exit_code) !== 0 || Number(row.issue_count) !== 0 || ['FAIL', 'ERROR'].includes((row.status || '').toUpperCase());
+    const disposition = (row.disposition || '').toLowerCase();
+    if (failed) {
+      hasFailed = true;
+      if (disposition === 'accepted') hasAccepted = true;
+      else if (!['fixed', 'verified'].includes(disposition)) hasUnacceptedFailure = true;
+    }
+  });
+  if (verdict === 'PASS' && (hasFailed || hasAccepted)) {
+    issues.push({ file, type: 'health_report_verdict_conflicts_with_checks', severity: 'blocker', message: 'health_check_report.md 写 PASS，但 machine_checks 存在失败或 accepted issue' });
+  }
+  if (['PASS', 'PASS_WITH_ACCEPTED_ISSUES', '建议通过'].includes(verdict) && hasUnacceptedFailure) {
+    issues.push({ file, type: 'health_report_verdict_conflicts_with_checks', severity: 'blocker', message: 'health_check_report.md 存在未修复/未豁免的失败检查' });
+  }
+  if (hasAccepted && verdict === 'PASS') {
+    issues.push({ file, type: 'health_report_verdict_conflicts_with_checks', severity: 'blocker', message: '存在 accepted issue 时最终结论不得写裸 PASS' });
+  }
+  issues.push(...checkAcceptedIssuesTable(file, text, hasAccepted));
+  issues.push(...checkHealthReportSelfResidue(file, text));
+  const countRe = /全部\s*(\d+)\s*个(?:产物|文档)|已完成\s*(\d+)\s*\/\s*(\d+)\s*个产物|总文件数\s*(\d+)/g;
+  let match;
+  while ((match = countRe.exec(text)) !== null) {
+    const expected = Number(match[1] || match[3] || match[4]);
+    if (expected !== targetCount) {
+      issues.push({ file, type: 'artifact_count_mismatch', severity: 'blocker', expected, actual: targetCount, message: '健康报告或进度记录中的产物数量与实际 Markdown 文件数量不一致' });
+    }
+  }
+  return { issues, verdict };
+}
+
+function checkMachineChecksTable(file, text, phase1Pass) {
+  const issues = [];
+  if (!phase1Pass) return issues;
+  const { headers, body } = parseFirstMarkdownTable(extractSectionAfterHeading(text, 'machine_checks'));
+  if (headers.length === 0) {
+    issues.push({
+      file,
+      type: 'machine_check_table_missing',
+      severity: 'blocker',
+      message: 'Phase 1 建议通过时必须用可解析表格记录 machine_checks',
+    });
+    return issues;
+  }
+  const required = ['round', 'tool', 'implementation', 'command', 'exit_code', 'issue_count', 'status', 'disposition'];
+  const missing = required.filter((field) => !headers.includes(field));
+  if (missing.length > 0) {
+    issues.push({ file, type: 'machine_check_table_column_missing', severity: 'blocker', missing, message: 'machine_checks 表缺少必需列' });
+    return issues;
+  }
+  const index = Object.fromEntries(headers.map((header, idx) => [header, idx]));
+  const tools = new Set(body.map((row) => row[index.tool]).filter(Boolean));
+  ['doc_health_checker', 'semantic_review_checker'].forEach((tool) => {
+    if (!tools.has(tool)) {
+      issues.push({ file, type: 'machine_check_required_tool_missing', severity: 'blocker', tool, message: `machine_checks 缺少工具运行记录: ${tool}` });
+    }
+  });
+  body.forEach((row) => {
+    if (row.length < headers.length) return;
+    if (!/^\d+$/.test(row[index.exit_code])) {
+      issues.push({ file, type: 'machine_check_exit_code_missing', severity: 'blocker', message: 'machine_checks exit_code 必须为数字' });
+    }
+    if (!/^\d+$/.test(row[index.issue_count])) {
+      issues.push({ file, type: 'machine_check_issue_count_mismatch', severity: 'blocker', message: 'machine_checks issue_count 必须为数字' });
+    }
+    const status = row[index.status].toUpperCase();
+    if (['FAIL', 'ERROR'].includes(status) && !row[index.disposition]) {
+      issues.push({ file, type: 'machine_check_unresolved_failure', severity: 'blocker', message: '失败的 machine_checks 行必须说明 disposition' });
+    }
+  });
+  return issues;
 }
 
 function checkPhase1ReviewRecord(file, text) {
@@ -390,6 +624,7 @@ function checkPhase1ReviewRecord(file, text) {
         });
       }
     });
+    issues.push(...checkMachineChecksTable(file, text, phase1Pass));
   }
   if (phase1Pass && text.includes('可进入正式文档生成') && !hasUserConfirmation(text)) {
     issues.push({
@@ -407,6 +642,19 @@ function checkRunRecordIntegrity(targets) {
   if (!targets || targets.length === 0) return { checked: 0, issues: [] };
   const issues = [];
   let checked = 0;
+  const existingMarkdownTargets = targets.filter((target) => fs.existsSync(target) && target.endsWith('.md'));
+  const targetCount = existingMarkdownTargets.length;
+  const healthReportPath = existingMarkdownTargets.find((target) => path.basename(target) === 'health_check_report.md');
+  let healthReportIssues = [];
+  let healthReportVerdict = '';
+  if (healthReportPath) {
+    checked++;
+    const healthText = fs.readFileSync(healthReportPath, 'utf8');
+    const healthResult = checkHealthReport(healthReportPath, healthText, targetCount);
+    healthReportIssues = healthResult.issues;
+    healthReportVerdict = healthResult.verdict;
+    issues.push(...healthReportIssues);
+  }
   for (const file of targets) {
     const name = path.basename(file);
     if (!['generation_plan.md', 'generation_progress.md'].includes(name) || !fs.existsSync(file)) continue;
@@ -429,6 +677,21 @@ function checkRunRecordIntegrity(targets) {
       });
     }
     if (name === 'generation_progress.md') {
+      const firstReleaseDone = ['首版建议通过', '首版验收 verdict = PASS', '首版验收完成', 'Step 9/9 已完成'].some((marker) => text.includes(marker));
+      if (firstReleaseDone && !healthReportPath) {
+        issues.push({ file, type: 'progress_completion_without_valid_health_report', severity: 'blocker', message: '进度记录声明首版完成或建议通过，但缺少 health_check_report.md' });
+      }
+      if (firstReleaseDone && healthReportPath && (healthReportIssues.length > 0 || ['FAIL', ''].includes(healthReportVerdict))) {
+        issues.push({ file, type: 'progress_completion_without_valid_health_report', severity: 'blocker', message: '进度记录声明首版完成或建议通过，但健康报告未通过结构化验收' });
+      }
+      const countRe = /全部\s*(\d+)\s*个(?:产物|文档)|已完成\s*(\d+)\s*\/\s*(\d+)\s*个产物|总文件数\s*(\d+)/g;
+      let countMatch;
+      while ((countMatch = countRe.exec(text)) !== null) {
+        const expected = Number(countMatch[1] || countMatch[3] || countMatch[4]);
+        if (expected !== targetCount) {
+          issues.push({ file, type: 'artifact_count_mismatch', severity: 'blocker', expected, actual: targetCount, message: '进度记录中的产物数量与实际 Markdown 文件数量不一致' });
+        }
+      }
       issues.push(...checkPhase1ReviewRecord(file, text));
       const lastUpdates = Array.from(text.matchAll(/\*\*最后更新\*\*:\s*([^\n]+)/g)).map((match) => match[1].trim());
       const uniqueLastUpdates = Array.from(new Set(lastUpdates)).sort();
