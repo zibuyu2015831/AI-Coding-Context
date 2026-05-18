@@ -15,3 +15,4 @@ verified_at: 2026-05-12
 ## 当前计划
 
 - [Skill 迁移计划](./skill-migration/README.md)
+- [Dayflow 首次运行复盘与 AICC Phase 1 改进计划](./dayflow-phase1-aicc-improvement-plan.md)

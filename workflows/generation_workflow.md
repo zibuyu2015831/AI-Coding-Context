@@ -854,6 +854,32 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 - 任一关键检查失败时，状态必须保持在 `首版验收中` 或 `已阻塞`
 - 不允许将“文档已生成”直接表述为“任务已完成”
 
+### 步骤 3.1B: Phase 1 方案自检 gate
+
+首次运行在提交 `generation_plan.md`、`project_analysis_report.md` 和 `generation_progress.md` 给用户审核前，必须先执行 Phase 1 自检。该 gate 不要求主文档、子文档、AI Rules 或 `health_check_report.md` 已存在；它只保证方案阶段产物可审核、可追溯、没有明显事实漂移。
+
+**最小要求**:
+
+- [ ] `_analysis` 产物无模板残留。
+- [ ] 关键技术事实有证据等级和来源。
+- [ ] 可由代码、配置或锁文件确认的事实没有进入用户确认清单。
+- [ ] 复查改变事实状态后，摘要、正文、表格、待确认清单、行动计划和进度记录已同步回写。
+- [ ] `generation_progress.md` 同时记录流程阶段进度、产物完成度、当前 gate 和下一步动作。
+
+**推荐命令**:
+
+```bash
+python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs
+node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
+```
+
+**阻断规则**:
+
+- 结构检查、运行记录检查或复查后全文一致性检查失败时，不得请求用户审核通过方案。
+- 工具存在项目类型适配限制时，可以人工复核，但必须记录命令、真实 issue 数量、人工判定和下一步修复方向。
+
 
 ### 步骤 3.2: AI 自测
 

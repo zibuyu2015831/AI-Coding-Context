@@ -9,7 +9,7 @@
  */
 
 const assert = require('assert');
-const { generateCommitMessage, parseArgs } = require('./commit_template_cli.js');
+const { generateCommitMessage, parseArgs, calculateQualityScore } = require('./commit_template_cli.js');
 
 // 测试套件
 function runTests() {
@@ -163,6 +163,27 @@ function runTests() {
         passed++;
     } catch (error) {
         console.log(`❌ 测试 8 失败: ${error.message}\n`);
+        failed++;
+    }
+
+    // 测试 9: 质量评分解析
+    try {
+        console.log('测试 9: calculateQualityScore() 应该正确解析多行 commit message');
+        const message = generateCommitMessage(
+            'feature',
+            '添加用户登录功能',
+            '满足业务需求提升用户体验',
+            ['实现登录API', '添加前端表单', '集成认证系统']
+        );
+        const score = calculateQualityScore(message);
+        assert.ok(score, '评分结果不应为空');
+        assert.ok(score.breakdown.why_depth > 0, 'WHY 评分应大于 0');
+        assert.ok(score.breakdown.how_completeness > 0, 'HOW 评分应大于 0');
+
+        console.log('✅ 测试 9 通过\n');
+        passed++;
+    } catch (error) {
+        console.log(`❌ 测试 9 失败: ${error.message}\n`);
         failed++;
     }
     

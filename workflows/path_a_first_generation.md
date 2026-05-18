@@ -585,6 +585,35 @@ design_thinking:
 
 ---
 
+## Step 7.4: Phase 1 自检门
+
+> 🎯 **目的**: 在进入人工审核前，确认 `_analysis` 方案产物本身可审核。
+
+Phase 1 自检只检查方案阶段产物，不要求 `AI_Coding_Context.md`、子文档、AI Rules 或 `health_check_report.md` 已经存在。
+
+### 必做检查
+
+- `dev_docs/_analysis/generation_plan.md` 不得包含模板残留、旧结论残留或未标注来源的关键事实。
+- `dev_docs/_analysis/project_analysis_report.md` 中的疑问、风险和强结论必须有当前状态与证据等级。
+- `dev_docs/_analysis/generation_progress.md` 必须区分流程阶段进度与产物完成度，并记录当前 gate。
+- 若 AI 互审改变了事实状态，必须同步回写摘要、正文、表格、待确认清单、行动计划和进度记录，禁止只在文末追加复查记录。
+
+### 推荐命令
+
+```bash
+python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs
+node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs
+python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
+node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .
+```
+
+### 失败处理
+
+- 结构检查、运行记录检查或复查后全文一致性检查失败时，不得进入“等待人工审核”输出。
+- Swift/Xcode 测试拓扑等已知工具适配缺口可人工复核，但必须在 `generation_progress.md` 中记录真实命令、issue 数量、人工判定和下一步动作。
+
+---
+
 ## Step 7.5: 等待人工审核
 
 > ⏸️ **暂停执行，等待用户确认**
@@ -624,8 +653,11 @@ design_thinking:
 同时，必须更新 `dev_docs/_analysis/generation_progress.md`，至少补全以下字段：
 
 - **当前状态**: `等待人工审核`
+- **流程阶段进度**: 例如 `Step 7.5/9，当前处于人工审核门`
+- **产物完成度**: 例如 `3/N，已完成 _analysis 产物，正式文档尚未开始`
+- **当前 gate**: `Phase 1 人工审核`
 - **本步结果**: 已生成 `generation_plan.md` 与 `project_analysis_report.md`
-- **下一步**: 等待用户确认后开始正式生成
+- **下一步动作**: 等待用户确认后开始正式生成
 - **最后更新**: 当前时间
 - **阻塞原因**: 无
 

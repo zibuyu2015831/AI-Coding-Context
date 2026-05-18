@@ -368,6 +368,47 @@ function checkRunRecordIntegrity(targets) {
         message: '进度记录声明已完成，但未见 health_check_report 留痕'
       });
     }
+    if (name === 'generation_progress.md') {
+      const lastUpdates = Array.from(text.matchAll(/\*\*最后更新\*\*:\s*([^\n]+)/g)).map((match) => match[1].trim());
+      const uniqueLastUpdates = Array.from(new Set(lastUpdates)).sort();
+      if (uniqueLastUpdates.length > 1) {
+        issues.push({
+          file,
+          type: 'progress_metadata_mismatch',
+          field: '最后更新',
+          values: uniqueLastUpdates,
+          message: '进度记录中存在多个不一致的最后更新时间',
+        });
+      }
+      const progressLabels = Array.from(text.matchAll(/\*\*([^*\n]*进度[^*\n]*)\*\*:\s*[^\n]*\d+%/g)).map((match) => match[1].trim());
+      const ambiguous = progressLabels.filter((label) => label === '进度');
+      if (ambiguous.length > 1) {
+        issues.push({
+          file,
+          type: 'ambiguous_progress_percentage',
+          message: '同一进度文件中存在多个未标明含义的百分比进度',
+        });
+      }
+    }
+    if (name === 'generation_plan.md') {
+      const lowerText = text.toLowerCase();
+      if (lowerText.includes('grdb') && ['SQLite/Core Data', 'SwiftData (待确认)', '可能的 SQLite.swift / GRDB'].some((marker) => text.includes(marker))) {
+        issues.push({
+          file,
+          type: 'stale_review_conclusion',
+          fact: 'GRDB',
+          message: '文档已确认 GRDB，但正文仍残留 SQLite/Core Data 或待确认旧结论',
+        });
+      }
+      if (text.includes('Package.resolved') && ['Package.resolved 待确认', '检查 Package.resolved', '未发现 Package.resolved'].some((marker) => text.includes(marker))) {
+        issues.push({
+          file,
+          type: 'stale_review_conclusion',
+          fact: 'Package.resolved',
+          message: '文档已引用 Package.resolved，但正文仍残留依赖待确认旧结论',
+        });
+      }
+    }
   }
   return { checked, issues };
 }

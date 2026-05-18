@@ -48,6 +48,19 @@ verified_at: 2026-01-21
 - **iOS**: CocoaPods / Swift Package Manager
 - **Android**: Gradle dependencies
 
+### iOS / Xcode 必查文件
+
+首次生成方案时，iOS 原生项目不得只扫描仓库根目录。必须检查：
+
+- `*.xcodeproj/project.pbxproj`
+- `*.xcworkspace/xcshareddata/swiftpm/Package.resolved`
+- `Info.plist`
+- `*.entitlements`
+- `README.md`
+- `scripts/`
+
+`project_scanner` 输出中的 `dependency_manifest_candidates`、`xcode_project_files`、`platform_config_files` 应作为 Phase 1 技术栈、依赖管理和平台配置判断的优先事实源。
+
 ### 热更新方案
 
 - **CodePush**: React Native 热更新

@@ -17,7 +17,7 @@ from pathlib import Path
 
 POSITIVE_KEYWORDS = ["推荐", "必须", "优先", "建议", "should", "recommended", "prefer", "需要"]
 NEGATIVE_KEYWORDS = ["不建议", "不要", "禁止", "deprecated", "废弃", "avoid", "do not", "不需要", "无需"]
-SOURCE_SUFFIXES = {".md", ".py", ".js", ".ts", ".tsx"}
+SOURCE_SUFFIXES = {".md", ".py", ".js", ".ts", ".tsx", ".swift"}
 
 
 def iter_markdown_files(root):
@@ -48,9 +48,18 @@ def scan_test_topology(repo_root):
     for path in repo_root.rglob("*"):
         if not path.is_dir():
             continue
-        if path.name not in {"tests", "test"}:
+        is_standard_test_dir = path.name in {"tests", "test"}
+        is_xcode_test_dir = path.name.endswith("Tests") or path.name.endswith("UITests")
+        if not (is_standard_test_dir or is_xcode_test_dir):
             continue
-        file_count = sum(1 for child in path.rglob("*") if child.is_file())
+        if is_xcode_test_dir:
+            swift_test_file_count = sum(
+                1 for child in path.rglob("*")
+                if child.is_file() and (child.name.endswith("Tests.swift") or child.name.endswith("UITests.swift"))
+            )
+            file_count = swift_test_file_count or sum(1 for child in path.rglob("*") if child.is_file())
+        else:
+            file_count = sum(1 for child in path.rglob("*") if child.is_file())
         topology.append({
             "path": path.relative_to(repo_root).as_posix() + "/",
             "file_count": file_count,
@@ -197,6 +206,81 @@ def check_fact_conflicts(doc_dir, repo_root):
     return issues
 
 
+def _line_number(text, offset):
+    return text[:offset].count("\n") + 1
+
+
+def check_review_consistency(doc_dir, repo_root):
+    issues = []
+    path_pattern = re.compile(r"`([^`]+)`")
+    for doc_path in iter_markdown_files(doc_dir):
+        text = doc_path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+
+        summary_counts = []
+        for line_no, line in enumerate(lines, 1):
+            if "疑问" not in line:
+                continue
+            match = re.search(r"\|\s*[^|\n]*疑问[^|\n]*\|\s*(\d+)\s*\|", line)
+            if match:
+                summary_counts.append((line_no, int(match.group(1))))
+        open_questions = [
+            line for line in lines
+            if re.search(r"- \[ \].*疑问", line) or re.search(r"待用户确认", line)
+        ]
+        if summary_counts and open_questions:
+            actual = len(open_questions)
+            for line_no, expected in summary_counts:
+                if expected != actual:
+                    issues.append({
+                        "type": "summary_question_count_mismatch",
+                        "file": str(doc_path),
+                        "line": line_no,
+                        "expected": expected,
+                        "actual": actual,
+                        "message": "摘要疑问数量与当前待确认清单数量不一致",
+                    })
+
+        if "技术债务评估" in text and "证据等级" not in text:
+            for line_no, line in enumerate(lines, 1):
+                if any(marker in line for marker in ("P0", "必须修复", "预计")):
+                    issues.append({
+                        "type": "unevidenced_strong_conclusion",
+                        "file": str(doc_path),
+                        "line": line_no,
+                        "message": "Phase 1 强结论缺少证据等级或验证状态",
+                    })
+                    break
+
+        for match in path_pattern.finditer(text):
+            raw_ref = match.group(1)
+            if "/" not in raw_ref:
+                continue
+            ref_path = raw_ref.split(":", 1)[0]
+            if ref_path.startswith(("http://", "https://")):
+                continue
+            line_no = _line_number(text, match.start())
+            if "xcsharedata" in ref_path:
+                issues.append({
+                    "type": "invalid_evidence_path",
+                    "file": str(doc_path),
+                    "line": line_no,
+                    "path": ref_path,
+                    "message": "Xcode SwiftPM 路径疑似拼写错误：应为 xcshareddata",
+                })
+                continue
+            candidate = repo_root / ref_path
+            if any(marker in ref_path for marker in ("Package.resolved", ".xcodeproj", ".xcworkspace")) and not candidate.exists():
+                issues.append({
+                    "type": "invalid_evidence_path",
+                    "file": str(doc_path),
+                    "line": line_no,
+                    "path": ref_path,
+                    "message": "关键证据路径不存在",
+                })
+    return issues
+
+
 def render_text(payload):
     status = "PASS" if payload["summary"]["passed"] else "FAIL"
     lines = [f"{status}: semantic_review_checker"]
@@ -222,6 +306,7 @@ def main():
         "fact_conflicts": [],
         "metrics": [],
         "test_topology": [],
+        "review_consistency": [],
     }
 
     if args.full_check or args.check_fact_conflicts:
@@ -230,6 +315,8 @@ def main():
         checks["metrics"] = check_metrics(doc_dir, repo_root)
     if args.full_check or args.check_test_topology:
         checks["test_topology"] = check_test_topology(doc_dir, repo_root)
+    if args.full_check:
+        checks["review_consistency"] = check_review_consistency(doc_dir, repo_root)
 
     if not any([args.full_check, args.check_fact_conflicts, args.check_metrics, args.check_test_topology]):
         parser.print_help()

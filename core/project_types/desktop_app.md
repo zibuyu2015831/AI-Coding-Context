@@ -10,7 +10,7 @@ verified_at: 2026-01-21
 
 # 桌面应用项目
 
-> **适用框架**: Electron / Tauri / Qt
+> **适用框架**: Electron / Tauri / Qt / macOS SwiftUI/AppKit
 
 ---
 
@@ -19,6 +19,7 @@ verified_at: 2026-01-21
 - **Electron**: JavaScript/TypeScript，Chromium + Node.js
 - **Tauri**: Rust + Web 技术，轻量级
 - **Qt**: C++/Python，跨平台原生 UI
+- **macOS 原生**: SwiftUI / AppKit / Swift Package Manager
 
 ---
 
@@ -63,6 +64,19 @@ verified_at: 2026-01-21
 - **Windows**: NSIS / Squirrel
 - **macOS**: DMG / PKG
 - **Linux**: AppImage / deb / rpm
+
+### macOS / Xcode 必查文件
+
+首次生成方案时，Swift/macOS 项目不得只扫描仓库根目录。必须检查：
+
+- `*.xcodeproj/project.pbxproj`
+- `*.xcworkspace/xcshareddata/swiftpm/Package.resolved`
+- `Info.plist`
+- `*.entitlements`
+- `README.md`
+- `scripts/`
+
+`project_scanner` 输出中的 `dependency_manifest_candidates`、`xcode_project_files`、`platform_config_files` 应作为 Phase 1 技术栈和依赖判断的优先事实源。
 
 ---
 

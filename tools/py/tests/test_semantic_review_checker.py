@@ -67,6 +67,46 @@ class TestSemanticReviewCheckerPython(unittest.TestCase):
         issue_types = {issue["type"] for issue in payload["checks"]["test_topology"]}
         self.assertIn("uncovered_test_topology", issue_types)
 
+    def test_swift_xcode_tests_are_counted(self):
+        case_root = SEMANTIC_ROOT / "dayflow_like_case"
+        result, payload = run_json([
+            "--doc-dir", str(case_root / "dev_docs"),
+            "--repo-root", str(case_root),
+            "--check-metrics",
+            "--check-test-topology",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(payload["checks"]["metrics"], [])
+        self.assertEqual(payload["checks"]["test_topology"], [])
+
+    def test_non_swift_tests_suffix_falls_back_to_all_files(self):
+        case_root = SEMANTIC_ROOT / "non_swift_tests_suffix_case"
+        result, payload = run_json([
+            "--doc-dir", str(case_root / "dev_docs"),
+            "--repo-root", str(case_root),
+            "--check-metrics",
+            "--check-test-topology",
+        ])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(payload["checks"]["metrics"], [])
+        self.assertEqual(payload["checks"]["test_topology"], [])
+
+    def test_second_review_semantic_issues_are_reported(self):
+        case_root = SEMANTIC_ROOT / "dayflow_second_review_case"
+        result, payload = run_json([
+            "--doc-dir", str(case_root / "dev_docs"),
+            "--repo-root", str(case_root),
+            "--full-check",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issues = []
+        for check_issues in payload["checks"].values():
+            issues.extend(check_issues)
+        issue_types = {issue["type"] for issue in issues}
+        self.assertIn("summary_question_count_mismatch", issue_types)
+        self.assertIn("unevidenced_strong_conclusion", issue_types)
+        self.assertIn("invalid_evidence_path", issue_types)
+
 
 if __name__ == "__main__":
     unittest.main()

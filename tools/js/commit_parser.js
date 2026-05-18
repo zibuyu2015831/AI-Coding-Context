@@ -315,3 +315,13 @@ function main() {
 if (require.main === module) {
     main();
 }
+
+module.exports = {
+    parseCommitMessage,
+    parsePromptCommit,
+    parseConventionalCommit,
+    parseTraditionalCommit,
+    getCommits,
+    aggregateCommits,
+    analyzeMergeCommits,
+};

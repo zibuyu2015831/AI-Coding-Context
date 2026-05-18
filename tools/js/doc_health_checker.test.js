@@ -51,7 +51,10 @@ const GENERATION_PROGRESS_BASE = `# 文档生成进度记录
 > **开始时间**: 2026-05-12 10:00
 > **最后更新**: 2026-05-12 10:30
 > **当前状态**: 生成中
-> **下一步**: 继续生成
+> **流程阶段进度**: Step 4/8，当前处于方案生成
+> **产物完成度**: 1/3，已完成部分 _analysis 产物
+> **当前 gate**: Phase 1 自检
+> **下一步动作**: 继续生成
 
 ## 🎯 总体步骤进度
 
@@ -136,6 +139,54 @@ function runTests() {
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
       assert.strictEqual(result.status, 1);
       assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'run_record_integrity'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('duplicate last updated values are reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(
+        path.join(devDocs, '_analysis', 'generation_progress.md'),
+        `${GENERATION_PROGRESS_BASE}\n**最后更新**: 2026-05-12 11:00\n`,
+        'utf8',
+      );
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'progress_metadata_mismatch'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('unlabeled multiple percentages are reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(
+        path.join(devDocs, '_analysis', 'generation_progress.md'),
+        `${GENERATION_PROGRESS_BASE}\n**进度**: 40%\n**进度**: 60%\n`,
+        'utf8',
+      );
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'ambiguous_progress_percentage'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('stale review conclusions are reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(
+        path.join(devDocs, '_analysis', 'generation_plan.md'),
+        `${GENERATION_PLAN_BASE}\n数据库技术: SQLite/Core Data / SwiftData (待确认)\n\n## 复查记录\n\n| 事实 | 新状态 |\n| --- | --- |\n| 数据库技术为 GRDB | ✅ 已确认 |\n`,
+        'utf8',
+      );
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.run_record_integrity.issues.some((issue) => issue.type === 'stale_review_conclusion'));
     } finally {
       cleanup(base);
     }

@@ -38,7 +38,7 @@
  */
 
 const readline = require('readline');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const path = require('path');
 
 /**
@@ -153,12 +153,10 @@ function generateCommitMessage(commitType, what, why, howItems) {
  */
 function calculateQualityScore(message) {
     try {
-        // 转义双引号
-        const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
         const scriptPath = path.join(__dirname, 'commit_quality_scorer.js');
-        
-        const result = execSync(
-            `node "${scriptPath}" --message "${escapedMessage}"`,
+        const result = execFileSync(
+            'node',
+            [scriptPath, '--message', message],
             { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
         );
         

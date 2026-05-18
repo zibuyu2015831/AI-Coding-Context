@@ -30,6 +30,12 @@ class TestCommitIntegrityValidator(unittest.TestCase):
         expected = {'src/utils/helper.js', 'tests/test_helper.py'}
         self.assertEqual(parse_how_files(message), expected)
 
+    def test_parse_how_files_keeps_hidden_files(self):
+        """测试隐藏文件不会被去掉开头的点"""
+        message = "HOW: 更新 .gitignore 和 ./src/utils/helper.js"
+        expected = {'.gitignore', 'src/utils/helper.js'}
+        self.assertEqual(parse_how_files(message), expected)
+
     def test_calculate_integrity_perfect(self):
         """测试完全匹配的情况"""
         msg_files = {'file1.py', 'file2.js'}

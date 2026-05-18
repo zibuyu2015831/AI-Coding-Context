@@ -164,7 +164,7 @@ function showUsage() {
 ║  Git Hooks 安装工具 (Node.js)                            ║
 ╚══════════════════════════════════════════════════════════╝
 
-功能:
+Hook 功能:
   • 自动安装 pre-commit / post-commit hooks
   • 在 commit 前检查 message 格式和代码合规性
   • 在 commit 后自动触发复杂度报告生成
@@ -231,3 +231,10 @@ if (require.main === module) {
         process.exit(1);
     });
 }
+
+module.exports = {
+    findGitRoot,
+    setExecutable,
+    installHook,
+    uninstallHook,
+};

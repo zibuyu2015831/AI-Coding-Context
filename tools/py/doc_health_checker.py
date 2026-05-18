@@ -401,6 +401,40 @@ def check_run_record_integrity(targets):
                 "missing": "health_check_report",
                 "message": "进度记录声明已完成，但未见 health_check_report 留痕",
             })
+        if path.name == "generation_progress.md":
+            last_updates = re.findall(r"\*\*最后更新\*\*:\s*([^\n]+)", text)
+            if len(set(last_updates)) > 1:
+                issues.append({
+                    "file": f,
+                    "type": "progress_metadata_mismatch",
+                    "field": "最后更新",
+                    "values": sorted(set(last_updates)),
+                    "message": "进度记录中存在多个不一致的最后更新时间",
+                })
+            progress_labels = re.findall(r"\*\*([^*\n]*进度[^*\n]*)\*\*:\s*[^\n]*\d+%", text)
+            ambiguous = [label for label in progress_labels if label.strip() == "进度"]
+            if len(ambiguous) > 1:
+                issues.append({
+                    "file": f,
+                    "type": "ambiguous_progress_percentage",
+                    "message": "同一进度文件中存在多个未标明含义的百分比进度",
+                })
+        if path.name == "generation_plan.md":
+            lower_text = text.lower()
+            if "grdb" in lower_text and any(marker in text for marker in ("SQLite/Core Data", "SwiftData (待确认)", "可能的 SQLite.swift / GRDB")):
+                issues.append({
+                    "file": f,
+                    "type": "stale_review_conclusion",
+                    "fact": "GRDB",
+                    "message": "文档已确认 GRDB，但正文仍残留 SQLite/Core Data 或待确认旧结论",
+                })
+            if "Package.resolved" in text and any(marker in text for marker in ("Package.resolved 待确认", "检查 Package.resolved", "未发现 Package.resolved")):
+                issues.append({
+                    "file": f,
+                    "type": "stale_review_conclusion",
+                    "fact": "Package.resolved",
+                    "message": "文档已引用 Package.resolved，但正文仍残留依赖待确认旧结论",
+                })
     return {"checked": checked, "issues": issues}
 
 

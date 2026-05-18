@@ -55,7 +55,7 @@ function parseHowFiles(message) {
     // 路径匹配正则: 匹配包含斜杠的文件名, 或者带常见扩展名的文件名
     const patterns = [
         /\b[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]{1,10}\b/g, // 标准路径或带扩展名文件
-        /\.[a-zA-Z0-9_\-]+\b/g                        // 隐藏文件如 .gitignore
+        /(?<![a-zA-Z0-9_\-/])\.[a-zA-Z0-9_\-]+(?:\.[a-zA-Z0-9_\-]+)?\b/g // 隐藏文件如 .gitignore
     ];
 
     patterns.forEach(pattern => {
@@ -63,7 +63,7 @@ function parseHowFiles(message) {
         if (matches) {
             matches.forEach(m => {
                 // 清理标点
-                let p = m.replace(/[.,:; "']+$/, '').replace(/^[.,:; "']+/, '');
+                let p = m.replace(/[.,:;]+$/, '').replace(/^[ "']+/, '').replace(/[ "']+$/, '');
                 // 统一处理 ./ 前缀
                 if (p.startsWith('./')) {
                     p = p.substring(2);

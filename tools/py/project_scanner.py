@@ -502,6 +502,33 @@ def scan_project(root_dir, ignore_patterns, follow_symlinks, max_files_per_dir, 
 
     return structure, stats, excluded_info  # 修改返回值
 
+def collect_xcode_project_metadata(root_dir):
+    """收集 Swift/Xcode 项目中容易被浅层目录扫描漏掉的关键文件。"""
+    dependency_manifest_candidates = []
+    xcode_project_files = []
+    platform_config_files = []
+
+    for current_root, dirs, files in os.walk(root_dir):
+        if ".git" in dirs:
+            dirs.remove(".git")
+        rel_root = os.path.relpath(current_root, root_dir).replace(os.sep, "/")
+        if rel_root == ".":
+            rel_root = ""
+        for filename in files:
+            rel_path = f"{rel_root}/{filename}" if rel_root else filename
+            if filename == "Package.resolved" and "/xcshareddata/swiftpm/" in f"/{rel_path}":
+                dependency_manifest_candidates.append(rel_path)
+            elif filename == "project.pbxproj" and ".xcodeproj/" in f"{rel_path}/":
+                xcode_project_files.append(rel_path)
+            elif filename == "Info.plist" or filename.endswith(".entitlements"):
+                platform_config_files.append(rel_path)
+
+    return {
+        "dependency_manifest_candidates": sorted(dependency_manifest_candidates),
+        "xcode_project_files": sorted(xcode_project_files),
+        "platform_config_files": sorted(platform_config_files),
+    }
+
 def main():
     start_time = time.time()
     
@@ -578,6 +605,7 @@ def main():
                                   args.exclude_standard, __file__)
         
         elapsed_time = round(time.time() - start_time, 2)
+        xcode_metadata = collect_xcode_project_metadata(root_dir)
         result = {
             "data": {
                 "summary": {
@@ -587,7 +615,8 @@ def main():
                     "complexity_level": complexity,
                     "empty_dirs_count": len(summary.get("empty_dirs", [])),
                     "empty_dirs": summary.get("empty_dirs", [])
-                }
+                },
+                **xcode_metadata,
             },
             "metadata": {
                 "mode": "summary",
@@ -612,6 +641,7 @@ def main():
         )
         
         elapsed_time = round(time.time() - start_time, 2)
+        xcode_metadata = collect_xcode_project_metadata(root_dir)
         
         # 获取摘要（用于metadata）
         if not args.no_adaptive and 'summary' in locals():
@@ -633,7 +663,7 @@ def main():
                 output_strategy = "limited_dirs_and_files_with_smart_judgment"
             
             result = {
-                "data": {"structure": structure, "stats": stats},
+                "data": {"structure": structure, "stats": stats, **xcode_metadata},
                 "metadata": {
                     "mode": "tree",
                     "complexity_level": complexity,

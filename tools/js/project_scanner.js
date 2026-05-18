@@ -502,6 +502,45 @@ function scanProject(rootDir, ignorePatterns, followSymlinks, maxFilesPerDir, ma
     return { structure, stats, excludedInfo };
 }
 
+function collectXcodeProjectMetadata(rootDir) {
+    const dependencyManifestCandidates = [];
+    const xcodeProjectFiles = [];
+    const platformConfigFiles = [];
+
+    function visit(currentPath) {
+        let entries;
+        try {
+            entries = fs.readdirSync(currentPath, { withFileTypes: true });
+        } catch {
+            return;
+        }
+        for (const entry of entries) {
+            if (entry.name === '.git') continue;
+            const fullPath = path.join(currentPath, entry.name);
+            if (entry.isDirectory()) {
+                visit(fullPath);
+                continue;
+            }
+            if (!entry.isFile()) continue;
+            const relPath = path.relative(rootDir, fullPath).replace(/\\/g, '/');
+            if (entry.name === 'Package.resolved' && `/${relPath}`.includes('/xcshareddata/swiftpm/')) {
+                dependencyManifestCandidates.push(relPath);
+            } else if (entry.name === 'project.pbxproj' && `${relPath}/`.includes('.xcodeproj/')) {
+                xcodeProjectFiles.push(relPath);
+            } else if (entry.name === 'Info.plist' || entry.name.endsWith('.entitlements')) {
+                platformConfigFiles.push(relPath);
+            }
+        }
+    }
+
+    visit(rootDir);
+    return {
+        dependency_manifest_candidates: dependencyManifestCandidates.sort(),
+        xcode_project_files: xcodeProjectFiles.sort(),
+        platform_config_files: platformConfigFiles.sort(),
+    };
+}
+
 function main() {
     const startTime = Date.now();
     
@@ -576,6 +615,7 @@ function main() {
         }
         
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+        const xcodeMetadata = collectXcodeProjectMetadata(rootDir);
         const result = {
             data: {
                 summary: {
@@ -585,7 +625,8 @@ function main() {
                     complexity_level: complexity,
                     empty_dirs_count: summary.empty_dirs.length,
                     empty_dirs: summary.empty_dirs
-                }
+                },
+                ...xcodeMetadata
             },
             metadata: {
                 mode: 'summary',
@@ -608,6 +649,7 @@ function main() {
         );
         
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+        const xcodeMetadata = collectXcodeProjectMetadata(rootDir);
         
         const emptyDirs = (summary && summary.empty_dirs) || [];
         const emptyDirsCount = emptyDirs.length;
@@ -623,7 +665,7 @@ function main() {
             }
             
             const result = {
-                data: { structure, stats },
+                data: { structure, stats, ...xcodeMetadata },
                 metadata: {
                     mode: 'tree',
                     complexity_level: complexity,

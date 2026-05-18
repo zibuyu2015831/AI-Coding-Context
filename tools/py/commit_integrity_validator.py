@@ -67,7 +67,7 @@ def parse_how_files(message: str) -> Set[str]:
     # 使用 \b 单词边界防止匹配到类似 v1.4 的版本号
     patterns = [
         r'\b[a-zA-Z0-9_\-\./]+\.[a-zA-Z0-9]{1,10}\b', # 标准路径或带扩展名文件
-        r'\.[a-zA-Z0-9_\-]+\b'                        # 隐藏文件如 .gitignore
+        r'(?<![a-zA-Z0-9_\-/])\.[a-zA-Z0-9_\-]+(?:\.[a-zA-Z0-9_\-]+)?\b'  # 隐藏文件如 .gitignore
     ]
     
     found_paths = set()
@@ -75,7 +75,7 @@ def parse_how_files(message: str) -> Set[str]:
         matches = re.findall(pattern, clean_how)
         for m in matches:
             # 清理标点
-            p = m.strip('.,:; "\'')
+            p = m.strip(' "\'').rstrip('.,:;')
             # 统一处理 ./ 前缀
             if p.startswith('./'):
                 p = p[2:]

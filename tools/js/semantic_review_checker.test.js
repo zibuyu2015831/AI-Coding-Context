@@ -67,6 +67,46 @@ function runTests() {
     assert.ok(payload.checks.test_topology.some((issue) => issue.type === 'uncovered_test_topology'));
   });
 
+  test('Swift/Xcode tests are counted', () => {
+    const caseRoot = path.join(SEMANTIC_ROOT, 'dayflow_like_case');
+    const { result, payload } = runJson([
+      '--doc-dir', path.join(caseRoot, 'dev_docs'),
+      '--repo-root', caseRoot,
+      '--check-metrics',
+      '--check-test-topology',
+    ]);
+    assert.strictEqual(result.status, 0);
+    assert.deepStrictEqual(payload.checks.metrics, []);
+    assert.deepStrictEqual(payload.checks.test_topology, []);
+  });
+
+  test('non-Swift *Tests directories fall back to all files', () => {
+    const caseRoot = path.join(SEMANTIC_ROOT, 'non_swift_tests_suffix_case');
+    const { result, payload } = runJson([
+      '--doc-dir', path.join(caseRoot, 'dev_docs'),
+      '--repo-root', caseRoot,
+      '--check-metrics',
+      '--check-test-topology',
+    ]);
+    assert.strictEqual(result.status, 0);
+    assert.deepStrictEqual(payload.checks.metrics, []);
+    assert.deepStrictEqual(payload.checks.test_topology, []);
+  });
+
+  test('second review semantic issues are reported', () => {
+    const caseRoot = path.join(SEMANTIC_ROOT, 'dayflow_second_review_case');
+    const { result, payload } = runJson([
+      '--doc-dir', path.join(caseRoot, 'dev_docs'),
+      '--repo-root', caseRoot,
+      '--full-check',
+    ]);
+    assert.strictEqual(result.status, 1);
+    const issueTypes = new Set(Object.values(payload.checks).flat().map((issue) => issue.type));
+    assert.ok(issueTypes.has('summary_question_count_mismatch'));
+    assert.ok(issueTypes.has('unevidenced_strong_conclusion'));
+    assert.ok(issueTypes.has('invalid_evidence_path'));
+  });
+
   console.log(`测试完成: ${passed} 通过, ${failed} 失败`);
   if (failed > 0) {
     process.exit(1);

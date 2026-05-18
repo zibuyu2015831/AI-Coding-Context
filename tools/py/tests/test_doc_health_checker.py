@@ -55,7 +55,10 @@ GENERATION_PROGRESS_BASE = """# 文档生成进度记录
 > **开始时间**: 2026-05-12 10:00
 > **最后更新**: 2026-05-12 10:30
 > **当前状态**: 生成中
-> **下一步**: 继续生成
+> **流程阶段进度**: Step 4/8，当前处于方案生成
+> **产物完成度**: 1/3，已完成部分 _analysis 产物
+> **当前 gate**: Phase 1 自检
+> **下一步动作**: 继续生成
 
 ## 🎯 总体步骤进度
 
@@ -163,6 +166,59 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
         self.assertIn("run_record_integrity", issue_types)
+
+    def test_progress_duplicate_last_updated_is_reported(self):
+        self._write_valid_bundle()
+        broken_progress = GENERATION_PROGRESS_BASE + "\n**最后更新**: 2026-05-12 11:00\n"
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(broken_progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("progress_metadata_mismatch", issue_types)
+
+    def test_unlabeled_multiple_percentages_are_reported(self):
+        self._write_valid_bundle()
+        broken_progress = GENERATION_PROGRESS_BASE + "\n**进度**: 40%\n**进度**: 60%\n"
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(broken_progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("ambiguous_progress_percentage", issue_types)
+
+    def test_stale_review_conclusion_is_reported(self):
+        self._write_valid_bundle()
+        plan = GENERATION_PLAN_BASE + """
+数据库技术: SQLite/Core Data / SwiftData (待确认)
+
+## 复查记录
+
+| 事实 | 新状态 |
+| --- | --- |
+| 数据库技术为 GRDB | ✅ 已确认 |
+"""
+        (self.dev_docs / "_analysis" / "generation_plan.md").write_text(plan, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("stale_review_conclusion", issue_types)
 
     def test_analysis_docs_do_not_require_frontmatter(self):
         self._write_valid_bundle()

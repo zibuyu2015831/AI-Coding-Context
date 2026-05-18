@@ -8,7 +8,7 @@ const path = require('path');
 
 const POSITIVE_KEYWORDS = ['推荐', '必须', '优先', '建议', 'should', 'recommended', 'prefer', '需要'];
 const NEGATIVE_KEYWORDS = ['不建议', '不要', '禁止', 'deprecated', '废弃', 'avoid', 'do not', '不需要', '无需'];
-const SOURCE_SUFFIXES = new Set(['.md', '.py', '.js', '.ts', '.tsx']);
+const SOURCE_SUFFIXES = new Set(['.md', '.py', '.js', '.ts', '.tsx', '.swift']);
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -70,8 +70,15 @@ function scanTestTopology(repoRoot) {
     const stat = fs.statSync(current);
     if (!stat.isDirectory()) return;
     const name = path.basename(current);
-    if (name === 'tests' || name === 'test') {
-      const fileCount = walkFiles(current, () => true).length;
+    const isStandardTestDir = name === 'tests' || name === 'test';
+    const isXcodeTestDir = name.endsWith('Tests') || name.endsWith('UITests');
+    if (isStandardTestDir || isXcodeTestDir) {
+      const swiftTestFileCount = isXcodeTestDir
+        ? walkFiles(current, (file) => file.endsWith('Tests.swift') || file.endsWith('UITests.swift')).length
+        : 0;
+      const fileCount = isXcodeTestDir && swiftTestFileCount > 0
+        ? swiftTestFileCount
+        : walkFiles(current, () => true).length;
       topology.push({
         path: `${path.relative(repoRoot, current).replace(/\\/g, '/')}/`,
         file_count: fileCount,
@@ -212,9 +219,88 @@ function checkFactConflicts(docDir, repoRoot) {
   return issues;
 }
 
+function lineNumber(text, offset) {
+  return text.slice(0, offset).split('\n').length;
+}
+
+function checkReviewConsistency(docDir, repoRoot) {
+  const issues = [];
+  const pathPattern = /`([^`]+)`/g;
+  iterMarkdownFiles(docDir).forEach((docPath) => {
+    const text = fs.readFileSync(docPath, 'utf8');
+    const lines = text.split('\n');
+
+    const summaryCounts = [];
+    lines.forEach((line, index) => {
+      if (!line.includes('疑问')) return;
+      const match = line.match(/\|\s*[^|\n]*疑问[^|\n]*\|\s*(\d+)\s*\|/);
+      if (match) summaryCounts.push({ line: index + 1, expected: parseInt(match[1], 10) });
+    });
+    const openQuestions = lines.filter((line) => /- \[ \].*疑问/.test(line) || line.includes('待用户确认'));
+    if (summaryCounts.length > 0 && openQuestions.length > 0) {
+      const actual = openQuestions.length;
+      summaryCounts.forEach(({ line, expected }) => {
+        if (expected !== actual) {
+          issues.push({
+            type: 'summary_question_count_mismatch',
+            file: docPath,
+            line,
+            expected,
+            actual,
+            message: '摘要疑问数量与当前待确认清单数量不一致',
+          });
+        }
+      });
+    }
+
+    if (text.includes('技术债务评估') && !text.includes('证据等级')) {
+      const strongLine = lines.findIndex((line) => ['P0', '必须修复', '预计'].some((marker) => line.includes(marker)));
+      if (strongLine >= 0) {
+        issues.push({
+          type: 'unevidenced_strong_conclusion',
+          file: docPath,
+          line: strongLine + 1,
+          message: 'Phase 1 强结论缺少证据等级或验证状态',
+        });
+      }
+    }
+
+    let match;
+    pathPattern.lastIndex = 0;
+    while ((match = pathPattern.exec(text)) !== null) {
+      const rawRef = match[1];
+      if (!rawRef.includes('/')) continue;
+      const refPath = rawRef.split(':', 1)[0];
+      if (refPath.startsWith('http://') || refPath.startsWith('https://')) continue;
+      const currentLine = lineNumber(text, match.index);
+      if (refPath.includes('xcsharedata')) {
+        issues.push({
+          type: 'invalid_evidence_path',
+          file: docPath,
+          line: currentLine,
+          path: refPath,
+          message: 'Xcode SwiftPM 路径疑似拼写错误：应为 xcshareddata',
+        });
+        continue;
+      }
+      const candidate = path.join(repoRoot, refPath);
+      if (['Package.resolved', '.xcodeproj', '.xcworkspace'].some((marker) => refPath.includes(marker)) && !fs.existsSync(candidate)) {
+        issues.push({
+          type: 'invalid_evidence_path',
+          file: docPath,
+          line: currentLine,
+          path: refPath,
+          message: '关键证据路径不存在',
+        });
+      }
+    }
+  });
+  return issues;
+}
+
 function renderText(payload) {
   const status = payload.summary.passed ? 'PASS' : 'FAIL';
-  return `${status}: semantic_review_checker\n- fact_conflicts: ${payload.checks.fact_conflicts.length} issue(s)\n- metrics: ${payload.checks.metrics.length} issue(s)\n- test_topology: ${payload.checks.test_topology.length} issue(s)\n`;
+  return `${status}: semantic_review_checker\n${Object.entries(payload.checks).map(([name, issues]) => `- ${name}: ${issues.length} issue(s)`).join('\n')}\n`;
 }
 
 function main() {
@@ -230,7 +316,7 @@ function main() {
 
   const docDir = path.resolve(args.docDir);
   const repoRoot = path.resolve(args.repoRoot);
-  const checks = { fact_conflicts: [], metrics: [], test_topology: [] };
+  const checks = { fact_conflicts: [], metrics: [], test_topology: [], review_consistency: [] };
   if (args.fullCheck || args.checkFactConflicts) {
     checks.fact_conflicts = checkFactConflicts(docDir, repoRoot);
   }
@@ -240,12 +326,15 @@ function main() {
   if (args.fullCheck || args.checkTestTopology) {
     checks.test_topology = checkTestTopology(docDir, repoRoot);
   }
+  if (args.fullCheck) {
+    checks.review_consistency = checkReviewConsistency(docDir, repoRoot);
+  }
   if (!(args.fullCheck || args.checkFactConflicts || args.checkMetrics || args.checkTestTopology)) {
     process.stdout.write('Usage: semantic_review_checker --doc-dir DIR [--repo-root DIR] [--check-fact-conflicts] [--check-metrics] [--check-test-topology] [--full-check] [--format json|text]\n');
     return 2;
   }
 
-  const totalIssues = checks.fact_conflicts.length + checks.metrics.length + checks.test_topology.length;
+  const totalIssues = Object.values(checks).reduce((sum, issues) => sum + issues.length, 0);
   const payload = {
     summary: { passed: totalIssues === 0, issues: totalIssues },
     checks,
