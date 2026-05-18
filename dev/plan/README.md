@@ -16,3 +16,4 @@ verified_at: 2026-05-12
 
 - [Skill 迁移计划](./skill-migration/README.md)
 - [Dayflow 首次运行复盘与 AICC Phase 1 改进计划](./dayflow-phase1-aicc-improvement-plan.md)
+- [AICC Phase 1 审核机制二次改进计划](./linguacafe-phase1-aicc-improvement-plan.md)
