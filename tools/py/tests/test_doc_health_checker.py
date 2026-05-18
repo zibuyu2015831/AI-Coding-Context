@@ -61,6 +61,7 @@ GENERATION_PROGRESS_BASE = """# 文档生成进度记录
 > **产物完成度**: 1/3，已完成部分 _analysis 产物
 > **当前 gate**: Phase 1 自检
 > **下一步动作**: 继续生成
+> **正式生成授权**: 未授权
 
 ## 🎯 总体步骤进度
 
@@ -70,6 +71,32 @@ GENERATION_PROGRESS_BASE = """# 文档生成进度记录
 
 - **总任务数**: 3
 - **已完成数**: 1
+"""
+
+PHASE1_CONFIRMED_RECORD = """
+## 🔎 Phase 1 方案复查记录
+
+- **review_trigger**: 用户要求审核 _analysis
+- **review_started_at**: 2026-05-12 10:30
+- **review_completed_at**: 2026-05-12 10:40
+- **reviewed_files**: generation_plan.md, project_analysis_report.md, generation_progress.md
+- **manual_review_summary**: 已复查
+- **writeback_summary**: 已更新 generation_plan.md
+- **blocker_count**: 0
+- **warning_count**: 0
+- **waived_issue_count**: 0
+- **phase1_recommendation**: 建议通过
+- **user_confirmation_status**: confirmed
+- **formal_generation_authorization**: user_confirmed
+- **authorization_source_summary**: 用户确认方案审核通过
+
+### machine_checks
+
+| round | tool | implementation | command | exit_code | issue_count | status | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs --recursive --strict` | 0 | 0 | PASS | metadata-only |
+| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
+| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
 """
 
 HEALTH_REPORT_BASE = """# 首版文档质量验收报告
@@ -82,6 +109,7 @@ HEALTH_REPORT_BASE = """# 首版文档质量验收报告
 
 | round | tool | implementation | command | exit_code | issue_count | status | disposition |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs --recursive --strict` | 0 | 0 | PASS | metadata-only |
 | 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
 | 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
 | 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
@@ -189,6 +217,45 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         issue_types = {issue["type"] for issue in payload["checks"]["template_residue"]["issues"]}
         self.assertIn("template_residue", issue_types)
 
+    def test_template_residue_scanner_command_is_not_reported(self):
+        self._write_valid_bundle()
+        command_doc = MAIN_DOC_BASE + """
+| check | command |
+| --- | --- |
+| residue | `rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs` |
+
+- `rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs`
+
+```bash
+rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
+```
+"""
+        (self.dev_docs / "AI_Coding_Context.md").write_text(command_doc, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-template-residue",
+        ])
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertEqual(payload["checks"]["template_residue"]["issues"], [])
+
+    def test_template_residue_plain_body_marker_is_still_reported(self):
+        self._write_valid_bundle()
+        residue_doc = MAIN_DOC_BASE + "\n正文仍然待补充。\n"
+        (self.dev_docs / "AI_Coding_Context.md").write_text(residue_doc, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-template-residue",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["template_residue"]["issues"]}
+        self.assertIn("template_residue", issue_types)
+
     def test_run_record_integrity_is_reported(self):
         self._write_valid_bundle()
         broken_progress = """# 文档生成进度记录
@@ -252,6 +319,8 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 """
         (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
         result, payload = _run_json([
@@ -289,6 +358,8 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 """
         (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
         result, payload = _run_json([
@@ -325,6 +396,8 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 
 ### machine_checks
 
@@ -420,6 +493,68 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         ])
         self.assertEqual(result.returncode, 0)
         self.assertEqual(payload["checks"]["run_record_integrity"]["issues"], [])
+
+    def test_formal_docs_without_health_report_are_reported(self):
+        self._write_valid_bundle()
+        (self.dev_docs / "architecture").mkdir()
+        (self.dev_docs / "architecture" / "overview.md").write_text("# 架构概览\n", encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("formal_docs_without_health_report", issue_types)
+
+    def test_formal_docs_without_phase1_confirmation_are_reported(self):
+        self._write_valid_first_release_bundle()
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("formal_docs_generated_without_phase1_confirmation", issue_types)
+
+    def test_formal_docs_with_phase1_confirmation_and_health_report_pass_run_record_gate(self):
+        self._write_valid_first_release_bundle()
+        progress = (self.dev_docs / "_analysis" / "generation_progress.md").read_text(encoding="utf-8")
+        progress += PHASE1_CONFIRMED_RECORD
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertEqual(payload["checks"]["run_record_integrity"]["issues"], [])
+
+    def test_summary_only_validation_misrepresented_is_reported(self):
+        self._write_valid_bundle()
+        progress = GENERATION_PROGRESS_BASE + """
+## 验证记录
+
+summary_validator PASS，验证已通过。
+"""
+        (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
+        self.assertIn("summary_only_validation_misrepresented", issue_types)
 
     def test_legacy_quick_mode_still_works(self):
         self._write_valid_bundle()

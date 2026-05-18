@@ -691,7 +691,7 @@ AI 应依次检测以下上下文信息：
 
 | 检测结果                             | 路由目标                 | 说明             |
 | ------------------------------------ | ------------------------ | ---------------- |
-| `dev_docs/` 不存在                   | **路径 A: 首次生成流程** | 执行 Step 2-8    |
+| `dev_docs/` 不存在                   | **路径 A: 首次生成流程** | 默认执行 Step 2-7.5，停在 Phase 1 人工审核门，等待用户确认后才能进入 Step 8 |
 | `dev_docs/` 存在 + 主文档存在        | **路径 B: 文档健康检查** | 评估文档状态     |
 | `dev_docs/` 存在但文档不完整         | **询问用户**             | 修复 or 重新生成 |
 | 检测到 `@commit` 或 Git 上下文       | **路径 C: 增量更新流程** | 智能局部更新     |
@@ -707,7 +707,7 @@ AI 应依次检测以下上下文信息：
 
 | 路由目标   | 触发条件                       | 文档路径                                                                           | 何时读取                        |
 | ---------- | ------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------- |
-| **路径 A** | `dev_docs/` 不存在             | [workflows/path_a_first_generation.md](./workflows/path_a_first_generation.md)     | **立即读取** - 执行首次生成流程 |
+| **路径 A** | `dev_docs/` 不存在             | [workflows/path_a_first_generation.md](./workflows/path_a_first_generation.md)     | **立即读取** - 默认只执行到 Phase 1 审核门 |
 | **路径 B** | `dev_docs/` 存在 + 主文档存在  | [workflows/path_b_health_check.md](./workflows/path_b_health_check.md)             | **立即读取** - 执行健康度检查   |
 | **路径 C** | 检测到 `@commit` 或 Git 上下文 | [workflows/path_c_incremental_update.md](./workflows/path_c_incremental_update.md) | **立即读取** - 执行增量更新     |
 | **路径 D** | 检测到显式指令                 | [workflows/path_d_specific_tasks.md](./workflows/path_d_specific_tasks.md)         | **立即读取** - 执行特定任务     |

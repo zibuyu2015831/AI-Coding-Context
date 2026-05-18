@@ -146,6 +146,83 @@ LinguaCafe 是 Laravel + Vue 语言学习应用，文档方案需覆盖主应用
         self.assertTrue(payload["checks"]["fact_conflicts"])
         self.assertEqual(payload["checks"]["fact_conflicts"][0]["type"], "fact_conflict")
 
+    def test_generated_file_rule_rephrasing_is_not_fact_conflict(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-rule-rephrasing-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            dev_docs.mkdir()
+            (tmpdir / "CONTRIBUTING.md").write_text("Generated output `*.g.dart` should not be edited by hand.\n", encoding="utf-8")
+            (dev_docs / "AI_Coding_Context.md").write_text("不要手改 `*.g.dart`。\n", encoding="utf-8")
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-fact-conflicts",
+            ])
+            self.assertEqual(result.returncode, 0, payload)
+            self.assertEqual(payload["checks"]["fact_conflicts"], [])
+        finally:
+            shutil.rmtree(tmpdir)
+
+    def test_generated_file_opposite_rule_is_fact_conflict(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-rule-conflict-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            dev_docs.mkdir()
+            (tmpdir / "CONTRIBUTING.md").write_text("Generated output `*.g.dart` should not be edited by hand.\n", encoding="utf-8")
+            (dev_docs / "AI_Coding_Context.md").write_text("建议直接编辑 `*.g.dart`。\n", encoding="utf-8")
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-fact-conflicts",
+            ])
+            self.assertEqual(result.returncode, 1)
+            issue_types = {issue["type"] for issue in payload["checks"]["fact_conflicts"]}
+            self.assertIn("rule_conflict", issue_types)
+        finally:
+            shutil.rmtree(tmpdir)
+
+    def test_sensitive_keyword_attention_is_not_fact_conflict_authority(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-sensitive-attention-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            docs = tmpdir / "docs"
+            dev_docs.mkdir()
+            docs.mkdir()
+            (docs / "pr-policy-preflight.en.md").write_text(
+                "| Sensitive keyword | Added lines include keywords such as `UserStorage`, `GlobalEventBus` | These words are not necessarily wrong, but AI or reviewers should notice them. |\n",
+                encoding="utf-8",
+            )
+            (dev_docs / "AI_Coding_Context.md").write_text("新增数据偏好时优先使用 `UserStorage`。\n", encoding="utf-8")
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-fact-conflicts",
+            ])
+            self.assertEqual(result.returncode, 0, payload)
+            self.assertEqual(payload["checks"]["fact_conflicts"], [])
+        finally:
+            shutil.rmtree(tmpdir)
+
+    def test_mixed_rule_line_applies_negative_polarity_to_actual_negative_anchor_only(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-mixed-rule-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            dev_docs.mkdir()
+            (tmpdir / "AGENTS.md").write_text(
+                "Do not scatter Drift `query.watch()` streams across services; centralize change observation through `TableChangeNotifier`.\n",
+                encoding="utf-8",
+            )
+            (dev_docs / "AI_Coding_Context.md").write_text("文件/数据库层变更：优先统一到 `TableChangeNotifier`。\n", encoding="utf-8")
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-fact-conflicts",
+            ])
+            self.assertEqual(result.returncode, 0, payload)
+            self.assertEqual(payload["checks"]["fact_conflicts"], [])
+        finally:
+            shutil.rmtree(tmpdir)
+
     def test_metric_drift_is_reported(self):
         case_root = SEMANTIC_ROOT / "metric_drift_case"
         result, payload = run_json([
@@ -167,6 +244,30 @@ LinguaCafe 是 Laravel + Vue 语言学习应用，文档方案需覆盖主应用
         self.assertEqual(result.returncode, 1)
         issue_types = {issue["type"] for issue in payload["checks"]["test_topology"]}
         self.assertIn("uncovered_test_topology", issue_types)
+
+    def test_memex_style_test_topology_requires_all_test_roots(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-memex-topology-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            dev_docs.mkdir()
+            (tmpdir / "test" / "agent").mkdir(parents=True)
+            (tmpdir / "tests" / "tools").mkdir(parents=True)
+            (tmpdir / "ios" / "RunnerTests").mkdir(parents=True)
+            (tmpdir / "test" / "agent" / "agent_test.dart").write_text("void main() {}\n", encoding="utf-8")
+            (tmpdir / "tests" / "tools" / "test_tool.py").write_text("def test_tool(): pass\n", encoding="utf-8")
+            (tmpdir / "ios" / "RunnerTests" / "RunnerTests.swift").write_text("import XCTest\n", encoding="utf-8")
+            (dev_docs / "testing_guide.md").write_text("仅记录 `test/`。\n", encoding="utf-8")
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-test-topology",
+            ])
+            self.assertEqual(result.returncode, 1)
+            uncovered = {issue["path"] for issue in payload["checks"]["test_topology"]}
+            self.assertIn("tests/", uncovered)
+            self.assertIn("ios/RunnerTests/", uncovered)
+        finally:
+            shutil.rmtree(tmpdir)
 
     def test_swift_xcode_tests_are_counted(self):
         case_root = SEMANTIC_ROOT / "dayflow_like_case"

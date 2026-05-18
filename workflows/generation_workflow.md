@@ -861,6 +861,8 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 首次运行在提交 `generation_plan.md`、`project_analysis_report.md` 和 `generation_progress.md` 给用户审核前，必须先执行 Phase 1 自检。该 gate 不要求主文档、子文档、AI Rules 或 `health_check_report.md` 已存在；它只保证方案阶段产物可审核、可追溯、没有明显事实漂移。
 
+默认首次运行必须在本 gate 后停止，输出“建议通过，等待用户确认”或“需修正”。除非用户明确授权跳过审核并要求一次性生成正式文档，否则不得继续生成 `AI_Coding_Context.md`、子文档或 AI Rules。
+
 如果用户后续要求“审核 `_analysis`”“判断 Phase 1 是否通过”“复查 `generation_plan.md`”，也执行本 gate。此类请求只允许复查和回写 `_analysis` 三件套，不得开始正式文档生成。
 
 **最小要求**:
@@ -1114,7 +1116,7 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 1. 优先生成 3 个高优先级文档
 2. 其他文档可先创建标题和 TOC
 3. 在主文档的"文档索引"中标注完成度
-4. 迭代补充，而非一次性完成
+4. 用户确认正式生成后迭代补充，而非一次性完成
 
 ---
 
@@ -1160,7 +1162,7 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 生成 dev_docs/state_management.md
 
 ## 第二批（根据需要选择）
-...
+按方案中的后续优先级继续生成。
 
 # 阶段4: 创建目录结构
 创建 dev_docs/plans/ 目录（含README和子目录）

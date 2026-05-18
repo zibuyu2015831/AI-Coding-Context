@@ -6,8 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const POSITIVE_KEYWORDS = ['推荐', '必须', '优先', '建议', 'should', 'recommended', 'prefer', '需要'];
-const NEGATIVE_KEYWORDS = ['不建议', '不要', '禁止', 'deprecated', '废弃', 'avoid', 'do not', '不需要', '无需'];
+const POSITIVE_KEYWORDS = ['推荐', '必须', '优先', '建议', 'should', 'recommended', 'prefer', '需要', '统一', '集中', 'centralize'];
+const NEGATIVE_KEYWORDS = ['不建议', '不要', '禁止', 'deprecated', '废弃', 'avoid', 'do not', 'should not', 'not be edited', '不需要', '无需'];
 const SOURCE_SUFFIXES = new Set(['.md', '.py', '.js', '.ts', '.tsx', '.swift']);
 const FRAMEWORK_ROOT = path.resolve(__dirname, '..', '..');
 const FRAMEWORK_DIR_NAMES = new Set(['AI-Coding-Context', 'ai_coding_context', 'ai-coding-context', '.ai', '.git', 'node_modules', 'vendor', 'storage']);
@@ -100,7 +100,7 @@ function scanTestTopology(repoRoot) {
     const stat = lstat.isSymbolicLink() ? fs.statSync(current) : lstat;
     if (!stat.isDirectory()) return;
     const name = path.basename(current);
-    const isStandardTestDir = name === 'tests' || name === 'test';
+    const isStandardTestDir = ['tests', 'test', 'integration_test', '__tests__', 'spec', 'androidTest'].includes(name);
     const isXcodeTestDir = name.endsWith('Tests') || name.endsWith('UITests');
     if (isStandardTestDir || isXcodeTestDir) {
       const swiftTestFileCount = isXcodeTestDir
@@ -109,10 +109,12 @@ function scanTestTopology(repoRoot) {
       const fileCount = isXcodeTestDir && swiftTestFileCount > 0
         ? swiftTestFileCount
         : walkFiles(current, () => true, { projectScan: true, repoRoot }).length;
-      topology.push({
-        path: `${path.relative(repoRoot, current).replace(/\\/g, '/')}/`,
-        file_count: fileCount,
-      });
+      if (fileCount > 0) {
+        topology.push({
+          path: `${path.relative(repoRoot, current).replace(/\\/g, '/')}/`,
+          file_count: fileCount,
+        });
+      }
     }
     fs.readdirSync(current).forEach((entry) => {
       const child = path.join(current, entry);
@@ -195,36 +197,69 @@ function checkTestTopology(docDir, repoRoot) {
 }
 
 function classifyPolarity(line) {
-  const negative = NEGATIVE_KEYWORDS.some((keyword) => line.includes(keyword));
-  const positive = POSITIVE_KEYWORDS.some((keyword) => line.includes(keyword));
+  const lowerLine = line.toLowerCase();
+  const negative = NEGATIVE_KEYWORDS.some((keyword) => keywordInLine(keyword, lowerLine));
+  const positive = POSITIVE_KEYWORDS.some((keyword) => keywordInLine(keyword, lowerLine));
   if (negative && !positive) return 'negative';
   if (positive && !negative) return 'positive';
   if (negative && positive) return 'negative';
   return null;
 }
 
+function keywordInLine(keyword, lowerLine) {
+  const lowerKeyword = keyword.toLowerCase();
+  if (/^[a-z ]+$/.test(lowerKeyword)) {
+    return new RegExp(`(?<![a-z])${lowerKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![a-z])`).test(lowerLine);
+  }
+  return lowerLine.includes(lowerKeyword);
+}
+
 function extractAnchors(line) {
   return Array.from(line.matchAll(/`([^`]+)`/g), (match) => match[1].trim()).filter(Boolean);
+}
+
+function isAttentionOnlyRule(line) {
+  const lower = line.toLowerCase();
+  return lower.includes('sensitive keyword') && lower.includes('not necessarily wrong');
+}
+
+function classifyAnchorPolarity(line, anchor) {
+  const anchorIndex = line.indexOf(`\`${anchor}\``);
+  if (anchorIndex < 0) return classifyPolarity(line);
+  const window = line.slice(Math.max(0, anchorIndex - 80), anchorIndex + anchor.length + 80);
+  return classifyPolarity(window) || classifyPolarity(line);
 }
 
 function collectAssertions(files) {
   const assertions = [];
   files.forEach((file) => {
     fs.readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
-      const polarity = classifyPolarity(line);
-      if (!polarity) return;
+      if (isAttentionOnlyRule(line)) return;
       const anchors = extractAnchors(line);
       if (anchors.length === 0) return;
-      assertions.push({
-        file,
-        line: index + 1,
-        polarity,
-        anchors,
-        text: line.trim(),
+      anchors.forEach((anchor) => {
+        const polarity = classifyAnchorPolarity(line, anchor);
+        if (!polarity) return;
+        assertions.push({
+          file,
+          line: index + 1,
+          polarity,
+          anchors: [anchor],
+          text: line.trim(),
+        });
       });
     });
   });
   return assertions;
+}
+
+function isRuleAnchor(anchor) {
+  const lower = anchor.toLowerCase();
+  return ['*.g.dart', 'generated', 'router', 'rules', 'policy'].some((marker) => lower.includes(marker));
+}
+
+function factConflictType(anchor) {
+  return isRuleAnchor(anchor) ? 'rule_conflict' : 'fact_conflict';
 }
 
 function checkFactConflicts(docDir, repoRoot) {
@@ -237,7 +272,7 @@ function checkFactConflicts(docDir, repoRoot) {
       const shared = docAssertion.anchors.filter((anchor) => authorityAssertion.anchors.includes(anchor));
       if (shared.length === 0) return;
       issues.push({
-        type: 'fact_conflict',
+        type: factConflictType(shared[0]),
         anchor: shared[0],
         doc_file: docAssertion.file,
         doc_line: docAssertion.line,

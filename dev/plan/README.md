@@ -21,3 +21,4 @@ verified_at: 2026-05-12
 - [AICC generation_plan 复查流程缺口记录与优化方案](./aicc-generation-plan-review-process-gap-plan.md)
 - [AICC Phase 1 审核门复测后续优化方案](./aicc-phase1-review-gate-followup-plan.md)
 - [AICC 首版验收门禁可信度优化方案](./aicc-first-release-acceptance-gate-improvement-plan.md)
+- [AICC Memex 首次运行复测问题记录与优化方案](./aicc-memex-first-run-regression-plan.md)

@@ -1,3 +1,13 @@
+---
+title: 文档质量保证体系
+summary: 说明 AICC 框架自身质量保证体系的目录结构、审查视角、归档方式、上下文分级和测试项目复测记录入口。
+keywords: quality | audit | review | test-runs | aicc
+scope: AICC 框架自身质量审查与复测归档体系
+related_files: dev/quality/test-runs/README.md | dev/quality/Framework_Review_Guidelines.md
+dependencies: dev/FRAMEWORK_CONTEXT.md | dev/quality/standards/QUALITY_CHECKLIST.md
+verified_at: 2026-05-18
+---
+
 # 文档质量保证体系
 
 > **用途**: 为 AICC 框架自身提供系统化的质量保证工具与流程
@@ -72,6 +82,12 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 可选附加：`Comprehensive_Review_Report.md`、`Improvement_Roadmap.md`、`Issue_Analysis.md`、专项报告等。
 
 详见 [Framework_Review_Guidelines.md §审查交付物清单](./Framework_Review_Guidelines.md#审查交付物清单模板)。
+
+### test-runs/ — 真实项目复测归档
+
+`test-runs/` 保存 Dayflow、LinguaCafe、Memex 等真实项目运行 AICC 后的原始复盘记录、复跑命令、检查结果和 fixture 提炼说明。优化方案仍放在 `dev/plan/`，本目录保留可回放证据。
+
+入口：[test-runs/README.md](./test-runs/README.md)
 
 ---
 

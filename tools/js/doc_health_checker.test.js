@@ -57,6 +57,7 @@ const GENERATION_PROGRESS_BASE = `# 文档生成进度记录
 > **产物完成度**: 1/3，已完成部分 _analysis 产物
 > **当前 gate**: Phase 1 自检
 > **下一步动作**: 继续生成
+> **正式生成授权**: 未授权
 
 ## 🎯 总体步骤进度
 
@@ -78,6 +79,7 @@ const HEALTH_REPORT_BASE = `# 首版文档质量验收报告
 
 | round | tool | implementation | command | exit_code | issue_count | status | disposition |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | summary_validator | python | \`python3 tools/py/summary_validator.py --dir dev_docs --recursive --strict\` | 0 | 0 | PASS | metadata-only |
 | 1 | doc_health_checker | python | \`python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | verified |
 | 1 | doc_health_checker | js | \`node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | verified |
 | 1 | semantic_review_checker | python | \`python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | verified |
@@ -171,6 +173,28 @@ function runTests() {
     }
   });
 
+  test('template residue scanner command is not reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(path.join(devDocs, 'AI_Coding_Context.md'), `${MAIN_DOC_BASE}
+| check | command |
+| --- | --- |
+| residue | \`rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs\` |
+
+- \`rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs\`
+
+\`\`\`bash
+rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
+\`\`\`
+`, 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-template-residue']);
+      assert.strictEqual(result.status, 0);
+      assert.deepStrictEqual(payload.checks.template_residue.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
   test('run record integrity is reported', () => {
     const { base, devDocs } = makeTempDevDocs();
     try {
@@ -220,6 +244,8 @@ function runTests() {
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 `;
       fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
@@ -251,6 +277,8 @@ function runTests() {
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 `;
       fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
@@ -282,6 +310,8 @@ function runTests() {
 - **waived_issue_count**: 0
 - **phase1_recommendation**: 建议通过，等待用户确认
 - **user_confirmation_status**: pending
+- **formal_generation_authorization**: none
+- **authorization_source_summary**: 未授权
 
 ### machine_checks
 
@@ -364,6 +394,37 @@ function runTests() {
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
       assert.strictEqual(result.status, 0);
       assert.deepStrictEqual(payload.checks.run_record_integrity.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('formal docs without health report are reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.mkdirSync(path.join(devDocs, 'architecture'));
+      fs.writeFileSync(path.join(devDocs, 'architecture', 'overview.md'), '# 架构概览\n', 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('formal_docs_without_health_report'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('summary-only validation misrepresentation is reported', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(
+        path.join(devDocs, '_analysis', 'generation_progress.md'),
+        `${GENERATION_PROGRESS_BASE}\n## 验证记录\n\nsummary_validator PASS，验证已通过。\n`,
+        'utf8',
+      );
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('summary_only_validation_misrepresented'));
     } finally {
       cleanup(base);
     }

@@ -33,6 +33,7 @@ verified_at: 2026-05-05
 **适用**: Path A 首版生成完成后的质量验收
 **硬性规则**:
 
+- `summary_validator` 只能证明元数据/摘要格式，不能单独作为首版验收通过依据。
 - 任一必需 checker 未运行、失败且未修复时，最终 verdict 必须为 `FAIL`。
 - 存在 accepted issue 时，最终 verdict 不得写裸 `PASS`，必须写 `PASS_WITH_ACCEPTED_ISSUES` 或“建议通过，含已接受问题”。
 - `accepted_issues` 必须逐项记录，不能只写“误报若干”。
@@ -53,6 +54,7 @@ verified_at: 2026-05-05
 
 | round | tool | implementation | command | exit_code | issue_count | status | disposition |
 | --- | --- | --- | --- | ---: | ---: | --- | --- |
+| 1 | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs --recursive --strict` | 0 | 0 | PASS | metadata-only |
 | 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
 | 1 | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
 | 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
@@ -539,17 +541,17 @@ E. 保持现有文档
 **新增文件** (XX个):
 1. [路径] - [文件类型]
 2. [路径] - [文件类型]
-...
+后续按实际清单继续编号。
 
 **修改文件** (XX个):
 1. [路径] - [文件类型] - [修改时间]
 2. [路径] - [文件类型] - [修改时间]
-...
+后续按实际清单继续编号。
 
 **删除文件** (XX个):
 1. [路径] - [文件类型]
 2. [路径] - [文件类型]
-...
+后续按实际清单继续编号。
 
 ### 核心文件采样清单
 
@@ -558,7 +560,7 @@ E. 保持现有文档
 采样的XX个核心文件:
 1. [路径] - [状态: 已覆盖/未覆盖/已变更]
 2. [路径] - [状态]
-...
+后续按实际清单继续编号。
 
 ---
 

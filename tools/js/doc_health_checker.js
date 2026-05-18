@@ -323,8 +323,44 @@ const RESIDUE_PATTERNS = [
   { re: /\[填写\]/g, label: '[填写]' },
   { re: /\[PROJECT_NAME\]/g, label: '[PROJECT_NAME]' },
   { re: /\bTODO\b/g, label: 'TODO' },
+  { re: /待补充/g, label: '待补充' },
   { re: /^\|\s*\.\.\.\s*\|/gm, label: 'ellipsis_table_row' }
 ];
+
+function isTemplateResidueScanLine(line) {
+  const stripped = line.trim();
+  if (!stripped.includes('rg ') && !stripped.includes('ripgrep')) return false;
+  return ['<marker:T-O-D-O>', '<marker:T-B-D>', '<marker:fill>', '待补充', 'TODO', 'TBD']
+    .some((marker) => stripped.includes(marker));
+}
+
+function templateResidueExemptLines(lines) {
+  const exempt = new Set();
+  let inFence = false;
+  let fenceStart = '';
+  lines.forEach((line, idx) => {
+    const stripped = line.trim();
+    if (stripped.startsWith('```')) {
+      if (!inFence) {
+        inFence = true;
+        fenceStart = stripped.toLowerCase();
+      } else {
+        inFence = false;
+        fenceStart = '';
+      }
+      return;
+    }
+    if (!isTemplateResidueScanLine(line)) return;
+    if (inFence && ['bash', 'sh', 'shell', 'zsh', 'console'].some((lang) => fenceStart.includes(lang))) {
+      exempt.add(idx + 1);
+    } else if (stripped.startsWith('|') && stripped.endsWith('|')) {
+      exempt.add(idx + 1);
+    } else if (stripped.includes('`')) {
+      exempt.add(idx + 1);
+    }
+  });
+  return exempt;
+}
 
 function checkTemplateResidue(targets) {
   if (!targets || targets.length === 0) return { checked: 0, issues: [] };
@@ -335,11 +371,13 @@ function checkTemplateResidue(targets) {
     checked++;
     const text = fs.readFileSync(file, 'utf8');
     const lines = text.split('\n');
+    const exemptLines = templateResidueExemptLines(lines);
     for (const { re, label } of RESIDUE_PATTERNS) {
       re.lastIndex = 0;
       let match;
       while ((match = re.exec(text)) !== null) {
         const line = text.slice(0, match.index).split('\n').length;
+        if (exemptLines.has(line)) continue;
         issues.push({ file, type: 'template_residue', marker: label, line, message: `检测到模板残留: ${label}` });
       }
     }
@@ -366,9 +404,12 @@ const PHASE1_REVIEW_FIELDS = [
   'waived_issue_count',
   'phase1_recommendation',
   'user_confirmation_status',
+  'formal_generation_authorization',
+  'authorization_source_summary',
 ];
 
 const HEALTH_CHECK_REQUIRED_TOOLS = new Set([
+  'summary_validator|python',
   'doc_health_checker|python',
   'doc_health_checker|js',
   'semantic_review_checker|python',
@@ -404,6 +445,34 @@ function isPhase1PassOrRecommendation(text) {
 
 function hasUserConfirmation(text) {
   return /当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)/i.test(text);
+}
+
+function hasFormalGenerationAuthorization(text) {
+  return [
+    /user_confirmation_status\*\*:\s*(confirmed|已确认)/i,
+    /当前状态\*\*:\s*已获用户确认/i,
+    /formal_generation_authorization\*\*:\s*(confirmed|explicit|已授权|已确认)/i,
+    /user_authorized_formal_generation\*\*:\s*(true|yes|是)/i,
+    /授权来源\s*[:：].*(用户|user)/i,
+    /明确授权跳过审核/i,
+    /用户确认.*正式文档生成/i,
+  ].some((pattern) => pattern.test(text));
+}
+
+function isAnalysisPath(file) {
+  return file.split(path.sep).includes('_analysis');
+}
+
+function isFormalDocPath(file) {
+  const name = path.basename(file);
+  if (name === 'health_check_report.md' || isAnalysisPath(file)) return false;
+  return true;
+}
+
+function formalDocPaths(targets) {
+  const paths = targets.filter((target) => fs.existsSync(target) && target.endsWith('.md') && isFormalDocPath(target));
+  if (paths.length <= 1 && paths.every((target) => path.basename(target) === 'AI_Coding_Context.md')) return [];
+  return paths;
 }
 
 function extractSectionAfterHeading(text, heading) {
@@ -645,6 +714,29 @@ function checkRunRecordIntegrity(targets) {
   const existingMarkdownTargets = targets.filter((target) => fs.existsSync(target) && target.endsWith('.md'));
   const targetCount = existingMarkdownTargets.length;
   const healthReportPath = existingMarkdownTargets.find((target) => path.basename(target) === 'health_check_report.md');
+  const progressPath = existingMarkdownTargets.find((target) => path.basename(target) === 'generation_progress.md');
+  const progressText = progressPath ? fs.readFileSync(progressPath, 'utf8') : '';
+  const formalDocs = formalDocPaths(targets);
+  const mainDocPath = existingMarkdownTargets.find((target) => path.basename(target) === 'AI_Coding_Context.md');
+  if (healthReportPath && mainDocPath && formalDocs.length === 0) formalDocs.push(mainDocPath);
+  if (formalDocs.length > 0 && !healthReportPath) {
+    issues.push({
+      file: progressPath || formalDocs[0],
+      type: 'formal_docs_without_health_report',
+      severity: 'blocker',
+      formal_docs: formalDocs,
+      message: '正式文档已生成，但缺少 dev_docs/_analysis/health_check_report.md',
+    });
+  }
+  if (formalDocs.length > 0 && progressText && !hasFormalGenerationAuthorization(progressText)) {
+    issues.push({
+      file: progressPath,
+      type: 'formal_docs_generated_without_phase1_confirmation',
+      severity: 'blocker',
+      formal_docs: formalDocs,
+      message: '正式文档已生成，但 generation_progress.md 缺少用户确认或明确授权记录',
+    });
+  }
   let healthReportIssues = [];
   let healthReportVerdict = '';
   if (healthReportPath) {
@@ -677,6 +769,17 @@ function checkRunRecordIntegrity(targets) {
       });
     }
     if (name === 'generation_progress.md') {
+      const hasSummaryValidatorPass = /summary_validator[^\n|]*(?:PASS|通过)/i.test(text);
+      const claimsValidationPassed = /验证(?:已)?通过|检查(?:已)?通过|验收(?:已)?通过/.test(text);
+      const hasRequiredQualityTools = text.includes('doc_health_checker') && text.includes('semantic_review_checker');
+      if (hasSummaryValidatorPass && claimsValidationPassed && !hasRequiredQualityTools) {
+        issues.push({
+          file,
+          type: 'summary_only_validation_misrepresented',
+          severity: 'blocker',
+          message: '进度记录只记录 summary_validator 通过，却表述为整体验证通过',
+        });
+      }
       const firstReleaseDone = ['首版建议通过', '首版验收 verdict = PASS', '首版验收完成', 'Step 9/9 已完成'].some((marker) => text.includes(marker));
       if (firstReleaseDone && !healthReportPath) {
         issues.push({ file, type: 'progress_completion_without_valid_health_report', severity: 'blocker', message: '进度记录声明首版完成或建议通过，但缺少 health_check_report.md' });

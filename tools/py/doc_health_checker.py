@@ -338,8 +338,41 @@ _RESIDUE_PATTERNS = [
     (re.compile(r"\[填写\]"), "[填写]"),
     (re.compile(r"\[PROJECT_NAME\]"), "[PROJECT_NAME]"),
     (re.compile(r"\bTODO\b"), "TODO"),
+    (re.compile(r"待补充"), "待补充"),
     (re.compile(r"^\|\s*\.\.\.\s*\|", re.MULTILINE), "ellipsis_table_row"),
 ]
+
+
+def _is_template_residue_scan_line(line):
+    stripped = line.strip()
+    if "rg " not in stripped and "ripgrep" not in stripped:
+        return False
+    scan_markers = ("<marker:T-O-D-O>", "<marker:T-B-D>", "<marker:fill>", "待补充", "TODO", "TBD")
+    return any(marker in stripped for marker in scan_markers)
+
+
+def _template_residue_exempt_lines(lines):
+    exempt = set()
+    in_fence = False
+    fence_start = ""
+    for index, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            if not in_fence:
+                in_fence = True
+                fence_start = stripped.lower()
+            else:
+                in_fence = False
+                fence_start = ""
+            continue
+        if _is_template_residue_scan_line(line):
+            if in_fence and any(lang in fence_start for lang in ("bash", "sh", "shell", "zsh", "console")):
+                exempt.add(index)
+            elif stripped.startswith("|") and stripped.endswith("|"):
+                exempt.add(index)
+            elif "`" in stripped:
+                exempt.add(index)
+    return exempt
 
 
 def check_template_residue(targets):
@@ -353,9 +386,12 @@ def check_template_residue(targets):
         checked += 1
         text = Path(f).read_text(encoding="utf-8", errors="ignore")
         lines = text.splitlines()
+        exempt_lines = _template_residue_exempt_lines(lines)
         for pattern, label in _RESIDUE_PATTERNS:
             for match in pattern.finditer(text):
                 lineno = text[:match.start()].count("\n") + 1
+                if lineno in exempt_lines:
+                    continue
                 issues.append({
                     "file": f,
                     "type": "template_residue",
@@ -389,9 +425,12 @@ PHASE1_REVIEW_FIELDS = [
     "waived_issue_count",
     "phase1_recommendation",
     "user_confirmation_status",
+    "formal_generation_authorization",
+    "authorization_source_summary",
 ]
 
 HEALTH_CHECK_REQUIRED_TOOLS = {
+    ("summary_validator", "python"),
     ("doc_health_checker", "python"),
     ("doc_health_checker", "js"),
     ("semantic_review_checker", "python"),
@@ -429,6 +468,39 @@ def _is_phase1_pass_or_recommendation(text):
 
 def _has_user_confirmation(text):
     return bool(re.search(r"当前状态\*\*:\s*已获用户确认|user_confirmation_status\*\*:\s*(confirmed|已确认)", text, flags=re.IGNORECASE))
+
+
+def _has_formal_generation_authorization(text):
+    patterns = (
+        r"user_confirmation_status\*\*:\s*(confirmed|已确认)",
+        r"当前状态\*\*:\s*已获用户确认",
+        r"formal_generation_authorization\*\*:\s*(confirmed|explicit|已授权|已确认)",
+        r"user_authorized_formal_generation\*\*:\s*(true|yes|是)",
+        r"授权来源\s*[:：].*(用户|user)",
+        r"明确授权跳过审核",
+        r"用户确认.*正式文档生成",
+    )
+    return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns)
+
+
+def _is_analysis_path(path):
+    return "_analysis" in Path(path).parts
+
+
+def _is_formal_doc_path(path):
+    p = Path(path)
+    if p.name in {"health_check_report.md"} or _is_analysis_path(p):
+        return False
+    if p.name in {"AI_Coding_Context.md", "AI_RULES.md"}:
+        return True
+    return True
+
+
+def _formal_doc_paths(targets):
+    paths = [Path(target) for target in targets if Path(target).exists() and Path(target).suffix == ".md" and _is_formal_doc_path(target)]
+    if len(paths) <= 1 and all(path.name == "AI_Coding_Context.md" for path in paths):
+        return []
+    return paths
 
 
 def _extract_section_after_heading(text, heading):
@@ -751,6 +823,30 @@ def check_run_record_integrity(targets):
     target_count = len([target for target in targets if Path(target).exists() and Path(target).suffix == ".md"])
     target_by_name = {Path(target).name: Path(target) for target in targets if Path(target).exists()}
     health_report_path = target_by_name.get("health_check_report.md")
+    formal_docs = _formal_doc_paths(targets)
+    main_doc_path = target_by_name.get("AI_Coding_Context.md")
+    if health_report_path and main_doc_path and not formal_docs:
+        formal_docs = [main_doc_path]
+    progress_text = ""
+    progress_path = target_by_name.get("generation_progress.md")
+    if progress_path:
+        progress_text = progress_path.read_text(encoding="utf-8", errors="ignore")
+    if formal_docs and not health_report_path:
+        issues.append({
+            "file": str(progress_path) if progress_path else str(formal_docs[0]),
+            "type": "formal_docs_without_health_report",
+            "severity": "blocker",
+            "formal_docs": [str(path) for path in formal_docs],
+            "message": "正式文档已生成，但缺少 dev_docs/_analysis/health_check_report.md",
+        })
+    if formal_docs and progress_text and not _has_formal_generation_authorization(progress_text):
+        issues.append({
+            "file": str(progress_path),
+            "type": "formal_docs_generated_without_phase1_confirmation",
+            "severity": "blocker",
+            "formal_docs": [str(path) for path in formal_docs],
+            "message": "正式文档已生成，但 generation_progress.md 缺少用户确认或明确授权记录",
+        })
     health_report_issues = []
     health_report_verdict = ""
     if health_report_path:
@@ -784,6 +880,16 @@ def check_run_record_integrity(targets):
                 "message": "进度记录声明已完成，但未见 health_check_report 留痕",
             })
         if path.name == "generation_progress.md":
+            has_summary_validator_pass = re.search(r"summary_validator[^\n|]*(?:PASS|通过)", text, flags=re.IGNORECASE)
+            claims_validation_passed = re.search(r"验证(?:已)?通过|检查(?:已)?通过|验收(?:已)?通过", text)
+            has_required_quality_tools = "doc_health_checker" in text and "semantic_review_checker" in text
+            if has_summary_validator_pass and claims_validation_passed and not has_required_quality_tools:
+                issues.append({
+                    "file": f,
+                    "type": "summary_only_validation_misrepresented",
+                    "severity": "blocker",
+                    "message": "进度记录只记录 summary_validator 通过，却表述为整体验证通过",
+                })
             first_release_done = any(marker in text for marker in ("首版建议通过", "首版验收 verdict = PASS", "首版验收完成", "Step 9/9 已完成"))
             if first_release_done and not health_report_path:
                 issues.append({

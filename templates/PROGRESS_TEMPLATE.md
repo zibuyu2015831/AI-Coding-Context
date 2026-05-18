@@ -19,6 +19,7 @@ verified_at: 2026-05-05
 > **当前 gate**: [Phase 1 人工审核/正式生成/首版质量验收/无]
 > **下一步动作**: [下一步动作]
 > **阻塞原因**: [如无则填写“无”]
+> **正式生成授权**: [未授权/用户确认/用户明确要求跳过审核；如已授权，记录用户原话摘要]
 
 ---
 
@@ -98,6 +99,7 @@ verified_at: 2026-05-05
 
 ## 🧪 验收进度
 
+- [ ] `summary_validator` 已执行（仅代表元数据/摘要格式检查）
 - [ ] `doc_health_checker` 已执行
 - [ ] Python/JS 两套 `doc_health_checker` 均已执行
 - [ ] 必需章节检查通过
@@ -106,6 +108,19 @@ verified_at: 2026-05-05
 - [ ] Python/JS 两套 `semantic_review_checker` 均已执行
 - [ ] `health_check_report.md` 已落盘并通过自身检查
 - [ ] 最终 verdict = PASS 或 PASS_WITH_ACCEPTED_ISSUES
+
+### checker_status_matrix
+
+| stage | tool | implementation | status | meaning | required_before_pass |
+| --- | --- | --- | --- | --- | --- |
+| metadata | summary_validator | python/js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 只证明 frontmatter/summary 格式 | no |
+| structure | doc_health_checker | python | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 结构、模板残留、运行记录和首版验收契约 | yes |
+| structure | doc_health_checker | js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 与 Python checker 交叉验证 | yes |
+| semantic | semantic_review_checker | python | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 事实一致性、测试拓扑和审核门语义 | yes |
+| semantic | semantic_review_checker | js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 与 Python checker 交叉验证 | yes |
+| acceptance | health_check_report | markdown | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 首版验收报告已落盘且自身通过检查 | yes |
+
+> 禁止把 `summary_validator PASS` 单独表述为“验证通过”或“首版验收通过”。任一首版必需项为 `FAIL`、`NOT_RUN` 或未结构化豁免时，最终 verdict 只能是 `FAIL`。
 
 ---
 
@@ -124,6 +139,8 @@ verified_at: 2026-05-05
 - **waived_issue_count**: [数量，含豁免理由]
 - **phase1_recommendation**: [需修正，已回写 _analysis/建议通过，等待用户确认/需人工确认，禁止正式生成]
 - **user_confirmation_status**: [pending/confirmed/rejected]
+- **formal_generation_authorization**: [none/user_confirmed/user_explicit_skip_review]
+- **authorization_source_summary**: [用户确认或授权原话摘要；未授权时写“未授权”]
 
 ### machine_checks
 

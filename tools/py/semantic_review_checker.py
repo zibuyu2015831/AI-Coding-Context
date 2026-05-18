@@ -15,8 +15,8 @@ import sys
 from pathlib import Path
 
 
-POSITIVE_KEYWORDS = ["推荐", "必须", "优先", "建议", "should", "recommended", "prefer", "需要"]
-NEGATIVE_KEYWORDS = ["不建议", "不要", "禁止", "deprecated", "废弃", "avoid", "do not", "不需要", "无需"]
+POSITIVE_KEYWORDS = ["推荐", "必须", "优先", "建议", "should", "recommended", "prefer", "需要", "统一", "集中", "centralize"]
+NEGATIVE_KEYWORDS = ["不建议", "不要", "禁止", "deprecated", "废弃", "avoid", "do not", "should not", "not be edited", "不需要", "无需"]
 SOURCE_SUFFIXES = {".md", ".py", ".js", ".ts", ".tsx", ".swift"}
 FRAMEWORK_DIR_NAMES = {"AI-Coding-Context", "ai_coding_context", "ai-coding-context", ".ai", ".git", "node_modules", "vendor", "storage"}
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[2]
@@ -82,7 +82,7 @@ def scan_test_topology(repo_root):
             continue
         if not path.is_dir():
             continue
-        is_standard_test_dir = path.name in {"tests", "test"}
+        is_standard_test_dir = path.name in {"tests", "test", "integration_test", "__tests__", "spec", "androidTest"}
         is_xcode_test_dir = path.name.endswith("Tests") or path.name.endswith("UITests")
         if not (is_standard_test_dir or is_xcode_test_dir):
             continue
@@ -94,6 +94,8 @@ def scan_test_topology(repo_root):
             file_count = swift_test_file_count or sum(1 for child in path.rglob("*") if child.is_file())
         else:
             file_count = sum(1 for child in path.rglob("*") if child.is_file())
+        if file_count == 0:
+            continue
         topology.append({
             "path": path.relative_to(repo_root).as_posix() + "/",
             "file_count": file_count,
@@ -179,8 +181,9 @@ def check_test_topology(doc_dir, repo_root):
 
 
 def classify_polarity(line):
-    negative = any(keyword in line for keyword in NEGATIVE_KEYWORDS)
-    positive = any(keyword in line for keyword in POSITIVE_KEYWORDS)
+    lower_line = line.lower()
+    negative = any(_keyword_in_line(keyword, lower_line) for keyword in NEGATIVE_KEYWORDS)
+    positive = any(_keyword_in_line(keyword, lower_line) for keyword in POSITIVE_KEYWORDS)
     if negative and not positive:
         return "negative"
     if positive and not negative:
@@ -189,6 +192,13 @@ def classify_polarity(line):
         # 以显式否定优先
         return "negative"
     return None
+
+
+def _keyword_in_line(keyword, lower_line):
+    lower_keyword = keyword.lower()
+    if re.fullmatch(r"[a-z ]+", lower_keyword):
+        return bool(re.search(rf"(?<![a-z]){re.escape(lower_keyword)}(?![a-z])", lower_line))
+    return lower_keyword in lower_line
 
 
 def extract_anchors(line):
@@ -200,20 +210,45 @@ def collect_assertions(files):
     assertions = []
     for path in files:
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            polarity = classify_polarity(line)
-            if not polarity:
+            if _is_attention_only_rule(line):
                 continue
             anchors = extract_anchors(line)
             if not anchors:
                 continue
-            assertions.append({
-                "file": str(path),
-                "line": line_no,
-                "polarity": polarity,
-                "anchors": anchors,
-                "text": line.strip(),
-            })
+            for anchor in anchors:
+                polarity = _classify_anchor_polarity(line, anchor)
+                if not polarity:
+                    continue
+                assertions.append({
+                    "file": str(path),
+                    "line": line_no,
+                    "polarity": polarity,
+                    "anchors": [anchor],
+                    "text": line.strip(),
+                })
     return assertions
+
+
+def _is_attention_only_rule(line):
+    lower = line.lower()
+    return "sensitive keyword" in lower and "not necessarily wrong" in lower
+
+
+def _classify_anchor_polarity(line, anchor):
+    anchor_index = line.find(f"`{anchor}`")
+    if anchor_index < 0:
+        return classify_polarity(line)
+    window = line[max(0, anchor_index - 80): anchor_index + len(anchor) + 80]
+    return classify_polarity(window) or classify_polarity(line)
+
+
+def _is_rule_anchor(anchor):
+    lower = anchor.lower()
+    return any(marker in lower for marker in ("*.g.dart", "generated", "router", "rules", "policy"))
+
+
+def _fact_conflict_type(anchor):
+    return "rule_conflict" if _is_rule_anchor(anchor) else "fact_conflict"
 
 
 def check_fact_conflicts(doc_dir, repo_root):
@@ -228,7 +263,7 @@ def check_fact_conflicts(doc_dir, repo_root):
             if not shared:
                 continue
             issues.append({
-                "type": "fact_conflict",
+                "type": _fact_conflict_type(shared[0]),
                 "anchor": shared[0],
                 "doc_file": doc_assertion["file"],
                 "doc_line": doc_assertion["line"],

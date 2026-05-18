@@ -148,6 +148,87 @@ function runTests() {
     assert.ok(payload.checks.fact_conflicts.some((issue) => issue.type === 'fact_conflict'));
   });
 
+  test('generated file rule rephrasing is not fact conflict', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-rule-rephrasing-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.writeFileSync(path.join(caseRoot, 'CONTRIBUTING.md'), 'Generated output `*.g.dart` should not be edited by hand.\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'AI_Coding_Context.md'), '不要手改 `*.g.dart`。\n', 'utf8');
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-fact-conflicts',
+      ]);
+      assert.strictEqual(result.status, 0, JSON.stringify(payload));
+      assert.deepStrictEqual(payload.checks.fact_conflicts, []);
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('generated file opposite rule is fact conflict', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-rule-conflict-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.writeFileSync(path.join(caseRoot, 'CONTRIBUTING.md'), 'Generated output `*.g.dart` should not be edited by hand.\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'AI_Coding_Context.md'), '建议直接编辑 `*.g.dart`。\n', 'utf8');
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-fact-conflicts',
+      ]);
+      assert.strictEqual(result.status, 1);
+      assert.ok(payload.checks.fact_conflicts.some((issue) => issue.type === 'rule_conflict'));
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('sensitive keyword attention is not fact conflict authority', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-sensitive-attention-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.mkdirSync(path.join(caseRoot, 'docs'));
+      fs.writeFileSync(
+        path.join(caseRoot, 'docs', 'pr-policy-preflight.en.md'),
+        '| Sensitive keyword | Added lines include keywords such as `UserStorage`, `GlobalEventBus` | These words are not necessarily wrong, but AI or reviewers should notice them. |\n',
+        'utf8',
+      );
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'AI_Coding_Context.md'), '新增数据偏好时优先使用 `UserStorage`。\n', 'utf8');
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-fact-conflicts',
+      ]);
+      assert.strictEqual(result.status, 0, JSON.stringify(payload));
+      assert.deepStrictEqual(payload.checks.fact_conflicts, []);
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('mixed rule line applies negative polarity to actual negative anchor only', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-mixed-rule-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.writeFileSync(
+        path.join(caseRoot, 'AGENTS.md'),
+        'Do not scatter Drift `query.watch()` streams across services; centralize change observation through `TableChangeNotifier`.\n',
+        'utf8',
+      );
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'AI_Coding_Context.md'), '文件/数据库层变更：优先统一到 `TableChangeNotifier`。\n', 'utf8');
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-fact-conflicts',
+      ]);
+      assert.strictEqual(result.status, 0, JSON.stringify(payload));
+      assert.deepStrictEqual(payload.checks.fact_conflicts, []);
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
+  });
+
   test('metric drift is reported', () => {
     const caseRoot = path.join(SEMANTIC_ROOT, 'metric_drift_case');
     const { result, payload } = runJson([
@@ -168,6 +249,31 @@ function runTests() {
     ]);
     assert.strictEqual(result.status, 1);
     assert.ok(payload.checks.test_topology.some((issue) => issue.type === 'uncovered_test_topology'));
+  });
+
+  test('Memex-style test topology requires all test roots', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-memex-topology-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.mkdirSync(path.join(caseRoot, 'test', 'agent'), { recursive: true });
+      fs.mkdirSync(path.join(caseRoot, 'tests', 'tools'), { recursive: true });
+      fs.mkdirSync(path.join(caseRoot, 'ios', 'RunnerTests'), { recursive: true });
+      fs.writeFileSync(path.join(caseRoot, 'test', 'agent', 'agent_test.dart'), 'void main() {}\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'tests', 'tools', 'test_tool.py'), 'def test_tool(): pass\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'ios', 'RunnerTests', 'RunnerTests.swift'), 'import XCTest\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'testing_guide.md'), '仅记录 `test/`。\n', 'utf8');
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-test-topology',
+      ]);
+      assert.strictEqual(result.status, 1);
+      const uncovered = new Set(payload.checks.test_topology.map((issue) => issue.path));
+      assert.ok(uncovered.has('tests/'));
+      assert.ok(uncovered.has('ios/RunnerTests/'));
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
   });
 
   test('Swift/Xcode tests are counted', () => {
