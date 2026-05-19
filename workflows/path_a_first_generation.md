@@ -607,13 +607,16 @@ Phase 1 自检只检查方案阶段产物，不要求 `AI_Coding_Context.md`、�
 
 ### 必做检查
 
+- `dev_docs/_analysis/*.md` 必须通过 `summary_validator --strict --dir dev_docs/_analysis --recursive`；该结果是 Phase 1 hard gate。
 - `dev_docs/_analysis/generation_plan.md` 不得包含模板残留、旧结论残留或未标注来源的关键事实。
 - `dev_docs/_analysis/project_analysis_report.md` 中的疑问、风险和强结论必须有当前状态与证据等级。
 - `dev_docs/_analysis/generation_progress.md` 必须区分流程阶段进度与产物完成度，并记录当前 gate。
 - `generation_progress.md` 若声明 Phase 1 PASS、建议通过或可进入正式生成，必须包含 `Phase 1 方案复查记录` 和 `writeback_summary`。
 - `generation_plan.md` 的 `证据与验证记录` 必须包含 `证据等级`，项目定位触发项必须影响子文档规划或说明合并覆盖位置。
+- `generation_plan.md` 必须包含或等价覆盖 `project_positioning_constraints` 和 `ai_external_service_boundaries`：项目愿景、用户承诺、平台约束、隐私/离线/本地优先/无服务端等架构边界、外部服务、凭证、上传数据类型和用户授权边界必须有证据。
 - `generation_plan.md` 的每个待确认项必须包含 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
 - `generation_progress.md` 的 `machine_checks` 必须使用结构化表格记录 tool、implementation、command、exit_code、issue_count、status 和 disposition。
+- `generation_progress.md` 必须包含 `phase1_review_verdict`；verdict 只能为 `BLOCKED_NEEDS_FIX`、`READY_FOR_USER_REVIEW` 或 `USER_APPROVED_FORMAL_GENERATION`，其中最后一项只能在用户明确确认后记录。
 - `project_analysis_report.md` 的警告、疑问和建议必须包含证据等级、当前状态、`blocks_phase1` 和回写目标。
 - `CONTRIBUTING.md`、README 贡献规则、PR 规则、测试策略和格式化规则属于治理约束事实源；测试、分支、PR、格式化建议不得与其冲突。
 - 若 AI 互审改变了事实状态，必须同步回写摘要、正文、表格、待确认清单、行动计划和进度记录，禁止只在文末追加复查记录。
@@ -621,6 +624,7 @@ Phase 1 自检只检查方案阶段产物，不要求 `AI_Coding_Context.md`、�
 ### 推荐命令
 
 ```bash
+python3 tools/py/summary_validator.py --dir dev_docs/_analysis --recursive --strict
 python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs
 node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs
 python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .
@@ -630,7 +634,8 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 ### 失败处理
 
 - 结构检查、运行记录检查或复查后全文一致性检查失败时，不得进入“等待人工审核”输出。
-- Swift/Xcode 测试拓扑等已知工具适配缺口可人工复核，但必须在 `generation_progress.md` 中记录真实命令、issue 数量、人工判定和下一步动作。
+- `summary_validator`、Python/JS `doc_health_checker`、Python/JS `semantic_review_checker` 任一 required 行失败、不可用且无结构化替代复核时，`phase1_review_verdict` 必须为 `BLOCKED_NEEDS_FIX`。
+- 特定语言、平台或生态的测试拓扑等已知工具适配缺口可人工复核，但必须在 `generation_progress.md` 中记录真实命令、issue 数量、人工判定和下一步动作。
 - 用户确认前只能输出“建议通过，等待用户确认”；禁止输出“Phase 1 PASS，可进入正式文档生成”。
 
 ### 输出协议

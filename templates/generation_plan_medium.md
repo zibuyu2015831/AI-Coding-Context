@@ -525,9 +525,12 @@ A: Medium 项目建议 3-5 个子文档。具体根据项目模块数量和复�
 ## 🔎 Phase 1 方案复查清单
 
 - [ ] 关键事实已写入 `证据与验证记录`，并包含 `证据等级`。
+- [ ] 已建立 `evidence_inventory` 或等价事实清单；修改文件数、测试数、依赖数、服务数、大文件行数等量化事实后，全文搜索旧值和同义表述并同步回写。
 - [ ] 待用户确认项只包含代码、配置和仓库文档无法回答的问题，并包含 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
 - [ ] `CONTRIBUTING.md`、README 贡献规则、PR 规则、测试策略和格式化规则已作为治理约束事实源检查，建议没有与维护者规则冲突。
 - [ ] 子文档清单覆盖项目定位触发项；不单独成文时已写明合并覆盖位置。
+- [ ] `project_positioning_constraints` 已覆盖；项目愿景和不可破坏约束已进入正式文档计划。
+- [ ] `ai_external_service_boundaries` 已覆盖；手动 Prompt、本地算法、外部 endpoint、API key、上传数据和授权边界没有混淆。
 - [ ] `project_analysis_report.md` 的疑问、警告和建议具备证据等级、当前状态、`blocks_phase1` 与回写目标。
 - [ ] 复查结果已回写 `_analysis` 三件套，或在 `generation_progress.md` 的 `writeback_summary` 说明无需回写。
 - [ ] 下一步动作是“建议通过，等待用户确认”或“需修正”，不是“可进入正式文档生成”。

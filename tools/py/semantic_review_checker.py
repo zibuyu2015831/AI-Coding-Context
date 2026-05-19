@@ -559,6 +559,96 @@ def _repo_text_signals(repo_root):
     return "\n".join(chunks)
 
 
+def _repo_source_text(repo_root, doc_dir=None):
+    chunks = []
+    for path in iter_authority_files(repo_root, doc_dir or (repo_root / "dev_docs")):
+        if path.suffix.lower() not in SOURCE_SUFFIXES:
+            continue
+        try:
+            chunks.append(path.read_text(encoding="utf-8", errors="ignore"))
+        except OSError:
+            continue
+    return "\n".join(chunks)
+
+
+def _external_service_signals(repo_root, doc_dir):
+    source = _repo_source_text(repo_root, doc_dir)
+    signals = set()
+    patterns = {
+        "external_request": r"\bfetch\s*\(|XMLHttpRequest|axios\.|http[s]?://",
+        "form_data_upload": r"\bFormData\s*\(",
+        "api_key_storage": r"api[_-]?key|apikey|token|localStorage|sessionStorage|IndexedDB",
+    }
+    for signal, pattern in patterns.items():
+        if re.search(pattern, source, flags=re.IGNORECASE):
+            signals.add(signal)
+    if re.search(r"audio|record|recorded|pronunciation|accuracy|transcri", source, flags=re.IGNORECASE) and "external_request" in signals:
+        signals.add("user_media_external_processing")
+    return signals
+
+
+def _check_external_service_boundary(repo_root, doc_dir, plan_path, plan):
+    issues = []
+    signals = _external_service_signals(repo_root, doc_dir)
+    if not signals:
+        return issues
+    lower_plan = plan.lower()
+    if re.search(r"(未集成|没有|无).{0,12}(外部\s*)?(ai|api|接口|调用)", plan, flags=re.IGNORECASE):
+        issues.append({
+            "type": "external_ai_boundary_contradiction",
+            "severity": "blocker",
+            "file": str(plan_path),
+            "signals": sorted(signals),
+            "message": "源码存在外部请求/API key/上传等信号，但 generation_plan.md 写成无外部 AI/API 调用",
+        })
+    required_keywords = {
+        "external_request": ("外部", "API", "endpoint", "接口", "请求"),
+        "form_data_upload": ("上传", "文件", "媒体", "表单", "数据"),
+        "api_key_storage": ("api key", "API key", "密钥", "token", "localStorage", "存储"),
+        "user_media_external_processing": ("媒体", "文件", "上传", "隐私", "授权", "用户数据"),
+    }
+    for signal in sorted(signals):
+        keywords = required_keywords.get(signal, ())
+        if keywords and not any(keyword.lower() in lower_plan for keyword in keywords):
+            issues.append({
+                "type": "external_service_boundary_missing",
+                "severity": "blocker" if signal in {"form_data_upload", "user_media_external_processing"} else "warning",
+                "file": str(plan_path),
+                "signal": signal,
+                "message": f"源码触发 {signal}，但 generation_plan.md 未覆盖对应 AI/外部服务边界",
+            })
+    return issues
+
+
+def _check_readme_positioning_coverage(repo_root, plan_path, plan):
+    issues = []
+    readme = _read_if_exists(repo_root / "README.md")
+    if not readme:
+        return issues
+    readme_lower = readme.lower()
+    requirements = []
+    if "privacy" in readme_lower or "隐私" in readme:
+        requirements.append(("privacy_first", ["隐私", "privacy", "数据流", "上传", "本地"]))
+    if "offline" in readme_lower or "离线" in readme:
+        requirements.append(("offline_first", ["离线", "offline", "缓存", "PWA", "本地"]))
+    if "no server" in readme_lower or "serverless" in readme_lower or "无服务器" in readme:
+        requirements.append(("no_server", ["无后端", "no server", "serverless", "本地", "架构"]))
+    if "pwa" in readme_lower or "progressive web app" in readme_lower:
+        requirements.append(("pwa", ["PWA", "manifest", "service worker", "离线", "平台"]))
+    if "twa" in readme_lower or "android" in readme_lower:
+        requirements.append(("android_twa", ["TWA", "Android", "移动", "平台", "发布"]))
+    for signal, keywords in requirements:
+        if not any(keyword.lower() in plan.lower() for keyword in keywords):
+            issues.append({
+                "type": "project_vision_coverage_missing",
+                "severity": "warning",
+                "file": str(plan_path),
+                "signal": signal,
+                "message": f"README 项目定位未进入 generation_plan.md 正式文档计划: {signal}",
+            })
+    return issues
+
+
 def _section_text(text, heading):
     pattern = re.compile(rf"^##+\s+.*{re.escape(heading)}.*$", flags=re.MULTILINE)
     match = pattern.search(text)
@@ -766,6 +856,8 @@ def check_phase1_analysis_gate(doc_dir, repo_root):
     if strict_phase1_review:
         issues.extend(_check_user_confirmation_items(plan_path, plan))
         issues.extend(_check_maintainer_rule_conflicts(repo_root, plan, report, report_path))
+        issues.extend(_check_external_service_boundary(repo_root, doc_dir, plan_path, plan))
+        issues.extend(_check_readme_positioning_coverage(repo_root, plan_path, plan))
 
     confirmable_markers = [
         ("贡献者指南", "CONTRIBUTING.md", repo_root / "CONTRIBUTING.md"),

@@ -27,6 +27,7 @@ documents:
       trigger: "当 generation_progress.md 声明 Phase 1 PASS、建议通过或可进入正式文档生成时"
       required_fields:
         - "Phase 1 方案复查记录"
+        - "phase1_review_verdict"
         - "review_trigger"
         - "review_started_at"
         - "review_completed_at"
@@ -44,17 +45,29 @@ documents:
       machine_checks_table:
         heading: "machine_checks"
         required_columns:
-          - "round"
+          - "phase"
           - "tool"
           - "implementation"
           - "command"
           - "exit_code"
           - "issue_count"
           - "status"
+          - "required"
           - "disposition"
         required_tools:
+          - "summary_validator"
           - "doc_health_checker"
           - "semantic_review_checker"
+        required_tool_implementations:
+          - "summary_validator:python"
+          - "doc_health_checker:python"
+          - "doc_health_checker:js"
+          - "semantic_review_checker:python"
+          - "semantic_review_checker:js"
+      verdict_values:
+        - "BLOCKED_NEEDS_FIX"
+        - "READY_FOR_USER_REVIEW"
+        - "USER_APPROVED_FORMAL_GENERATION"
   health_check_report:
     required_headings:
       - "总体结论"

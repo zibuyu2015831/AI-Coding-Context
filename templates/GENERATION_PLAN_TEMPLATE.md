@@ -239,6 +239,34 @@ src/ (或项目主目录)
 
 ---
 
+### 1.3B 项目定位与不可破坏约束
+
+| constraint | evidence | documentation_impact | ai_rules_impact | status |
+| --- | --- | --- | --- | --- |
+| [隐私优先/离线优先/本地优先/无服务端/平台发布约束/其他] | [README/product docs/platform config/source path] | [影响哪些正式文档] | [AI 修改代码时不可破坏的边界] | [confirmed/needs_user_confirmation] |
+
+**要求**:
+
+- README、项目官网文档、manifest、部署配置和核心源码中的产品承诺必须进入本表。
+- 若项目宣称隐私优先、离线优先、本地优先、无服务端、特定平台发布或其他产品承诺，正式文档计划必须覆盖数据流、存储、平台和 AI Rules 边界。
+- 若代码与 README 愿景存在张力，应写成“核心路径/可选路径”的边界，不得简单改写为完全本地或完全在线。
+
+---
+
+### 1.3C AI/外部服务边界
+
+| boundary | evidence | data_sent_or_stored | user_authorization_or_config | documentation_impact | status |
+| --- | --- | --- | --- | --- | --- |
+| 手动 Prompt / 本地算法 / 外部 API / 自定义智能服务 endpoint | [source path + line/grep command] | [无/文本/文件/媒体/表单数据/凭证/本地存储等] | [配置入口/用户输入/未知] | [影响哪些正式文档] | [confirmed/needs_user_confirmation] |
+
+**要求**:
+
+- 不得只按 OpenAI、Gemini、Claude 等 Provider 识别 AI 集成；自定义 endpoint、识别、分析、分类、推荐、生成、评分等外部智能服务也必须记录。
+- 出现外部请求、SDK client、表单/文件/媒体上传、凭证、token、本地持久化凭证或用户数据离开运行环境时，必须说明上传数据、密钥存储和授权边界。
+- 隐私优先、离线优先或本地优先项目存在可选在线服务时，必须区分默认本地路径和用户配置后的在线路径。
+
+---
+
 ### 1.4 业务模块识别
 
 **业务模块清单**:
@@ -804,6 +832,9 @@ const email = "user@example.com";
 
 - [ ] 项目类型、技术栈、依赖、测试、部署方式均有 E2/E3/E4 证据；仅 E1 证据不得写成强结论。
 - [ ] `证据与验证记录` 表包含 `证据等级` 列，关键事实均能追溯来源文件或命令。
+- [ ] 已建立 `evidence_inventory` 或等价事实清单；修改文件数、测试数、依赖数、服务数、大文件行数等量化事实后，全文搜索旧值和同义表述并同步回写。
+- [ ] 已填写或等价覆盖 `project_positioning_constraints`，项目愿景和不可破坏约束已进入正式文档计划。
+- [ ] 已填写或等价覆盖 `ai_external_service_boundaries`，手动 Prompt、本地算法、外部 endpoint、API key、上传数据和授权边界没有混淆。
 - [ ] 子文档清单覆盖项目定位触发项；不单独成文时已写明合并覆盖位置。
 - [ ] 待用户确认项只包含代码、配置、锁文件、README、现有项目文档无法回答的问题。
 - [ ] 每个待用户确认项都包含 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。

@@ -224,7 +224,11 @@ function checkFrontmatter(targets, timeoutSec) {
   const issues = [];
   let checked = 0;
   for (const f of targets) {
-    if (f.split(path.sep).includes('_analysis')) continue;
+    if (f.split(path.sep).includes('_analysis')) {
+      let hasFrontmatter = false;
+      try { hasFrontmatter = fs.readFileSync(f, 'utf8').trimStart().startsWith('---'); } catch (e) { hasFrontmatter = false; }
+      if (!hasFrontmatter) continue;
+    }
     checked++;
     const r = runPyTool(['summary_validator.py', '--file', f, '--strict'], timeoutSec);
     if (!r.stdout.trim()) {
@@ -407,6 +411,14 @@ const PHASE1_REVIEW_FIELDS = [
   'formal_generation_authorization',
   'authorization_source_summary',
 ];
+
+const PHASE1_REQUIRED_TOOL_IMPLEMENTATIONS = new Set([
+  'summary_validator|python',
+  'doc_health_checker|python',
+  'doc_health_checker|js',
+  'semantic_review_checker|python',
+  'semantic_review_checker|js',
+]);
 
 const HEALTH_CHECK_REQUIRED_TOOLS = new Set([
   'summary_validator|python',
@@ -629,7 +641,6 @@ function checkHealthReport(file, text, targetCount) {
 
 function checkMachineChecksTable(file, text, phase1Pass) {
   const issues = [];
-  if (!phase1Pass) return issues;
   const { headers, body } = parseFirstMarkdownTable(extractSectionAfterHeading(text, 'machine_checks'));
   if (headers.length === 0) {
     issues.push({
@@ -640,30 +651,67 @@ function checkMachineChecksTable(file, text, phase1Pass) {
     });
     return issues;
   }
-  const required = ['round', 'tool', 'implementation', 'command', 'exit_code', 'issue_count', 'status', 'disposition'];
+  const required = ['phase', 'tool', 'implementation', 'command', 'exit_code', 'issue_count', 'status', 'required', 'disposition'];
   const missing = required.filter((field) => !headers.includes(field));
   if (missing.length > 0) {
     issues.push({ file, type: 'machine_check_table_column_missing', severity: 'blocker', missing, message: 'machine_checks 表缺少必需列' });
     return issues;
   }
-  const index = Object.fromEntries(headers.map((header, idx) => [header, idx]));
-  const tools = new Set(body.map((row) => row[index.tool]).filter(Boolean));
-  ['doc_health_checker', 'semantic_review_checker'].forEach((tool) => {
-    if (!tools.has(tool)) {
-      issues.push({ file, type: 'machine_check_required_tool_missing', severity: 'blocker', tool, message: `machine_checks 缺少工具运行记录: ${tool}` });
+  const rows = tableRowsAsDicts(headers, body);
+  const seen = new Set(rows.map((row) => `${row.tool}|${row.implementation}`));
+  PHASE1_REQUIRED_TOOL_IMPLEMENTATIONS.forEach((key) => {
+    if (!seen.has(key)) {
+      const [tool, implementation] = key.split('|');
+      issues.push({ file, type: 'machine_check_required_tool_missing', severity: 'blocker', tool, implementation, message: `machine_checks 缺少工具运行记录: ${implementation} ${tool}` });
     }
   });
-  body.forEach((row) => {
-    if (row.length < headers.length) return;
-    if (!/^\d+$/.test(row[index.exit_code])) {
+  let hasRequiredFailure = false;
+  rows.forEach((row) => {
+    if (!/^\d+$/.test(row.exit_code || '')) {
       issues.push({ file, type: 'machine_check_exit_code_missing', severity: 'blocker', message: 'machine_checks exit_code 必须为数字' });
     }
-    if (!/^\d+$/.test(row[index.issue_count])) {
+    if (!/^\d+$/.test(row.issue_count || '')) {
       issues.push({ file, type: 'machine_check_issue_count_mismatch', severity: 'blocker', message: 'machine_checks issue_count 必须为数字' });
     }
-    const status = row[index.status].toUpperCase();
-    if (['FAIL', 'ERROR'].includes(status) && !row[index.disposition]) {
+    const status = (row.status || '').toUpperCase();
+    if ((row.required || '').toLowerCase() === 'yes' && status !== 'PASS') hasRequiredFailure = true;
+    if (['FAIL', 'ERROR', 'UNAVAILABLE', 'NOT_RUN'].includes(status) && !row.disposition) {
       issues.push({ file, type: 'machine_check_unresolved_failure', severity: 'blocker', message: '失败的 machine_checks 行必须说明 disposition' });
+    }
+  });
+  const verdict = extractPhase1Verdict(text);
+  if (phase1Pass && hasRequiredFailure && verdict !== 'BLOCKED_NEEDS_FIX') {
+    issues.push({ file, type: 'phase1_verdict_conflicts_with_machine_checks', severity: 'blocker', message: '存在 required machine check 失败时，phase1_review_verdict 必须为 BLOCKED_NEEDS_FIX' });
+  }
+  return issues;
+}
+
+function extractPhase1Verdict(text) {
+  const { headers, body } = parseFirstMarkdownTable(extractSectionAfterHeading(text, 'phase1_review_verdict'));
+  for (const row of tableRowsAsDicts(headers, body)) {
+    if (row.field === 'verdict') return (row.value || '').trim().toUpperCase();
+  }
+  const match = text.match(/phase1_review_verdict[^\n]*(BLOCKED_NEEDS_FIX|READY_FOR_USER_REVIEW|USER_APPROVED_FORMAL_GENERATION)/i);
+  return match ? match[1].toUpperCase() : '';
+}
+
+function checkCheckerStatusConflicts(file, text) {
+  const issues = [];
+  if (!text.includes('checker_status_matrix') || !text.includes('machine_checks')) return issues;
+  const statusByTool = {};
+  text.split('\n').forEach((line) => {
+    if (!line.trim().startsWith('|')) return;
+    ['summary_validator', 'doc_health_checker', 'semantic_review_checker', 'health_check_report'].forEach((tool) => {
+      if (!line.includes(tool)) return;
+      const match = line.match(/\b(PASS|FAIL|NOT_RUN|UNAVAILABLE|WAIVED_WITH_REASON)\b/);
+      if (!match) return;
+      if (!statusByTool[tool]) statusByTool[tool] = new Set();
+      statusByTool[tool].add(match[1]);
+    });
+  });
+  Object.entries(statusByTool).forEach(([tool, statuses]) => {
+    if (statuses.has('NOT_RUN') && (statuses.has('PASS') || statuses.has('FAIL'))) {
+      issues.push({ file, type: 'checker_status_matrix_conflict', severity: 'blocker', tool, statuses: Array.from(statuses).sort(), message: '同一工具在 checker_status_matrix 和 machine_checks 中出现 NOT_RUN 与已运行状态冲突' });
     }
   });
   return issues;
@@ -693,7 +741,24 @@ function checkPhase1ReviewRecord(file, text) {
         });
       }
     });
+    if (!text.includes('phase1_review_verdict')) {
+      issues.push({
+        file,
+        type: 'phase1_review_verdict_missing',
+        severity: phase1Pass ? 'blocker' : 'warning',
+        message: 'Phase 1 方案复查记录缺少 phase1_review_verdict',
+      });
+    } else {
+      const verdict = extractPhase1Verdict(text);
+      if (!['BLOCKED_NEEDS_FIX', 'READY_FOR_USER_REVIEW', 'USER_APPROVED_FORMAL_GENERATION'].includes(verdict)) {
+        issues.push({ file, type: 'phase1_review_verdict_invalid', severity: 'blocker', verdict, message: 'phase1_review_verdict 取值不合法' });
+      }
+      if (verdict === 'USER_APPROVED_FORMAL_GENERATION' && !hasUserConfirmation(text)) {
+        issues.push({ file, type: 'phase1_approved_without_user_confirmation', severity: 'blocker', message: '没有用户确认时不得记录 USER_APPROVED_FORMAL_GENERATION' });
+      }
+    }
     issues.push(...checkMachineChecksTable(file, text, phase1Pass));
+    issues.push(...checkCheckerStatusConflicts(file, text));
   }
   if (phase1Pass && text.includes('可进入正式文档生成') && !hasUserConfirmation(text)) {
     issues.push({

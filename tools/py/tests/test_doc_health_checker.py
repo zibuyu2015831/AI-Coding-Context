@@ -92,11 +92,23 @@ PHASE1_CONFIRMED_RECORD = """
 
 ### machine_checks
 
-| round | tool | implementation | command | exit_code | issue_count | status | disposition |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs --recursive --strict` | 0 | 0 | PASS | metadata-only |
-| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | verified |
-| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | verified |
+| phase | tool | implementation | command | exit_code | issue_count | status | required | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase1_review | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs/_analysis --recursive --strict` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | yes | verified |
+
+### phase1_review_verdict
+
+| field | value |
+| --- | --- |
+| verdict | USER_APPROVED_FORMAL_GENERATION |
+| reason | 用户已确认方案 |
+| can_generate_formal_docs | yes |
+| user_confirmation_required | yes |
+| next_action | 执行正式生成 |
 """
 
 HEALTH_REPORT_BASE = """# 首版文档质量验收报告
@@ -401,10 +413,23 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
 
 ### machine_checks
 
-| round | tool | implementation | command | exit_code | issue_count | status | disposition |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | 无需处理 |
-| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | 无需处理 |
+| phase | tool | implementation | command | exit_code | issue_count | status | required | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase1_review | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs/_analysis --recursive --strict` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | 0 | 0 | PASS | yes | verified |
+
+### phase1_review_verdict
+
+| field | value |
+| --- | --- |
+| verdict | READY_FOR_USER_REVIEW |
+| reason | 必需检查通过 |
+| can_generate_formal_docs | no |
+| user_confirmation_required | yes |
+| next_action | 等待用户审核 |
 """
         (self.dev_docs / "_analysis" / "generation_progress.md").write_text(progress, encoding="utf-8")
         result, payload = _run_json([
@@ -481,6 +506,23 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
         ])
         self.assertEqual(result.returncode, 0)
         self.assertEqual(payload["checks"]["frontmatter"]["issues"], [])
+
+    def test_analysis_docs_with_frontmatter_are_strictly_checked(self):
+        self._write_valid_bundle()
+        (self.dev_docs / "_analysis" / "generation_plan.md").write_text(
+            "---\nsummary: 缺少必填字段。\n---\n\n# 文档生成方案模板\n",
+            encoding="utf-8",
+        )
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(self.dev_docs),
+            "--full-check",
+        ])
+        self.assertEqual(result.returncode, 1)
+        issue_types = {issue["type"] for issue in payload["checks"]["frontmatter"]["issues"]}
+        self.assertIn("frontmatter", issue_types)
 
     def test_completed_count_does_not_trigger_health_report_requirement(self):
         self._write_valid_bundle()

@@ -113,14 +113,14 @@ verified_at: 2026-05-05
 
 | stage | tool | implementation | status | meaning | required_before_pass |
 | --- | --- | --- | --- | --- | --- |
-| metadata | summary_validator | python/js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 只证明 frontmatter/summary 格式 | no |
+| metadata | summary_validator | python | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | Phase 1 复查时证明 `_analysis` frontmatter/summary 格式；首版验收时证明正式文档元数据格式 | yes |
 | structure | doc_health_checker | python | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 结构、模板残留、运行记录和首版验收契约 | yes |
 | structure | doc_health_checker | js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 与 Python checker 交叉验证 | yes |
 | semantic | semantic_review_checker | python | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 事实一致性、测试拓扑和审核门语义 | yes |
 | semantic | semantic_review_checker | js | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 与 Python checker 交叉验证 | yes |
 | acceptance | health_check_report | markdown | [PASS/FAIL/NOT_RUN/UNAVAILABLE/WAIVED_WITH_REASON] | 首版验收报告已落盘且自身通过检查 | yes |
 
-> 禁止把 `summary_validator PASS` 单独表述为“验证通过”或“首版验收通过”。任一首版必需项为 `FAIL`、`NOT_RUN` 或未结构化豁免时，最终 verdict 只能是 `FAIL`。
+> `checker_status_matrix` 只能作为 `machine_checks` 的派生摘要；不得与 `machine_checks` 出现 `NOT_RUN`/`PASS` 等冲突。禁止把 `summary_validator PASS` 单独表述为“验证通过”或“首版验收通过”。任一阶段必需项为 `FAIL`、`NOT_RUN` 或未结构化豁免时，最终 verdict 只能是 `FAIL` 或 `BLOCKED_NEEDS_FIX`。
 
 ---
 
@@ -144,16 +144,30 @@ verified_at: 2026-05-05
 
 ### machine_checks
 
-| round | tool | implementation | command | exit_code | issue_count | status | disposition |
-| ----- | ---- | -------------- | ------- | --------- | ----------- | ------ | ----------- |
-| 1 | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [fixed/accepted/waived/原因] |
-| 1 | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | [fixed/accepted/waived/原因] |
+| phase | tool | implementation | command | exit_code | issue_count | status | required | disposition |
+| ----- | ---- | -------------- | ------- | --------: | ----------: | ------ | -------- | ----------- |
+| phase1_review | summary_validator | python | `python3 tools/py/summary_validator.py --dir dev_docs/_analysis --recursive --strict` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | yes | [verified/fixed/waived_with_reason] |
+| phase1_review | doc_health_checker | python | `python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | yes | [verified/fixed/waived_with_reason] |
+| phase1_review | doc_health_checker | js | `node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | yes | [verified/fixed/waived_with_reason] |
+| phase1_review | semantic_review_checker | python | `python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | yes | [verified/fixed/waived_with_reason] |
+| phase1_review | semantic_review_checker | js | `node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .` | [0/1/2/124] | [数量] | [PASS/FAIL/UNAVAILABLE] | yes | [verified/fixed/waived_with_reason] |
+
+### phase1_review_verdict
+
+| field | value |
+| --- | --- |
+| verdict | [BLOCKED_NEEDS_FIX/READY_FOR_USER_REVIEW/USER_APPROVED_FORMAL_GENERATION] |
+| reason | [hard gate 失败原因或全部通过摘要] |
+| can_generate_formal_docs | [no/no/yes，仅用户明确确认后可为 yes] |
+| user_confirmation_required | yes |
+| next_action | [修正 _analysis/等待用户审核/执行正式生成] |
 
 ### 复查输出协议
 
 - `需修正，已回写 _analysis`: 仍有 blocker 或三件套不一致，禁止请求用户通过。
 - `建议通过，等待用户确认`: 无 blocker，但正式生成仍需用户明确确认。
 - `需人工确认，禁止正式生成`: 存在代码和仓库文档无法回答的策略/业务问题。
+- 任一 `required=yes` 的 `machine_checks` 行不是 `PASS`，或 `exit_code`/`issue_count` 不是数字时，`verdict` 必须为 `BLOCKED_NEEDS_FIX`。
 
 ## 🔎 首版质量验收记录
 

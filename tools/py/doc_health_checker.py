@@ -224,7 +224,12 @@ def check_frontmatter(targets, timeout=30):
     for f in targets:
         path = Path(f)
         if "_analysis" in path.parts:
-            continue
+            try:
+                has_frontmatter = path.read_text(encoding="utf-8", errors="ignore").lstrip().startswith("---")
+            except OSError:
+                has_frontmatter = False
+            if not has_frontmatter:
+                continue
         checked += 1
         code, out, err = _run_tool([
             str(TOOLS_PY / "summary_validator.py"),
@@ -428,6 +433,14 @@ PHASE1_REVIEW_FIELDS = [
     "formal_generation_authorization",
     "authorization_source_summary",
 ]
+
+PHASE1_REQUIRED_TOOL_IMPLEMENTATIONS = {
+    ("summary_validator", "python"),
+    ("doc_health_checker", "python"),
+    ("doc_health_checker", "js"),
+    ("semantic_review_checker", "python"),
+    ("semantic_review_checker", "js"),
+}
 
 HEALTH_CHECK_REQUIRED_TOOLS = {
     ("summary_validator", "python"),
@@ -718,8 +731,6 @@ def _check_health_report(path, text, target_count):
 
 def _check_machine_checks_table(path, text, phase1_pass):
     issues = []
-    if not phase1_pass:
-        return issues
     section = _extract_section_after_heading(text, "machine_checks")
     headers, rows = _parse_first_markdown_table(section)
     if not headers:
@@ -730,7 +741,7 @@ def _check_machine_checks_table(path, text, phase1_pass):
             "message": "Phase 1 建议通过时必须用可解析表格记录 machine_checks",
         })
         return issues
-    required = ["round", "tool", "implementation", "command", "exit_code", "issue_count", "status", "disposition"]
+    required = ["phase", "tool", "implementation", "command", "exit_code", "issue_count", "status", "required", "disposition"]
     missing = [field for field in required if field not in headers]
     if missing:
         issues.append({
@@ -741,42 +752,91 @@ def _check_machine_checks_table(path, text, phase1_pass):
             "message": "machine_checks 表缺少必需列",
         })
         return issues
-    index = {header: headers.index(header) for header in headers}
-    tools = {row[index["tool"]] for row in rows if len(row) > index["tool"]}
-    for required_tool in ("doc_health_checker", "semantic_review_checker"):
-        if required_tool not in tools:
+    machine_rows = _table_rows_as_dicts(headers, rows)
+    seen = {(row.get("tool"), row.get("implementation")) for row in machine_rows}
+    for required_tool, required_implementation in sorted(PHASE1_REQUIRED_TOOL_IMPLEMENTATIONS):
+        if (required_tool, required_implementation) not in seen:
             issues.append({
                 "file": str(path),
                 "type": "machine_check_required_tool_missing",
                 "severity": "blocker",
                 "tool": required_tool,
-                "message": f"machine_checks 缺少工具运行记录: {required_tool}",
+                "implementation": required_implementation,
+                "message": f"machine_checks 缺少工具运行记录: {required_implementation} {required_tool}",
             })
-    for row in rows:
-        if len(row) < len(headers):
-            continue
-        if not re.fullmatch(r"\d+", row[index["exit_code"]]):
+    has_required_failure = False
+    for row in machine_rows:
+        if not re.fullmatch(r"\d+", row.get("exit_code", "")):
             issues.append({
                 "file": str(path),
                 "type": "machine_check_exit_code_missing",
                 "severity": "blocker",
                 "message": "machine_checks exit_code 必须为数字",
             })
-        if not re.fullmatch(r"\d+", row[index["issue_count"]]):
+        if not re.fullmatch(r"\d+", row.get("issue_count", "")):
             issues.append({
                 "file": str(path),
                 "type": "machine_check_issue_count_mismatch",
                 "severity": "blocker",
                 "message": "machine_checks issue_count 必须为数字",
             })
-        status = row[index["status"]].upper()
-        disposition = row[index["disposition"]]
-        if status in {"FAIL", "ERROR"} and not disposition:
+        status = row.get("status", "").upper()
+        disposition = row.get("disposition", "")
+        required_value = row.get("required", "").lower()
+        if required_value == "yes" and status != "PASS":
+            has_required_failure = True
+        if status in {"FAIL", "ERROR", "UNAVAILABLE", "NOT_RUN"} and not disposition:
             issues.append({
                 "file": str(path),
                 "type": "machine_check_unresolved_failure",
                 "severity": "blocker",
                 "message": "失败的 machine_checks 行必须说明 disposition",
+            })
+    verdict = _extract_phase1_verdict(text)
+    if phase1_pass and has_required_failure and verdict != "BLOCKED_NEEDS_FIX":
+        issues.append({
+            "file": str(path),
+            "type": "phase1_verdict_conflicts_with_machine_checks",
+            "severity": "blocker",
+            "message": "存在 required machine check 失败时，phase1_review_verdict 必须为 BLOCKED_NEEDS_FIX",
+        })
+    return issues
+
+
+def _extract_phase1_verdict(text):
+    section = _extract_section_after_heading(text, "phase1_review_verdict")
+    if section:
+        headers, rows = _parse_first_markdown_table(section)
+        for row in _table_rows_as_dicts(headers, rows):
+            if row.get("field") == "verdict":
+                return row.get("value", "").strip().upper()
+    match = re.search(r"phase1_review_verdict[^\n]*(BLOCKED_NEEDS_FIX|READY_FOR_USER_REVIEW|USER_APPROVED_FORMAL_GENERATION)", text, flags=re.IGNORECASE)
+    return match.group(1).upper() if match else ""
+
+
+def _check_checker_status_conflicts(path, text):
+    issues = []
+    if "checker_status_matrix" not in text or "machine_checks" not in text:
+        return issues
+    status_by_tool = {}
+    for line in text.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        for tool in ("summary_validator", "doc_health_checker", "semantic_review_checker", "health_check_report"):
+            if tool not in line:
+                continue
+            status_match = re.search(r"\b(PASS|FAIL|NOT_RUN|UNAVAILABLE|WAIVED_WITH_REASON)\b", line)
+            if status_match:
+                status_by_tool.setdefault(tool, set()).add(status_match.group(1))
+    for tool, statuses in status_by_tool.items():
+        if "NOT_RUN" in statuses and ("PASS" in statuses or "FAIL" in statuses):
+            issues.append({
+                "file": str(path),
+                "type": "checker_status_matrix_conflict",
+                "severity": "blocker",
+                "tool": tool,
+                "statuses": sorted(statuses),
+                "message": "同一工具在 checker_status_matrix 和 machine_checks 中出现 NOT_RUN 与已运行状态冲突",
             })
     return issues
 
@@ -803,7 +863,32 @@ def _check_phase1_review_record(path, text):
                     "missing": field,
                     "message": f"Phase 1 方案复查记录缺少字段: {field}",
                 })
+        if "phase1_review_verdict" not in text:
+            issues.append({
+                "file": str(path),
+                "type": "phase1_review_verdict_missing",
+                "severity": "blocker" if phase1_pass else "warning",
+                "message": "Phase 1 方案复查记录缺少 phase1_review_verdict",
+            })
+        else:
+            verdict = _extract_phase1_verdict(text)
+            if verdict not in {"BLOCKED_NEEDS_FIX", "READY_FOR_USER_REVIEW", "USER_APPROVED_FORMAL_GENERATION"}:
+                issues.append({
+                    "file": str(path),
+                    "type": "phase1_review_verdict_invalid",
+                    "severity": "blocker",
+                    "verdict": verdict,
+                    "message": "phase1_review_verdict 取值不合法",
+                })
+            if verdict == "USER_APPROVED_FORMAL_GENERATION" and not _has_user_confirmation(text):
+                issues.append({
+                    "file": str(path),
+                    "type": "phase1_approved_without_user_confirmation",
+                    "severity": "blocker",
+                    "message": "没有用户确认时不得记录 USER_APPROVED_FORMAL_GENERATION",
+                })
         issues.extend(_check_machine_checks_table(path, text, phase1_pass))
+        issues.extend(_check_checker_status_conflicts(path, text))
     if phase1_pass and "可进入正式文档生成" in text and not _has_user_confirmation(text):
         issues.append({
             "file": str(path),

@@ -315,10 +315,23 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
 
 ### machine_checks
 
-| round | tool | implementation | command | exit_code | issue_count | status | disposition |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | doc_health_checker | js | \`node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | 无需处理 |
-| 1 | semantic_review_checker | js | \`node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | 无需处理 |
+| phase | tool | implementation | command | exit_code | issue_count | status | required | disposition |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase1_review | summary_validator | python | \`python3 tools/py/summary_validator.py --dir dev_docs/_analysis --recursive --strict\` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | python | \`python3 tools/py/doc_health_checker.py --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | yes | verified |
+| phase1_review | doc_health_checker | js | \`node tools/js/doc_health_checker.js --full-check --doc-dir dev_docs\` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | python | \`python3 tools/py/semantic_review_checker.py --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | yes | verified |
+| phase1_review | semantic_review_checker | js | \`node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-root .\` | 0 | 0 | PASS | yes | verified |
+
+### phase1_review_verdict
+
+| field | value |
+| --- | --- |
+| verdict | READY_FOR_USER_REVIEW |
+| reason | 必需检查通过 |
+| can_generate_formal_docs | no |
+| user_confirmation_required | yes |
+| next_action | 等待用户审核 |
 `;
       fs.writeFileSync(path.join(devDocs, '_analysis', 'generation_progress.md'), progress, 'utf8');
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);
@@ -383,6 +396,23 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
       const { result, payload } = runJson(['--doc-dir', devDocs, '--full-check']);
       assert.strictEqual(result.status, 0);
       assert.deepStrictEqual(payload.checks.frontmatter.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('analysis docs with frontmatter are strictly checked', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      fs.writeFileSync(
+        path.join(devDocs, '_analysis', 'generation_plan.md'),
+        '---\nsummary: 缺少必填字段。\n---\n\n# 文档生成方案模板\n',
+        'utf8',
+      );
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--full-check']);
+      assert.strictEqual(result.status, 1);
+      const issueTypes = new Set(payload.checks.frontmatter.issues.map((issue) => issue.type));
+      assert.ok(issueTypes.has('frontmatter'));
     } finally {
       cleanup(base);
     }

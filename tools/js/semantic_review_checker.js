@@ -527,6 +527,102 @@ function repoTextSignals(repoRoot) {
   return chunks.join('\n');
 }
 
+function repoSourceText(repoRoot, docDir) {
+  return iterAuthorityFiles(repoRoot, docDir || path.join(repoRoot, 'dev_docs'))
+    .filter((file) => SOURCE_SUFFIXES.has(path.extname(file)))
+    .map((file) => {
+      try { return fs.readFileSync(file, 'utf8'); } catch (error) { return ''; }
+    })
+    .join('\n');
+}
+
+function externalServiceSignals(repoRoot, docDir) {
+  const source = repoSourceText(repoRoot, docDir);
+  const signals = new Set();
+  const patterns = {
+    external_request: /\bfetch\s*\(|XMLHttpRequest|axios\.|http[s]?:\/\//i,
+    form_data_upload: /\bFormData\s*\(/i,
+    api_key_storage: /api[_-]?key|apikey|token|localStorage|sessionStorage|IndexedDB/i,
+  };
+  Object.entries(patterns).forEach(([signal, pattern]) => {
+    if (pattern.test(source)) signals.add(signal);
+  });
+  if (/audio|record|recorded|pronunciation|accuracy|transcri/i.test(source) && signals.has('external_request')) {
+    signals.add('user_media_external_processing');
+  }
+  return signals;
+}
+
+function checkExternalServiceBoundary(repoRoot, docDir, planPath, plan) {
+  const issues = [];
+  const signals = externalServiceSignals(repoRoot, docDir);
+  if (signals.size === 0) return issues;
+  const lowerPlan = plan.toLowerCase();
+  if (/(未集成|没有|无).{0,12}(外部\s*)?(ai|api|接口|调用)/i.test(plan)) {
+    issues.push({
+      type: 'external_ai_boundary_contradiction',
+      severity: 'blocker',
+      file: planPath,
+      signals: Array.from(signals).sort(),
+      message: '源码存在外部请求/API key/上传等信号，但 generation_plan.md 写成无外部 AI/API 调用',
+    });
+  }
+  const requiredKeywords = {
+    external_request: ['外部', 'API', 'endpoint', '接口', '请求'],
+    form_data_upload: ['上传', '文件', '媒体', '表单', '数据'],
+    api_key_storage: ['api key', 'API key', '密钥', 'token', 'localStorage', '存储'],
+    user_media_external_processing: ['媒体', '文件', '上传', '隐私', '授权', '用户数据'],
+  };
+  Array.from(signals).sort().forEach((signal) => {
+    const keywords = requiredKeywords[signal] || [];
+    if (keywords.length > 0 && !keywords.some((keyword) => lowerPlan.includes(keyword.toLowerCase()))) {
+      issues.push({
+        type: 'external_service_boundary_missing',
+        severity: ['form_data_upload', 'user_media_external_processing'].includes(signal) ? 'blocker' : 'warning',
+        file: planPath,
+        signal,
+        message: `源码触发 ${signal}，但 generation_plan.md 未覆盖对应 AI/外部服务边界`,
+      });
+    }
+  });
+  return issues;
+}
+
+function checkReadmePositioningCoverage(repoRoot, planPath, plan) {
+  const issues = [];
+  const readme = readIfExists(path.join(repoRoot, 'README.md'));
+  if (!readme) return issues;
+  const readmeLower = readme.toLowerCase();
+  const requirements = [];
+  if (readmeLower.includes('privacy') || readme.includes('隐私')) {
+    requirements.push({ signal: 'privacy_first', keywords: ['隐私', 'privacy', '数据流', '上传', '本地'] });
+  }
+  if (readmeLower.includes('offline') || readme.includes('离线')) {
+    requirements.push({ signal: 'offline_first', keywords: ['离线', 'offline', '缓存', 'PWA', '本地'] });
+  }
+  if (readmeLower.includes('no server') || readmeLower.includes('serverless') || readme.includes('无服务器')) {
+    requirements.push({ signal: 'no_server', keywords: ['无后端', 'no server', 'serverless', '本地', '架构'] });
+  }
+  if (readmeLower.includes('pwa') || readmeLower.includes('progressive web app')) {
+    requirements.push({ signal: 'pwa', keywords: ['PWA', 'manifest', 'service worker', '离线', '平台'] });
+  }
+  if (readmeLower.includes('twa') || readmeLower.includes('android')) {
+    requirements.push({ signal: 'android_twa', keywords: ['TWA', 'Android', '移动', '平台', '发布'] });
+  }
+  requirements.forEach(({ signal, keywords }) => {
+    if (!keywords.some((keyword) => plan.toLowerCase().includes(keyword.toLowerCase()))) {
+      issues.push({
+        type: 'project_vision_coverage_missing',
+        severity: 'warning',
+        file: planPath,
+        signal,
+        message: `README 项目定位未进入 generation_plan.md 正式文档计划: ${signal}`,
+      });
+    }
+  });
+  return issues;
+}
+
 function sectionText(text, heading) {
   const lines = text.split('\n');
   let start = -1;
@@ -732,6 +828,8 @@ function checkPhase1AnalysisGate(docDir, repoRoot) {
   if (strictPhase1Review) {
     issues.push(...checkUserConfirmationItems(planPath, plan));
     issues.push(...checkMaintainerRuleConflicts(repoRoot, plan, report, reportPath));
+    issues.push(...checkExternalServiceBoundary(repoRoot, docDir, planPath, plan));
+    issues.push(...checkReadmePositioningCoverage(repoRoot, planPath, plan));
   }
 
   const combinedAnalysis = `${plan}\n${report}`;

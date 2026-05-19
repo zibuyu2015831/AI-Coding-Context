@@ -472,11 +472,13 @@ graph TD
 ### 必须执行
 
 1. 复查 `_analysis` 三件套：`generation_plan.md`、`project_analysis_report.md`、`generation_progress.md`。
-2. 如发现事实、证据等级、待确认边界、项目定位覆盖或状态表达问题，直接回写对应 `_analysis` 文件。
-3. 在 `generation_plan.md` 的待确认项中逐项写明 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
-4. 在 `generation_progress.md` 写入 `Phase 1 方案复查记录`，包含触发来源、结构化 `machine_checks` 表、人工语义复查摘要、回写摘要、blocker/warning/waived 统计和用户确认状态。
-5. 运行 Python 与 JS 两套 `doc_health_checker --full-check`、`semantic_review_checker --full-check`；若两套结果不一致，必须先修正或记录为 blocker，不得直接建议通过。工具不可用时必须记录 `UNAVAILABLE`、原因和替代复核。
-6. 最终回复只能使用以下结论之一：
+2. 运行 `summary_validator --strict --dir dev_docs/_analysis --recursive`，并把结果作为 Phase 1 hard gate 回写到 `generation_progress.md` 的 `machine_checks`。
+3. 如发现事实、证据等级、待确认边界、项目定位覆盖、AI/外部服务边界或状态表达问题，直接回写对应 `_analysis` 文件。
+4. 在 `generation_plan.md` 的待确认项中逐项写明 `当前保守结论`、`已检查证据`、`为什么代码或仓库文档无法回答`、`blocks_phase1` 和 `回写目标`。
+5. 在 `generation_plan.md` 复核 README、产品文档、平台配置、部署配置和核心源码中的项目定位与不可破坏约束；隐私优先、离线优先、本地优先、无服务端、特定平台发布、外部上传、凭证存储等项目承诺必须影响正式文档计划或说明合并覆盖位置。
+6. 在 `generation_progress.md` 写入 `Phase 1 方案复查记录`、`phase1_review_verdict` 和结构化 `machine_checks` 表，包含触发来源、工具结果、人工语义复查摘要、回写摘要、blocker/warning/waived 统计和用户确认状态。
+7. 运行 Python 与 JS 两套 `doc_health_checker --full-check`、`semantic_review_checker --full-check`；若两套结果不一致，必须先修正或记录为 blocker，不得直接建议通过。工具不可用时必须记录 `UNAVAILABLE`、原因和替代复核。
+8. 最终回复必须先给 verdict，且只能使用以下结论之一：
    - `需修正，已回写 _analysis`
    - `建议通过，等待用户确认`
    - `需人工确认，禁止正式生成`
@@ -486,6 +488,7 @@ graph TD
 - 禁止用户确认前写“Phase 1 PASS，可进入正式文档生成”。
 - 禁止只更新 `generation_progress.md` 而不复查 `generation_plan.md` 与 `project_analysis_report.md`。
 - 禁止把可由代码、配置、锁文件、README 或现有项目文档确认的事实放入用户确认项。
+- 禁止仅按 OpenAI/Gemini/Claude 等常见 Provider 判断 AI/API 集成。任何外部数据处理、智能服务调用、用户数据上传或凭证传输，都必须进入 AI/外部服务边界复查。
 
 ---
 
