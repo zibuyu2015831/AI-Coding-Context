@@ -1020,14 +1020,6 @@ def check_run_record_integrity(targets):
                     "message": "同一进度文件中存在多个未标明含义的百分比进度",
                 })
         if path.name == "generation_plan.md":
-            lower_text = text.lower()
-            if "grdb" in lower_text and any(marker in text for marker in ("SQLite/Core Data", "SwiftData (待确认)", "可能的 SQLite.swift / GRDB")):
-                issues.append({
-                    "file": f,
-                    "type": "stale_review_conclusion",
-                    "fact": "GRDB",
-                    "message": "文档已确认 GRDB，但正文仍残留 SQLite/Core Data 或待确认旧结论",
-                })
             if "Package.resolved" in text and any(marker in text for marker in ("Package.resolved 待确认", "检查 Package.resolved", "未发现 Package.resolved")):
                 issues.append({
                     "file": f,

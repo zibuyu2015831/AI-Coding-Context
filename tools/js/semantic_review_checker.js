@@ -496,7 +496,7 @@ function checkFirstReleaseAcceptance(docDir, repoRoot) {
       while ((match = secretLikePattern.exec(line)) !== null) {
         const value = match[1];
         if (isPlaceholderValue(value) || value.toUpperCase().endsWith('_KEY')) continue;
-        if (/\b[A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\b|Pusher|Reverb|PUSHER|REVERB/.test(line)) {
+        if (/\b[A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\b/.test(line)) {
           issues.push({ type: 'secret_like_value_in_docs', severity: 'blocker', file, line: index + 1, message: '正式文档出现疑似 token/key/password 具体值' });
         }
       }
@@ -547,7 +547,7 @@ function externalServiceSignals(repoRoot, docDir) {
   Object.entries(patterns).forEach(([signal, pattern]) => {
     if (pattern.test(source)) signals.add(signal);
   });
-  if (/audio|record|recorded|pronunciation|accuracy|transcri/i.test(source) && signals.has('external_request')) {
+  if (/media|file|blob|upload|multipart|record|camera|image|video|audio/i.test(source) && signals.has('external_request')) {
     signals.add('user_media_external_processing');
   }
   return signals;
@@ -862,8 +862,8 @@ function checkPhase1AnalysisGate(docDir, repoRoot) {
     positioningRequirements.push({ signal: 'self_hosted_ops', keywords: ['Docker', '部署', '运维', '自托管'] });
   }
   const signals = repoTextSignals(repoRoot).toLowerCase();
-  if (['deepl', 'anki', 'jellyfin', 'dictionary', 'external api'].some((signal) => signals.includes(signal))) {
-    positioningRequirements.push({ signal: 'external_data_api', keywords: ['外部', 'API', '授权', '集成', 'DeepL', 'Anki', 'Jellyfin', 'dictionary'] });
+  if (['external api', 'external service', 'third-party', '3rd-party', 'webhook', 'oauth', 'api key', 'token', '外部 api', '外部接口', '外部服务', '第三方'].some((signal) => signals.includes(signal))) {
+    positioningRequirements.push({ signal: 'external_data_api', keywords: ['外部', 'API', '授权', '集成', '第三方', '外部服务'] });
   }
   positioningRequirements.forEach(({ signal, keywords }) => {
     if (strictPhase1Review && !keywords.some((keyword) => plan.includes(keyword))) {

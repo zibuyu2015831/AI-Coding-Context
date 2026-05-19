@@ -525,7 +525,7 @@ def check_first_release_acceptance(doc_dir, repo_root):
                 value = match.group(1)
                 if _is_placeholder_value(value) or value.upper().endswith("_KEY"):
                     continue
-                if re.search(r"\b[A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\b|Pusher|Reverb|PUSHER|REVERB", line):
+                if re.search(r"\b[A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\b", line):
                     issues.append({
                         "type": "secret_like_value_in_docs",
                         "severity": "blocker",
@@ -582,7 +582,7 @@ def _external_service_signals(repo_root, doc_dir):
     for signal, pattern in patterns.items():
         if re.search(pattern, source, flags=re.IGNORECASE):
             signals.add(signal)
-    if re.search(r"audio|record|recorded|pronunciation|accuracy|transcri", source, flags=re.IGNORECASE) and "external_request" in signals:
+    if re.search(r"media|file|blob|upload|multipart|record|camera|image|video|audio", source, flags=re.IGNORECASE) and "external_request" in signals:
         signals.add("user_media_external_processing")
     return signals
 
@@ -883,8 +883,8 @@ def check_phase1_analysis_gate(doc_dir, repo_root):
     if _repo_has_any(repo_root, ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]):
         positioning_requirements.append(("self_hosted_ops", ["Docker", "部署", "运维", "自托管"]))
     repo_signals = _repo_text_signals(repo_root)
-    if any(signal.lower() in repo_signals.lower() for signal in ("deepl", "anki", "jellyfin", "dictionary", "external api")):
-        positioning_requirements.append(("external_data_api", ["外部", "API", "授权", "集成", "DeepL", "Anki", "Jellyfin", "dictionary"]))
+    if any(signal.lower() in repo_signals.lower() for signal in ("external api", "external service", "third-party", "3rd-party", "webhook", "oauth", "api key", "token", "外部 api", "外部接口", "外部服务", "第三方")):
+        positioning_requirements.append(("external_data_api", ["外部", "API", "授权", "集成", "第三方", "外部服务"]))
     for signal, keywords in positioning_requirements:
         if strict_phase1_review and not any(keyword in plan for keyword in keywords):
             issues.append({

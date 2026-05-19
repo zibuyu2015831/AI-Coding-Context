@@ -379,7 +379,7 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
     try {
       fs.writeFileSync(
         path.join(devDocs, '_analysis', 'generation_plan.md'),
-        `${GENERATION_PLAN_BASE}\n数据库技术: SQLite/Core Data / SwiftData (待确认)\n\n## 复查记录\n\n| 事实 | 新状态 |\n| --- | --- |\n| 数据库技术为 GRDB | ✅ 已确认 |\n`,
+        `${GENERATION_PLAN_BASE}\n依赖锁文件: Package.resolved 待确认\n\n## 复查记录\n\n| 事实 | 新状态 |\n| --- | --- |\n| Package.resolved 已存在 | ✅ 已确认 |\n`,
         'utf8',
       );
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-run-record-integrity']);

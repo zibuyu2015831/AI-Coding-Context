@@ -883,15 +883,6 @@ function checkRunRecordIntegrity(targets) {
       }
     }
     if (name === 'generation_plan.md') {
-      const lowerText = text.toLowerCase();
-      if (lowerText.includes('grdb') && ['SQLite/Core Data', 'SwiftData (待确认)', '可能的 SQLite.swift / GRDB'].some((marker) => text.includes(marker))) {
-        issues.push({
-          file,
-          type: 'stale_review_conclusion',
-          fact: 'GRDB',
-          message: '文档已确认 GRDB，但正文仍残留 SQLite/Core Data 或待确认旧结论',
-        });
-      }
       if (text.includes('Package.resolved') && ['Package.resolved 待确认', '检查 Package.resolved', '未发现 Package.resolved'].some((marker) => text.includes(marker))) {
         issues.push({
           file,

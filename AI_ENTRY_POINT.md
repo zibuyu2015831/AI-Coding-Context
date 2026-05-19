@@ -488,7 +488,7 @@ graph TD
 - 禁止用户确认前写“Phase 1 PASS，可进入正式文档生成”。
 - 禁止只更新 `generation_progress.md` 而不复查 `generation_plan.md` 与 `project_analysis_report.md`。
 - 禁止把可由代码、配置、锁文件、README 或现有项目文档确认的事实放入用户确认项。
-- 禁止仅按 OpenAI/Gemini/Claude 等常见 Provider 判断 AI/API 集成。任何外部数据处理、智能服务调用、用户数据上传或凭证传输，都必须进入 AI/外部服务边界复查。
+- 禁止仅按常见大模型 Provider 或 SDK 判断 AI/API 集成。任何外部数据处理、智能服务调用、用户数据上传或凭证传输，都必须进入 AI/外部服务边界复查。
 
 ---
 

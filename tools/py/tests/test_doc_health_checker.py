@@ -475,13 +475,13 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
     def test_stale_review_conclusion_is_reported(self):
         self._write_valid_bundle()
         plan = GENERATION_PLAN_BASE + """
-数据库技术: SQLite/Core Data / SwiftData (待确认)
+依赖锁文件: Package.resolved 待确认
 
 ## 复查记录
 
 | 事实 | 新状态 |
 | --- | --- |
-| 数据库技术为 GRDB | ✅ 已确认 |
+| Package.resolved 已存在 | ✅ 已确认 |
 """
         (self.dev_docs / "_analysis" / "generation_plan.md").write_text(plan, encoding="utf-8")
         result, payload = _run_json([
