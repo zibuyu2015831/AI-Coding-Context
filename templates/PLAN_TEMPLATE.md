@@ -1,29 +1,30 @@
 ---
 title: 实施方案模板
-summary: 提供功能开发、Bug 修复或性能优化等场景的统一方案模板，用于记录背景、技术选型、实施步骤和验证计划。
+summary: 提供功能开发、Bug 修复或性能优化等场景的统一方案模板，用于记录类型、生命周期状态、背景、技术选型、实施步骤和验证计划。
 keywords: template | implementation-plan | bugfix | feature | aicc
 scope: 单个功能或 Bug 的方案模板
 related_files: 无
 dependencies: 无
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # [功能/Bug] 简短标题
 
 > **模板说明**: 统一的功能开发/Bug 修复方案模板  
-> **用途**: 确保方案规范化，便于后续归档到 knowledge/  
+> **用途**: 确保方案规范化，便于在 plans/active、plans/done、plans/archive 之间流转，并提取关键要点到 knowledge/
 > **版本**: v1.0
 
 ---
 
 ## 📋 方案元信息
 
-- **类型**: [功能开发/Bug 修复/性能优化/架构调整]
+- **类型**: [feature/bugfix/perf/refactor/docs]
 - **优先级**: [P0-紧急/P1-高/P2-中/P3-低]
 - **创建日期**: YYYY-MM-DD
 - **创建人**: [姓名/ID]
 - **预计工时**: X 小时
-- **状态**: [待审核/进行中/已完成/已归档]
+- **状态**: [active/done/archived]
+- **当前位置**: [dev_docs/plans/active/ | dev_docs/plans/done/ | dev_docs/plans/archive/]
 
 ---
 

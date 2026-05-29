@@ -5,7 +5,7 @@ keywords: template | ai-coding-context | dev-docs | summary | aicc
 scope: 主文档 AI_Coding_Context.md 模板
 related_files: 无
 dependencies: templates/GENERATION_PLAN_TEMPLATE.md | core/SUMMARY_FORMAT_SPEC.md
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # 主文档模板 (AI_Coding_Context.md)
@@ -81,7 +81,7 @@ verified_at: 2026-05-05
 | [常见场景 1] | [[子文档名称]]    |
 | [常见场景 2] | [[子文档名称]]    |
 | [常见场景 3] | [[子文档名称]] ⭐ |
-| [新增功能或修复 Bug] | `dev_docs/plans/features/` 或 `dev_docs/plans/bugfixes/` 中对应方案文档 |
+| [新增功能或修复 Bug] | `dev_docs/plans/active/` 中对应方案文档 |
 | [常见场景 4] | [[子文档名称]] |
 | [常见场景 5] | [[子文档名称]] |
 
@@ -139,8 +139,8 @@ verified_at: 2026-05-05
 
 #### 1️⃣ 创建方案文档
 
-- **位置**: `dev_docs/plans/features/` (功能) 或 `dev_docs/plans/bugfixes/` (Bug)
-- **命名**: `YYYY-MM-DD_简短描述.md`
+- **位置**: `dev_docs/plans/active/`
+- **命名**: `YYYY-MM-DD_<type>_<short-name>.md`，例如 `2026-05-29_feature_export.md` 或 `2026-05-29_bugfix_login-timeout.md`
 - **模板**: 见 [plans/README.md](./plans/README.md)
 
 **可跳过方案的场景**:
@@ -160,7 +160,18 @@ verified_at: 2026-05-05
 
 完成后，若方案有价值（耗时>2h 或难度高），提炼到 `dev_docs/knowledge/`。
 
-#### 4️⃣ 沉淀工具
+#### 4️⃣ 记录延后事项
+
+`dev_docs/memos/` 的中文名称是**备忘录**，用于记录开发过程中暂时无法实现、依赖外部条件或不应进入当前计划的想法。
+
+与用户讨论需求、Bug、架构调整或后续优化时，AI 必须：
+
+- 主动阅读 `dev_docs/memos/README.md` 和相关备忘录，关联已有想法、依赖和阻塞项。
+- 在回答或制定方案前说明是否存在相关备忘录，避免重复讨论、重复规划或遗漏历史约束。
+- 主动将合适的内容沉淀为备忘录，例如暂不实现的想法、外部依赖、延后优化点、待验证假设和用户明确要求稍后处理的事项。
+- 当备忘录事项被确认推进时，创建 `dev_docs/plans/active/YYYY-MM-DD_<type>_<short-name>.md`，并在原备忘录中追加迁移链接。
+
+#### 5️⃣ 沉淀工具
 
 若开发过程中遇到**高频重复**或**高稳定性要求**的操作，请参考 `workflows/create_custom_tool_workflow.md` 创建通用脚本工具，并更新 `tools/README.md`。
 
@@ -288,11 +299,13 @@ const loadData = async () => {
 
 | 任务 | 关键步骤 |
 | ---- | -------- |
-| 新增功能 | 先创建 `dev_docs/plans/features/YYYY-MM-DD_任务名.md` → 等待审核 → 审核通过后开发 |
-| 修复 Bug | 先创建 `dev_docs/plans/bugfixes/YYYY-MM-DD_问题名.md` → 标注复现与验证方式 |
+| 新增功能 | 先创建 `dev_docs/plans/active/YYYY-MM-DD_feature_任务名.md` → 等待审核 → 审核通过后开发 |
+| 修复 Bug | 先创建 `dev_docs/plans/active/YYYY-MM-DD_bugfix_问题名.md` → 标注复现与验证方式 |
 | 调用 API | 先查“核心代码模式”与 `api_layer.md` → 对齐错误处理和返回值约定 |
 | 新增业务模块 | 先更新“业务模块映射”涉及目录/服务 → 再补对应子文档 |
 | 更新知识沉淀 | 方案完成后评估是否写入 `dev_docs/knowledge/` |
+| 讨论需求或后续优化 | 主动阅读 `dev_docs/memos/README.md` 和相关备忘录 → 关联已有记录，避免重复 |
+| 记录延后想法 | 主动将合适的内容沉淀为备忘录：写入 `dev_docs/memos/YYYY-MM-DD_deferred_简述.md`，确认推进后再迁入 `plans/active/` |
 | [任务 1] | [步骤说明] |
 | [任务 2] | [步骤说明] |
 

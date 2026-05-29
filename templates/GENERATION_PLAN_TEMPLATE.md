@@ -5,7 +5,7 @@ keywords: template | generation-plan | analysis | dev-docs | aicc
 scope: 文档生成方案模板
 related_files: 无
 dependencies: workflows/generation_workflow.md | templates/AI_Coding_Context_TEMPLATE.md
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # 文档生成方案模板
@@ -863,6 +863,7 @@ const email = "user@example.com";
 
 3. **目录结构**
    - `plans/` - 15 分钟
+   - `memos/` - 10 分钟
    - `knowledge/` - 15 分钟
 
 ### 第二批生成（可选，按需）

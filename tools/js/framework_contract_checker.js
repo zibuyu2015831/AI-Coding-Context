@@ -19,6 +19,10 @@ const DEFAULT_WORKFLOWS = [
   path.join(ROOT, 'workflows', 'generation_workflow.md'),
   path.join(ROOT, 'workflows', 'path_a_first_generation.md'),
 ];
+const OBSOLETE_STANDARD_PATHS = new Set([
+  'dev_docs/plans/features/',
+  'dev_docs/plans/bugfixes/',
+]);
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -83,7 +87,44 @@ function checkTemplate(templatePath, contractPath) {
 
 function extractStandardPaths(specPath) {
   const text = fs.readFileSync(specPath, 'utf8');
-  return new Set(Array.from(text.matchAll(/`(dev_docs\/[^`]+)`/g), (match) => match[1]));
+  const paths = new Set();
+  text.split('\n').forEach((line) => {
+    if (line.includes('❌')) return;
+    Array.from(line.matchAll(/`(dev_docs\/[^`]+)`/g), (match) => match[1])
+      .forEach((targetPath) => paths.add(targetPath));
+  });
+  return paths;
+}
+
+function normalizeStandardPath(targetPath) {
+  if (targetPath === 'dev_docs/plans/README.md') return 'dev_docs/plans/';
+  if (targetPath.startsWith('dev_docs/plans/active/')) return 'dev_docs/plans/active/';
+  if (targetPath.startsWith('dev_docs/plans/done/')) return 'dev_docs/plans/done/';
+  if (targetPath.startsWith('dev_docs/plans/archive/')) return 'dev_docs/plans/archive/';
+  if (targetPath.startsWith('dev_docs/memos/')) return 'dev_docs/memos/';
+  if (targetPath.startsWith('dev_docs/knowledge/')) return 'dev_docs/knowledge/';
+  if (targetPath.startsWith('dev_docs/rules/combined/')) return 'dev_docs/rules/combined/AI_RULES.md';
+  return targetPath;
+}
+
+function extractUserDocPaths(text) {
+  return Array.from(text.matchAll(/dev_docs\/[\w./-]+/g), (match) => normalizeStandardPath(match[0]));
+}
+
+function checkSpecPaths(specPath) {
+  const standardPaths = Array.from(extractStandardPaths(specPath)).sort();
+  const issues = [];
+  for (const obsoletePath of Array.from(OBSOLETE_STANDARD_PATHS).sort()) {
+    if (standardPaths.includes(obsoletePath)) {
+      issues.push({
+        file: specPath,
+        type: 'obsolete_standard_path',
+        path: obsoletePath,
+        message: `spec 仍包含过期标准路径: ${obsoletePath}`,
+      });
+    }
+  }
+  return { checked: 1, standard_paths: standardPaths, issues };
 }
 
 function contextIsOptional(lines, index) {
@@ -104,12 +145,29 @@ function checkWorkflow(workflowPath, specPath) {
   const specPaths = extractStandardPaths(specPath);
   const lines = fs.readFileSync(workflowPath, 'utf8').split('\n');
   const issues = [];
-  const regex = /(dev_docs\/[\w./-]*review\/[\w./-]*)/g;
+  const seenStandardPaths = new Set();
   lines.forEach((line, index) => {
-    regex.lastIndex = 0;
-    let match;
-    while ((match = regex.exec(line)) !== null) {
-      const driftPath = match[1];
+    for (const driftPath of extractUserDocPaths(line)) {
+      if (specPaths.has(driftPath)) {
+        seenStandardPaths.add(driftPath);
+      }
+      if (OBSOLETE_STANDARD_PATHS.has(driftPath)) {
+        issues.push({
+          file: workflowPath,
+          line: index + 1,
+          type: 'obsolete_standard_path',
+          path: driftPath,
+          message: `workflow 使用了过期标准路径: ${driftPath}`,
+        });
+        continue;
+      }
+      if (
+        !driftPath.startsWith('dev_docs/plans/')
+        && !driftPath.startsWith('dev_docs/memos/')
+        && !driftPath.startsWith('dev_docs/review/')
+      ) {
+        continue;
+      }
       if (!specPaths.has(driftPath) && !contextIsOptional(lines, index)) {
         issues.push({
           file: workflowPath,
@@ -121,7 +179,7 @@ function checkWorkflow(workflowPath, specPath) {
       }
     }
   });
-  return { checked: 1, issues };
+  return { checked: 1, seen_standard_paths: Array.from(seenStandardPaths).sort(), issues };
 }
 
 function renderText(payload) {
@@ -158,11 +216,19 @@ function main() {
 
   if (args.selfCheck) {
     checks.template = checkTemplate(DEFAULT_TEMPLATE, args.contract);
+    checks.spec_paths = checkSpecPaths(args.spec);
     const issues = [];
+    const seenStandardPaths = new Set();
     DEFAULT_WORKFLOWS.forEach((workflowPath) => {
-      issues.push(...checkWorkflow(workflowPath, args.spec).issues);
+      const workflowResult = checkWorkflow(workflowPath, args.spec);
+      issues.push(...workflowResult.issues);
+      workflowResult.seen_standard_paths.forEach((seenPath) => seenStandardPaths.add(seenPath));
     });
-    checks.workflow = { checked: DEFAULT_WORKFLOWS.length, issues };
+    checks.workflow = {
+      checked: DEFAULT_WORKFLOWS.length,
+      seen_standard_paths: Array.from(seenStandardPaths).sort(),
+      issues,
+    };
   }
 
   if (Object.keys(checks).length === 0) {

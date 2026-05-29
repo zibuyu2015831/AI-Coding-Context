@@ -20,6 +20,7 @@ verified_at: 2026-05-12
 - [计划模板](./PLAN_TEMPLATE.md)
 - [进度跟踪模板](./PROGRESS_TRACKING_TEMPLATE.md)
 - [健康检查报告模板](./HEALTH_CHECK_REPORT_TEMPLATE.md)
+- [备忘目录模板](./memos_README_TEMPLATE.md)
 
 ## 与模板配套的测试样本
 

@@ -1,12 +1,12 @@
 ---
 title: AICC 框架全局上下文（dev/FRAMEWORK_CONTEXT.md）
-summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V3.0 稳定能力和核心基础设施，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
+summary: 提供 AI Coding Context 框架仓库的全局结构与版本快照，统一展示 V3.0 稳定能力、核心基础设施、方案生命周期目录和 memos 备忘目录，并为 AI 与人类在质量审查等场景下提供统一的框架心智模型入口。
 keywords: framework | global-context | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
 related_files: AI_ENTRY_POINT.md | README.md | dev/plan/ | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
 dependencies: core/SUMMARY_FORMAT_SPEC.md | core/design_decisions.md
-verified_at: 2026-05-10
-progress_synced_at: 2026-05-10
+verified_at: 2026-05-29
+progress_synced_at: 2026-05-29
 ---
 
 **当前框架版本**: V3.0 (2026-05)
@@ -354,8 +354,11 @@ project_root/
 │   ├── authentication.md          # 认证（后端）
 │   │
 │   ├── plans/                     # 方案文档
-│   │   ├── features/              # 功能方案
-│   │   └── bugs/                  # Bug 修复方案
+│   │   ├── active/                # 待审核、已确认或实施中的方案
+│   │   ├── done/                  # 已实施、验证并完成同步的方案
+│   │   └── archive/               # 废弃、搁置或被替代的方案
+│   │
+│   ├── memos/                     # 延后想法、外部依赖、阻塞项和待验证假设
 │   │
 │   ├── knowledge/                 # 知识库
 │   │   ├── troubleshooting/       # 问题解决
@@ -434,10 +437,10 @@ project_root/
 
 **生命周期**:
 
-1. 创建方案 (plans/features/xxx.md)
+1. 创建方案 (`plans/active/YYYY-MM-DD_<type>_<short-name>.md`)
 2. 人工审核
 3. 执行编码
-4. 归档或删除
+4. 完成后移动到 `plans/done/`；废弃、搁置或被替代时移动到 `plans/archive/`
 
 **价值**: 避免冲动编码
 
@@ -733,6 +736,6 @@ project_root/
 ---
 
 **文档版本**: v2.1（更新 V3.0 P1 优化点进度）
-**最后更新**: 2026-04-22  
+**最后更新**: 2026-05-29
 **维护者**: Framework Team  
 **反馈**: 欢迎在 dev/discussions/提出改进建议

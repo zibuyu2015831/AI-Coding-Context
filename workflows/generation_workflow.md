@@ -5,7 +5,7 @@ keywords: generation | workflow | review | plan | documents | aicc
 scope: 首次生成与全量生成场景下的详细执行流程
 related_files: 无
 dependencies: workflows/path_a_first_generation.md | core/SUMMARY_FORMAT_SPEC.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # 详细生成流程指南
@@ -591,19 +591,38 @@ src/
 ```
 请创建 dev_docs/plans/ 目录结构，包括：
 
-1. plans/README.md（参考规范中的模板）
-2. plans/features/ 子目录
-3. plans/bugfixes/ 子目录
+1. dev_docs/plans/README.md（参考规范中的模板）
+2. dev_docs/plans/active/ 子目录
+3. dev_docs/plans/done/ 子目录
+4. dev_docs/plans/archive/ 子目录
 
 README.md 包含：
 - 使用规范
 - 方案文档模板
-- 状态管理说明
+- 生命周期管理说明
 ```
 
 ---
 
-### 步骤 2.4: 创建 knowledge/ 目录
+### 步骤 2.4: 创建 memos/ 目录
+
+**AI 指令模板**:
+
+```
+请创建 dev_docs/memos/ 目录结构，包括：
+
+1. dev_docs/memos/README.md（参考规范中的模板）
+
+README.md 包含：
+- 使用边界
+- 命名规范
+- 备忘模板
+- Open/Closed 索引
+```
+
+---
+
+### 步骤 2.5: 创建 knowledge/ 目录
 
 **AI 指令模板**:
 
@@ -820,6 +839,7 @@ node tools/js/summary_validator.js --file dev_docs/api_layer.md
 目录结构:
 
 - [ ] `plans/` 目录创建完成
+- [ ] `memos/` 目录创建完成
 - [ ] `knowledge/` 目录创建完成
 - [ ] README 文件齐全
 
@@ -1166,6 +1186,7 @@ node tools/js/semantic_review_checker.js --full-check --doc-dir dev_docs --repo-
 
 # 阶段4: 创建目录结构
 创建 dev_docs/plans/ 目录（含README和子目录）
+创建 dev_docs/memos/ 目录（含README）
 创建 dev_docs/knowledge/ 目录（含README和子目录）
 如用户明确要求复审体系，再单独创建可选的 dev_docs/review/ 子系统
 
@@ -1277,7 +1298,7 @@ graph LR
 - 阶段一产出物: `project_analysis_data.json`
 - 阶段二产出物: `AI_Coding_Context.md`
 - 阶段三产出物: 核心子文档(3 个)
-- 阶段四产出物: `plans/` 和 `knowledge/` 目录结构
+- 阶段四产出物: `plans/`、`memos/` 和 `knowledge/` 目录结构
 
 ### 6. 执行日志记录
 

@@ -5,7 +5,7 @@ keywords: template | ai-rules | ide | rules | aicc
 scope: 项目级 AI Rules 模板
 related_files: 无
 dependencies: 无
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # AI Rules - [项目名称]
@@ -167,14 +167,14 @@ verified_at: 2026-05-05
 
 ### 新功能开发
 
-1. **先创建方案**: `dev_docs/plans/features/YYYY-MM-DD_功能描述.md`
+1. **先创建方案**: `dev_docs/plans/active/YYYY-MM-DD_feature_功能描述.md`
 2. **等待用户审核** - 方案通过后再开始编码
 3. **按规范实施** - 参考对应的子文档
 4. **完成后沉淀** - 提取关键要点到`dev_docs/knowledge/`
 
 ### Bug 修复
 
-1. **先创建方案**: `dev_docs/plans/bugfixes/YYYY-MM-DD_bug描述.md`（复杂 bug）
+1. **先创建方案**: `dev_docs/plans/active/YYYY-MM-DD_bugfix_bug描述.md`（复杂 bug）
 2. **分析根因** - 检查`dev_docs/knowledge/troubleshooting/`
 3. **按规范修复** - 遵守项目规范
 4. **记录经验** - 难题沉淀到 knowledge/
@@ -185,6 +185,13 @@ verified_at: 2026-05-05
 2. **阅读相关文档** - 根据触发器阅读对应文档
 3. **遵守规范修改** - 保持一致性
 4. **更新文档**（如有必要） - 保持文档与代码同步
+
+### 备忘录使用
+
+1. **主动读取** - 与用户讨论需求、Bug、架构调整或后续优化时，先检查 `dev_docs/memos/README.md` 和相关备忘录
+2. **主动关联** - 回答或制定方案前，说明是否存在相关备忘录，避免重复讨论、重复规划或遗漏历史约束
+3. **主动沉淀** - 将暂不实现的想法、外部依赖、延后优化点、待验证假设和用户明确要求稍后处理的事项写入 `dev_docs/memos/`
+4. **推进迁移** - 当备忘录事项被确认执行时，创建 `dev_docs/plans/active/YYYY-MM-DD_<type>_<short-name>.md`，并在原备忘录中追加迁移链接
 
 ---
 

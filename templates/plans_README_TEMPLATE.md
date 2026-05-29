@@ -1,16 +1,16 @@
 ---
 title: 方案文档索引模板
-summary: 提供项目方案文档索引模板，用于管理功能开发和 Bug 修复的临时方案文档并支持后续归档。
+summary: 提供项目方案文档索引模板，用于按 active、done、archive 生命周期管理功能开发、Bug 修复和其他方案文档。
 keywords: template | plans | index | bugfix | feature | aicc
 scope: 方案文档索引模板
 related_files: 无
 dependencies: templates/PLAN_TEMPLATE.md | 无
-verified_at: 2026-05-05
+verified_at: 2026-05-29
 ---
 
 # plans/README.md 模板
 
-> **用途**: 存放所有功能开发和 Bug 修复的临时方案文档，作为开发前的必经规划步骤。
+> **用途**: 按生命周期管理所有功能开发、Bug 修复、重构和文档调整方案，作为开发前的必经规划步骤。
 
 ---
 
@@ -18,7 +18,7 @@ verified_at: 2026-05-05
 
 ### **方案规范化说明**
 
-为了便于后续归档和提取关键要点到`knowledge/`，所有方案文档应使用统一模板：
+为了便于状态流转、后续归档和提取关键要点到 `knowledge/`，所有方案文档应使用统一模板：
 
 **模板位置**: `ai_coding_context/templates/PLAN_TEMPLATE.md`
 
@@ -49,11 +49,13 @@ verified_at: 2026-05-05
 ### **方案文档命名规范**
 
 ```
-格式: YYYY-MM-DD_简短描述.md
+格式: YYYY-MM-DD_<type>_<short-name>.md
+目录: 新方案统一创建到 dev_docs/plans/active/
+类型: feature | bugfix | refactor | docs | perf
 
 示例:
-- features/2025-11-27_user-export-功能.md
-- bugfixes/2025-11-26_login-timeout-fix.md
+- active/2025-11-27_feature_user-export.md
+- active/2025-11-26_bugfix_login-timeout.md
 ```
 
 ### **方案文档模板**
@@ -98,14 +100,18 @@ verified_at: 2026-05-05
    - 在`knowledge/`对应分类下创建文档
    - 使用知识库文档模板
 
-3. **添加归档标记**
+3. **添加知识沉淀标记**
 
    - 在原方案末尾添加:
      ```markdown
      > ✅ 已归档到: `knowledge/[分类]/[文档名].md`
      ```
 
-4. **更新索引**
+4. **移动方案到 done/**
+   - 将原方案从 `active/` 移动到 `done/`
+   - 将 frontmatter 或元信息中的状态改为 `done` / `已完成`
+
+5. **更新索引**
    - 更新`knowledge/README.md`索引
    - 更新本文件的方案状态
 
@@ -113,48 +119,48 @@ verified_at: 2026-05-05
 
 ## 📊 方案状态索引
 
-### 🟡 待处理 (Pending)
+### 🔵 Active
 
 _暂无_
 
-### 🔵 进行中 (In Progress)
-
-_暂无_
-
-### ✅ 已完成 (Completed)
+### ✅ Done
 
 _暂无_
 
 <!-- 示例:
-- [2025-11-25_优化列表性能](./features/2025-11-25_list-performance.md)
+- [2025-11-25_优化列表性能](./done/2025-11-25_perf_list-performance.md)
   - 已归档到: `knowledge/performance/list-virtualization.md`
 -->
 
-### 📦 已归档 (Archived)
+### 📦 Archive
 
-> 已完成超过 30 天的方案，且未提取到 knowledge/的会移至此处
+> 废弃、搁置或被替代的方案移至此处。已完成方案继续保留在 `done/`。
 
 _暂无_
 
 ---
 
-## 🗂️ 方案分类
+## 🗂️ 生命周期目录
 
-### 功能开发 (`features/`)
+### Active (`active/`)
 
-存放新功能开发方案。
+存放待审核、已确认或实施中的方案。新功能、Bug 修复、重构、文档调整都先进入这里。
 
-### Bug 修复 (`bugfixes/`)
+### Done (`done/`)
 
-存放 Bug 修复方案。
+存放已经实施、验证并完成必要文档同步的方案。
+
+### Archive (`archive/`)
+
+存放废弃、搁置或被替代的方案。不要把已完成方案移入这里。
 
 ---
 
 ## 🔄 维护规范
 
 1. **创建方案**: AI 在开发功能/修复 Bug 前，先创建方案文档
-2. **更新状态**: 在本 README 的索引中标记方案状态
-3. **归档规则**: 完成后 30 天自动归档
+2. **更新状态**: 状态变化时移动文件到 `active/`、`done/` 或 `archive/`，并更新本 README 索引
+3. **归档规则**: 只有废弃、搁置或被替代的方案进入 `archive/`
 4. **知识沉淀**: 有价值的方案完成后，提炼到 `knowledge/` 目录
 
 ---

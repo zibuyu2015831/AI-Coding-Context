@@ -23,6 +23,10 @@ DEFAULT_WORKFLOWS = [
     ROOT / "workflows" / "generation_workflow.md",
     ROOT / "workflows" / "path_a_first_generation.md",
 ]
+OBSOLETE_STANDARD_PATHS = {
+    "dev_docs/plans/features/",
+    "dev_docs/plans/bugfixes/",
+}
 
 
 def load_required_titles(contract_path):
@@ -55,7 +59,48 @@ def check_template(template_path, contract_path):
 
 def extract_standard_paths(spec_path):
     text = spec_path.read_text(encoding="utf-8")
-    return set(re.findall(r"`(dev_docs/[^`]+)`", text))
+    paths = set()
+    for line in text.splitlines():
+        if "❌" in line:
+            continue
+        paths.update(re.findall(r"`(dev_docs/[^`]+)`", line))
+    return paths
+
+
+def normalize_standard_path(path):
+    if path == "dev_docs/plans/README.md":
+        return "dev_docs/plans/"
+    if path.startswith("dev_docs/plans/active/"):
+        return "dev_docs/plans/active/"
+    if path.startswith("dev_docs/plans/done/"):
+        return "dev_docs/plans/done/"
+    if path.startswith("dev_docs/plans/archive/"):
+        return "dev_docs/plans/archive/"
+    if path.startswith("dev_docs/memos/"):
+        return "dev_docs/memos/"
+    if path.startswith("dev_docs/knowledge/"):
+        return "dev_docs/knowledge/"
+    if path.startswith("dev_docs/rules/combined/"):
+        return "dev_docs/rules/combined/AI_RULES.md"
+    return path
+
+
+def extract_user_doc_paths(text):
+    return [normalize_standard_path(match) for match in re.findall(r"dev_docs/[\w./-]+", text)]
+
+
+def check_spec_paths(spec_path):
+    standard_paths = sorted(extract_standard_paths(spec_path))
+    issues = []
+    for obsolete_path in sorted(OBSOLETE_STANDARD_PATHS):
+        if obsolete_path in standard_paths:
+            issues.append({
+                "file": str(spec_path),
+                "type": "obsolete_standard_path",
+                "path": obsolete_path,
+                "message": f"spec 仍包含过期标准路径: {obsolete_path}",
+            })
+    return {"checked": 1, "standard_paths": standard_paths, "issues": issues}
 
 
 def _context_is_optional(lines, index):
@@ -74,8 +119,26 @@ def check_workflow(workflow_path, spec_path):
     spec_paths = extract_standard_paths(spec_path)
     lines = workflow_path.read_text(encoding="utf-8").splitlines()
     issues = []
+    seen_standard_paths = set()
     for index, line in enumerate(lines):
-        for matched in re.findall(r"(dev_docs/[\w./-]*review/[\w./-]*)", line):
+        for matched in extract_user_doc_paths(line):
+            if matched in spec_paths:
+                seen_standard_paths.add(matched)
+            if matched in OBSOLETE_STANDARD_PATHS:
+                issues.append({
+                    "file": str(workflow_path),
+                    "line": index + 1,
+                    "type": "obsolete_standard_path",
+                    "path": matched,
+                    "message": f"workflow 使用了过期标准路径: {matched}",
+                })
+                continue
+            if not (
+                matched.startswith("dev_docs/plans/")
+                or matched.startswith("dev_docs/memos/")
+                or matched.startswith("dev_docs/review/")
+            ):
+                continue
             if matched not in spec_paths and not _context_is_optional(lines, index):
                 issues.append({
                     "file": str(workflow_path),
@@ -84,7 +147,7 @@ def check_workflow(workflow_path, spec_path):
                     "path": matched,
                     "message": f"workflow 使用了未被 spec 收录的标准路径: {matched}",
                 })
-    return {"checked": 1, "issues": issues}
+    return {"checked": 1, "seen_standard_paths": sorted(seen_standard_paths), "issues": issues}
 
 
 def render_text(payload):
@@ -121,10 +184,18 @@ def main():
 
     if args.self_check:
         checks["template"] = check_template(DEFAULT_TEMPLATE, Path(args.contract))
+        checks["spec_paths"] = check_spec_paths(Path(args.spec))
         workflow_issues = []
+        seen_standard_paths = set()
         for workflow_path in DEFAULT_WORKFLOWS:
-            workflow_issues.extend(check_workflow(workflow_path, Path(args.spec))["issues"])
-        checks["workflow"] = {"checked": len(DEFAULT_WORKFLOWS), "issues": workflow_issues}
+            workflow_result = check_workflow(workflow_path, Path(args.spec))
+            workflow_issues.extend(workflow_result["issues"])
+            seen_standard_paths.update(workflow_result.get("seen_standard_paths", []))
+        checks["workflow"] = {
+            "checked": len(DEFAULT_WORKFLOWS),
+            "seen_standard_paths": sorted(seen_standard_paths),
+            "issues": workflow_issues,
+        }
 
     if not checks:
         parser.print_help()

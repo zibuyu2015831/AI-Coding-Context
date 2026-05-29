@@ -612,6 +612,7 @@ graph TD
 | `templates/testing_guide_TEMPLATE.md`           | 测试文档模板       | 生成测试文档时使用      |
 | `templates/deployment_guide_TEMPLATE.md`        | 部署文档模板       | 生成部署文档时使用      |
 | `templates/plans_README_TEMPLATE.md`            | Plans 目录模板     | 创建 plans/时使用       |
+| `templates/memos_README_TEMPLATE.md`            | Memos 目录模板     | 创建 memos/时使用       |
 | `templates/knowledge_README_TEMPLATE.md`        | Knowledge 目录模板 | 创建 knowledge/时使用   |
 | `templates/PLAN_TEMPLATE.md`                    | 方案文档模板       | 创建功能/Bug 方案时使用 |
 

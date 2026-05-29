@@ -1,11 +1,11 @@
 ---
 title: AI 辅助开发文档体系规范
-summary: AICC 框架的总规范；定义文档体系结构、目录约定、SSOT 标准产物路径、双脚本红线、零依赖红线等核心约束
+summary: AICC 框架的总规范；定义文档体系结构、目录约定、SSOT 标准产物路径、方案生命周期目录、memos 备忘目录、双脚本红线、零依赖红线等核心约束
 keywords: framework-spec | ssot | aicc | v3 | architecture
 scope: AICC 框架的根级规范文档（SSOT 章节为命名一致性集群的真相源）
 related_files: AI_ENTRY_POINT.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
 dependencies: 无
-verified_at: 2026-04-26
+verified_at: 2026-05-29
 ---
 
 # AI 辅助开发文档体系规范
@@ -41,8 +41,12 @@ project_root/
 │   │
 │   ├── plans/                          # 🔧 开发方案目录
 │   │   ├── README.md                  # 方案索引
-│   │   ├── features/                  # 功能开发方案
-│   │   └── bugfixes/                  # Bug修复方案
+│   │   ├── active/                    # 当前推进中的方案
+│   │   ├── done/                      # 已完成并验证的方案
+│   │   └── archive/                   # 废弃、搁置或被替代的方案
+│   │
+│   ├── memos/                          # 📝 延后事项与备忘
+│   │   └── README.md                  # 备忘索引
 │   │
 │   └── knowledge/                      # 📚 知识库目录
 │       ├── README.md                  # 知识库索引
@@ -66,7 +70,11 @@ project_root/
 | 项目问题报告      | `dev_docs/_analysis/project_analysis_report.md`   | 小写下划线         | 项目分析问题清单                    |
 | 生成进度          | `dev_docs/_analysis/generation_progress.md`       | 小写下划线         | 生成进度跟踪                        |
 | 子文档（架构等）  | `dev_docs/architecture_overview.md` 等            | 小写下划线         | 详见"📖 子文档规范"                  |
-| 计划目录          | `dev_docs/plans/`                                 | 小写复数           | features/ 与 bugfixes/ 子目录       |
+| 计划目录          | `dev_docs/plans/`                                 | 小写复数           | 生命周期管理入口                    |
+| 进行中方案        | `dev_docs/plans/active/`                          | 小写单数           | 待审核、已确认或实施中的方案        |
+| 已完成方案        | `dev_docs/plans/done/`                            | 小写单数           | 已实施、验证并完成必要文档同步      |
+| 归档方案          | `dev_docs/plans/archive/`                         | 小写单数           | 废弃、搁置或被替代的方案            |
+| 备忘目录          | `dev_docs/memos/`                                 | 小写复数           | 延后想法、暂不可做事项和外部依赖    |
 | 知识库            | `dev_docs/knowledge/`                             | 小写单数           | troubleshooting / patterns / performance |
 
 ### 命名规范要点
@@ -81,6 +89,8 @@ project_root/
 - ❌ `项目根/ai_rules.md`（小写 + 错位置）
 - ❌ `dev_docs/AI_RULES.md`（缺 rules/combined/ 子路径）
 - ❌ `ai_coding_context.md`（小写主文档）
+- ❌ `dev_docs/plans/features/`（按类型分目录，无法区分生命周期）
+- ❌ `dev_docs/plans/bugfixes/`（按类型分目录，无法区分生命周期）
 
 ### 规范文档与契约文件
 
@@ -189,7 +199,7 @@ project_root/
 
 ### 用途
 
-存放所有功能开发和Bug修复的**临时方案文档**。
+存放所有功能开发、Bug 修复、重构、文档调整等需要方案先行的**生命周期方案文档**。目录按状态分层，方案类型由文件名与 frontmatter 表达。
 
 ### 目录结构
 
@@ -197,12 +207,23 @@ project_root/
 
 plans/
 ├── README.md # 方案索引与使用规范
-├── features/ # 功能开发方案
-│ └── YYYY-MM-DD\_功能描述.md
-└── bugfixes/ # Bug 修复方案
-└── YYYY-MM-DD_bug 描述.md
+├── active/ # 待审核、已确认或实施中的方案
+│ └── YYYY-MM-DD_feature_功能描述.md
+├── done/ # 已实施、验证并完成必要文档同步的方案
+│ └── YYYY-MM-DD_bugfix_bug描述.md
+└── archive/ # 废弃、搁置或被替代的方案
+  └── YYYY-MM-DD_refactor_旧方案.md
 
 ````
+
+### 命名与状态
+
+- 文件名格式：`YYYY-MM-DD_<type>_<short-name>.md`
+- 推荐类型：`feature`、`bugfix`、`refactor`、`docs`、`perf`
+- frontmatter 必须包含 `type` 与 `status`，其中 `status` 与所在目录保持一致：`active`、`done`、`archived`
+- 新方案默认写入 `dev_docs/plans/active/`
+- 完成并通过验证后移动到 `dev_docs/plans/done/`
+- 废弃、搁置或被替代后移动到 `dev_docs/plans/archive/`
 
 ### 方案文档模板
 
@@ -251,22 +272,44 @@ plans/
 在 `plans/README.md` 中维护方案状态：
 
 ```markdown
-### 🟡 待处理 (Pending)
+### 🔵 Active
 
-- [2025-11-27\_新增导出功能](./features/2025-11-27_export-feature.md)
+- [2025-11-27\_新增导出功能](./active/2025-11-27_feature_export.md)
 
-### 🔵 进行中 (In Progress)
+- [2025-11-26\_修复登录 bug](./active/2025-11-26_bugfix_login.md)
 
-- [2025-11-26\_修复登录 bug](./bugfixes/2025-11-26_login-bug.md)
+### ✅ Done
 
-### ✅ 已完成 (Completed)
+- [2025-11-25\_优化列表性能](./done/2025-11-25_perf_list-performance.md)
 
-- [2025-11-25\_优化列表性能](./features/2025-11-25_list-performance.md)
+### 📦 Archive
 
-### 📦 已归档 (Archived)
-
-- [2025-10-01\_旧功能](./features/2025-10-01_old-feature.md)
+- [2025-10-01\_旧功能](./archive/2025-10-01_feature_old-feature.md)
 ```
+
+---
+
+## 📝 memos/ 目录规范
+
+### 用途
+
+`memos/` 的中文名称是**备忘录**，用于记录开发过程中出现、但暂时不应进入正式方案的想法、依赖、阻塞项、后续优化点和待验证假设。
+
+### 目录结构
+
+```
+memos/
+├── README.md
+└── YYYY-MM-DD_deferred_简短描述.md
+```
+
+### 使用边界
+
+- `memos/` 不代表已承诺实施，不进入当前计划排期。
+- 与用户讨论需求、Bug、架构调整或后续优化时，AI 必须主动阅读已有备忘录，关联已有记录，避免重复讨论或重复规划。
+- 讨论中出现暂不实现的想法、外部依赖、延后优化点、待验证假设或用户明确要求稍后处理的事项时，AI 应主动将合适的内容沉淀为备忘录。
+- 当备忘事项被确认要执行时，创建对应 `dev_docs/plans/active/YYYY-MM-DD_<type>_<short-name>.md`，并在 memo 中追加迁移链接。
+- 当备忘事项失效时，在 memo 中标记 `status: closed` 或迁入 `plans/archive/` 中作为被废弃方案。
 
 ---
 

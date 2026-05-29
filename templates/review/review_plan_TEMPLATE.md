@@ -163,7 +163,7 @@ TARGET_DOC = <此处填入目标文档完整路径>
 【硬性约束】
 - 本次为只读审核：不得修改 TARGET_DOC，不得修改任何代码；
 - 除了 REPORT_PATH 和 QUESTIONS_PATH 两个产物文件，不得写入任何其他文件；
-- 允许读取 dev_docs/plans/bugfixes/ 与 dev_docs/thinking/ 作为上下文辅助；
+- 允许读取 dev_docs/plans/active/、dev_docs/plans/done/、dev_docs/plans/archive/ 与 dev_docs/thinking/ 作为上下文辅助；
 - 不得把 dev_docs/_analysis / knowledge / plans / review / thinking 列为"目标文档"；
 - 任何无法在代码中直接验证的断言，必须写入 QUESTIONS_PATH 而不是凭直觉填写；
 - 你返回给调用方的消息只能包含：产物文件路径 + 一句话摘要 + 异常（如有）。
@@ -202,7 +202,7 @@ written_at: <今日 ISO 日期>
   - 代码位置：`<文件:行号>`
   - 现象：...
   - 可能影响：...
-  - 建议归档文件名草稿：plans/bugfixes/<date>_<slug>.md
+  - 建议归档文件名草稿：plans/active/<date>_bugfix_<slug>.md
 
 ## E. 证据索引
 - 本次审核访问过的主要源码文件列表
@@ -423,7 +423,7 @@ estimated_churn: <low/medium/high>
 | Q3 | 用户标注 [?] 不确定 | 对应段落加 `⚠️ 此处设计意图待确认` |
 
 ## 代码问题归档建议
-- D1 → 建议新建 plans/bugfixes/<date>_<slug>.md，标题草稿：...
+- D1 → 建议新建 plans/active/<date>_bugfix_<slug>.md，标题草稿：...
 
 【约束】
 - Write 权限仅限 FIX_PLAN_PATH
@@ -502,7 +502,7 @@ TARGET_DOC = <文件路径>
 
 ### 阶段 5：副产物归档 + 用户合并
 
-1. 代码问题（report.md D 章节）→ 归档到 `plans/bugfixes/<date>_<slug>.md`，在相关文档中以"参见 BUG-N"交叉引用
+1. 代码问题（report.md D 章节）→ 归档到 `plans/active/<date>_bugfix_<slug>.md`，在相关文档中以"参见 BUG-N"交叉引用；修复完成后移动到 `plans/done/`
 2. 所有目标文档的 `verified_at` 更新为审核当日日期
 3. 在 `REVIEW_LOG.md` 中追加本轮摘要与指向 `rounds/<round-id>/` 的链接
 4. `rounds/<round-id>/` 目录作为中间产物**永久归档保留**（不要删除）
@@ -552,7 +552,7 @@ TARGET_DOC = <文件路径>
 - [ ] 所有需修订文档均有对应的 `fix_plans/*.fix_plan.md` 且已被用户批准
 - [ ] 所有执行子代理均以"正常完成"或"异常已裁定"收尾，`_meta.md` 异常区为空或均已处理
 - [ ] `consistency_check.md` 已生成且所有冲突均已修复
-- [ ] 所有"代码问题观察"均已归档到 `plans/bugfixes/`
+- [ ] 所有"代码问题观察"均已归档到 `plans/active/`
 - [ ] 所有目标文档的 `verified_at` 已更新为审核当日
 - [ ] `REVIEW_LOG.md` 已追加本轮摘要
 - [ ] **终极验收**：随机抽 1 份文档，新会话 AI 仅凭此文档可完成典型变更任务，不追问用户
@@ -642,7 +642,7 @@ status: in_progress | completed | paused
 | 完整性 | 核心服务、模块、关键入口是否有文档覆盖 | P0 |
 | 完整性 | 关键业务流程是否端到端描述 | P0 |
 | 完整性 | 启动依赖、健康检查、容错策略是否记录 | P1 |
-| 完整性 | 历史坑点是否引用 `plans/bugfixes/` 或相关记录 | P1 |
+| 完整性 | 历史坑点是否引用 `plans/active/`、`plans/done/`、`plans/archive/` 或相关记录 | P1 |
 | 一致性 | 服务名、端口、字段名、术语跨文档统一 | P1 |
 | 时效性 | `verified_at` 是否在 3 个月以内 | P2 |
 | 时效性 | 新功能、删除功能、废弃功能是否反映到文档 | P2 |
@@ -673,7 +673,7 @@ status: in_progress | completed | paused
 - [ ] 端口、协议、部署拓扑在入口文档、部署文档和模块文档中一致
 - [ ] 主文档索引与实际子文档列表一致
 - [ ] `_round_decisions.md` 中的裁定已落地到所有受影响文档
-- [ ] `plans/bugfixes/` 中本轮新增问题已在相关文档交叉引用
+- [ ] `plans/active/` 中本轮新增问题已在相关文档交叉引用
 
 ### 7.5 常见问题模式速查
 
@@ -706,7 +706,7 @@ status: in_progress | completed | paused
 | `rounds/<round>/fix_plans/*.fix_plan.md` | 计划子代理 | 阶段 3a | 只能写对应目标文档的修复计划 |
 | `dev_docs/<target>.md` | 执行子代理 | 阶段 3c | 只能按已批准 fix plan 修改指定目标文档 |
 | `rounds/<round>/consistency_check.md` | 主会话 | 阶段 4 | 记录裁定落地和冲突结果 |
-| `dev_docs/plans/bugfixes/*.md` | 主会话 | 阶段 5 | 只归档代码问题，不修改代码 |
+| `dev_docs/plans/active/*.md` | 主会话 | 阶段 5 | 只归档代码问题，不修改代码 |
 | 代码文件 | 无人 | 全阶段禁止 | 审核流程只读代码，不修代码 |
 
 ---
