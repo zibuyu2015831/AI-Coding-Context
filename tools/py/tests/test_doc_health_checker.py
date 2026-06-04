@@ -23,16 +23,22 @@ verified_at: 2026-05-12
 
 # AI 编码上下文
 
-## 📊 项目概览
-## 📂 关键目录速查
-## 🎯 场景快速导航
-## 🚀 文档索引
-## 💻 核心代码模式
-## 🛠️ 开发流程规范
-## 📋 命名规范
-## 🏢 业务模块映射
-## ⚠️ AI 编码禁忌
-## 🔧 常见任务速查
+## 1. 默认工作方式
+## 2. 事实源与权威顺序
+## 3. 项目当前状态
+## 4. 不可轻易破坏的核心决策
+## 5. 按任务类型读取文档
+## 6. 关键目录速查
+## 7. 文档目录结构
+## 8. 测试拓扑现状
+## 9. Brainary 的核心架构特点
+## 10. 四维风险入口
+## 11. 开发流程规范
+## 15. 命名规范
+## 16. 业务模块映射
+## 17. AI 编码禁忌
+## 18. 常见任务速查
+## 19. 核心代码模式
 """
 
 GENERATION_PLAN_BASE = """# 文档生成方案模板
@@ -200,8 +206,8 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
 
     def test_missing_required_sections_are_reported(self):
         self._write_valid_bundle()
-        broken = MAIN_DOC_BASE.replace("## 🏢 业务模块映射\n", "")
-        broken = broken.replace("## 🔧 常见任务速查\n", "")
+        broken = MAIN_DOC_BASE.replace("## 16. 业务模块映射\n", "")
+        broken = broken.replace("## 18. 常见任务速查\n", "")
         (self.dev_docs / "AI_Coding_Context.md").write_text(broken, encoding="utf-8")
         result, payload = _run_json([
             "python3",
@@ -550,6 +556,21 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
         self.assertEqual(result.returncode, 1)
         issue_types = {issue["type"] for issue in payload["checks"]["run_record_integrity"]["issues"]}
         self.assertIn("formal_docs_without_health_report", issue_types)
+
+    def test_subdirectory_formal_docs_use_dev_docs_analysis_health_report(self):
+        self._write_valid_first_release_bundle()
+        review_dir = self.dev_docs / "review"
+        review_dir.mkdir()
+        (review_dir / "README.md").write_text("# 文档审查入口\n", encoding="utf-8")
+        result, payload = _run_json([
+            "python3",
+            str(PY_CHECKER),
+            "--doc-dir",
+            str(review_dir),
+            "--check-run-record-integrity",
+        ])
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertEqual(payload["checks"]["run_record_integrity"]["issues"], [])
 
     def test_formal_docs_without_phase1_confirmation_are_reported(self):
         self._write_valid_first_release_bundle()

@@ -1,23 +1,35 @@
 contract_version: 1
 document: AI_Coding_Context
 required_sections:
-  - id: project_overview
-    title: "📊 项目概览"
+  - id: default_working_mode
+    title: "1. 默认工作方式"
+  - id: authority_order
+    title: "2. 事实源与权威顺序"
+  - id: current_status
+    title: "3. 项目当前状态"
+  - id: core_decisions
+    title: "4. 不可轻易破坏的核心决策"
+  - id: task_navigation
+    title: "5. 按任务类型读取文档"
   - id: key_directories
-    title: "📂 关键目录速查"
-  - id: scenario_navigation
-    title: "🎯 场景快速导航"
-  - id: document_index
-    title: "🚀 文档索引"
-  - id: core_patterns
-    title: "💻 核心代码模式"
+    title: "6. 关键目录速查"
+  - id: document_structure
+    title: "7. 文档目录结构"
+  - id: testing_topology
+    title: "8. 测试拓扑现状"
+  - id: architecture_features
+    title: "9. Brainary 的核心架构特点"
+  - id: risk_entry
+    title: "10. 四维风险入口"
   - id: development_workflow
-    title: "🛠️ 开发流程规范"
+    title: "11. 开发流程规范"
   - id: naming_rules
-    title: "📋 命名规范"
+    title: "15. 命名规范"
   - id: business_modules
-    title: "🏢 业务模块映射"
+    title: "16. 业务模块映射"
   - id: ai_taboo
-    title: "⚠️ AI 编码禁忌"
+    title: "17. AI 编码禁忌"
   - id: common_tasks
-    title: "🔧 常见任务速查"
+    title: "18. 常见任务速查"
+  - id: core_patterns
+    title: "19. 核心代码模式"

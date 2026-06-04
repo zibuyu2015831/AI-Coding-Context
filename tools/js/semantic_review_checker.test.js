@@ -251,6 +251,29 @@ function runTests() {
     assert.ok(payload.checks.test_topology.some((issue) => issue.type === 'uncovered_test_topology'));
   });
 
+  test('virtualenv site-packages tests are excluded from topology', () => {
+    const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-venv-topology-js-'));
+    try {
+      fs.mkdirSync(path.join(caseRoot, 'dev_docs'));
+      fs.mkdirSync(path.join(caseRoot, 'tests', 'unit'), { recursive: true });
+      fs.mkdirSync(path.join(caseRoot, '.venv', 'lib', 'python3.11', 'site-packages', 'numpy', 'tests'), { recursive: true });
+      fs.writeFileSync(path.join(caseRoot, 'tests', 'unit', 'test_real.py'), 'def test_real(): pass\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, '.venv', 'lib', 'python3.11', 'site-packages', 'numpy', 'tests', 'test_vendor.py'), 'def test_vendor(): pass\n', 'utf8');
+      fs.writeFileSync(path.join(caseRoot, 'dev_docs', 'testing_guide.md'), '测试目录覆盖 `tests/`。\n', 'utf8');
+
+      const { result, payload } = runJson([
+        '--doc-dir', path.join(caseRoot, 'dev_docs'),
+        '--repo-root', caseRoot,
+        '--check-test-topology',
+      ]);
+
+      assert.strictEqual(result.status, 0, JSON.stringify(payload));
+      assert.deepStrictEqual(payload.checks.test_topology, []);
+    } finally {
+      fs.rmSync(caseRoot, { recursive: true, force: true });
+    }
+  });
+
   test('Memex-style test topology requires all test roots', () => {
     const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'semantic-memex-topology-js-'));
     try {

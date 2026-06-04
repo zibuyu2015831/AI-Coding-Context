@@ -516,6 +516,28 @@ def _formal_doc_paths(targets):
     return paths
 
 
+def _nearest_dev_docs_dir(path):
+    current = path if path.is_dir() else path.parent
+    for candidate in (current, *current.parents):
+        if candidate.name == "dev_docs":
+            return candidate
+    return None
+
+
+def _find_analysis_file_near_targets(targets, filename):
+    for target in targets:
+        path = Path(target)
+        if not path.exists():
+            continue
+        dev_docs_dir = _nearest_dev_docs_dir(path)
+        if not dev_docs_dir:
+            continue
+        candidate = dev_docs_dir / "_analysis" / filename
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def _extract_section_after_heading(text, heading):
     match = re.search(rf"^##+\s+{re.escape(heading)}\s*$", text, flags=re.MULTILINE | re.IGNORECASE)
     if not match:
@@ -907,7 +929,7 @@ def check_run_record_integrity(targets):
     checked = 0
     target_count = len([target for target in targets if Path(target).exists() and Path(target).suffix == ".md"])
     target_by_name = {Path(target).name: Path(target) for target in targets if Path(target).exists()}
-    health_report_path = target_by_name.get("health_check_report.md")
+    health_report_path = target_by_name.get("health_check_report.md") or _find_analysis_file_near_targets(targets, "health_check_report.md")
     formal_docs = _formal_doc_paths(targets)
     main_doc_path = target_by_name.get("AI_Coding_Context.md")
     if health_report_path and main_doc_path and not formal_docs:

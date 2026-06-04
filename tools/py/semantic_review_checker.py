@@ -18,7 +18,22 @@ from pathlib import Path
 POSITIVE_KEYWORDS = ["推荐", "必须", "优先", "建议", "should", "recommended", "prefer", "需要", "统一", "集中", "centralize"]
 NEGATIVE_KEYWORDS = ["不建议", "不要", "禁止", "deprecated", "废弃", "avoid", "do not", "should not", "not be edited", "不需要", "无需"]
 SOURCE_SUFFIXES = {".md", ".py", ".js", ".ts", ".tsx", ".swift"}
-FRAMEWORK_DIR_NAMES = {"AI-Coding-Context", "ai_coding_context", "ai-coding-context", ".ai", ".git", "node_modules", "vendor", "storage"}
+FRAMEWORK_DIR_NAMES = {
+    "AI-Coding-Context",
+    "ai_coding_context",
+    "ai-coding-context",
+    ".ai",
+    ".git",
+    "node_modules",
+    "vendor",
+    "storage",
+    ".venv",
+    "venv",
+    "env",
+    "dist",
+    "build",
+}
+NESTED_EXCLUDED_NAMES = {"site-packages", "__pycache__"}
 FRAMEWORK_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -40,6 +55,8 @@ def _is_project_scan_excluded(path, repo_root, doc_dir=None):
         rel_parts = path.parts
     rel_names = set(rel_parts)
     if rel_parts and rel_parts[0] in FRAMEWORK_DIR_NAMES:
+        return True
+    if rel_names & NESTED_EXCLUDED_NAMES:
         return True
     if "bootstrap" in rel_names and "cache" in rel_names:
         return True

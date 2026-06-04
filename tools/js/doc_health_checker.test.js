@@ -19,16 +19,22 @@ verified_at: 2026-05-12
 
 # AI 编码上下文
 
-## 📊 项目概览
-## 📂 关键目录速查
-## 🎯 场景快速导航
-## 🚀 文档索引
-## 💻 核心代码模式
-## 🛠️ 开发流程规范
-## 📋 命名规范
-## 🏢 业务模块映射
-## ⚠️ AI 编码禁忌
-## 🔧 常见任务速查
+## 1. 默认工作方式
+## 2. 事实源与权威顺序
+## 3. 项目当前状态
+## 4. 不可轻易破坏的核心决策
+## 5. 按任务类型读取文档
+## 6. 关键目录速查
+## 7. 文档目录结构
+## 8. 测试拓扑现状
+## 9. Brainary 的核心架构特点
+## 10. 四维风险入口
+## 11. 开发流程规范
+## 15. 命名规范
+## 16. 业务模块映射
+## 17. AI 编码禁忌
+## 18. 常见任务速查
+## 19. 核心代码模式
 `;
 
 const GENERATION_PLAN_BASE = `# 文档生成方案模板
@@ -438,6 +444,20 @@ rg -n "<marker:T-O-D-O>|<marker:T-B-D>|待补充" dev_docs
       assert.strictEqual(result.status, 1);
       const issueTypes = new Set(payload.checks.run_record_integrity.issues.map((issue) => issue.type));
       assert.ok(issueTypes.has('formal_docs_without_health_report'));
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('subdirectory formal docs use dev_docs analysis health report', () => {
+    const { base, devDocs } = makeFirstReleaseDevDocs();
+    try {
+      const reviewDir = path.join(devDocs, 'review');
+      fs.mkdirSync(reviewDir);
+      fs.writeFileSync(path.join(reviewDir, 'README.md'), '# 文档审查入口\n', 'utf8');
+      const { result, payload } = runJson(['--doc-dir', reviewDir, '--check-run-record-integrity']);
+      assert.strictEqual(result.status, 0, JSON.stringify(payload));
+      assert.deepStrictEqual(payload.checks.run_record_integrity.issues, []);
     } finally {
       cleanup(base);
     }

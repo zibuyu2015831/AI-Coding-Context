@@ -487,6 +487,26 @@ function formalDocPaths(targets) {
   return paths;
 }
 
+function nearestDevDocsDir(file) {
+  let current = fs.existsSync(file) && fs.statSync(file).isDirectory() ? file : path.dirname(file);
+  while (current && current !== path.dirname(current)) {
+    if (path.basename(current) === 'dev_docs') return current;
+    current = path.dirname(current);
+  }
+  return null;
+}
+
+function findAnalysisFileNearTargets(targets, filename) {
+  for (const target of targets) {
+    if (!fs.existsSync(target)) continue;
+    const devDocsDir = nearestDevDocsDir(target);
+    if (!devDocsDir) continue;
+    const candidate = path.join(devDocsDir, '_analysis', filename);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
 function extractSectionAfterHeading(text, heading) {
   const lines = text.split('\n');
   let start = -1;
@@ -778,7 +798,7 @@ function checkRunRecordIntegrity(targets) {
   let checked = 0;
   const existingMarkdownTargets = targets.filter((target) => fs.existsSync(target) && target.endsWith('.md'));
   const targetCount = existingMarkdownTargets.length;
-  const healthReportPath = existingMarkdownTargets.find((target) => path.basename(target) === 'health_check_report.md');
+  const healthReportPath = existingMarkdownTargets.find((target) => path.basename(target) === 'health_check_report.md') || findAnalysisFileNearTargets(targets, 'health_check_report.md');
   const progressPath = existingMarkdownTargets.find((target) => path.basename(target) === 'generation_progress.md');
   const progressText = progressPath ? fs.readFileSync(progressPath, 'utf8') : '';
   const formalDocs = formalDocPaths(targets);

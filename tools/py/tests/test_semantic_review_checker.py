@@ -245,6 +245,28 @@ LinguaCafe 是 Laravel + Vue 语言学习应用，文档方案需覆盖主应用
         issue_types = {issue["type"] for issue in payload["checks"]["test_topology"]}
         self.assertIn("uncovered_test_topology", issue_types)
 
+    def test_virtualenv_site_packages_tests_are_excluded_from_topology(self):
+        tmpdir = Path(tempfile.mkdtemp(prefix="semantic-venv-topology-"))
+        try:
+            dev_docs = tmpdir / "dev_docs"
+            dev_docs.mkdir()
+            (tmpdir / "tests" / "unit").mkdir(parents=True)
+            (tmpdir / ".venv" / "lib" / "python3.11" / "site-packages" / "numpy" / "tests").mkdir(parents=True)
+            (tmpdir / "tests" / "unit" / "test_real.py").write_text("def test_real(): pass\n", encoding="utf-8")
+            (tmpdir / ".venv" / "lib" / "python3.11" / "site-packages" / "numpy" / "tests" / "test_vendor.py").write_text("def test_vendor(): pass\n", encoding="utf-8")
+            (dev_docs / "testing_guide.md").write_text("测试目录覆盖 `tests/`。\n", encoding="utf-8")
+
+            result, payload = run_json([
+                "--doc-dir", str(dev_docs),
+                "--repo-root", str(tmpdir),
+                "--check-test-topology",
+            ])
+
+            self.assertEqual(result.returncode, 0, payload)
+            self.assertEqual(payload["checks"]["test_topology"], [])
+        finally:
+            shutil.rmtree(tmpdir)
+
     def test_memex_style_test_topology_requires_all_test_roots(self):
         tmpdir = Path(tempfile.mkdtemp(prefix="semantic-memex-topology-"))
         try:

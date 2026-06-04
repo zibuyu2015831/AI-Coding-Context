@@ -10,7 +10,12 @@ const POSITIVE_KEYWORDS = ['推荐', '必须', '优先', '建议', 'should', 're
 const NEGATIVE_KEYWORDS = ['不建议', '不要', '禁止', 'deprecated', '废弃', 'avoid', 'do not', 'should not', 'not be edited', '不需要', '无需'];
 const SOURCE_SUFFIXES = new Set(['.md', '.py', '.js', '.ts', '.tsx', '.swift']);
 const FRAMEWORK_ROOT = path.resolve(__dirname, '..', '..');
-const FRAMEWORK_DIR_NAMES = new Set(['AI-Coding-Context', 'ai_coding_context', 'ai-coding-context', '.ai', '.git', 'node_modules', 'vendor', 'storage']);
+const FRAMEWORK_DIR_NAMES = new Set([
+  'AI-Coding-Context', 'ai_coding_context', 'ai-coding-context',
+  '.ai', '.git', 'node_modules', 'vendor', 'storage',
+  '.venv', 'venv', 'env', 'dist', 'build',
+]);
+const NESTED_EXCLUDED_NAMES = new Set(['site-packages', '__pycache__']);
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -42,6 +47,7 @@ function isProjectScanExcluded(current, repoRoot, docDir) {
   const relative = path.relative(repoRoot, current);
   const relParts = relative && !relative.startsWith('..') ? relative.split(path.sep).filter(Boolean) : current.split(path.sep).filter(Boolean);
   if (relParts.length > 0 && FRAMEWORK_DIR_NAMES.has(relParts[0])) return true;
+  if (relParts.some((part) => NESTED_EXCLUDED_NAMES.has(part))) return true;
   if (relParts.includes('bootstrap') && relParts.includes('cache')) return true;
   let real = current;
   try { real = fs.realpathSync(current); } catch (e) { /* ignore */ }
