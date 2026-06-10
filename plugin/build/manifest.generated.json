@@ -13,8 +13,28 @@
       "path": "BUILD_NOTES.md",
       "sources": [],
       "converged": null,
-      "lines": 111,
+      "lines": 129,
       "note": "authored build log"
+    },
+    {
+      "path": "MIGRATION.md",
+      "sources": [
+        "config/MIGRATION_GUIDE.md",
+        "AI_ENTRY_POINT.md"
+      ],
+      "converged": true,
+      "lines": 57,
+      "note": "clone->plugin migration guide; supersedes manual-bootstrap instructions"
+    },
+    {
+      "path": "README.md",
+      "sources": [
+        "AI_ENTRY_POINT.md",
+        "README.md"
+      ],
+      "converged": true,
+      "lines": 102,
+      "note": "quick-start distilled from the 811-line entry doc; rest deleted"
     },
     {
       "path": "agents/api-designer.md",
@@ -119,7 +139,7 @@
       "path": "build/build.py",
       "sources": [],
       "converged": null,
-      "lines": 312,
+      "lines": 317,
       "note": "authored"
     },
     {

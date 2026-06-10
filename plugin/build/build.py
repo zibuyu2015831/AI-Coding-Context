@@ -39,6 +39,11 @@ import lint
 PROVENANCE = {
     ".claude-plugin/plugin.json": {"sources": [], "converged": None, "note": "authored"},
     "BUILD_NOTES.md": {"sources": [], "converged": None, "note": "authored build log"},
+    "MIGRATION.md": {
+        "sources": ["config/MIGRATION_GUIDE.md", "AI_ENTRY_POINT.md"],
+        "converged": True,
+        "note": "clone->plugin migration guide; supersedes manual-bootstrap instructions",
+    },
     "README.md": {
         "sources": ["AI_ENTRY_POINT.md", "README.md"],
         "converged": True,

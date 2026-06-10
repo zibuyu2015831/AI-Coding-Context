@@ -104,6 +104,24 @@ Everything dropped, deferred, or adapted from the dev-tree sources is recorded h
   is the mechanism intended to let future versions make such claims from
   measured data.
 
+## Final status (P5)
+
+- Shipped: 10 skills (init, health-check, incremental-update,
+  design-thinking, mutual-review, adr, doc-fallacy-fix, systematic-review,
+  doc-reading-habit, knowledge-reuse), 4 hooks, 4 dev-time agents + 3
+  skill-coupled agents, 8 bin CLIs over 8 English scripts, 5 shared
+  references, settings, build tooling (build/lint/codex projection),
+  README + MIGRATION guide.
+- Omitted (with reasons above): complexity-dashboard skill (mock data),
+  scripts/js + fallback command docs (second-language duplication),
+  doc-fix tool layer (native session capabilities), persona files (folded
+  into the design-thinking `perspective` parameter), AI_ENTRY_POINT.md
+  (replaced by SessionStart injection + skill descriptions), per-tier
+  generation plan templates (merged into one parametric template),
+  knowledge transclusion/index extras (additive layers).
+- Doc line budget: final number recorded in
+  `build/manifest.generated.json` (`doc_budget`), far under the 50% cap.
+
 ## Phantom / unusable source references
 
 - `core/contracts/main_doc_contract.yaml` — exists but unusable as-is (see
