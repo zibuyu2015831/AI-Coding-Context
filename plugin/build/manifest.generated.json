@@ -17,12 +17,30 @@
       "note": "authored build log"
     },
     {
+      "path": "agents/api-designer.md",
+      "sources": [
+        "agents/development/api_designer.md"
+      ],
+      "converged": true,
+      "lines": 32,
+      "note": "English conversion, boilerplate stripped"
+    },
+    {
       "path": "agents/architecture-analyst.md",
       "sources": [
         "agents/development/architecture_analyst.md"
       ],
       "converged": true,
       "lines": 33,
+      "note": "English conversion, boilerplate stripped"
+    },
+    {
+      "path": "agents/database-designer.md",
+      "sources": [
+        "agents/development/database_designer.md"
+      ],
+      "converged": true,
+      "lines": 34,
       "note": "English conversion, boilerplate stripped"
     },
     {
@@ -240,6 +258,60 @@
       "note": "config keys reduced to the consumed set (spec \u00a75)"
     },
     {
+      "path": "skills/adr/SKILL.md",
+      "sources": [
+        "dev/architecture/adr-template.md",
+        "workflows/decision_workflow.md"
+      ],
+      "converged": true,
+      "lines": 50,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/adr/references/adr-template.md",
+      "sources": [
+        "dev/architecture/adr-template.md",
+        "workflows/decision_workflow.md"
+      ],
+      "converged": true,
+      "lines": 51,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/design-thinking/SKILL.md",
+      "sources": [
+        "workflows/path_d_specific_tasks.md",
+        "templates/prompts/design_thinking/step1_why.md",
+        "templates/prompts/design_thinking/step2_how.md",
+        "templates/prompts/design_thinking/step3_risk.md",
+        "templates/prompts/design_thinking/step4_reflection.md",
+        "templates/prompts/design_thinking/step5_decision.md",
+        "agents/personas/linus_torvalds.md",
+        "agents/personas/martin_fowler.md",
+        "agents/personas/uncle_bob.md"
+      ],
+      "converged": true,
+      "lines": 72,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/design-thinking/references/step-prompts.md",
+      "sources": [
+        "workflows/path_d_specific_tasks.md",
+        "templates/prompts/design_thinking/step1_why.md",
+        "templates/prompts/design_thinking/step2_how.md",
+        "templates/prompts/design_thinking/step3_risk.md",
+        "templates/prompts/design_thinking/step4_reflection.md",
+        "templates/prompts/design_thinking/step5_decision.md",
+        "agents/personas/linus_torvalds.md",
+        "agents/personas/martin_fowler.md",
+        "agents/personas/uncle_bob.md"
+      ],
+      "converged": true,
+      "lines": 76,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
       "path": "skills/health-check/SKILL.md",
       "sources": [
         "workflows/path_b_health_check.md",
@@ -389,10 +461,70 @@
       "converged": true,
       "lines": 63,
       "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/mutual-review/SKILL.md",
+      "sources": [
+        "workflows/review-workflow.md",
+        "agents/runtime/plan_reviewer.md",
+        "agents/runtime/code_reviewer.md",
+        "workflows/review_standards/feature_review_standard.md",
+        "workflows/review_standards/bugfix_review_standard.md",
+        "workflows/review_standards/refactor_review_standard.md",
+        "workflows/review_standards/doc_review_standard.md"
+      ],
+      "converged": true,
+      "lines": 66,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/mutual-review/agents/code-reviewer.md",
+      "sources": [
+        "workflows/review-workflow.md",
+        "agents/runtime/plan_reviewer.md",
+        "agents/runtime/code_reviewer.md",
+        "workflows/review_standards/feature_review_standard.md",
+        "workflows/review_standards/bugfix_review_standard.md",
+        "workflows/review_standards/refactor_review_standard.md",
+        "workflows/review_standards/doc_review_standard.md"
+      ],
+      "converged": true,
+      "lines": 33,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/mutual-review/agents/plan-reviewer.md",
+      "sources": [
+        "workflows/review-workflow.md",
+        "agents/runtime/plan_reviewer.md",
+        "agents/runtime/code_reviewer.md",
+        "workflows/review_standards/feature_review_standard.md",
+        "workflows/review_standards/bugfix_review_standard.md",
+        "workflows/review_standards/refactor_review_standard.md",
+        "workflows/review_standards/doc_review_standard.md"
+      ],
+      "converged": true,
+      "lines": 44,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/mutual-review/references/review-standards.md",
+      "sources": [
+        "workflows/review-workflow.md",
+        "agents/runtime/plan_reviewer.md",
+        "agents/runtime/code_reviewer.md",
+        "workflows/review_standards/feature_review_standard.md",
+        "workflows/review_standards/bugfix_review_standard.md",
+        "workflows/review_standards/refactor_review_standard.md",
+        "workflows/review_standards/doc_review_standard.md"
+      ],
+      "converged": true,
+      "lines": 41,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
     }
   ],
   "doc_budget": {
-    "doc_lines": 892,
+    "doc_lines": 1391,
     "baseline": 63176,
     "cap": 31588,
     "within_budget": true
