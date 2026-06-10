@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# AICC frontmatter summary validator CLI — see `aicc-summary-validate --help`.
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/py/summary_validator.py" "$@"

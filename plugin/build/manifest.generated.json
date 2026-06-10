@@ -17,6 +17,33 @@
       "note": "authored build log"
     },
     {
+      "path": "bin/aicc-doc-health",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
+      "path": "bin/aicc-scan",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
+      "path": "bin/aicc-summary-validate",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
       "path": "build/build.py",
       "sources": [],
       "converged": null,
@@ -41,7 +68,7 @@
       "path": "hooks/hooks.json",
       "sources": [],
       "converged": null,
-      "lines": 15,
+      "lines": 25,
       "note": "authored"
     },
     {
@@ -55,6 +82,61 @@
       "note": "advisory pre-commit doc checks turned into an enforcing PreToolUse gate"
     },
     {
+      "path": "hooks/session_inject.py",
+      "sources": [
+        "AI_ENTRY_POINT.md"
+      ],
+      "converged": true,
+      "lines": 94,
+      "note": "replaces the manual paste-the-entry-doc bootstrap"
+    },
+    {
+      "path": "references/framework-boundary.md",
+      "sources": [
+        "AI_ENTRY_POINT.md"
+      ],
+      "converged": true,
+      "lines": 34,
+      "note": "English convergence of core rule doc"
+    },
+    {
+      "path": "references/language-rules.md",
+      "sources": [
+        "core/language_rules.md"
+      ],
+      "converged": true,
+      "lines": 17,
+      "note": "English convergence of core rule doc"
+    },
+    {
+      "path": "references/project-types.md",
+      "sources": [
+        "core/project_types.md",
+        "core/project_types/README.md"
+      ],
+      "converged": true,
+      "lines": 27,
+      "note": "English convergence of core rule doc"
+    },
+    {
+      "path": "references/security-rules.md",
+      "sources": [
+        "core/security_rules.md"
+      ],
+      "converged": true,
+      "lines": 31,
+      "note": "English convergence of core rule doc"
+    },
+    {
+      "path": "references/summary-format-spec.md",
+      "sources": [
+        "core/SUMMARY_FORMAT_SPEC.md"
+      ],
+      "converged": true,
+      "lines": 45,
+      "note": "English convergence of core rule doc"
+    },
+    {
       "path": "scripts/py/contract_check.py",
       "sources": [
         "tools/py/framework_contract_checker.py",
@@ -65,6 +147,25 @@
       "note": "English rewrite; project-specific Chinese contract replaced by plugin contract v1"
     },
     {
+      "path": "scripts/py/doc_health.py",
+      "sources": [
+        "tools/py/doc_health_checker.py",
+        "tools/py/timestamp_analyzer.py"
+      ],
+      "converged": true,
+      "lines": 172,
+      "note": "English rewrite of the health orchestrator (paths/staleness/frontmatter)"
+    },
+    {
+      "path": "scripts/py/project_scan.py",
+      "sources": [
+        "tools/py/project_scanner.py"
+      ],
+      "converged": true,
+      "lines": 136,
+      "note": "English rewrite, trimmed to type detection + inventory"
+    },
+    {
       "path": "scripts/py/summary_validator.py",
       "sources": [
         "tools/py/summary_validator.py",
@@ -73,10 +174,122 @@
       "converged": true,
       "lines": 170,
       "note": "English rewrite, ~60% smaller, same rule set"
+    },
+    {
+      "path": "skills/health-check/SKILL.md",
+      "sources": [
+        "workflows/path_b_health_check.md",
+        "workflows/document_health_check.md",
+        "templates/HEALTH_CHECK_REPORT_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 59,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/health-check/references/health-report-template.md",
+      "sources": [
+        "workflows/path_b_health_check.md",
+        "workflows/document_health_check.md",
+        "templates/HEALTH_CHECK_REPORT_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 42,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/init/SKILL.md",
+      "sources": [
+        "workflows/path_a_first_generation.md",
+        "AI_ENTRY_POINT.md",
+        "templates/GENERATION_PLAN_TEMPLATE.md",
+        "templates/generation_plan_simple.md",
+        "templates/generation_plan_medium.md",
+        "templates/generation_plan_complex.md",
+        "templates/generation_plan_critical.md",
+        "templates/generation_plan_trivial.md",
+        "templates/AI_Coding_Context_TEMPLATE.md",
+        "templates/AI_RULES_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 114,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/init/agents/doc-summarizer.md",
+      "sources": [
+        "workflows/path_a_first_generation.md",
+        "AI_ENTRY_POINT.md",
+        "templates/GENERATION_PLAN_TEMPLATE.md",
+        "templates/generation_plan_simple.md",
+        "templates/generation_plan_medium.md",
+        "templates/generation_plan_complex.md",
+        "templates/generation_plan_critical.md",
+        "templates/generation_plan_trivial.md",
+        "templates/AI_Coding_Context_TEMPLATE.md",
+        "templates/AI_RULES_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 25,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/init/references/ai-rules-template.md",
+      "sources": [
+        "workflows/path_a_first_generation.md",
+        "AI_ENTRY_POINT.md",
+        "templates/GENERATION_PLAN_TEMPLATE.md",
+        "templates/generation_plan_simple.md",
+        "templates/generation_plan_medium.md",
+        "templates/generation_plan_complex.md",
+        "templates/generation_plan_critical.md",
+        "templates/generation_plan_trivial.md",
+        "templates/AI_Coding_Context_TEMPLATE.md",
+        "templates/AI_RULES_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 53,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/init/references/generation-plan-template.md",
+      "sources": [
+        "workflows/path_a_first_generation.md",
+        "AI_ENTRY_POINT.md",
+        "templates/GENERATION_PLAN_TEMPLATE.md",
+        "templates/generation_plan_simple.md",
+        "templates/generation_plan_medium.md",
+        "templates/generation_plan_complex.md",
+        "templates/generation_plan_critical.md",
+        "templates/generation_plan_trivial.md",
+        "templates/AI_Coding_Context_TEMPLATE.md",
+        "templates/AI_RULES_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 153,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/init/references/main-doc-template.md",
+      "sources": [
+        "workflows/path_a_first_generation.md",
+        "AI_ENTRY_POINT.md",
+        "templates/GENERATION_PLAN_TEMPLATE.md",
+        "templates/generation_plan_simple.md",
+        "templates/generation_plan_medium.md",
+        "templates/generation_plan_complex.md",
+        "templates/generation_plan_critical.md",
+        "templates/generation_plan_trivial.md",
+        "templates/AI_Coding_Context_TEMPLATE.md",
+        "templates/AI_RULES_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 63,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
     }
   ],
   "doc_budget": {
-    "doc_lines": 0,
+    "doc_lines": 663,
     "baseline": 63176,
     "cap": 31588,
     "within_budget": true

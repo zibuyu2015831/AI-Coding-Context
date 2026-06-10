@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# AICC doc health CLI — see `aicc-doc-health --help`.
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/py/doc_health.py" "$@"

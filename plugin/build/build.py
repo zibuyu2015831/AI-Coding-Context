@@ -121,7 +121,7 @@ def shipped_files():
         for name in sorted(names):
             rel = os.path.relpath(os.path.join(base, name), PLUGIN_ROOT)
             rel = rel.replace(os.sep, "/")
-            if rel in skip_prefixes or name == ".gitkeep":
+            if rel in skip_prefixes or name in (".gitkeep", ".gitignore"):
                 continue
             yield rel
 
