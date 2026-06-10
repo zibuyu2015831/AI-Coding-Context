@@ -51,7 +51,7 @@ status: 规划完成
 | **P2 思维类 skill** | design-thinking / mutual-review / adr | = 沿用；➕ mutual-review 与 PreToolUse 门禁串联 | 链式 skill 触发稳定；互审可被门禁调用 |
 | **P3 其余 V3.0 能力** | complexity / doc-fallacy-fix / systematic-review / doc-reading-habit / knowledge-reuse | 🔁 complexity 必须先做实或删除，不许带“剧场”进 plugin | 全能力收敛后入 plugin；总行数达标 |
 | **P3.5 ➕ 遥测闭环** | PostToolUse 审计 + 用真实数据回填/修正宣称 | ➕ skill-migration 无此阶段 | 至少一项原“量化宣称”被真实数据替换或撤回 |
-| **P4 多平台** | Gemini 二期；flat 包 `aicc-` 前缀 | = 沿用；明确 hooks 在 flat 平台退化为建议 | Gemini 基本对齐 |
+| **P4 Codex 投影** | 由同一套源 build-time 生成 `dist/codex/`（`aicc-` 前缀；hooks 退化为 body 内建议） | 🔁 平台收敛为 Codex 单一次形态，**不做 Gemini/Copilot** | Codex flat 包可由同源生成 |
 | **P5 迁移与归档** | clone→plugin 迁移指南；clone 模式弃用策略 | = 沿用 | 老用户有迁移路径 |
 
 ---
@@ -68,11 +68,11 @@ status: 规划完成
 
 | 风险 | 缓解 / 回退 |
 | --- | --- |
-| hooks 跨平台不一致拉高维护成本 | 强制层仅在 Claude Code 主形态强保证；flat 平台显式退化为建议级，写入退化矩阵（`01` §3.4） |
+| Codex 无 hooks，强制层不可用 | 这是 by-design 退化：强制层仅在 Claude Code 主形态保证；Codex 形态显式标注“建议级”，写入退化矩阵（`01` §3.4）。不为此增加跨平台维护负担 |
 | PreToolUse deny 误伤正常 commit（过严） | 门禁先以 `ask`（提示+人工确认）灰度，稳定后再升 `deny`；阈值与白名单可在 settings.json 调 |
 | 收敛动作与迁移耦合拖慢进度 | 收敛只针对“即将迁移”的那块，按 skill 切片增量进行，不要求一次性全仓瘦身 |
 | skill 链式触发实测不稳定 | 回退到 subagent 调用或 body 内嵌片段（skill-migration 已有三级回退，沿用） |
-| 与 skill-migration 双规划并存造成混淆 | 立项即把 skill-migration 标注 superseded，单一真相源落在 `plugin-conversion`（呼应审查 P6） |
+| 与 skill-migration 双规划并存造成混淆 | 已把 skill-migration 标注 superseded，单一真相源落在 `dev/plan/plugin`（呼应审查 P6） |
 
 ---
 
@@ -87,9 +87,10 @@ status: 规划完成
 
 ---
 
-## 六、立项前置 checklist
+## 六、执行前置 checklist（决策已锁定 D1–D7，无未决问题）
 
-- [ ] 复审人确认 README §五 三个待决问题（收敛原则 / hooks 一等层 / 吸收 skill-migration）
-- [ ] 将 `skill-migration` 标注 superseded，登记单一真相源
-- [ ] 为本工作项在 `dev/` 状态系统登记（V3.1 或 V4.0），指定实施负责人
-- [ ] 确认 `plugin-conversion` 分支为唯一工作分支（不在 dev/master 推进）
+- [x] 决策 D1–D7 已由用户确认锁定（见 `README.md` §一）
+- [x] `skill-migration` 已标注 superseded，单一真相源落在 `dev/plan/plugin`
+- [x] `dev` 基线已先行修复审查硬伤（版本标题、无依据量化宣称）并合入 `plugin`
+- [ ] 在新会话以 `PLUGIN_BUILD_KICKOFF.md` 启动 `/goal`，在 `plugin` 分支一次性执行（不在 dev/master 推进）
+- [ ] （可选）为本工作项在 `dev/` 状态系统登记为 V3.1 / V4.0 工作项
