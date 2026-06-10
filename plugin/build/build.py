@@ -97,6 +97,12 @@ PROVENANCE = {
         "converged": True,
         "note": "English rewrite; metrics only, dashboard skill omitted (BUILD_NOTES)",
     },
+    "scripts/py/knowledge.py": {
+        "sources": ["tools/py/knowledge_cli.py", "tools/py/knowledge_matcher.py",
+                    "tools/py/knowledge_repo_manager.py"],
+        "converged": True,
+        "note": "English rewrite of the real shared-repo mechanism, 3 tools merged",
+    },
     "build/build.py": {"sources": [], "converged": None, "note": "authored"},
     "build/lint.py": {"sources": [], "converged": None, "note": "authored"},
 }

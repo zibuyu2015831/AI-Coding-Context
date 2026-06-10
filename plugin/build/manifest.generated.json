@@ -13,7 +13,7 @@
       "path": "BUILD_NOTES.md",
       "sources": [],
       "converged": null,
-      "lines": 68,
+      "lines": 93,
       "note": "authored build log"
     },
     {
@@ -53,6 +53,15 @@
       "note": "English conversion, boilerplate stripped"
     },
     {
+      "path": "bin/aicc-complexity",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
       "path": "bin/aicc-contract-check",
       "sources": [
         "tools/py/"
@@ -72,6 +81,15 @@
     },
     {
       "path": "bin/aicc-git-safety",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
+      "path": "bin/aicc-knowledge",
       "sources": [
         "tools/py/"
       ],
@@ -101,7 +119,7 @@
       "path": "build/build.py",
       "sources": [],
       "converged": null,
-      "lines": 304,
+      "lines": 310,
       "note": "authored"
     },
     {
@@ -201,6 +219,15 @@
       "note": "English convergence of core rule doc"
     },
     {
+      "path": "scripts/py/complexity_scan.py",
+      "sources": [
+        "tools/py/complexity_scanner.py"
+      ],
+      "converged": true,
+      "lines": 89,
+      "note": "English rewrite; metrics only, dashboard skill omitted (BUILD_NOTES)"
+    },
+    {
       "path": "scripts/py/contract_check.py",
       "sources": [
         "tools/py/framework_contract_checker.py",
@@ -228,6 +255,17 @@
       "converged": true,
       "lines": 129,
       "note": "English rewrite of dangerous-operation classifier"
+    },
+    {
+      "path": "scripts/py/knowledge.py",
+      "sources": [
+        "tools/py/knowledge_cli.py",
+        "tools/py/knowledge_matcher.py",
+        "tools/py/knowledge_repo_manager.py"
+      ],
+      "converged": true,
+      "lines": 163,
+      "note": "English rewrite of the real shared-repo mechanism, 3 tools merged"
     },
     {
       "path": "scripts/py/project_scan.py",
@@ -309,6 +347,27 @@
       ],
       "converged": true,
       "lines": 76,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/doc-fallacy-fix/SKILL.md",
+      "sources": [
+        "workflows/doc_error_fix_workflow.md",
+        "agents/workflows/error_detector.md",
+        "agents/workflows/document_fix_coordinator.md"
+      ],
+      "converged": true,
+      "lines": 62,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/doc-reading-habit/SKILL.md",
+      "sources": [
+        "core/SUMMARY_FORMAT_SPEC.md",
+        "agents/runtime/document_recommender.md"
+      ],
+      "converged": true,
+      "lines": 39,
       "note": "converged English skill content (see BUILD_NOTES.md)"
     },
     {
@@ -463,6 +522,32 @@
       "note": "converged English skill content (see BUILD_NOTES.md)"
     },
     {
+      "path": "skills/knowledge-reuse/SKILL.md",
+      "sources": [
+        "tools/py/knowledge_cli.py",
+        "tools/py/knowledge_matcher.py",
+        "agents/workflows/knowledge_librarian.md",
+        "agents/workflows/knowledge_matcher.md",
+        "templates/knowledge_README_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 51,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/knowledge-reuse/references/knowledge-entry-template.md",
+      "sources": [
+        "tools/py/knowledge_cli.py",
+        "tools/py/knowledge_matcher.py",
+        "agents/workflows/knowledge_librarian.md",
+        "agents/workflows/knowledge_matcher.md",
+        "templates/knowledge_README_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 43,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
       "path": "skills/mutual-review/SKILL.md",
       "sources": [
         "workflows/review-workflow.md",
@@ -521,10 +606,21 @@
       "converged": true,
       "lines": 41,
       "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/systematic-review/SKILL.md",
+      "sources": [
+        "dev/quality/AUDIT_WORKFLOW.md",
+        "dev/quality/Start_Review.md",
+        "dev/quality/Issue_Recording_Standard.md"
+      ],
+      "converged": true,
+      "lines": 56,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
     }
   ],
   "doc_budget": {
-    "doc_lines": 1391,
+    "doc_lines": 1642,
     "baseline": 63176,
     "cap": 31588,
     "within_budget": true

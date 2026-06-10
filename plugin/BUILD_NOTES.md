@@ -61,6 +61,31 @@ Everything dropped, deferred, or adapted from the dev-tree sources is recorded h
   dirs intact, lint, budgets), generates the provenance manifest, and projects
   the Codex package. It does not regenerate skill prose from Chinese sources.
 
+## P3 decisions
+
+- **knowledge-reuse ships as real (not experimental)**: code audit of
+  `tools/py/knowledge_cli.py` / `knowledge_matcher.py` /
+  `knowledge_repo_manager.py` confirmed the shared cross-project repo
+  mechanism is actually implemented (git clone/pull to
+  `.aicc-cache/shared-knowledge/`, config toggle, local-first search).
+  `scripts/py/knowledge.py` is an English merge of the three tools, kept
+  layout-compatible. Dropped from the rewrite: match-strategy switching
+  (shared-first/hybrid — local-first only), the `:::knowledge-ref:::`
+  transclusion syntax, and the index generator; all are additive layers the
+  skill body does not depend on.
+- **doc-fallacy-fix support tools not shipped**: `batch_fix_manager`,
+  `fix_history_manager`, `doc_fix_executor`, `manage_fix_with_git` automate
+  what a Claude Code session does natively (edit, commit, revert). The
+  skill encodes their workflow (severity strategy, blast-radius tracing,
+  rollback) without the tool layer.
+- **complexity**: `bin/aicc-complexity` ships raw static metrics (English
+  rewrite of the scanner core); it intentionally produces NO scores or
+  grades because the calibration data behind the source dashboard's
+  thresholds does not exist (see the dashboard omission above).
+- **Doc line budget (P3 record)**: skills/ + references/ + agents/ total
+  1,642 lines vs cap 31,588 (50% of the 63,176-line source corpus) —
+  about 2.6% of baseline. Recorded by build.py in the manifest.
+
 ## Phantom / unusable source references
 
 - `core/contracts/main_doc_contract.yaml` — exists but unusable as-is (see

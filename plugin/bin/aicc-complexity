@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# AICC static complexity metrics CLI — see `aicc-complexity --help`.
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/py/complexity_scan.py" "$@"

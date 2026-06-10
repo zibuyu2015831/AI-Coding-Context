@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# AICC knowledge base CLI — see `aicc-knowledge --help`.
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/py/knowledge.py" "$@"
