@@ -119,8 +119,15 @@
       "path": "build/build.py",
       "sources": [],
       "converged": null,
-      "lines": 310,
+      "lines": 312,
       "note": "authored"
+    },
+    {
+      "path": "build/codex_projection.py",
+      "sources": [],
+      "converged": null,
+      "lines": 141,
+      "note": "authored Codex flat projection (spec 7)"
     },
     {
       "path": "build/lint.py",
