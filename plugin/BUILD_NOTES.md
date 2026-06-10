@@ -86,6 +86,24 @@ Everything dropped, deferred, or adapted from the dev-tree sources is recorded h
   1,642 lines vs cap 31,588 (50% of the 63,176-line source corpus) —
   about 2.6% of baseline. Recorded by build.py in the manifest.
 
+## P3.5 decisions
+
+- **Telemetry destination**: `${CLAUDE_PLUGIN_DATA}` is confirmed real on
+  Claude Code 2.1.170 — in-session it points at
+  `~/.claude/plugins/data/<plugin>/` and `post_tool_audit.py` writes
+  `telemetry.jsonl` there (verified end-to-end). Outside a session the
+  script falls back to `~/.claude/aicc/telemetry.jsonl`.
+- **No `async` hook flag**: the spec draft marked the PostToolUse hook
+  `"async": true`; that key is not part of the verified hooks schema, so
+  the hook is a plain fast-exit command instead.
+- **Quantified claims formally withdrawn**: the source corpus asserted,
+  among others, a "98% fix success rate" (doc_error_fix workflow), "80%
+  time savings / 22 minutes per change" (commit-guided guides), "85%+
+  token reduction" (aggregation mode), and "70% token savings"
+  (project-type loading). None ships anywhere in plugin/; telemetry.jsonl
+  is the mechanism intended to let future versions make such claims from
+  measured data.
+
 ## Phantom / unusable source references
 
 - `core/contracts/main_doc_contract.yaml` — exists but unusable as-is (see
