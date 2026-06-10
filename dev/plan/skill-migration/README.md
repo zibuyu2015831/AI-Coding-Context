@@ -11,6 +11,8 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 
 # AICC Skill 化迁移规划
 
+> ⚠️ **已被吸收（superseded）**：本规划的核心架构决策（锁定决策 #2 实为“单 plugin × 多 skill”）已被 [`dev/plan/plugin-conversion/`](../plugin-conversion/README.md) 吸收并扩展。后者澄清了“skill vs plugin”实为伪二选一（plugin 是容器、skill 是组件），并补上本规划缺失的【hooks 强制执行层】与【迁移即收敛】两条主线。**新工作请以 `plugin-conversion` 为单一真相源**；本目录的 11-skill 组件映射（`02`）、边界条件（`04`）、开放问题（`05`）仍作为有效输入保留。
+
 > **当前阶段**：头脑风暴产出已落档，等待人工复审。**尚未进入实施**。
 > **分支**：`skill`（后续所有相关工作均在此分支推进）。
 > **触发原因**：业界主流 AI 编程工具（Claude Code、Copilot CLI、Gemini CLI、Codex）均已原生支持 skill 机制。AICC 当前的 "clone 仓库 + 发送 AI_ENTRY_POINT.md" 模式相对市场成熟实践显得笨重。本规划探讨"将 AICC 优秀设计沉淀为 skill"的可行性、架构与实施路线。
