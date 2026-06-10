@@ -17,7 +17,43 @@
       "note": "authored build log"
     },
     {
+      "path": "agents/architecture-analyst.md",
+      "sources": [
+        "agents/development/architecture_analyst.md"
+      ],
+      "converged": true,
+      "lines": 33,
+      "note": "English conversion, boilerplate stripped"
+    },
+    {
+      "path": "agents/product-manager.md",
+      "sources": [
+        "agents/development/product_manager.md"
+      ],
+      "converged": true,
+      "lines": 34,
+      "note": "English conversion, boilerplate stripped"
+    },
+    {
+      "path": "bin/aicc-contract-check",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
       "path": "bin/aicc-doc-health",
+      "sources": [
+        "tools/py/"
+      ],
+      "converged": true,
+      "lines": 3,
+      "note": "authored CLI wrapper over scripts/py"
+    },
+    {
+      "path": "bin/aicc-git-safety",
       "sources": [
         "tools/py/"
       ],
@@ -65,10 +101,20 @@
       "note": "authored"
     },
     {
+      "path": "hooks/dangerous_git_guard.py",
+      "sources": [
+        "tools/py/git_safety.py",
+        "workflows/git_safety_workflow.md"
+      ],
+      "converged": true,
+      "lines": 62,
+      "note": "dangerous-command list enforced at PreToolUse instead of advisory doc"
+    },
+    {
       "path": "hooks/hooks.json",
       "sources": [],
       "converged": null,
-      "lines": 25,
+      "lines": 29,
       "note": "authored"
     },
     {
@@ -157,6 +203,15 @@
       "note": "English rewrite of the health orchestrator (paths/staleness/frontmatter)"
     },
     {
+      "path": "scripts/py/git_safety.py",
+      "sources": [
+        "tools/py/git_safety.py"
+      ],
+      "converged": true,
+      "lines": 129,
+      "note": "English rewrite of dangerous-operation classifier"
+    },
+    {
       "path": "scripts/py/project_scan.py",
       "sources": [
         "tools/py/project_scanner.py"
@@ -174,6 +229,15 @@
       "converged": true,
       "lines": 170,
       "note": "English rewrite, ~60% smaller, same rule set"
+    },
+    {
+      "path": "settings.json",
+      "sources": [
+        "config/CONFIG_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 12,
+      "note": "config keys reduced to the consumed set (spec \u00a75)"
     },
     {
       "path": "skills/health-check/SKILL.md",
@@ -195,6 +259,45 @@
       ],
       "converged": true,
       "lines": 42,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/incremental-update/SKILL.md",
+      "sources": [
+        "workflows/path_c_incremental_update.md",
+        "workflows/commit_guided_update.md",
+        "workflows/git_safety_workflow.md",
+        "guides/commit_guided_quick_start.md",
+        "guides/commit_guided_migration.md"
+      ],
+      "converged": true,
+      "lines": 81,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/incremental-update/references/change-doc-mapping.md",
+      "sources": [
+        "workflows/path_c_incremental_update.md",
+        "workflows/commit_guided_update.md",
+        "workflows/git_safety_workflow.md",
+        "guides/commit_guided_quick_start.md",
+        "guides/commit_guided_migration.md"
+      ],
+      "converged": true,
+      "lines": 29,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
+      "path": "skills/incremental-update/references/commit-guided.md",
+      "sources": [
+        "workflows/path_c_incremental_update.md",
+        "workflows/commit_guided_update.md",
+        "workflows/git_safety_workflow.md",
+        "guides/commit_guided_quick_start.md",
+        "guides/commit_guided_migration.md"
+      ],
+      "converged": true,
+      "lines": 52,
       "note": "converged English skill content (see BUILD_NOTES.md)"
     },
     {
@@ -289,7 +392,7 @@
     }
   ],
   "doc_budget": {
-    "doc_lines": 663,
+    "doc_lines": 892,
     "baseline": 63176,
     "cap": 31588,
     "within_budget": true

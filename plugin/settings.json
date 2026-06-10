@@ -1,0 +1,12 @@
+{
+  "aicc": {
+    "documentLanguage": "en",
+    "enableMutualReview": true,
+    "enforceDesignThinking": false,
+    "git_safety": {
+      "mode": "standard",
+      "commit_gate": "ask",
+      "protected_branches": ["main", "master", "production"]
+    }
+  }
+}

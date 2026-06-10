@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# AICC main-doc contract checker CLI — see `aicc-contract-check --help`.
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/py/contract_check.py" "$@"
