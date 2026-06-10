@@ -1,0 +1,84 @@
+{
+  "plugin": "aicc",
+  "source_branch": "dev",
+  "entries": [
+    {
+      "path": ".claude-plugin/plugin.json",
+      "sources": [],
+      "converged": null,
+      "lines": 8,
+      "note": "authored"
+    },
+    {
+      "path": "BUILD_NOTES.md",
+      "sources": [],
+      "converged": null,
+      "lines": 68,
+      "note": "authored build log"
+    },
+    {
+      "path": "build/build.py",
+      "sources": [],
+      "converged": null,
+      "lines": 304,
+      "note": "authored"
+    },
+    {
+      "path": "build/lint.py",
+      "sources": [],
+      "converged": null,
+      "lines": 190,
+      "note": "authored"
+    },
+    {
+      "path": "hooks/_aicc_common.py",
+      "sources": [],
+      "converged": null,
+      "lines": 94,
+      "note": "authored"
+    },
+    {
+      "path": "hooks/hooks.json",
+      "sources": [],
+      "converged": null,
+      "lines": 15,
+      "note": "authored"
+    },
+    {
+      "path": "hooks/pre_commit_gate.py",
+      "sources": [
+        "tools/git-hooks/pre-commit",
+        "workflows/git_safety_workflow.md"
+      ],
+      "converged": true,
+      "lines": 119,
+      "note": "advisory pre-commit doc checks turned into an enforcing PreToolUse gate"
+    },
+    {
+      "path": "scripts/py/contract_check.py",
+      "sources": [
+        "tools/py/framework_contract_checker.py",
+        "core/contracts/main_doc_contract.yaml"
+      ],
+      "converged": true,
+      "lines": 80,
+      "note": "English rewrite; project-specific Chinese contract replaced by plugin contract v1"
+    },
+    {
+      "path": "scripts/py/summary_validator.py",
+      "sources": [
+        "tools/py/summary_validator.py",
+        "core/SUMMARY_FORMAT_SPEC.md"
+      ],
+      "converged": true,
+      "lines": 170,
+      "note": "English rewrite, ~60% smaller, same rule set"
+    }
+  ],
+  "doc_budget": {
+    "doc_lines": 0,
+    "baseline": 63176,
+    "cap": 31588,
+    "within_budget": true
+  }
+}

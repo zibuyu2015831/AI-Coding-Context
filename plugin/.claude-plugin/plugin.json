@@ -1,0 +1,8 @@
+{
+  "name": "aicc",
+  "description": "AI Coding Context — generate, health-check, and incrementally maintain AI-facing project documentation, with enforced plan-first, mutual-review, and git-safety gates.",
+  "version": "0.1.0",
+  "author": { "name": "AICC Framework Team" },
+  "repository": "https://github.com/zibuyu2015831/AI-Coding-Context",
+  "license": "MIT"
+}
