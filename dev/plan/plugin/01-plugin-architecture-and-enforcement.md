@@ -2,16 +2,18 @@
 title: AICC Plugin 架构与强制执行层设计
 summary: 定义 AICC 作为 Claude Code Plugin 的目录骨架、组件映射增量，并重点设计 skill-migration 缺失的【hooks 强制执行层】（PreToolUse 门禁 + SessionStart 注入 + PostToolUse 审计），将两份审查指出的“无强制层/手动注入/无遥测”三大根因落地。附 Phase-0 五个高优开放问题（Q1–Q5）基于官方机制核验后的已答清单。
 keywords: plugin | hooks | enforcement | skill | subagent | claude-plugin-root | settings
-scope: dev/plan/plugin-conversion（plugin 架构与强制层）
-related_files: ./README.md | ./02-implementation-roadmap.md | ../skill-migration/02-component-mapping.md
+scope: dev/plan/plugin（plugin 架构与强制层）
+related_files: ./README.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/02-component-mapping.md
 dependencies: ./README.md
 verified_at: 2026-06-11
-status: 规划中
+status: 规划完成
 ---
 
 # AICC Plugin 架构与强制执行层设计
 
-> 本文是 `plugin-conversion` 的技术核心。约定：**11-skill 的语义映射沿用 `../skill-migration/02-component-mapping.md`，本文只写其增量与官方机制核验后的修正**，不重复。
+> 本文是本方案的技术核心（设计/理由层）。**逐文件的执行蓝图见 `./03-execution-spec.md`（英文）。** 约定：11-skill 的语义映射沿用 `../skill-migration/02-component-mapping.md`，本文只写其增量与官方机制核验后的修正，不重复。
+>
+> **语言强制（D5）**：本文为中文规划稿；但**一切 plugin 产物（plugin.json description、SKILL.md、references、hooks 注释与消息、bin 帮助、plugin README）必须为英文**。下文出现的中文仅为设计说明，落地时全部以英文实现。
 
 ---
 
@@ -146,17 +148,20 @@ sys.exit(0)
 
 PostToolUse hook（异步、不阻断）把“哪个 skill 被触发、跑了哪个工具、产出多少文档”追加到 `${CLAUDE_PLUGIN_DATA}/aicc_telemetry.jsonl`。**即便不做对照实验，也能用真实触发数据替代拍脑袋数字。**
 
-### 3.4 跨平台退化策略
+### 3.4 平台范围与 Codex 退化策略（D4：仅 Claude Code + Codex）
 
-非 Claude Code 平台（Codex/Copilot flat 包）**无 hooks**。退化矩阵：
+目标平台收敛为两个，**不为 Gemini/Copilot 等任何其它平台适配**。Codex **无 hooks 机制**，强制层退化为建议级。
 
-| 能力 | Claude Code | flat 平台 |
+| 能力 | Claude Code（主形态） | Codex（次形态，flat 包） |
 | --- | --- | --- |
-| commit 门禁 | PreToolUse deny（强制） | skill body 内“请先运行校验”（建议，回退到现状） |
-| 上下文注入 | SessionStart 自动 | 用户手动触发入口 skill |
-| 审计遥测 | PostToolUse 自动 | 无 |
+| skill 触发 | description 自动 + `/aicc:*` | `aicc-*` 前缀 prompt/AGENTS.md 引导 |
+| commit 门禁 | `PreToolUse` deny（强制） | skill body 内“请先运行 `aicc-doc-health`”（建议） |
+| 上下文注入 | `SessionStart` 自动 | 用户手动触发入口 skill |
+| 审计遥测 | `PostToolUse` 自动 | 无 |
 
-> **结论**：强制层是 Claude Code 形态的**差异化优势**，应作为主形态主打；flat 平台明确标注为“退化为建议级”，不让二级平台拉低主设计（与 skill-migration 决策 #5/#7 一致）。
+**Codex 形态如何产出**：由 build-time 从**同一套 skill 源**生成 flat 包——把短名加 `aicc-` 前缀、把 hooks 的强制语义降级为 SKILL.md body 内的“建议步骤”文字。Codex 包**不复制独立内容**，仅是主形态的“降级投影”，避免双份维护。
+
+> **结论**：强制层是 Claude Code 主形态的差异化优势，作为主打；Codex 明确标注“退化为建议级”，**主设计不被 Codex 能力上限拉低**。Codex 适配排在所有 Claude Code 能力之后（见 `02` 路线）。
 
 ---
 

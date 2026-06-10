@@ -2,16 +2,18 @@
 title: AICC Plugin 化实施路线图（迁移即收敛）
 summary: 定义 plugin 改造的分阶段实施路线，核心原则是“迁移即收敛”——每迁移一块能力，先按两份审查的瘦身要求收敛，再打包，绝不 1:1 搬运体量债。给出与 skill-migration 8 阶段路线的差异、阶段门禁、风险与回退，以及 Phase 0 因开放问题已答而可压缩的工期。
 keywords: roadmap | migration | convergence | phases | gate | rollback
-scope: dev/plan/plugin-conversion（实施路线）
-related_files: ./README.md | ./01-plugin-architecture-and-enforcement.md | ../skill-migration/03-implementation-roadmap.md
+scope: dev/plan/plugin（实施路线）
+related_files: ./README.md | ./01-plugin-architecture-and-enforcement.md | ./03-execution-spec.md | ../skill-migration/03-implementation-roadmap.md
 dependencies: ./01-plugin-architecture-and-enforcement.md
 verified_at: 2026-06-11
-status: 规划中
+status: 规划完成
 ---
 
 # AICC Plugin 化实施路线图（迁移即收敛）
 
 > 本路线图**不复制** skill-migration `03-implementation-roadmap.md` 的 8 阶段细节，而是叠加两个新约束：**①每阶段强制耦合“收敛动作”；②Phase 0 因 Q1–Q5 已答而收敛为冒烟测试。**
+
+> **用于一次性 `/goal` 执行**：下列阶段**不是 7.5 人月的人工排期，而是单次 goal 会话应遵循的「构建顺序 + 检查点」**。执行者按 P0→P5 顺序推进，**每完成一个阶段做一次 checkpoint commit**（含该阶段验收自检），失败则在本阶段内自我修复后再进入下一阶段。逐文件的“构建什么”见 `./03-execution-spec.md`（英文蓝图）。
 
 ---
 
