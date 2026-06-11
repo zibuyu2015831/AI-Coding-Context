@@ -142,3 +142,6 @@ vite.config.ts.timestamp-*
 
 # AICC 知识库缓存
 .aicc-cache/
+
+# Claude Code local settings
+.claude/settings.local.json
