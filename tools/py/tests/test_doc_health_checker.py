@@ -23,22 +23,16 @@ verified_at: 2026-05-12
 
 # AI 编码上下文
 
-## 1. 默认工作方式
-## 2. 事实源与权威顺序
-## 3. 项目当前状态
-## 4. 不可轻易破坏的核心决策
-## 5. 按任务类型读取文档
-## 6. 关键目录速查
-## 7. 文档目录结构
-## 8. 测试拓扑现状
-## 9. Brainary 的核心架构特点
-## 10. 四维风险入口
-## 11. 开发流程规范
-## 15. 命名规范
-## 16. 业务模块映射
-## 17. AI 编码禁忌
-## 18. 常见任务速查
-## 19. 核心代码模式
+## 📊 项目概览
+## 📂 关键目录速查
+## 🎯 场景快速导航
+## 🚀 文档索引
+## 🛠️ 开发流程规范
+## 💻 核心代码模式
+## 📋 命名规范
+## 🏢 业务模块映射
+## ⚠️ AI 编码禁忌
+## 🔧 常见任务速查
 """
 
 GENERATION_PLAN_BASE = """# 文档生成方案模板
@@ -207,8 +201,8 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
 
     def test_missing_required_sections_are_reported(self):
         self._write_valid_bundle()
-        broken = MAIN_DOC_BASE.replace("## 16. 业务模块映射\n", "")
-        broken = broken.replace("## 18. 常见任务速查\n", "")
+        broken = MAIN_DOC_BASE.replace("## 🏢 业务模块映射\n", "")
+        broken = broken.replace("## 🔧 常见任务速查\n", "")
         (self.dev_docs / "AI_Coding_Context.md").write_text(broken, encoding="utf-8")
         result, payload = _run_json([
             "python3",
