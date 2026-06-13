@@ -6,7 +6,7 @@ scope: AI-Coding-Context 框架 plans/ 子系统的方案审核能力演进
 related_files: core/framework_spec.md | workflows/review-workflow.md | workflows/review_standards | templates/PLAN_TEMPLATE.md | templates/plans_README_TEMPLATE.md | templates/review/review_plan_TEMPLATE.md | agents/runtime/plan_reviewer.md | plugin/skills/mutual-review/SKILL.md | plugin/hooks/pre_commit_gate.py | plugin/scripts/py/doc_health.py | plugin/build/build.py | plugin/settings.json
 dependencies: dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md
 verified_at: 2026-06-13
-status: proposed（开放问题已定案 + 插件/Codex 落地映射已设计，待转可执行实施计划，2026-06-13）
+status: proposed（开放问题已定案 + 插件/Codex 落地映射已设计；Codex hook 前提已更正、通用强制包已落地 c8d3f46，待转可执行实施计划，2026-06-13）
 ---
 
 # LingoTrace 方案自审核协议吸收分析与决策记录
@@ -161,7 +161,7 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 
 ### 7.6 三种交付形态的落地映射（框架 SSOT / 插件 / Codex）
 
-前置事实：AICC 以三种形态交付**同一套能力**——(a) **框架 SSOT**（master/dev 上的 `core/ workflows/ templates/ tools/ agents/`，§7.1–7.5 即针对它）；(b) **Claude Code 插件** `plugin/`（由 `plugin/build/build.py` 从 SSOT **收敛投影**，`name=aicc`，靠 `skills/ + hooks/ + scripts/py/` 落地，带 `build/manifest.generated.json` provenance 清单）；(c) **Codex 扁平包** `dist/codex/`（由 `plugin/build/codex_projection.py` 从插件再投影，**无 hook**，门禁降级为顾问式 CLI）。§7.1–7.5 的每个落点都必须同时定义其在插件与 codex 形态中的对应物，否则自审门只在 SSOT 生效、插件用户拿不到。
+前置事实：AICC 以三种形态交付**同一套能力**——(a) **框架 SSOT**（master/dev 上的 `core/ workflows/ templates/ tools/ agents/`，§7.1–7.5 即针对它）；(b) **Claude Code 插件** `plugin/`（由 `plugin/build/build.py` 从 SSOT **收敛投影**，`name=aicc`，靠 `skills/ + hooks/ + scripts/py/` 落地，带 `build/manifest.generated.json` provenance 清单）；(c) **Codex 扁平包** `dist/codex/`（由 `plugin/build/codex_projection.py` 从插件再投影；**Codex ≥ v0.117 已支持 lifecycle hooks** 且契约与 Claude Code 同构，投影额外产出可安装的 `dist/codex/.codex/` 强制包，使门禁获 enforcement parity，顾问式 CLI 退为 shell-拦截-gap 的兜底——见 §7.6.5）。§7.1–7.5 的每个落点都必须同时定义其在插件与 codex 形态中的对应物，否则自审门只在 SSOT 生效、插件用户拿不到。
 
 **核心约束：插件不是另写一套，而是 build.py 的投影目标。** SSOT 仍是唯一真源（含 §7.3 的 Python/JS 双实现纪律）；插件按既有收敛规则取其投影——**插件只跑 Python 3，JS 变体在投影时丢弃**，故双实现纪律留在 SSOT 层，插件落地以 Python 投影为准。新增/改动的 SSOT 源必须登记进 build.py 的源映射，由 manifest 记录 provenance（authored / converged）与行数预算（现用 1,642 / 上限 31,588，余量充裕）。
 
@@ -182,17 +182,20 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 - `templates/PLAN_TEMPLATE.md` 的 `review_status / review_rounds / review_reason` 字段与「方案自审核记录」块，随 `init` 技能脚手架的 plan 模板一并投影（插件生成 plan 即带新字段）。
 - `plugin/settings.json` 新增 `aicc.planReview` 配置块，**镜像既有 `git_safety.commit_gate` 风格**：`gate: ask|deny|off`（默认 `ask`）、复杂度阈值、高风险面默认清单（§7.5）。符合分层轻量：默认 `ask`、仅 done-without-review 才硬 `deny`、trivial/simple 默认放行。
 
-#### 7.6.5 Codex 降级（对应交付链末端）
-- `codex_projection.py` 把 `plan-review` 技能扁平投影为 `dist/codex/aicc-plan-review/`；因 codex **无 hook**，7.6.2 的硬门**降级为顾问式**——`AGENTS.md` 指示用户在标记 done 前自行运行 `aicc-doc-health`（其会报出 `plan_done_without_review`），与既有「hook 门 → 顾问 CLI」降级范式一致。
+#### 7.6.5 Codex 落地（对应交付链末端，2026-06-13 更正前提）
+- **前提更正**：原文断言「codex 无 hook，硬门降级为顾问式」。查验 OpenAI 官方文档后确认：**Codex 自 v0.117.0 起已支持 lifecycle hooks**，其 stdin/stdout 契约与 Claude Code **同构**（`tool_name` / `tool_input.command` / `cwd` 入，`hookSpecificOutput.permissionDecision(+Reason)` 出，并提供 `CLAUDE_PLUGIN_ROOT` 兼容别名）。故 AICC 的 hook 脚本在 I/O 层**本已 Codex 兼容**，「无 hook → 全面降级」的前提已失效。
+- **通用基础设施已落地**：`codex_projection.py` 现额外产出自包含的 `dist/codex/.codex/` 强制包（`hooks.json` + 原样 hook 脚本 + `scripts/py` 依赖 + `settings.json`）；用户拷至仓库根、经 `/hooks` 信任后，`pre_commit_gate` / `dangerous_git_guard` / `session_inject` 自动强制——与插件**同脚本、非重写**。已本地验证（`CLAUDE_PLUGIN_ROOT` 未设、project-local 安装下，force-push / hard-reset / 提交非法 dev_docs 均被 deny）。2026-06-13 提交 `c8d3f46`（dev 分支）。
+- **本方案 Codex 落点据此升级**：`codex_projection.py` 把 `plan-review` 技能扁平投影为 `dist/codex/aicc-plan-review/`；7.6.2 的 `plan_done_without_review` 硬门由该 `.codex/` 包内的 `pre_commit_gate` 承接（实现时扩展其判定即可），**不再降级为顾问式**，获得与插件一致的 done-hard-block。
+- **兜底保留**：Codex hook 对部分 shell 路径拦截有 gap（官方自承「a guardrail rather than a complete enforcement boundary」），故 `AGENTS.md` 仍保留 `aicc-doc-health` 顾问条目作为 backstop，与既有「hook 门 + 顾问 CLI 双层」一致。
 
 #### 7.6.6 落地点对照表
 
 | §7 SSOT 落点 | 插件形态 | Codex 形态 |
 |---|---|---|
 | `core/plan_review_protocol.md`（薄层） | 新技能 `skills/plan-review/SKILL.md`，委派 mutual-review 引擎 | `dist/codex/aicc-plan-review/` 扁平包（顾问式） |
-| framework_spec plans/ 指针 + done 硬规则 | `pre_commit_gate.py` 扩展 + `doc_health.py` 检查 | `AGENTS.md` 顾问条目 |
+| framework_spec plans/ 指针 + done 硬规则 | `pre_commit_gate.py` 扩展 + `doc_health.py` 检查 | `.codex/` 包内 `pre_commit_gate` **hook 强制** + `AGENTS.md` 顾问兜底 |
 | PLAN_TEMPLATE `review_status` 字段 | init 技能脚手架模板投影 | 同（扁平模板） |
-| `doc_health_checker` 新增 `plan_done_without_review`（Py/JS 双实现） | 投影为 `scripts/py/doc_health.py`（仅 Python） | `aicc-doc-health` CLI 顾问式报出 |
+| `doc_health_checker` 新增 `plan_done_without_review`（Py/JS 双实现） | 投影为 `scripts/py/doc_health.py`（仅 Python） | 投影进 `.codex/scripts/py/`，hook 强制 + `aicc-doc-health` 顾问兜底 |
 | 入口/工作流流程门 | init / incremental-update 技能正文引用协议 | 技能正文（顾问） |
 | 高风险面清单 / 复杂度分级 | `settings.json` `aicc.planReview` 配置 | settings 默认值（无 hook 强制） |
 
@@ -253,8 +256,9 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 
 - [x] 就 §11 开放问题与用户确认 —— 2026-06-13 用户采纳架构师推荐方案，四问全部定案（见 §11 / §11.1）。
 - [x] 设计自审机制在**插件 / Codex 交付形态**的落地映射 —— 2026-06-13 写入 §7.6（薄技能 `/aicc:plan-review` 委派 mutual-review 引擎、复用 `pre_commit_gate` hook 承接 done 硬阻断、`settings.json` `aicc.planReview` 配置、build/codex 投影与降级）。
+- [x] 查验 Codex 新 hook 机制并升级 Codex 投影 —— 2026-06-13 确认 Codex v0.117 hooks 契约与 Claude 同构（推翻「Codex 无 hook」前提）；`codex_projection.py` 改为产出自包含 `dist/codex/.codex/` 强制包，`pre_commit_gate` / `dangerous_git_guard` 在 Codex 获 enforcement parity（commit `c8d3f46`，dev，已本地验证 deny 路径）；§7.6 前提与 §7.6.5 同步更正。**此为通用基础设施**，本方案 `plan_done_without_review` 门实现时即落在该包内的 `pre_commit_gate`。
 - [ ] 将本分析转化为可执行实施计划（精确到 §7 各落点的 diff 设计与验证命令），作为已落地 generation_plan 门的**扩展**实现，覆盖**三种交付形态**：
   - **框架 SSOT**：`core/plan_review_protocol.md`（统一薄层）+ framework_spec plans/ 指针与硬规则 + PLAN_TEMPLATE/plans_README_TEMPLATE 增 `review_status` 字段 + `doc_health_checker` 新增 `plan_done_without_review`（Python/JS 双实现 + fixture）+ 入口/工作流路由的流程门。
   - **插件**（§7.6）：新增 `plugin/skills/plan-review/SKILL.md`（投影自薄层、委派 mutual-review）+ 扩展 `plugin/hooks/pre_commit_gate.py` 承接 done 硬阻断 + `plugin/scripts/py/doc_health.py` 投影新检查项 + `plugin/settings.json` 增 `aicc.planReview` + build.py 源映射登记。
-  - **Codex**：`codex_projection.py` 输出 `dist/codex/aicc-plan-review/` + `AGENTS.md` 顾问条目（hook 门降级为 `aicc-doc-health` 自助）。
+  - **Codex**：`codex_projection.py` 输出 `dist/codex/aicc-plan-review/`；done 硬门由**已落地**的 `.codex/` 强制包内 `pre_commit_gate` 承接（扩展其判定，与插件同脚本，2026-06-13 通用基础设施已提交 `c8d3f46`），`AGENTS.md` 保留 `aicc-doc-health` 顾问兜底。
 - [x] 在 `dev/plan/README.md` 索引登记本文档。
