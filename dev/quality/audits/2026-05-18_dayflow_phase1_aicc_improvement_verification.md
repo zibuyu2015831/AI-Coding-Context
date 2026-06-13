@@ -3,7 +3,7 @@ title: Dayflow Phase 1 AICC 改进专项验证记录
 summary: 记录 Dayflow 首次运行复盘后，AICC Phase 1 自检门、证据规则、Swift/Xcode 识别、语义复查一致性规则的实现验证结果。
 keywords: dayflow | phase1 | aicc | verification | dogfood | semantic-review
 scope: AICC 框架自身验证记录；不评价 Dayflow 项目质量
-related_files: dev/plan/dayflow-phase1-aicc-improvement-plan.md | workflows/path_a_first_generation.md | tools/py/doc_health_checker.py | tools/py/semantic_review_checker.py | tools/py/project_scanner.py
+related_files: dev/plan/done/dayflow-phase1-aicc-improvement-plan.md | workflows/path_a_first_generation.md | tools/py/doc_health_checker.py | tools/py/semantic_review_checker.py | tools/py/project_scanner.py
 dependencies: core/contracts/run_record_contract.yaml | tools/testdata/semantic_review/dayflow_like_case | tools/testdata/semantic_review/dayflow_second_review_case
 verified_at: 2026-05-18
 ---

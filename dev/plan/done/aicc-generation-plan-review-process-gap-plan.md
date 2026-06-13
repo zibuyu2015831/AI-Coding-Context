@@ -4,11 +4,14 @@ summary: 记录 LinguaCafe 第三次运行后发现的 generation_plan.md 复查
 keywords: aicc | generation-plan | phase-1 | review-process | progress-record
 scope: AI-Coding-Context 框架首次生成 Phase 1 方案复查流程
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | tools/py/doc_health_checker.py | tools/py/semantic_review_checker.py
-dependencies: dev/plan/aicc-phase1-review-gate-implementation-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
+dependencies: dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
 verified_at: 2026-05-18
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC generation_plan 复查流程缺口记录与优化方案
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。
 
 ## 1. 背景
 

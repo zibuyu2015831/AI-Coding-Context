@@ -2,7 +2,7 @@
 title: AICC Plugin 架构与强制执行层设计
 summary: 定义 AICC 作为 Claude Code Plugin 的目录骨架、组件映射增量，并重点设计 skill-migration 缺失的【hooks 强制执行层】（PreToolUse 门禁 + SessionStart 注入 + PostToolUse 审计），将两份审查指出的“无强制层/手动注入/无遥测”三大根因落地。附 Phase-0 五个高优开放问题（Q1–Q5）基于官方机制核验后的已答清单。
 keywords: plugin | hooks | enforcement | skill | subagent | claude-plugin-root | settings
-scope: dev/plan/plugin（plugin 架构与强制层）
+scope: dev/plan/done/plugin（plugin 架构与强制层）
 related_files: ./README.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/02-component-mapping.md
 dependencies: ./README.md
 verified_at: 2026-06-13

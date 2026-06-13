@@ -1,13 +1,13 @@
 ---
 title: AICC → Claude Code Plugin 改造方案 — 总索引与决策
-summary: 将 AICC 框架改造为单个 Claude Code Plugin（内含多 skill + subagents + hooks + tools）的完整方案。已吸收并取代 dev/plan/skill-migration。核心四原则：单 plugin 多 skill、hooks 强制执行层、迁移即收敛、所有 plugin 交付物使用英文。目标平台仅 Claude Code（主，全能力）与 Codex（次，退化为建议级）。已实施并交付：插件已合入 master（V3.0「conversion complete」P1.5→P5），master 同时保留 clone 用法；临时 plugin 分支完成后已删除。
+summary: 将 AICC 框架改造为单个 Claude Code Plugin（内含多 skill + subagents + hooks + tools）的完整方案。已吸收并取代 dev/plan/done/skill-migration。核心四原则：单 plugin 多 skill、hooks 强制执行层、迁移即收敛、所有 plugin 交付物使用英文。目标平台仅 Claude Code（主，全能力）与 Codex（次，退化为建议级）。已实施并交付：插件已合入 master（V3.0「conversion complete」P1.5→P5），master 同时保留 clone 用法；临时 plugin 分支完成后已删除。
 keywords: aicc | plugin | claude-code | codex | skills | hooks | enforcement | convergence | english
-scope: dev/plan/plugin 子项目根（已实施并交付，保留作规划档案）
-related_files: ./01-plugin-architecture-and-enforcement.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/README.md | ../../../FRAMEWORK_REVIEW.md | ../../../FRAMEWORK_REVIEW_II.md | ../../../PLUGIN_BUILD_KICKOFF.md
+scope: dev/plan/done/plugin 子项目根（已实施并交付，保留作规划档案）
+related_files: ./01-plugin-architecture-and-enforcement.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/README.md | ../../../../FRAMEWORK_REVIEW.md | ../../../../FRAMEWORK_REVIEW_II.md | ../../../../PLUGIN_BUILD_KICKOFF.md
 dependencies: ../skill-migration/02-component-mapping.md
 verified_at: 2026-06-13
 status: done（已实施）
-supersedes: dev/plan/skill-migration（整体吸收并更名）
+supersedes: dev/plan/done/skill-migration（整体吸收并更名）
 ---
 
 # AICC → Claude Code Plugin 改造方案
@@ -16,7 +16,7 @@ supersedes: dev/plan/skill-migration（整体吸收并更名）
 
 > **状态（历史）**：方案已定稿，等待在新会话中以 Claude Code `/goal` 一次性执行。
 > **执行分支**：`plugin`（长期维护，与 `master` 并行；`master` 保留现有 clone 用法）。
-> **启动指令**：根目录 [`PLUGIN_BUILD_KICKOFF.md`](../../../PLUGIN_BUILD_KICKOFF.md)（复制到新会话即可启动）。
+> **启动指令**：根目录 [`PLUGIN_BUILD_KICKOFF.md`](../../../../PLUGIN_BUILD_KICKOFF.md)（复制到新会话即可启动）。
 
 ---
 

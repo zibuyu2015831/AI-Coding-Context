@@ -4,7 +4,7 @@ summary: 记录 LingoTrace 下游项目首创的「单个 active plan 自审核�
 keywords: aicc | plan-review | active-plan | review-object | self-review | lingotrace | absorption
 scope: AI-Coding-Context 框架 plans/ 子系统的方案审核能力演进
 related_files: core/framework_spec.md | workflows/review-workflow.md | workflows/review_standards | templates/PLAN_TEMPLATE.md | templates/plans_README_TEMPLATE.md | templates/review/review_plan_TEMPLATE.md | agents/runtime/plan_reviewer.md
-dependencies: dev/plan/aicc-generation-plan-review-process-gap-plan.md | dev/plan/aicc-phase1-review-gate-implementation-plan.md | dev/plan/aicc-phase1-review-gate-followup-plan.md
+dependencies: dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md
 verified_at: 2026-06-13
 status: proposed（提案，待决策）
 ---

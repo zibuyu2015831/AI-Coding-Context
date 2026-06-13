@@ -4,7 +4,7 @@ summary: 基于 LinguaCafe 作为测试项目暴露出的 AICC 首次生成与 P
 keywords: aicc | linguacafe | phase1 | first-generation | evidence-level | self-check | project-positioning
 scope: AICC 首次生成与 Phase 1 审核机制的二次改进方案；LinguaCafe 仅作为测试样本，不包含 LinguaCafe 正式 dev_docs 生成，也不直接实施框架代码修改
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | core/contracts/run_record_contract.yaml | core/project_types/fullstack.md | core/project_types/web_frontend.md | core/project_types/containerized.md | tools/py/doc_health_checker.py | tools/js/doc_health_checker.js | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js | tools/py/project_scanner.py | tools/js/project_scanner.js | tools/py/framework_contract_checker.py | tools/js/framework_contract_checker.js
-dependencies: dev/plan/dayflow-phase1-aicc-improvement-plan.md | AI_ENTRY_POINT.md | core/framework_spec.md
+dependencies: dev/plan/done/dayflow-phase1-aicc-improvement-plan.md | AI_ENTRY_POINT.md | core/framework_spec.md
 verified_at: 2026-05-18
 status: proposed（待审核）
 ---

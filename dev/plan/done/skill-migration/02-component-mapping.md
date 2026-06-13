@@ -2,7 +2,7 @@
 title: AICC 组件 → Skill Plugin 映射表
 summary: 将 AICC 现有的 workflows / agents / tools / templates / core / config / guides 等 7 大组件，逐一映射到目标 plugin 的 skills / agents / scripts / references 等位置；记录每个 skill 的职责、触发 description 草稿、依赖、规模估算与命名理由。
 keywords: aicc | skill-mapping | component-migration | plugin-architecture
-scope: dev/plan/skill-migration 子项目（组件映射阶段）
+scope: dev/plan/done/skill-migration 子项目（组件映射阶段）
 related_files: 01-feasibility-and-architecture.md | 03-implementation-roadmap.md | README.md
 dependencies: 01-feasibility-and-architecture.md
 verified_at: 2026-04-26

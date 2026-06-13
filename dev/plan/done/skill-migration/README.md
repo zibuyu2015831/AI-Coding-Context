@@ -2,7 +2,7 @@
 title: AICC Skill 化迁移规划 — 总索引
 summary: 将 AICC 框架的能力沉淀为 Claude Code plugin / skill 体系的整体规划入口；记录决策共识、文档导航与状态。本文件仅做总索引，所有展开内容请进入 01-04 子文档。
 keywords: aicc | skill-migration | plugin | claude-code | planning
-scope: dev/plan/skill-migration 子项目根（规划阶段）
+scope: dev/plan/done/skill-migration 子项目根（规划阶段）
 related_files: 01-feasibility-and-architecture.md | 02-component-mapping.md | 03-implementation-roadmap.md | 04-edge-cases-and-risks.md | 05-open-questions.md | ../../FRAMEWORK_CONTEXT.md
 dependencies: ../../FRAMEWORK_CONTEXT.md
 verified_at: 2026-06-13
@@ -11,7 +11,7 @@ status: superseded（已被 plugin 方案取代）
 
 # AICC Skill 化迁移规划
 
-> ⚠️ **已被吸收（superseded）**：本规划的核心架构决策（锁定决策 #2 实为“单 plugin × 多 skill”）已被 [`dev/plan/plugin/`](../plugin/README.md) 吸收并扩展。后者澄清了“skill vs plugin”实为伪二选一（plugin 是容器、skill 是组件），并补上本规划缺失的【hooks 强制执行层】与【迁移即收敛】两条主线。**新工作请以 `plugin` 为单一真相源**；本目录的 11-skill 组件映射（`02`）、边界条件（`04`）、开放问题（`05`）仍作为有效输入保留。
+> ⚠️ **已被吸收（superseded）**：本规划的核心架构决策（锁定决策 #2 实为“单 plugin × 多 skill”）已被 [`dev/plan/done/plugin/`](../plugin/README.md) 吸收并扩展。后者澄清了“skill vs plugin”实为伪二选一（plugin 是容器、skill 是组件），并补上本规划缺失的【hooks 强制执行层】与【迁移即收敛】两条主线。**新工作请以 `plugin` 为单一真相源**；本目录的 11-skill 组件映射（`02`）、边界条件（`04`）、开放问题（`05`）仍作为有效输入保留。
 
 > **当前阶段**：头脑风暴产出已落档，等待人工复审。**尚未进入实施**。
 > **分支**：`skill`（后续所有相关工作均在此分支推进）。

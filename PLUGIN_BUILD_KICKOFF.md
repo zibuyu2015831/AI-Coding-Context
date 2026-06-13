@@ -7,9 +7,9 @@
 ```text
 GOAL: Convert the AICC framework into a Claude Code plugin, IN FULL, this run.
 
-THE BLUEPRINT IS dev/plan/plugin/03-execution-spec.md — read it FIRST and execute it
+THE BLUEPRINT IS dev/plan/done/plugin/03-execution-spec.md — read it FIRST and execute it
 exactly (its sections §0 invariants, §0.5 build order, §1-§8 file-level specs, §9
-checkpoints, §10 final gate). Read dev/plan/plugin/README.md for locked decisions D1-D7.
+checkpoints, §10 final gate). Read dev/plan/done/plugin/README.md for locked decisions D1-D7.
 Do not re-derive or re-plan; the design work is done.
 
 HARD INVARIANTS (also in 03 §0 — never violate):
@@ -56,6 +56,6 @@ the safest convergent choice — do not stall. End with: what shipped, what was 
 ---
 
 **Notes for you (not part of the paste):**
-- The plan is on the `plugin` branch under `dev/plan/plugin/`. If your new session opens on a different branch, run `git checkout plugin` first so the agent can read the plan.
+- The plan is on the `plugin` branch under `dev/plan/done/plugin/`. If your new session opens on a different branch, run `git checkout plugin` first so the agent can read the plan.
 - The run aims to finish the ENTIRE conversion (P0→P5). A large build may exceed one session's budget; if so it checkpoints and you re-paste the same block to continue to completion with no rework.
 - The conversion baseline is `dev` (not `master`), per your note that dev isn't merged yet.

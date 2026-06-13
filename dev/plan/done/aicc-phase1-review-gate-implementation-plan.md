@@ -6,9 +6,12 @@ scope: AI-Coding-Context 框架 Phase 1 审核机制实现计划
 related_files: dev/plan/linguacafe-phase1-aicc-improvement-plan.md | AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md
 dependencies: templates/PROGRESS_TEMPLATE.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md | core/contracts/run_record_contract.yaml | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js
 verified_at: 2026-05-18
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC Phase 1 审核门落地实施计划
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。（核验：13/14 任务落地；Task 3 的 `project_positioning_signals` 以 semantic_review_checker 等价实现，另有 2 个 project_types 指南为次要文档待补。）
 
 ## 1. 目标与边界
 

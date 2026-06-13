@@ -4,11 +4,14 @@ summary: 记录 Memex 作为新测试项目首次运行 AICC 后暴露的首版�
 keywords: aicc | memex | first-run | path-a | first-release | health-check | testing-topology | semantic-review
 scope: AI-Coding-Context 路径 A 首次运行、正式文档生成后首版验收、运行记录契约、检查器语义质量和测试项目复测闭环
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | templates/HEALTH_CHECK_REPORT_TEMPLATE.md | tools/py/doc_health_checker.py | tools/py/semantic_review_checker.py | tools/py/summary_validator.py | tools/js/doc_health_checker.js | tools/js/semantic_review_checker.js | core/contracts/run_record_contract.yaml
-dependencies: dev/plan/aicc-first-release-acceptance-gate-improvement-plan.md | dev/plan/aicc-phase1-review-gate-followup-plan.md | dev/plan/aicc-generation-plan-review-process-gap-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
+dependencies: dev/plan/done/aicc-first-release-acceptance-gate-improvement-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md | dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
 verified_at: 2026-05-18
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC Memex 首次运行复测问题记录与优化方案
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。
 
 ## 1. 背景
 

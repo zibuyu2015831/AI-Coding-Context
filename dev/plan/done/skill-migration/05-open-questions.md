@@ -2,7 +2,7 @@
 title: AICC Skill 化 — 开放问题清单
 summary: 记录在 brainstorm 与设计阶段未能解决、或需要外部验证才能闭环的所有问题。每条包含问题描述、提出背景、影响面、决策方、解决路径、紧迫度与状态。本文档将持续维护到所有问题闭环。
 keywords: aicc | skill | open-questions | uncertainties | decision-log
-scope: dev/plan/skill-migration 子项目（持续维护）
+scope: dev/plan/done/skill-migration 子项目（持续维护）
 related_files: 01-feasibility-and-architecture.md | 02-component-mapping.md | 03-implementation-roadmap.md | 04-edge-cases-and-risks.md | README.md
 dependencies: README.md
 verified_at: 2026-04-26

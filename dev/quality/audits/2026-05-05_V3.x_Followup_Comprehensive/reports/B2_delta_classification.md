@@ -47,7 +47,7 @@ dependencies: dev/quality/audits/2026-05-05_V3.x_Followup_Comprehensive/_meta.md
 当前可见目录：
 
 - `dev/plan/`
-- `dev/plan/skill-migration/`
+- `dev/plan/done/skill-migration/`
 
 初步判断：
 

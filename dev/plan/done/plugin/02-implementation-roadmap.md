@@ -2,7 +2,7 @@
 title: AICC Plugin 化实施路线图（迁移即收敛）
 summary: 定义 plugin 改造的分阶段实施路线，核心原则是“迁移即收敛”——每迁移一块能力，先按两份审查的瘦身要求收敛，再打包，绝不 1:1 搬运体量债。给出与 skill-migration 8 阶段路线的差异、阶段门禁、风险与回退，以及 Phase 0 因开放问题已答而可压缩的工期。
 keywords: roadmap | migration | convergence | phases | gate | rollback
-scope: dev/plan/plugin（实施路线）
+scope: dev/plan/done/plugin（实施路线）
 related_files: ./README.md | ./01-plugin-architecture-and-enforcement.md | ./03-execution-spec.md | ../skill-migration/03-implementation-roadmap.md
 dependencies: ./01-plugin-architecture-and-enforcement.md
 verified_at: 2026-06-13
@@ -72,7 +72,7 @@ status: done（已实施）
 | PreToolUse deny 误伤正常 commit（过严） | 门禁先以 `ask`（提示+人工确认）灰度，稳定后再升 `deny`；阈值与白名单可在 settings.json 调 |
 | 收敛动作与迁移耦合拖慢进度 | 收敛只针对“即将迁移”的那块，按 skill 切片增量进行，不要求一次性全仓瘦身 |
 | skill 链式触发实测不稳定 | 回退到 subagent 调用或 body 内嵌片段（skill-migration 已有三级回退，沿用） |
-| 与 skill-migration 双规划并存造成混淆 | 已把 skill-migration 标注 superseded，单一真相源落在 `dev/plan/plugin`（呼应审查 P6） |
+| 与 skill-migration 双规划并存造成混淆 | 已把 skill-migration 标注 superseded，单一真相源落在 `dev/plan/done/plugin`（呼应审查 P6） |
 
 ---
 
@@ -90,7 +90,7 @@ status: done（已实施）
 ## 六、执行前置 checklist（决策已锁定 D1–D7，无未决问题）
 
 - [x] 决策 D1–D7 已由用户确认锁定（见 `README.md` §一）
-- [x] `skill-migration` 已标注 superseded，单一真相源落在 `dev/plan/plugin`
+- [x] `skill-migration` 已标注 superseded，单一真相源落在 `dev/plan/done/plugin`
 - [x] `dev` 基线已先行修复审查硬伤（版本标题、无依据量化宣称）并合入 `plugin`
 - [ ] 在新会话以 `PLUGIN_BUILD_KICKOFF.md` 启动 `/goal`，在 `plugin` 分支一次性执行（不在 dev/master 推进）
 - [ ] （可选）为本工作项在 `dev/` 状态系统登记为 V3.1 / V4.0 工作项

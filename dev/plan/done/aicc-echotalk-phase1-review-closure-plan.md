@@ -4,11 +4,14 @@ summary: 记录 EchoTalk 第二轮 Phase 1 方案复查后仍暴露的 summary �
 keywords: aicc | echotalk | phase1-review | summary-validator | progress-consistency | evidence-model | project-vision
 scope: AI-Coding-Context 路径 A Phase 1 方案复查阶段、_analysis 三件套回写、机器检查门禁、代码事实一致性和项目定位校准机制
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | tools/py/summary_validator.py | tools/py/doc_health_checker.py | tools/py/semantic_review_checker.py | tools/js/doc_health_checker.js | tools/js/semantic_review_checker.js | core/contracts/run_record_contract.yaml
-dependencies: dev/plan/aicc-generation-plan-review-process-gap-plan.md | dev/plan/aicc-phase1-review-gate-followup-plan.md | dev/plan/aicc-first-release-acceptance-gate-improvement-plan.md | dev/plan/aicc-memex-first-run-regression-plan.md
+dependencies: dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md | dev/plan/done/aicc-first-release-acceptance-gate-improvement-plan.md | dev/plan/done/aicc-memex-first-run-regression-plan.md
 verified_at: 2026-05-19
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC EchoTalk Phase 1 复查闭环优化方案
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。（核验：约 15/17 项落地；残留 `frontmatter_check_not_applied` 规则与 PROJECT_ANALYSIS_REPORT 愿景对比小节为次要后续项。）
 
 ## 1. 背景
 

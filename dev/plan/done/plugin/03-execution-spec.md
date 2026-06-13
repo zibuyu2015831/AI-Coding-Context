@@ -2,7 +2,7 @@
 title: AICC Plugin Build — Execution Spec (one-shot /goal blueprint)
 summary: The prescriptive, file-level blueprint a single Claude Code /goal session follows to build the AICC plugin end-to-end. Defines invariants, the exact plugin tree, plugin.json, the full skill list with English trigger descriptions, the hooks enforcement layer (hooks.json + scripts), bin wrappers, shared references, settings mapping, convergence targets with line budgets, the Codex flat-package projection, build-time copy + manifest, per-checkpoint acceptance criteria, and the final acceptance gate. This document and ALL plugin deliverables are English by mandate (D5).
 keywords: execution | blueprint | plugin | skills | hooks | bin | settings | convergence | acceptance | codex
-scope: dev/plan/plugin (executable blueprint for one-shot build)
+scope: dev/plan/done/plugin (executable blueprint for one-shot build)
 related_files: ./README.md | ./01-plugin-architecture-and-enforcement.md | ./02-implementation-roadmap.md | ../skill-migration/02-component-mapping.md
 dependencies: ./01-plugin-architecture-and-enforcement.md | ./02-implementation-roadmap.md
 verified_at: 2026-06-13

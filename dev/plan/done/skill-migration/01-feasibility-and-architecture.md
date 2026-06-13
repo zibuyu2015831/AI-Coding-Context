@@ -2,7 +2,7 @@
 title: AICC Skill 化 — 可行性与架构设计
 summary: 完整记录 AICC 迁移到 skill 模式的问题陈述、业界 skill 机制深度调研、可行性论证、4 个备选架构方案对比，以及最终选定方案的详细设计（plugin 顶层结构、skill 内部结构、路由机制、与 AICC 现有体系的关系）。
 keywords: aicc | skill | feasibility | architecture | plugin-design | progressive-disclosure
-scope: dev/plan/skill-migration 子项目（架构论证阶段）
+scope: dev/plan/done/skill-migration 子项目（架构论证阶段）
 related_files: README.md | 02-component-mapping.md | 03-implementation-roadmap.md | 04-edge-cases-and-risks.md
 dependencies: README.md | ../../FRAMEWORK_CONTEXT.md
 verified_at: 2026-04-26

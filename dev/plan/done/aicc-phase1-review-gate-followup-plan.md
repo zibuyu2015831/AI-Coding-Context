@@ -4,11 +4,14 @@ summary: 记录完善后的 AICC 在 LinguaCafe 复测中暴露的检查器一�
 keywords: aicc | phase-1 | review-gate | follow-up | linguacafe | checker-consistency
 scope: AI-Coding-Context Phase 1 审核门复测后的框架优化计划
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js
-dependencies: dev/plan/aicc-generation-plan-review-process-gap-plan.md | dev/plan/aicc-phase1-review-gate-implementation-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
+dependencies: dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
 verified_at: 2026-05-18
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC Phase 1 审核门复测后续优化方案
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。
 
 ## 1. 背景
 
@@ -469,7 +472,7 @@ python3 -m unittest discover tools/py/tests
 for test_file in tools/js/*.test.js; do node "$test_file" || exit 1; done
 python3 tools/py/framework_contract_checker.py --self-check
 node tools/js/framework_contract_checker.js --self-check
-python3 tools/py/doc_health_checker.py --file dev/plan/aicc-phase1-review-gate-followup-plan.md --check-template-residue --check-file-paths --check-code-samples
+python3 tools/py/doc_health_checker.py --file dev/plan/done/aicc-phase1-review-gate-followup-plan.md --check-template-residue --check-file-paths --check-code-samples
 python3 tools/py/doc_health_checker.py --file dev/plan/README.md --check-template-residue --check-file-paths
 python3 tools/py/doc_health_checker.py --file AI_ENTRY_POINT.md --check-template-residue --check-code-samples
 git diff --check

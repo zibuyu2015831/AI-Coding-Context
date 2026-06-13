@@ -57,7 +57,7 @@ flowchart TD
     class PLUGIN,BRANCH Shipped;
 ```
 
-- **Plugin 改造（已交付）**：将 AICC 从"clone 仓库 + 必读入口文档"升级为单个 Claude Code Plugin（多 skill + subagents + hooks + bin），已于 V3.0 完成并合入 master（提交 P1.5→P5「conversion complete」）。规划档案见 `dev/plan/plugin/`，迁移说明见 master 分支 `plugin/MIGRATION.md`。此事件实质改变了框架的主分发形态，但未编为正式 ADR。
+- **Plugin 改造（已交付）**：将 AICC 从"clone 仓库 + 必读入口文档"升级为单个 Claude Code Plugin（多 skill + subagents + hooks + bin），已于 V3.0 完成并合入 master（提交 P1.5→P5「conversion complete」）。规划档案见 `dev/plan/done/plugin/`，迁移说明见 master 分支 `plugin/MIGRATION.md`。此事件实质改变了框架的主分发形态，但未编为正式 ADR。
 - **三分支 / orphan 分支重构（2026-06-13）**：确立 master（用户面）/ dev（与 master 同步）/ internal（orphan 孤儿分支，承载 `dev/` 开发档案）三分支模型，将框架开发元数据隔离到 internal 分支。此后 `dev/V3.0/` 目录在 internal 上已移除。
 
 > 待办：如需将上述两项正式化，应在 `decisions/` 下新建 `003-*` / `004-*` ADR 文件并回链本节。

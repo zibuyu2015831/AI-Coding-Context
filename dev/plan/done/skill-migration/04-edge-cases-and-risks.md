@@ -2,7 +2,7 @@
 title: AICC Skill 化 — 边界条件与风险全景
 summary: 系统梳理 skill 化迁移过程中可能遇到的边界条件与风险，按 8 个类别（skill 系统约束 / token / 互调用 / 工具脚本 / 项目检测 / 用户认知 / 升级兼容 / 多平台 / dogfood）归并；每条记录现象、影响、缓解措施、是否 Phase 已覆盖。
 keywords: aicc | skill | edge-cases | risks | mitigation
-scope: dev/plan/skill-migration 子项目（风险评估阶段）
+scope: dev/plan/done/skill-migration 子项目（风险评估阶段）
 related_files: 01-feasibility-and-architecture.md | 02-component-mapping.md | 03-implementation-roadmap.md | 05-open-questions.md | README.md
 dependencies: 01-feasibility-and-architecture.md | 03-implementation-roadmap.md
 verified_at: 2026-04-26

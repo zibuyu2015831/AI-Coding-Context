@@ -4,11 +4,14 @@ summary: 记录 LinguaCafe 正式文档体系生成完成后暴露的首版验�
 keywords: aicc | first-release | acceptance-gate | health-check | ai-rules | sensitive-redaction | linguacafe
 scope: AI-Coding-Context 路径 A 正式文档生成后的首版质量验收流程、模板、检查器和契约
 related_files: AI_ENTRY_POINT.md | workflows/path_a_first_generation.md | workflows/generation_workflow.md | workflows/shared/ai_checklist.md | templates/HEALTH_CHECK_REPORT_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | templates/AI_RULES_TEMPLATE.md | tools/py/doc_health_checker.py | tools/js/doc_health_checker.js | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js | core/security_rules.md | core/contracts/run_record_contract.yaml
-dependencies: dev/plan/aicc-phase1-review-gate-followup-plan.md | dev/plan/aicc-generation-plan-review-process-gap-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
+dependencies: dev/plan/done/aicc-phase1-review-gate-followup-plan.md | dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/linguacafe-phase1-aicc-improvement-plan.md
 verified_at: 2026-05-18
+status: done（已实施并验证，2026-06-13 归档）
 ---
 
 # AICC 首版验收门禁可信度优化方案
+
+> **状态：✅ 已实施并验证（done）** — 本方案提出的改进已落地到框架（契约 / 检查器 / 模板 / 工作流，Python+JS 一致并配有通过的测试），于 2026-06-13 经逐任务核验后归档至 `dev/plan/done/`。以下为当时的规划与问题记录，保留作开发档案，措辞中的“待办/暴露的问题”为历史状态。
 
 ## 1. 背景
 

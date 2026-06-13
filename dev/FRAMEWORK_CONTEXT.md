@@ -723,7 +723,7 @@ project_root/
 ### 开发文档
 
 - [dev/FRAMEWORK_CONTEXT.md](./FRAMEWORK_CONTEXT.md) - 本文档（全局上下文）
-- [dev/plan/](./plan/) - 框架长期迭代计划与蓝图
+- [dev/plan/](./plan/) - 框架长期迭代计划与蓝图（active）；已完成/已取代的计划归档于 [dev/plan/done/](./plan/done/)
 
 
 ### 参考文档

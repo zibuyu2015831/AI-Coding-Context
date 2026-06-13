@@ -2,7 +2,7 @@
 title: AICC Skill 化 — 实施路线图（Phase 0a-5）
 summary: 将 skill 化迁移拆解为 8 个独立可发布或可验收的阶段（Phase 0a、0b、1、1.5、2、3、4、5），每阶段包含目标、交付物、验收标准、依赖、估算工作量与风险。Phase 之间以"独立可发布/可验证"为门槛，避免一次性大爆炸式迁移。
 keywords: aicc | implementation | roadmap | phases | gates
-scope: dev/plan/skill-migration 子项目（路线图阶段）
+scope: dev/plan/done/skill-migration 子项目（路线图阶段）
 related_files: 01-feasibility-and-architecture.md | 02-component-mapping.md | 04-edge-cases-and-risks.md | README.md
 dependencies: 01-feasibility-and-architecture.md | 02-component-mapping.md
 verified_at: 2026-04-26
@@ -112,7 +112,7 @@ plugin/
   - [ ] frontmatter `verified_at` 不超过 N 天（防陈旧）
   - [ ] description 中没有时间敏感信息（"after 2025"、"before August" 等正则检查）
 
-**核心规范文档**（`dev/plan/skill-migration/standards/` 下，规划期辅助产物）：
+**核心规范文档**（`dev/plan/done/skill-migration/standards/` 下，规划期辅助产物）：
 - `skill-naming-convention.md`：命名细则（Claude Code 短名 / flat repackage 前缀 / 大小写 / 连字符）
 - `skill-md-template.md`：SKILL.md 标准模板（含 frontmatter、章节结构）
 - `description-style-guide.md`：description 写法规范（"Use when..." 起头、第三人称、不总结 workflow、< 1024 字符）
@@ -410,7 +410,7 @@ plugin/
 
 ### 10.2 交付物
 
-- `dev/plan/skill-migration/migrate-from-clone.md`：手把手迁移指南
+- `dev/plan/done/skill-migration/migrate-from-clone.md`：手把手迁移指南
   - 现有 dev_docs/ 兼容性说明（哪些保留、哪些升级）
   - 迁移检查清单
   - 常见问题
@@ -419,7 +419,7 @@ plugin/
   - 提示需手动处理的差异
   - 备份 + 升级
 - 框架仓库 `README.md` 更新：plugin 模式置顶；clone 模式降至"高级用户/兜底"
-- `dev/plan/skill-migration/clone-mode-deprecation-policy.md`：clone 模式的维护承诺
+- `dev/plan/done/skill-migration/clone-mode-deprecation-policy.md`：clone 模式的维护承诺
   - 维护到何时
   - 哪些 P0 bug 仍然修复
   - 何时停止
