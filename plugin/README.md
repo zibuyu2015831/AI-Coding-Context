@@ -33,7 +33,8 @@ Optional: put `plugin/bin` on PATH for the `aicc-*` CLIs outside sessions.
 | `/aicc:health-check` | assess existing docs: staleness, drift, score, routing |
 | `/aicc:incremental-update` | code changed — sync the docs (commit-guided supported) |
 | `/aicc:design-thinking` | complex/ambiguous task — 5-Why, multi-option, risk analysis |
-| `/aicc:mutual-review` | adversarial second-AI review of a plan/code/doc |
+| `/aicc:mutual-review` | adversarial second-AI review of an in-flight plan/code/doc you just generated |
+| `/aicc:plan-review` | review one already-landed plan file before implementation — addressable + re-enterable; sets `review_status` (commit gate blocks a `plans/done/` plan that skipped it) |
 | `/aicc:adr` | record an architecture decision |
 | `/aicc:doc-fallacy-fix` | docs contradict the code — verify and correct everywhere |
 | `/aicc:systematic-review` | multi-round audit of the whole doc set |
@@ -48,7 +49,7 @@ database-designer.
 | hook | event | effect |
 | --- | --- | --- |
 | session_inject | SessionStart | injects skill catalog + `dev_docs/` health snapshot — no paste needed |
-| pre_commit_gate | PreToolUse (git commit) | validates changed `dev_docs/**/*.md` (frontmatter + main-doc contract); default `ask`, set `deny` to hard-block |
+| pre_commit_gate | PreToolUse (git commit) | validates changed `dev_docs/**/*.md` (frontmatter + main-doc contract), and blocks a `plans/done/` plan whose `review_status` is not `reviewed`/`skipped(+reason)`; doc gate `aicc.git_safety.commit_gate` + plan gate `aicc.planReview.gate`, default `ask`, set `deny` to hard-block |
 | dangerous_git_guard | PreToolUse (git) | denies force push, hard reset, history rewrite, protected-branch commits |
 | post_tool_audit | PostToolUse | appends minimal JSONL telemetry under the plugin data dir |
 
