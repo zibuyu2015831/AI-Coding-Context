@@ -86,9 +86,13 @@ green classifier), `aicc-complexity` (raw size metrics), `aicc-knowledge`
 ## Codex package
 
 `python3 build/build.py --codex` emits `dist/codex/`: the same skills,
-flat-named `aicc-*`, with enforcement degraded to explicit advisory notes
-and an `AGENTS.md` index. Codex gets recommendations; Claude Code gets
-guarantees.
+flat-named `aicc-*`, plus an `AGENTS.md` index and a self-contained
+`.codex/` hooks bundle. Codex (>= v0.117) runs lifecycle hooks with a
+stdin/stdout contract matching Claude Code's, so the commit gate and
+git-safety guard enforce there too — install `.codex/` at your repo root
+and trust it via `/hooks` (same hook scripts as the plugin, not a
+reimplementation). Codex hook interception has gaps on some shell paths,
+so the `bin/aicc-*` validators remain the advisory backstop.
 
 ## Migrating from the clone form
 
