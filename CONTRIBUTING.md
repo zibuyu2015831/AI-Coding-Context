@@ -1207,12 +1207,31 @@ Closes #42
 
 ---
 
-## 📝 框架文档贡献规范
+## 📝 分支模型与框架文档贡献规范
 
-框架自身的文档质量保证体系位于 `dev/quality/`（仅 dev 分支可见）。当你为框架新增或修改文档（workflow、guide、core 规范等）时：
+本仓库采用三分支模型，提交前请务必理解：
 
-1. 切换到 dev 分支
-2. 阅读 `dev/quality/README.md` 了解审查体系总览
-3. 遵循 `dev/quality/standards/COMMON_STANDARDS.md` 与 `QUALITY_CHECKLIST.md` 的质量标准
-4. 单文档变更走 `dev/quality/AUDIT_WORKFLOW.md`；全框架审查走 `dev/quality/Framework_Review_Guidelines.md`
-5. 新文档需配套生成审查上下文（参见 `dev/quality/HOW_TO_GENERATE_CONTEXTS.md`）
+| 分支 | 面向 | 内容 |
+|------|------|------|
+| `master` | **最终用户** | 干净的可用框架（clone+入口文档用法 + `plugin/` 插件用法），不含任何开发过程内容 |
+| `dev` | 集成 / 测试 | 与 `master` **结构相同**的产品树；功能在此开发与测试，通过后合并入 `master` |
+| `internal` | 框架维护者 | 开发过程元数据：质量保证体系、计划、ADR、评审报告等。**孤儿分支，与 dev/master 无共同历史，永不参与其合并** |
+
+> ⚠️ **关键约束（避免破坏隔离）**：`dev` 与 `master` 的文件结构必须始终保持一致。
+> **不要**把 `dev/`（开发元数据目录）、`FRAMEWORK_REVIEW*.md`、`PLUGIN_BUILD_KICKOFF.md`、`framework_improvement_*.md` 等开发过程文件加回 `dev` 或 `master`——它们只属于 `internal` 分支。
+> 一旦这些文件出现在 `dev`，下次 `merge dev → master` 就会产生 modify/delete 冲突，并可能把开发内容泄漏给用户。
+
+### 访问框架质量保证体系（位于 internal 分支）
+
+框架自身的文档质量保证体系不在 `dev`/`master`，而在 `internal` 分支。用 git worktree 在本地挂载，开发时随时查阅（`_internal/` 已在 `.gitignore` 中忽略）：
+
+```bash
+git worktree add _internal internal
+```
+
+当你为框架新增或修改文档（workflow、guide、core 规范等）时：
+
+1. 阅读 `_internal/dev/quality/README.md` 了解审查体系总览
+2. 遵循 `_internal/dev/quality/standards/COMMON_STANDARDS.md` 与 `QUALITY_CHECKLIST.md` 的质量标准
+3. 单文档变更走 `_internal/dev/quality/AUDIT_WORKFLOW.md`；全框架审查走 `_internal/dev/quality/Framework_Review_Guidelines.md`
+4. 新文档需配套生成审查上下文（参见 `_internal/dev/quality/HOW_TO_GENERATE_CONTEXTS.md`）

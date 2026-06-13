@@ -1,6 +1,6 @@
 # AICC Plugin — Build Notes
 
-Convergence log for the plugin build (spec: `dev/plan/plugin/03-execution-spec.md`).
+Convergence log for the plugin build (spec: `_internal/dev/plan/plugin/03-execution-spec.md`, on the `internal` branch).
 Everything dropped, deferred, or adapted from the dev-tree sources is recorded here.
 
 ## Confirmed hook schema (P0, Claude Code 2.1.170)

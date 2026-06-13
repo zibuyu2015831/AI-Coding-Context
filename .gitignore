@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# internal 分支的本地 worktree 挂载点（开发元数据，见 CONTRIBUTING.md）
+_internal/
