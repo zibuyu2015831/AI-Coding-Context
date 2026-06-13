@@ -111,7 +111,7 @@ PROVENANCE = {
     "build/build.py": {"sources": [], "converged": None, "note": "authored"},
     "build/lint.py": {"sources": [], "converged": None, "note": "authored"},
     "build/codex_projection.py": {"sources": [], "converged": None,
-                                  "note": "authored Codex flat projection (spec 7)"},
+                                  "note": "authored Codex flat projection (spec 7) + self-contained .codex/ hooks bundle for enforcement parity (Codex >= v0.117)"},
 }
 
 

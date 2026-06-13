@@ -146,8 +146,8 @@
       "path": "build/codex_projection.py",
       "sources": [],
       "converged": null,
-      "lines": 141,
-      "note": "authored Codex flat projection (spec 7)"
+      "lines": 301,
+      "note": "authored Codex flat projection (spec 7) + self-contained .codex/ hooks bundle for enforcement parity (Codex >= v0.117)"
     },
     {
       "path": "build/lint.py",
