@@ -28,6 +28,15 @@ verified_at: 2026-06-13
 | [EchoTalk Phase 1 复查闭环优化方案](./aicc-echotalk-phase1-review-closure-plan.md) | EchoTalk 第二轮 | ~15/17（2 项次要后续） |
 | [Dayflow 首次运行复盘与 AICC Phase 1 改进计划](./dayflow-phase1-aicc-improvement-plan.md) | Dayflow | 已实施（见 `dev/quality/audits/2026-05-18_dayflow_phase1_aicc_improvement_verification.md`） |
 
+## 框架演进方案 (done)
+
+下列方案为框架自身能力演进（非单个下游项目的 Phase 1 改进），均已实施并验证后归档：
+
+| 计划 | 来源 | 核验 |
+| --- | --- | --- |
+| [LingoTrace 方案自审核协议吸收分析与决策记录](./lingotrace-active-plan-self-review-absorption-plan.md)（Doc B） | LingoTrace `plan-review-protocol.md` | plan-review 自审机制跨 SSOT/插件/Codex 三形态落地（dev `df7ab06`）：`core/plan_review_protocol.md` 薄层 + `plan_done_without_review`（Py/JS 双实现 + 测试，键于 `plans/done/` 目录成员）+ `skills/plan-review/` 委派 mutual-review + `pre_commit_gate` 调用同一判定 + `aicc.planReview` + Codex 投影。build/codex/doc_health 测试全绿 |
+| [Codex hook 机制收敛与交付形态对齐方案](./codex-hook-convergence-delivery-form-alignment-plan.md)（Doc A） | Codex v0.117 官方文档查证 | Doc B 的前置基础：`.codex/` 强制包 + README 对齐 + `test_codex_projection.py` + 已归档规格更正横幅；前置使命随 Doc B 落地兑现 |
+
 ## 已被取代 / 子项目档案 (superseded / shipped)
 
 | 计划 | 状态 | 说明 |
@@ -37,4 +46,4 @@ verified_at: 2026-06-13
 
 ---
 
-**最后更新**：2026-06-13 — 建立 `done/` 归档区；迁入 6 份已验证的 aicc-* 方案 + dayflow + plugin/ + skill-migration/。
+**最后更新**：2026-06-13 — 迁入框架演进方案 Doc B（plan-review 自审机制，dev `df7ab06`）+ Doc A（Codex hook 收敛，前置使命兑现）。此前：建立 `done/` 归档区，迁入 6 份已验证的 aicc-* 方案 + dayflow + plugin/ + skill-migration/。

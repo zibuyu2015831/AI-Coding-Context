@@ -4,14 +4,16 @@ summary: 记录 LingoTrace 下游项目首创的「单个 active plan 自审核�
 keywords: aicc | plan-review | active-plan | review-object | self-review | lingotrace | absorption
 scope: AI-Coding-Context 框架 plans/ 子系统的方案审核能力演进
 related_files: core/framework_spec.md | workflows/review-workflow.md | workflows/review_standards | templates/PLAN_TEMPLATE.md | templates/plans_README_TEMPLATE.md | templates/review/review_plan_TEMPLATE.md | agents/runtime/plan_reviewer.md | plugin/skills/mutual-review/SKILL.md | plugin/hooks/pre_commit_gate.py | plugin/scripts/py/doc_health.py | plugin/build/build.py | plugin/settings.json
-dependencies: dev/plan/codex-hook-convergence-delivery-form-alignment-plan.md | dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md
+dependencies: dev/plan/done/codex-hook-convergence-delivery-form-alignment-plan.md | dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md
 verified_at: 2026-06-13
-status: proposed（开放问题已定案 + 插件/Codex 落地映射已设计；Codex hook 前提已更正、通用强制包已落地 c8d3f46，待转可执行实施计划，2026-06-13）
+status: done（已跨 SSOT/插件/Codex 三形态实施并验证，dev df7ab06，2026-06-13）
 ---
 
 # LingoTrace 方案自审核协议吸收分析与决策记录
 
-状态：Proposed（分析与决策已完成，待实现）
+> **归档横幅（2026-06-13）**：本方案已**实施落地**——plan-review 自审机制已跨三形态交付（dev `df7ab06`）：SSOT `core/plan_review_protocol.md` 薄层 + framework_spec done 硬规则 + PLAN_TEMPLATE/plans_README review_status 字段 + `doc_health_checker` 新增 `plan_done_without_review`（Py/JS 双实现 + 测试，键于 `plans/done/` 目录成员身份）+ review-workflow §6 流程门；插件 `skills/plan-review/` 委派 mutual-review + `pre_commit_gate` 调用同一判定 + `settings.json aicc.planReview`；Codex 投影 `aicc-plan-review/` + `.codex/` 包同脚本强制。`build --codex` / `test_codex_projection` / doc_health Py·JS 测试全绿。下文正文保留为决策时原貌。
+
+状态：Done（已实施并验证，dev df7ab06，2026-06-13）
 创建日期：2026-06-13
 最后更新日期：2026-06-13
 来源：LingoTrace 下游项目 `docs/plans/plan-review-protocol.md`
@@ -263,7 +265,7 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 - [x] 就 §11 开放问题与用户确认 —— 2026-06-13 用户采纳架构师推荐方案，四问全部定案（见 §11 / §11.1）。
 - [x] 设计自审机制在**插件 / Codex 交付形态**的落地映射 —— 2026-06-13 写入 §7.6（薄技能 `/aicc:plan-review` 委派 mutual-review 引擎、复用 `pre_commit_gate` hook 承接 done 硬阻断、`settings.json` `aicc.planReview` 配置、build/codex 投影与降级）。
 - [x] 查验 Codex 新 hook 机制并升级 Codex 投影 —— 2026-06-13 确认 Codex v0.117 hooks 契约与 Claude 同构（推翻「Codex 无 hook」前提）；`codex_projection.py` 改为产出自包含 `dist/codex/.codex/` 强制包，`pre_commit_gate` / `dangerous_git_guard` 在 Codex 获 enforcement parity（commit `c8d3f46`，dev，已本地验证 deny 路径）；§7.6 前提与 §7.6.5 同步更正。**此为通用基础设施**，已独立记录为 [Codex hook 机制收敛方案](./codex-hook-convergence-delivery-form-alignment-plan.md)（Doc A，含 README 对齐、规格更正横幅、回归测试 `test_codex_projection.py`）；本方案（Doc B）的 `plan_done_without_review` 门实现时即落在该包内的 `pre_commit_gate`，**实施顺序先 A 后 B**。
-- [ ] 将本分析转化为可执行实施计划（精确到 §7 各落点的 diff 设计与验证命令），作为已落地 generation_plan 门的**扩展**实现，覆盖**三种交付形态**：
+- [x] 将本分析转化为可执行实施计划并**落地三形态**（2026-06-13，dev `df7ab06`）。下列各落点均已实现并验证：
   - **框架 SSOT**：`core/plan_review_protocol.md`（统一薄层）+ framework_spec plans/ 指针与硬规则 + PLAN_TEMPLATE/plans_README_TEMPLATE 增 `review_status` 字段 + `doc_health_checker` 新增 `plan_done_without_review`（Python/JS 双实现 + fixture）+ 入口/工作流路由的流程门。
   - **插件**（§7.6）：新增 `plugin/skills/plan-review/SKILL.md`（投影自薄层、委派 mutual-review）+ 扩展 `plugin/hooks/pre_commit_gate.py` 承接 done 硬阻断 + `plugin/scripts/py/doc_health.py` 投影新检查项 + `plugin/settings.json` 增 `aicc.planReview` + build.py 源映射登记。
   - **Codex**：`codex_projection.py` 输出 `dist/codex/aicc-plan-review/`；done 硬门由**已落地**的 `.codex/` 强制包内 `pre_commit_gate` 承接（扩展其判定，与插件同脚本，2026-06-13 通用基础设施已提交 `c8d3f46`），`AGENTS.md` 保留 `aicc-doc-health` 顾问兜底。

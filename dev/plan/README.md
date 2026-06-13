@@ -35,10 +35,8 @@ verified_at: 2026-06-13
 
 ## 进行中 / 提案 (active)
 
-- [Codex hook 机制收敛与交付形态对齐方案](./codex-hook-convergence-delivery-form-alignment-plan.md) — `done`（交付形态对齐已实施验证：`.codex/` 强制包 + README + 回归测试 + 规格更正横幅；保留为 plan-review 方案的前置基础，待 Doc B 落地后归档）
-- [LingoTrace 方案自审核协议吸收分析与决策记录](./lingotrace-active-plan-self-review-absorption-plan.md) — `proposed`（§11 开放问题已定案 + §7.6 插件/Codex 落地映射已设计；Codex hook 前提已更正、强制包已落地于 Doc A，待转可执行实施计划。**实施依赖 Doc A，顺序先 A 后 B**）
 - [AICC Phase 1 审核机制二次改进计划](./linguacafe-phase1-aicc-improvement-plan.md) — `proposed`（待审核）
 
 ## 已完成 / 已归档 (done/superseded)
 
-→ 见 [`done/README.md`](./done/README.md)（已迁入 6 份已验证的 aicc-* 方案、dayflow，以及 plugin/、skill-migration/ 两个子项目档案）。
+→ 见 [`done/README.md`](./done/README.md)（已迁入 6 份已验证的 aicc-* 方案、dayflow，plan-review 自审机制方案（Doc B）+ Codex hook 收敛方案（Doc A），以及 plugin/、skill-migration/ 两个子项目档案）。

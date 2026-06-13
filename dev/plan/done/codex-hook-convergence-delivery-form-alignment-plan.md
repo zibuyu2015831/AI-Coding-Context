@@ -6,12 +6,14 @@ scope: AICC 框架交付形态（插件 / Codex 扁平包）的强制层一致�
 related_files: plugin/build/codex_projection.py | plugin/build/test_codex_projection.py | plugin/README.md | plugin/hooks/hooks.json | dev/plan/done/plugin/03-execution-spec.md | dev/plan/done/plugin/01-plugin-architecture-and-enforcement.md | dev/plan/lingotrace-active-plan-self-review-absorption-plan.md
 dependencies: dev/plan/done/plugin/01-plugin-architecture-and-enforcement.md | dev/plan/done/plugin/03-execution-spec.md
 verified_at: 2026-06-13
-status: done（交付形态对齐已实施并验证，2026-06-13；保留为 Doc B 前置基础，待 plan-review 落地后归档）
+status: done（交付形态对齐已实施并验证，2026-06-13；前置使命完成——Doc B plan-review 已于 dev df7ab06 落地，本文归档）
 ---
 
 # Codex hook 机制收敛与交付形态对齐方案
 
-状态：Done（代码 / 用户文档 / 回归测试已落地并验证；规格档案已加更正横幅）
+> **归档横幅（2026-06-13）**：本文的前置使命已完成——其确立的 Codex `.codex/` 强制包成为 Doc B plan-review 自审门的 Codex 落点，Doc B 已于 dev `df7ab06` 跨三形态落地（`pre_commit_gate` 的 `plan_done_without_review` 硬门即挂接在本文交付的 `.codex/` 包内同脚本）。前置依赖兑现，随 Doc B 一并归档至 `done/`。
+
+状态：Done（代码 / 用户文档 / 回归测试已落地并验证；规格档案已加更正横幅；前置使命完成，归档）
 创建日期：2026-06-13
 最后更新日期：2026-06-13
 来源：Codex v0.117.0 新增 lifecycle hooks 的官网查证
@@ -112,4 +114,4 @@ Codex 自 **v0.117.0** 起支持 lifecycle hooks，与 Claude Code **逐字段�
 
 - [x] 完成 T1–T5（本文）。
 - [x] 在 `dev/plan/README.md` 索引登记本文档。
-- [ ] 实施 Doc B（plan-review 自审）：以本文确立的 Codex `.codex/` 强制包为前置，落地 `plan_done_without_review` 等门（见 Doc B §12）。
+- [x] 实施 Doc B（plan-review 自审）：以本文确立的 Codex `.codex/` 强制包为前置，已落地 `plan_done_without_review` 等门（2026-06-13，dev `df7ab06`；见 Doc B §12 与其归档横幅）。
