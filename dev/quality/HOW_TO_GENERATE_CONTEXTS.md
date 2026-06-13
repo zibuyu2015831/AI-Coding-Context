@@ -277,8 +277,7 @@ save_file(save_path, generated_context)
 **步骤 2: 准备参考材料**
 
 - ✅ `quality/contexts/_template.md` - 上下文模板
-- ✅ `DOCUMENT_OPTIMIZATION_GUIDE.md`（旧版）- 原有的文档上下文信息
-- ✅ `quality/standards/BY_DOCUMENT_TYPE.md` - 文档类型标准（已创建，详见该文件）
+- ✅ `quality/standards/BY_DOCUMENT_TYPE.md` - 文档类型标准（按文档类型的专项审查标准）
 - ✅ 各个实际文档
 
 ### 执行阶段
@@ -295,8 +294,8 @@ save_file(save_path, generated_context)
 【上下文1：模板】
 [粘贴 quality/contexts/_template.md 完整内容]
 
-【上下文2：原有信息（可选）】
-[粘贴 DOCUMENT_OPTIMIZATION_GUIDE.md 中相关文档的信息]
+【上下文2：文档类型标准（可选）】
+[粘贴 quality/standards/BY_DOCUMENT_TYPE.md 中对应文档类型的专项标准]
 
 【上下文3：实际文档】
 当前要生成审查上下文的文档是：[文档名]
@@ -744,7 +743,8 @@ git commit -m "feat: 生成批次X的审查上下文（文档类型Y）"
 
 ---
 
-**版本**: v1.0  
+**版本**: v1.1  
 **创建日期**: 2025-11-29  
-**最后更新**: 2025-11-29  
-**维护者**: Framework Team
+**最后更新**: 2026-06-13  
+**维护者**: Framework Team  
+**v1.1 变更（2026-06-13）**: 删除对已不存在的 `DOCUMENT_OPTIMIZATION_GUIDE.md`（旧版）的引用，改由 `BY_DOCUMENT_TYPE.md` 提供文档类型标准。

@@ -5,7 +5,7 @@ keywords: framework | global-context | v3.0 | quality-workflow
 scope: AICC 框架自身的全局框架上下文与版本快照（dev/ 目录）
 related_files: AI_ENTRY_POINT.md | README.md | dev/plan/ | config/README.md | tools/README.md | agents/README.md | dev/quality/README.md | core/design_decisions.md | core/SUMMARY_FORMAT_SPEC.md
 dependencies: core/SUMMARY_FORMAT_SPEC.md | core/design_decisions.md
-verified_at: 2026-05-29
+verified_at: 2026-06-13
 progress_synced_at: 2026-05-29
 ---
 
@@ -295,12 +295,11 @@ V3.0: ADR系统 + 演进历史（P1 已交付）
 #### 3.1.1 框架仓库结构（ai_coding_context/）
 
 ```text
+# [master / dev 分支]——结构相同的产品树，面向最终用户，零开发内容
 ai_coding_context/
-│
-├─[Public — main + dev 分支均可见]──────────
 │  ├── AI_ENTRY_POINT.md         # AI 入口（AI 读这个）
 │  ├── README.md                 # 对人类的框架介绍
-│  ├── CONTRIBUTING.md           # 贡献指南
+│  ├── CONTRIBUTING.md           # 贡献指南（含「分支模型与框架文档贡献规范」权威说明）
 │  ├── core/                     # 核心规范（语言/安全/项目类型/更新触发/摘要规范/设计决策）
 │  ├── agents/                   # AI 角色库（runtime/development/language_specific/workflows 等）
 │  ├── config/                   # 配置管理系统（user_config + CONFIG_TEMPLATE）
@@ -308,22 +307,23 @@ ai_coding_context/
 │  ├── workflows/                # 核心工作流（生成/检查/互审/Git 安全等）
 │  ├── guides/                   # 使用与适配指南（含 commit_guided_* 等）
 │  └── templates/                # 各类文档模板
-│
-└─[Dev-only — 仅 dev 分支可见，release 自动剔除]─────
-   └── dev/                              # 框架自身开发工作区
-       ├── FRAMEWORK_CONTEXT.md          # 本文档（全局上下文）
-       ├── architecture/                 # 架构产物（dogfood ADR 系统）
-       │   ├── adr-template.md           # ADR 模板
-       │   ├── evolution.md              # ADR 演进图谱
-       │   └── decisions/                # 已接受 ADR（001 markdown / 002 layered）
-       ├── complexity/                   # 复杂度仪表盘运行时（config + dashboard + data）
-       ├── quality/                      # 文档质量保证体系（标准 + 审查 SOP + contexts）
-       ├── reference/                    # 开发参考资料（理论分析、外部案例研究等）
-       ├── case_skillatlas_review/       # SkillAtlas 项目审查案例（019 ADR 来源）
-       └── plan/                         # 框架迭代的长期计划与蓝图
+
+# [internal 分支]——孤儿分支，与 master/dev 无共同历史、永不参与其合并；
+# 本目录（dev/）只存在于此分支，本地通过 `git worktree add _internal internal` 挂载
+dev/                                  # 框架自身开发工作区（仅 internal 分支）
+├── FRAMEWORK_CONTEXT.md          # 本文档（全局上下文）
+├── architecture/                 # 架构产物（dogfood ADR 系统）
+│   ├── adr-template.md           # ADR 模板
+│   ├── evolution.md              # ADR 演进图谱
+│   └── decisions/                # 已接受 ADR（001 markdown / 002 layered）
+├── complexity/                   # 复杂度仪表盘运行时（config + dashboard + data）
+├── quality/                      # 文档质量保证体系（标准 + 审查 SOP + contexts）
+├── reference/                    # 开发参考资料（理论分析、外部案例研究等）
+├── case_skillatlas_review/       # SkillAtlas 项目审查案例（019 ADR 来源）
+└── plan/                         # 框架迭代的长期计划与蓝图
 ```
 
-**⚠️ `dev/` 目录排除机制**：通过 `.gitattributes` 设置 `dev/ export-ignore`，`git archive` 与 GitHub release 自动剔除该目录；merge 到 main 分支时也应保持 `dev/` 不进入 main（详见 `dev/README.md`）。
+**⚠️ 分支隔离机制（权威说明见 `CONTRIBUTING.md` §分支模型 与 `internal` 分支根 `README.md`）**：`dev/`、`FRAMEWORK_REVIEW*.md`、`framework_improvement_*.md` 等开发过程元数据**只存在于 `internal` 孤儿分支**，`master` 与 `dev` 结构相同且都不含这些内容。因此二者合并永远是干净 fast-forward，不会泄漏开发内容给用户。**切勿**把上述内容加回 `dev` 或 `master`。本地开发用 `git worktree add _internal internal` 挂载 internal 分支（`_internal/` 已被忽略）。
 
 #### 3.1.2 典型用户项目结构（复制框架后的目标形态）
 
@@ -525,8 +525,9 @@ project_root/
     - 顶层目录与职责
     - V2.3 能力与 V3.0 基础设施
     - 质量体系与摘要机制的大致结构
-- 然后根据被审查的目标文档，从 `quality/contexts/` 中选择对应的审查上下文文件：
-  - 例如审查 `AI_ENTRY_POINT.md` 时，先加载 `quality/contexts/AI_ENTRY_POINT.md`
+- 然后根据被审查的目标文档，按 `quality/HOW_TO_GENERATE_CONTEXTS.md` 在审查时**即时生成**对应的审查上下文：
+  - `quality/contexts/` 下仅有 `_template.md`，各文档的专属上下文按需现场生成，而非加载预先存在的逐文档文件
+  - 例如审查 `AI_ENTRY_POINT.md` 时，依据该指南即时生成其审查上下文，不要去加载并不存在的 `quality/contexts/AI_ENTRY_POINT.md`
 - 审查过程中，如涉及以下内容，再按需展开：
   - 配置行为 → 查阅 `config/README.md`
   - 工具使用与性能 → 查阅 `tools/README.md`
@@ -738,4 +739,4 @@ project_root/
 **文档版本**: v2.1（更新 V3.0 P1 优化点进度）
 **最后更新**: 2026-05-29
 **维护者**: Framework Team  
-**反馈**: 欢迎在 dev/discussions/提出改进建议
+**反馈**: 欢迎在 internal 分支 dev/plan/ 下记录改进提案

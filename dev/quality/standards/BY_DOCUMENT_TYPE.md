@@ -39,10 +39,10 @@
 
 ### 特定检查项
 
-- [ ] **索引完整性**：`AI_ENTRY_POINT.md` 索引表覆盖所有 Public 层关键文档（不能遗漏新增的 workflow / template）
+- [ ] **索引完整性**：`AI_ENTRY_POINT.md` 索引表覆盖用户可见树(master/dev)所有关键文档（不能遗漏新增的 workflow / template）
 - [ ] **何时读取明确**：每个被索引文档的"何时读取"描述具体（禁止"需要时"这种空话）
 - [ ] **决策树可执行**：工作流分派决策树有明确判断条件、覆盖典型场景、有异常分支
-- [ ] **链接全部 Public**：视角 A 下，入口文档不得引用 `dev/` 任何路径（CONTRIBUTING.md 例外，因其本身面向贡献者，但需明确标注"仅 dev 分支可见"）
+- [ ] **链接全部指向用户可见树**：视角 A 下，入口文档不得引用 `dev/` 任何路径（CONTRIBUTING.md 例外（面向贡献者），其中对 `dev/` 的引用需标注 "dev/ 内容仅存在于 internal 分支，需 git worktree add _internal internal 获取"）
 - [ ] **README 30 秒能读完前 10 行**：定位、价值主张、入口链接必须在头部
 
 ### 常见反模式
@@ -105,7 +105,7 @@
 - [ ] **AI 指令模板可直接复制**：步骤中给 AI 的 prompt 应可直接 copy-paste
 - [ ] **流程衔接闭环**：path_a → path_b → path_c 之间的衔接条件明确，不出现"孤儿状态"
 - [ ] **commit_guided_update 必须挂载 git_safety**：v3.0 强制约束，工作流中应有强制校验阻断
-- [ ] **doc_error_fix_workflow 与 011 ADR 的关系标注清晰**：视角 A 下不得直接链接 dev/V3.0/confirmed/011/
+- [ ] **doc_error_fix_workflow 与对应 ADR 的关系标注清晰**：视角 A 下不得直接链接 dev/architecture/decisions/
 - [ ] **review-workflow 在 Complex/Critical 变更下强制触发**：不能依赖人主动调用
 
 ### 常见反模式
@@ -306,7 +306,7 @@ grep -rn "require(" tools/js/ | grep -v "require('fs')\|require('path')\|require
 
 ### 特定检查项
 
-- [ ] **`README.md` 索引覆盖率**：与实际 Public 层文件数量对齐（不能仍停留在"30+"而实际有 200+）
+- [ ] **`README.md` 索引覆盖率**：与用户可见树(master/dev)实际文件数量对齐（不能仍停留在"30+"而实际有 200+）
 - [ ] **`Framework_Review_Guidelines.md` 内部不自相矛盾**（如 dev/ 是否纳入审查）
 - [ ] **被引用的 standards 文件都存在**（如本文件 `BY_DOCUMENT_TYPE.md` 长期被引用却缺失，是历史教训）
 - [ ] **`contexts/` 真实数量** ≥ README 索引中标注 🔴 的数量
@@ -330,7 +330,9 @@ grep -rn "require(" tools/js/ | grep -v "require('fs')\|require('path')\|require
 
 ---
 
-**版本**：v1.0
+**版本**：v1.1
 **创建日期**：2026-04-25
+**最后更新**：2026-06-13
 **维护者**：Framework Team
 **说明**：本文件填补长期被引用却缺失的历史空白（HOW_TO_GENERATE_CONTEXTS / COMMON_STANDARDS / QUALITY_CHECKLIST 中均有指向）。后续每新增一类文档应在此文件追加专项章节。
+**v1.1 变更（2026-06-13）**：对齐三分支模型——"Public 层"术语改为"用户可见树(master/dev)"；CONTRIBUTING.md 对 dev/ 引用的标注更新为 internal 分支获取方式；失效 ADR 路径示例 genericize 为 dev/architecture/decisions/。

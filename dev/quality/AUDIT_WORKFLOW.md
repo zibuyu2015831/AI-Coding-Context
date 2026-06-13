@@ -187,7 +187,7 @@ AI生成修改后的完整文档
 - [建议 1]
 ```
 
-**保存位置**: `dev/quality/audits/YYYY-MM-DD-[文档名]-audit.md`
+**保存位置**: `dev/quality/audits/YYYY-MM-DD_<scope>.md`（轻量单文档审查采用 loose-file 形式，无需建目录；`<scope>` 用下划线连接的简明范围标签，如 `2026-05-18_dayflow_phase1_aicc_improvement_verification.md`）。完整 round 审查则归档为 `audits/YYYY-MM-DD_Version_Scope/` 目录含 5 件套——两种形式详见 [`audits/README.md`](./audits/README.md)。
 
 ---
 
@@ -315,6 +315,7 @@ AI生成修改后的完整文档
 
 ---
 
-**版本**: v1.0  
-**最后更新**: 2025-11-29  
-**维护者**: Framework Team
+**版本**: v1.1  
+**最后更新**: 2026-06-13  
+**维护者**: Framework Team  
+**v1.1 变更（2026-06-13）**: 单文档审查保存路径与 `audits/README.md` 的 loose-file 归档约定（`audits/YYYY-MM-DD_<scope>.md`）对齐。

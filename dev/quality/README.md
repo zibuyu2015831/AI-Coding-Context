@@ -5,14 +5,14 @@ keywords: quality | audit | review | test-runs | aicc
 scope: AICC 框架自身质量审查与复测归档体系
 related_files: dev/quality/test-runs/README.md | dev/quality/Framework_Review_Guidelines.md
 dependencies: dev/FRAMEWORK_CONTEXT.md | dev/quality/standards/QUALITY_CHECKLIST.md
-verified_at: 2026-05-18
+verified_at: 2026-06-13
 ---
 
 # 文档质量保证体系
 
 > **用途**: 为 AICC 框架自身提供系统化的质量保证工具与流程
 > **核心理念**: AI 辅助下的多视角审查 + 人工裁决
-> **版本**: v2.0（2026-04-25 全面重写：完整文件索引 + 三视角分层 + context 优先级分级）
+> **版本**: v2.1（2026-06-13 三分支模型对齐；v2.0 2026-04-25 全面重写：完整文件索引 + 三视角分层 + context 优先级分级）
 
 ---
 
@@ -69,7 +69,7 @@ verified_at: 2026-05-18
 
 ### audits/ — 审查归档
 
-每次完整审查（round）对应 `audits/YYYY-MM-DD_Version_Scope/` 一个子目录，含 5 件套：
+完整审查（round）对应 `audits/YYYY-MM-DD_Version_Scope/` 一个子目录，含 5 件套；轻量单文档审查可直接落地为 `audits/YYYY-MM-DD_<scope>.md` 单文件（loose-file 形式，无需建目录）。完整目录 5 件套：
 
 ```
 Review_Plan.md          - 本轮范围、视角、批次切分、退出条件
@@ -97,9 +97,9 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 | 视角 | 可见范围 | 审核什么 |
 |---|---|---|
-| **A. 用户视角** | 仅 Public 层 | 模拟终端用户能否照着 README → AI_ENTRY_POINT 跑通；任何对 dev/ 的引用都视为缺陷 |
-| **B. 完整性视角** | Public + dev/ | 实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ V3.0/PROGRESS 一致性 |
-| **C. dev/ 卫生视角** | 仅 dev/ | dev/ 自身组织、无悬空引用、export-ignore 边界封闭 |
+| **A. 用户视角** | master/dev 用户可见树 | 模拟终端用户能否照着 README → AI_ENTRY_POINT 跑通；用户可见树中任何对 dev/ 的引用都视为缺陷 |
+| **B. 完整性视角** | 用户可见树 + internal/dev/ | 实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ dev/plan 一致性 |
+| **C. internal/dev/ 卫生视角** | internal 分支的 dev/ 树 | dev/ 仅存在于 internal 分支、master/dev 结构一致、用户可见树无 dev/ 泄漏 |
 
 **Comprehensive round 应执行 A+B+C 全部三视角**。详见 Framework_Review_Guidelines.md §审核视角分层。
 
@@ -188,7 +188,7 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 **examples/（18 个，🟡 批审，含 1 个 design_thinking/ 子目录与 1 个 README，重点：示例与角色定义一致性）**
 
-**_progress/（3 个，视角 B 专属）**：`implementation_progress.md`、`issues_and_feedback.md`、`role_conversion_log.md` —— 视角 A 下应不存在引用泄漏（已知 implementation_progress.md 引用 dev/V3.0/，是 F-2 缺陷之一）
+**_progress/（3 个，视角 B 专属）**：`implementation_progress.md`、`issues_and_feedback.md`、`role_conversion_log.md` —— 视角 A 下应不存在引用泄漏（用户可见树中任何指回 `dev/` 的引用均为泄漏缺陷）
 
 ### workflows/ — 工作流（🔴 关键路径独立，🟡 其他批审）
 
@@ -272,18 +272,19 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 **🔴 1 个独立 context**：[`tools/README.md`](../../tools/README.md)（工具库总览，对外承诺的能力清单）
 
-### dev/ 层（视角 B/C 专属）
+### internal/dev/ 树（视角 B/C 专属）
 
-视角 B/C 下需审查：
+视角 B/C 下需审查（`dev/` 仅存在于 internal 分支，当前子目录如下）：
 
 - `dev/FRAMEWORK_CONTEXT.md`（🔴 独立 context，全局心智模型源头）
-- `dev/architecture/`（ADR 系统，含 `decisions/001`、`decisions/002`、`evolution.md`、`adr-template.md`）
+- `dev/architecture/`（ADR 系统，含 `decisions/`、`evolution.md`、`adr-template.md`）
 - `dev/quality/` —— **本目录**自指审查（v2.0 起明确纳入）
-- `dev/V3.0/`（PROGRESS / README / confirmed/ 14 项 + archived/ 5 项）
+- `dev/plan/`（规划与进度源头，视角 B 一致性轴）
 - `dev/complexity/`（complexity 仪表盘运行时）
-- `dev/V2.3/` 与 `dev/V2.2/`（历史版本审查档案，🟡 批审）
 - `dev/reference/`（开发参考资料，🟡 批审）
-- `dev/real_case/`、`dev/case_skillatlas_review/`（真实案例素材，🟡 批审）
+- `dev/case_skillatlas_review/`（真实案例素材，🟡 批审）
+
+（注：V3.0/V2.3/V2.2/real_case/discussions 等历史目录已归档/清理，不在当前 internal 分支。）
 
 ### 仓库根孤儿文件（视角 C 关注）
 
@@ -293,15 +294,16 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 ## 📈 审查进度跟踪
 
-**当前状态**：V3.0+ Comprehensive round 已完成；待修 31 项 Issue 进入 P0/P1/P2 修复阶段
+**当前状态**：多轮审查已完成并归档于 `audits/`（详见下表）。注：2026-04-25 轮曾记录"待修 31 项 Issue 进入 P0/P1/P2"——此为该轮历史快照，后续轮次已对其复查/修复，最新状态以各轮归档为准。
 
 **历史轮次**：
 
 | 日期 | 范围 | 报告路径 | 主要发现 |
 |---|---|---|---|
 | 2026-04-25 | V3.0+ Comprehensive | `audits/2026-04-25_V3.x_Comprehensive/` | 35 项 Issue（严重 2 / 主要 11 / 次要 14 / 建议 8）；V3.0 12 项实体 ✅ 真实落地；frontmatter 14% 自指失败；30 分钟用户旅程不达标；详见该轮 Comprehensive_Review_Report.md |
-
-（先前的 V2.3 / V2.2 审查档案位于 `dev/V2.3/`、`dev/V2.2/`，未走当前 `audits/` 规范）
+| 2026-05-05 | V3.x Followup Comprehensive | `audits/2026-05-05_V3.x_Followup_Comprehensive/` | 历史 Issue 复验 + delta 分类 + 入口路径回放 + 工作流回归 + 合规扫描 + 修复验证（reports/B1–B8）|
+| 2026-05-12 | Framework dogfood 健康检查 | `audits/2026-05-12_framework_dogfood/health_check_report.md` | 单文档健康检查（loose-file 形式）|
+| 2026-05-18 | Dayflow Phase1 AICC 改进验证 | `audits/2026-05-18_dayflow_phase1_aicc_improvement_verification.md` | Dayflow 真实项目 Phase1 改进项验证（loose-file 形式）|
 
 ---
 
@@ -343,8 +345,8 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 
 ---
 
-**版本**: v2.0
-**最后更新**: 2026-04-25
+**版本**: v2.1
+**最后更新**: 2026-06-13
 **维护者**: Framework Team
 **v2.0 变更要点**:
 - 完整索引 200+ 公共文档（v1.0 仅列 30+）
@@ -352,3 +354,7 @@ Review_Checklist.md     - 复查清单（用于修复后验证）
 - 引入"审核视角分层"与 Guidelines.md 呼应
 - 新增 dev/ 层审查范围说明（与三视角对应）
 - 新增 audits/ 5 件套规范说明
+**v2.1 变更要点（2026-06-13）**:
+- 改写为三分支模型（master/dev/internal），视角表与 dev/ 树范围对齐当前 internal 分支
+- 删除 export-ignore / V3.0/V2.3/V2.2/real_case 等失效路径
+- 审查历史补齐 2026-05-05 / 05-12 / 05-18 三轮，刷新当前状态口径

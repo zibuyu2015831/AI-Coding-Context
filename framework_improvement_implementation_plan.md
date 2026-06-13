@@ -10,6 +10,8 @@ verified_at: 2026-05-12
 
 # AICC Framework Improvement Implementation Plan
 
+> **状态：✅ 已执行（EXECUTED in V3.0）** — 本方案提出的契约层（core/contracts/）、双语言校验器（framework_contract_checker / semantic_review_checker）与提交门禁（pre_commit_gate.py）均已实现并合入 dev/master。保留作开发档案；下方 checkbox 为历史工作清单，非待办。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans` 执行本计划。所有任务使用 checkbox 语法跟踪，不要跳步，不要脱离本文档自行改 scope。
 
 **Goal:** 把 AICC 从“规范存在但执行靠经验”的框架，升级成“契约可执行、质量可校验、交付有闸门、运行可复盘、复查可半自动化”的稳定生成系统。

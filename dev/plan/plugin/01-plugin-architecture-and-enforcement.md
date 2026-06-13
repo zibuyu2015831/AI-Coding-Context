@@ -5,8 +5,8 @@ keywords: plugin | hooks | enforcement | skill | subagent | claude-plugin-root |
 scope: dev/plan/plugin（plugin 架构与强制层）
 related_files: ./README.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/02-component-mapping.md
 dependencies: ./README.md
-verified_at: 2026-06-11
-status: 规划完成
+verified_at: 2026-06-13
+status: done（已实施）
 ---
 
 # AICC Plugin 架构与强制执行层设计

@@ -6,7 +6,7 @@ scope: AICC 首次生成流程的方案阶段改进；不包含 Dayflow dev_docs
 related_files: workflows/path_a_first_generation.md | templates/GENERATION_PLAN_TEMPLATE.md | templates/PROJECT_ANALYSIS_REPORT_TEMPLATE.md | templates/PROGRESS_TEMPLATE.md | core/contracts/run_record_contract.yaml | tools/py/semantic_review_checker.py | tools/js/semantic_review_checker.js | tools/py/project_scanner.py | tools/js/project_scanner.js
 dependencies: AI_ENTRY_POINT.md | core/framework_spec.md | workflows/generation_workflow.md
 verified_at: 2026-05-18
-status: 已实施
+status: done（已实施）
 ---
 
 # Dayflow 首次运行复盘与 AICC Phase 1 改进计划

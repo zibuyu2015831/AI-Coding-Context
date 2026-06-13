@@ -21,15 +21,15 @@ AI Coding Context (AICC) 框架是一个全面的 AI 辅助编程框架，自启
 
 ### 审查范围说明
 
-AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对应 `.gitattributes` 中未被 `export-ignore` 的所有内容）与 **dev/ 层**（仅 dev 分支可见，release 时自动剔除）。任何一次完整审查都必须明确选择"视角"，避免把"终端用户体验问题"与"开发工作区问题"混为一谈。
+AICC 采用三分支模型：**master**（终端用户、干净框架树）/ **dev**（集成测试，结构与 master 完全一致）/ **internal**（孤儿分支，承载全部 `dev/` 开发元数据，永不并入 master/dev）。`dev/` 树仅存在于 `internal` 分支。任何一次完整审查都必须明确选择"视角"，避免把"终端用户体验问题"与"开发工作区问题"混为一谈。
 
 ### 审核视角分层（V1.1 起）
 
 | 视角 | 可见范围 | 审核目标 | 何时使用 |
 |---|---|---|---|
-| **A. 用户视角** | 仅 Public 层 | 模拟终端用户照着 `README.md` → `AI_ENTRY_POINT.md` 能否跑通；**任何对 `dev/` 路径的引用都视为 release tarball 中的断链缺陷** | 评估上手路径、对外承诺与实现一致性、文档闭环 |
-| **B. 完整性视角** | Public + dev/ | 交叉检查 实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ V3.0/PROGRESS 是否一致；验证设计意图是否在代码中落地 | 评估架构演进、设计-实现匹配度、自指一致性 |
-| **C. dev/ 卫生视角** | 仅 dev/ | dev/ 自身组织清晰、无悬空引用、不向 main 泄漏；确认 `.gitattributes export-ignore` 真的封住边界 | 评估开发工作区健康度、版本演进档案完整性 |
+| **A. 用户视角** | master/dev 用户可见树 | 模拟终端用户照着 `README.md` → `AI_ENTRY_POINT.md` 能否跑通；**任何对 `dev/` 路径的引用都视为用户可见树(master/dev)中指向 `dev/` 的引用——因 `dev/` 不在该分支，属断链/泄漏缺陷** | 评估上手路径、对外承诺与实现一致性、文档闭环 |
+| **B. 完整性视角** | 用户可见树 + internal/dev/ | 交叉检查 实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ dev/plan 是否一致；验证设计意图是否在代码中落地 | 评估架构演进、设计-实现匹配度、自指一致性 |
+| **C. internal/dev/ 卫生视角** | 范围：`internal` 分支的 `dev/` 树 | 审核目标：(1) `dev/` 自身组织清晰、无悬空内部引用；(2) `dev/` 仅存在于 `internal` 分支——`master`/`dev` 工作树不得出现任何 `dev/`、`FRAMEWORK_REVIEW*.md` 等开发元数据；(3) `master` 与 `dev` 结构一致，使 `git merge dev → master` 永远是干净 fast-forward；(4) 用户可见树(master/dev)中无任何指回 `dev/` 的引用泄漏。 | 评估开发工作区健康度、版本演进档案完整性 |
 
 **与旧政策的关系**：v1.0 曾要求"跳过 dev/ 目录"——该政策仅在视角 A 下成立。v1.1 起三视角并存，依据视角决定可见范围，不再统一排除 dev/。
 
@@ -37,7 +37,7 @@ AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对�
 
 - 一次完整审查（Comprehensive round）应同时执行 A、B、C 三视角
 - 每条问题在 `Issue_Tracking.md` 中必须标注其归属视角（便于按视角分类修复）
-- 同一文件在不同视角下可能得出不同结论：例如 `core/design_decisions.md` 链接 `dev/V3.0/` 在视角 A 是缺陷、在视角 B 是设计意图证据 —— **以视角 A 为优先**（用户体验是底线）
+- 同一文件在不同视角下可能得出不同结论：例如 `core/design_decisions.md` 链接 `dev/architecture/decisions/` 在视角 A 是缺陷、在视角 B 是设计意图证据 —— **以视角 A 为优先**（用户体验是底线）
 - 仅在专项审查（Component / Security / Performance scope）时可省略部分视角，需在 `Review_Plan.md` 中显式声明
 
 ### 整体架构审查
@@ -136,7 +136,7 @@ AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对�
 - [ ] 框架的扩展机制是否满足未来发展需求
 - [ ] 核心概念模型是否清晰且一致
 - [ ] 框架命名规范与约定是否统一
-- [ ] dev/ 与 Public 的边界是否封闭良好（视角 A 下任何 dev/ 引用都是缺陷；`.gitattributes export-ignore` 应真实生效）
+- [ ] `dev/` 仅存在于 internal 分支；master/dev 工作树不含 dev/；master 与 dev 结构一致（视角 A 下用户可见树中任何 dev/ 引用都是缺陷）
 
 ### 核心组件审查清单 (V3.0 增强)
 
@@ -527,8 +527,8 @@ AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对�
 
    - 在 `Review_Plan.md` 中显式声明本轮使用的视角集合（A / B / C 或子集）及理由
    - 视角 A 必检项：所有从 Public 文件出发的链接、引用必须不指向 dev/
-   - 视角 B 必检项：实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ PROGRESS 一致性
-   - 视角 C 必检项：dev/ 自身无悬空引用、`.gitattributes export-ignore` 实际生效
+   - 视角 B 必检项：实现 ↔ ADR ↔ FRAMEWORK_CONTEXT ↔ dev/plan 一致性
+   - 视角 C 必检项：`dev/` 仅存在于 internal 分支；master/dev 工作树不含 dev/；master 与 dev 结构一致
 
 5. **审查文档目录创建**
    - 创建 dev/quality/audits/目录（如果不存在）
@@ -566,13 +566,14 @@ AICC 仓库由两层组成：**Public 层**（main + dev 分支均可见，对�
 
 ---
 
-**文档版本**：1.2  
+**文档版本**：1.3  
 **创建日期**：2025-12-18  
 **更新历史**：
 - 2026-04-17 v1.1：适配 V3.0（强制摘要、双脚本、ADR、Commit-Guided）
 - 2026-04-25 v1.2：引入"审核视角分层"（用户/完整性/dev 卫生），删除自相矛盾的"跳过 dev/"政策，修正 sub-agent 名称对齐到实际 `agents/runtime/` 角色
+- 2026-06-13 v1.3：改写为三分支模型（master/dev/internal），删除 `.gitattributes export-ignore`/release tarball 语义；视角 C 重定义为 internal/dev/ 卫生视角；修正失效路径示例
 
 **创建人**：AI 助手  
-**状态**：标准化指南（V1.2 引入三视角分层）  
+**状态**：标准化指南（V1.3 三分支模型 + 三视角分层）  
 **适用范围**：所有 AI Coding Context 框架审查活动  
-**最后更新**：2026-04-25
+**最后更新**：2026-06-13

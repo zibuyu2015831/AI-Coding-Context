@@ -5,8 +5,8 @@ keywords: roadmap | migration | convergence | phases | gate | rollback
 scope: dev/plan/plugin（实施路线）
 related_files: ./README.md | ./01-plugin-architecture-and-enforcement.md | ./03-execution-spec.md | ../skill-migration/03-implementation-roadmap.md
 dependencies: ./01-plugin-architecture-and-enforcement.md
-verified_at: 2026-06-11
-status: 规划完成
+verified_at: 2026-06-13
+status: done（已实施）
 ---
 
 # AICC Plugin 化实施路线图（迁移即收敛）

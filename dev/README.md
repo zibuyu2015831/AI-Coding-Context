@@ -2,11 +2,14 @@
 
 本目录承载 AICC 框架自身的开发与维护资产，**不属于框架对外发布的内容**。
 
-## ⚠️ 不入 main / release
+## ⚠️ 仅存在于 `internal` 孤儿分支
 
-- `.gitattributes` 已配置 `dev/ export-ignore`：`git archive`、GitHub release tarball 会自动剔除本目录。
-- **merge dev → main 时也应保持 `dev/` 不进入 main**：在合并前确认 main 不携带 `dev/`，必要时通过 `git rm -r --cached dev/ && git commit` 清除。
-- 用户克隆 main 分支时不会看到本目录。
+> 权威说明见 `CONTRIBUTING.md` §分支模型 与 `internal` 分支根 [`README.md`](../README.md)。
+
+- 本目录（`dev/`）**只存在于 `internal` 孤儿分支**，与 `master` / `dev` 无共同历史、永不参与其合并。
+- `master` 与 `dev` 结构相同、都不含本目录，因此二者合并永远是干净 fast-forward，开发内容不会泄漏给用户。
+- **切勿**把 `dev/` 加回 `dev` 或 `master` 分支。
+- 本地开发用 `git worktree add _internal internal` 挂载（`_internal/` 已被忽略）。
 
 ## 目录角色（与 [`FRAMEWORK_CONTEXT.md`](./FRAMEWORK_CONTEXT.md) §3.1.1 保持一致）
 

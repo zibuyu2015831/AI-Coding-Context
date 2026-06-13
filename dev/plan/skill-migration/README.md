@@ -5,13 +5,13 @@ keywords: aicc | skill-migration | plugin | claude-code | planning
 scope: dev/plan/skill-migration 子项目根（规划阶段）
 related_files: 01-feasibility-and-architecture.md | 02-component-mapping.md | 03-implementation-roadmap.md | 04-edge-cases-and-risks.md | 05-open-questions.md | ../../FRAMEWORK_CONTEXT.md
 dependencies: ../../FRAMEWORK_CONTEXT.md
-verified_at: 2026-04-26
-status: 规划中（brainstorm 完成 → 待复审 → 待立项）
+verified_at: 2026-06-13
+status: superseded（已被 plugin 方案取代）
 ---
 
 # AICC Skill 化迁移规划
 
-> ⚠️ **已被吸收（superseded）**：本规划的核心架构决策（锁定决策 #2 实为“单 plugin × 多 skill”）已被 [`dev/plan/plugin-conversion/`](../plugin-conversion/README.md) 吸收并扩展。后者澄清了“skill vs plugin”实为伪二选一（plugin 是容器、skill 是组件），并补上本规划缺失的【hooks 强制执行层】与【迁移即收敛】两条主线。**新工作请以 `plugin-conversion` 为单一真相源**；本目录的 11-skill 组件映射（`02`）、边界条件（`04`）、开放问题（`05`）仍作为有效输入保留。
+> ⚠️ **已被吸收（superseded）**：本规划的核心架构决策（锁定决策 #2 实为“单 plugin × 多 skill”）已被 [`dev/plan/plugin/`](../plugin/README.md) 吸收并扩展。后者澄清了“skill vs plugin”实为伪二选一（plugin 是容器、skill 是组件），并补上本规划缺失的【hooks 强制执行层】与【迁移即收敛】两条主线。**新工作请以 `plugin` 为单一真相源**；本目录的 11-skill 组件映射（`02`）、边界条件（`04`）、开放问题（`05`）仍作为有效输入保留。
 
 > **当前阶段**：头脑风暴产出已落档，等待人工复审。**尚未进入实施**。
 > **分支**：`skill`（后续所有相关工作均在此分支推进）。
@@ -91,7 +91,7 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 | 复审目标日期 | _待定_ |
 | 立项决策日期 | _待定_ |
 | 关联分支 | `skill` |
-| 关联 PROGRESS 条目 | _尚未登记到 V3.0/PROGRESS.md_ |
+| 关联 PROGRESS 条目 | _未登记；`dev/V3.0/PROGRESS.md` 已不存在（V3.0 目录在三分支重构后移除），此条为历史引用_ |
 
 **修订记录**：
 
@@ -125,5 +125,5 @@ status: 规划中（brainstorm 完成 → 待复审 → 待立项）
 
 1. 维护者（你）阅读 6 份文档，记录任何反对意见或补充
 2. 召开/约定一次 review 节点，确认所有锁定决策仍然成立
-3. 决定是否将本规划登记到 `dev/V3.0/PROGRESS.md`（若立项后归类为 V3.1 或 V4.0 工作项）
+3. 决定是否将本规划登记到 PROGRESS（注：`dev/V3.0/PROGRESS.md` 已在三分支重构后移除；本步骤为历史规划，已随本目录 superseded 失效）
 4. 立项后先进入 Phase 0a：技术验证 + 真实资产清单同步；审核通过后再搭建 `plugin/` 骨架、起草第一个 skill MVP（推荐 `init`）

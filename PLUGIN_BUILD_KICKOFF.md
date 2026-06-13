@@ -1,5 +1,7 @@
 # AICC Plugin Build — Kickoff (paste into a new Claude Code session / `/goal`)
 
+> **状态：✅ 已完成（COMPLETED）** — 插件转换已交付（见 dev/master 的 plugin/ 与 plugin/MIGRATION.md）。保留作历史启动 prompt 记录。
+
 > Copy everything in the fenced block below into a fresh session. It drives the conversion of AICC into a Claude Code **plugin**, on the long-lived `plugin` branch. It aims to complete the ENTIRE conversion in this run; resumability is only a safety net if the session hits its budget — re-paste to continue with zero rework.
 
 ```text

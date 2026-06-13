@@ -1,18 +1,20 @@
 ---
 title: AICC → Claude Code Plugin 改造方案 — 总索引与决策
-summary: 将 AICC 框架改造为单个 Claude Code Plugin（内含多 skill + subagents + hooks + tools）的完整方案。已吸收并取代 dev/plan/skill-migration。核心四原则：单 plugin 多 skill、hooks 强制执行层、迁移即收敛、所有 plugin 交付物使用英文。目标平台仅 Claude Code（主，全能力）与 Codex（次，退化为建议级）。改造在长期维护的 plugin 分支进行，master 保留现有 clone 用法。
+summary: 将 AICC 框架改造为单个 Claude Code Plugin（内含多 skill + subagents + hooks + tools）的完整方案。已吸收并取代 dev/plan/skill-migration。核心四原则：单 plugin 多 skill、hooks 强制执行层、迁移即收敛、所有 plugin 交付物使用英文。目标平台仅 Claude Code（主，全能力）与 Codex（次，退化为建议级）。已实施并交付：插件已合入 master（V3.0「conversion complete」P1.5→P5），master 同时保留 clone 用法；临时 plugin 分支完成后已删除。
 keywords: aicc | plugin | claude-code | codex | skills | hooks | enforcement | convergence | english
-scope: dev/plan/plugin 子项目根（规划已定向，待一次性 goal 执行）
+scope: dev/plan/plugin 子项目根（已实施并交付，保留作规划档案）
 related_files: ./01-plugin-architecture-and-enforcement.md | ./02-implementation-roadmap.md | ./03-execution-spec.md | ../skill-migration/README.md | ../../../FRAMEWORK_REVIEW.md | ../../../FRAMEWORK_REVIEW_II.md | ../../../PLUGIN_BUILD_KICKOFF.md
 dependencies: ../skill-migration/02-component-mapping.md
-verified_at: 2026-06-11
-status: 规划完成 → 待一次性执行（Claude Code /goal）
+verified_at: 2026-06-13
+status: done（已实施）
 supersedes: dev/plan/skill-migration（整体吸收并更名）
 ---
 
 # AICC → Claude Code Plugin 改造方案
 
-> **状态**：方案已定稿，等待在新会话中以 Claude Code `/goal` 一次性执行。
+> **状态：✅ 已实施并交付（shipped）** — 插件转换已于 V3.0 完成并合入 master（提交 P1.5→P5「conversion complete」），见 master 分支 `plugin/` 与 `plugin/MIGRATION.md`。以下为当时的规划记录，保留作开发档案；其“待执行”措辞为历史状态。
+
+> **状态（历史）**：方案已定稿，等待在新会话中以 Claude Code `/goal` 一次性执行。
 > **执行分支**：`plugin`（长期维护，与 `master` 并行；`master` 保留现有 clone 用法）。
 > **启动指令**：根目录 [`PLUGIN_BUILD_KICKOFF.md`](../../../PLUGIN_BUILD_KICKOFF.md)（复制到新会话即可启动）。
 
@@ -97,7 +99,7 @@ Plugin       ✅ 多 skill（渐进披露）+ subagents（角色）+ hooks（强
 | 执行方式 | Claude Code `/goal`，一次性完成 |
 | 启动指令 | 根目录 `PLUGIN_BUILD_KICKOFF.md`（复制即用） |
 | 执行分支 | `plugin`（从 dev 谱系派生，含 dev/plan；长期维护） |
-| master | 维持现有 clone 用法 |
+| master | ✅ 插件已合入 master（V3.0「conversion complete」）；上一行"维持现有 clone 用法"为规划期历史设想，已被实际交付取代 |
 | 前置输入 | `FRAMEWORK_REVIEW.md`、`FRAMEWORK_REVIEW_II.md`、`skill-migration/*` |
 
 **修订记录**

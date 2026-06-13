@@ -7,26 +7,31 @@
 
 ## 📁 目录结构与命名规范
 
-每次审查（round）对应一个独立子目录：
+审查归档支持**两种形式**，按本轮体量选择：
+
+**形式 1 — 完整目录（Comprehensive / 多产物 round）**：每次审查对应一个独立子目录：
 
 ```
 audits/
 ├── README.md                          ← 本文件（轮次索引）
-└── YYYY-MM-DD_Version_Scope/          ← 单轮审查目录
-    ├── Review_Plan.md                 ← 必需：本轮范围、视角、批次切分、退出条件
-    ├── Issue_Tracking.md              ← 必需：问题清单（PROJ-YYYYMMDD-XXX 编号）
-    ├── Progress_Tracking.md           ← 必需：阶段/任务进度
-    ├── Review_Log.md                  ← 必需：每日日志、关键决策
-    ├── Review_Checklist.md            ← 必需：复查清单
-    ├── Comprehensive_Review_Report.md ← 可选：完整审查报告
-    ├── Improvement_Roadmap.md         ← 可选：改进路线图
-    ├── Issue_Analysis.md              ← 可选：问题分类统计
-    └── [Topic]_Assessment_Report.md   ← 可选：专项评估报告
+├── YYYY-MM-DD_Version_Scope/          ← 完整审查目录
+│   ├── Review_Plan.md                 ← 必需：本轮范围、视角、批次切分、退出条件
+│   ├── Issue_Tracking.md              ← 必需：问题清单（PROJ-YYYYMMDD-XXX 编号）
+│   ├── Progress_Tracking.md           ← 必需：阶段/任务进度
+│   ├── Review_Log.md                  ← 必需：每日日志、关键决策
+│   ├── Review_Checklist.md            ← 必需：复查清单
+│   ├── Comprehensive_Review_Report.md ← 可选：完整审查报告
+│   ├── Improvement_Roadmap.md         ← 可选：改进路线图
+│   ├── Issue_Analysis.md              ← 可选：问题分类统计
+│   └── [Topic]_Assessment_Report.md   ← 可选：专项评估报告
+└── YYYY-MM-DD_<scope>.md              ← 形式 2：轻量单文档审查（loose-file）
 ```
+
+**形式 2 — 轻量单文档（loose-file）**：单文档 / 单主题的轻量审查、健康检查、专项验证，**无需建目录**，直接落地为 `audits/YYYY-MM-DD_<scope>.md` 一个文件（自带 YAML frontmatter）。该文件即完整产物，不要求 5 件套。
 
 ### 命名规范
 
-格式：`YYYY-MM-DD_Version_Scope`
+**完整目录**：`YYYY-MM-DD_Version_Scope`
 
 | 字段 | 含义 | 示例 |
 |---|---|---|
@@ -34,10 +39,12 @@ audits/
 | Version | 框架版本（含次要变体） | V3.0 / V3.x |
 | Scope | 审查范围标签 | Comprehensive / Strategic / Component-tools / Security / Performance |
 
+**轻量单文档**：`YYYY-MM-DD_<scope>.md`，其中 `<scope>` 用下划线连接的简明范围标签。
+
 **示例**：
-- `2026-04-25_V3.x_Comprehensive/` — 全面审查
-- `2026-05-10_V3.0_Component-agents/` — agents 组件专项
-- `2026-06-01_V3.0_Security/` — 安全专项
+- `2026-04-25_V3.x_Comprehensive/` — 完整目录（全面审查）
+- `2026-05-10_V3.0_Component-agents/` — 完整目录（agents 组件专项）
+- `2026-05-18_dayflow_phase1_aicc_improvement_verification.md` — 轻量单文档（专项验证）
 
 ---
 
@@ -62,17 +69,16 @@ touch "$ROUND_DIR"/Review_Checklist.md
 
 ## 🗂️ 历史轮次索引
 
-| 启动日期 | 范围 | 视角 | 状态 | 主要发现 | 链接 |
+| 启动日期 | 范围 | 视角 | 形式 | 状态 | 链接 |
 |---|---|---|---|---|---|
-| 2026-04-25 | V3.x Comprehensive | A+B+C | 准备中 | (待启动) | (待创建) |
+| 2026-04-25 | V3.x Comprehensive | A+B+C | 完整目录 | 已完成 | [`2026-04-25_V3.x_Comprehensive/`](./2026-04-25_V3.x_Comprehensive/) |
+| 2026-05-05 | V3.x Followup Comprehensive | A+B+C | 完整目录 | 已完成 | [`2026-05-05_V3.x_Followup_Comprehensive/`](./2026-05-05_V3.x_Followup_Comprehensive/) |
+| 2026-05-12 | Framework dogfood 健康检查 | B/C | 轻量单文档 | 已完成 | [`2026-05-12_framework_dogfood/health_check_report.md`](./2026-05-12_framework_dogfood/health_check_report.md) |
+| 2026-05-18 | Dayflow Phase1 AICC 改进验证 | B | 轻量单文档 | 已完成 | [`2026-05-18_dayflow_phase1_aicc_improvement_verification.md`](./2026-05-18_dayflow_phase1_aicc_improvement_verification.md) |
 
-**先前的非规范化审查档案**：
+**先前的非规范化审查档案（已归档，不在 internal 分支）**：
 
-- V2.3 历史审查：位于 `dev/V2.3/`（双 AI 评估 / Monorepo / 入口文档 / 智能工作流等专项）
-- V2.2 历史审查：位于 `dev/V2.2/`（V2.2 综合审查）
-- 真实案例审查：位于 `dev/real_case/case_002/quality_review/`（外部案例审查参考）
-
-这些档案先于本规范化体系产生，未来不强制迁移，但应在 `quality/README.md` 中保留入口。
+- V2.3 / V2.2 历史审查、`real_case/` 外部案例审查参考等档案，先于本规范化体系产生；其原 `dev/V2.3/`、`dev/V2.2/`、`dev/real_case/` 目录在 V3.0 交付后已归档/清理，**不在当前 internal 分支**，不强制迁移。
 
 ---
 
@@ -87,4 +93,6 @@ touch "$ROUND_DIR"/Review_Checklist.md
 ---
 
 **创建日期**：2026-04-25
+**最后更新**：2026-06-13
 **维护者**：Framework Team
+**2026-06-13 变更**：补全四轮真实审查记录（04-25 / 05-05 / 05-12 / 05-18）并标记已完成；明确允许"轻量单文档 loose-file"归档形式；删除指向 dev/V2.3/V2.2/real_case 的失效引用（已归档，不在 internal 分支）。

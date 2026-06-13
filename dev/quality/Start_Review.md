@@ -32,9 +32,9 @@ read_file dev/quality/Progress_Tracking_Standard.md
   - Component（组件专项审查：如 agents, tools, config, adr 等）
   - Security/Performance（安全/性能专项审查）
 - **审核视角**（v1.2 起必填）：
-  - A 用户视角（仅 Public 层）
-  - B 完整性视角（Public + dev/）
-  - C dev/ 卫生视角（仅 dev/）
+  - A 用户视角（master/dev 用户可见树）
+  - B 完整性视角（用户可见树 + internal/dev/）
+  - C internal/dev/ 卫生视角（internal 分支的 dev/ 树）
   - Comprehensive round 默认 A+B+C 全部，专项审查可省略部分但需在 Review_Plan 显式声明
 
 ### 3. 创建审查目录
@@ -126,11 +126,12 @@ review_dir = f"dev/quality/audits/{review_date}_{version}_{scope}"
 2. **路径准确性**：使用相对于项目根目录的路径，严禁使用硬编码绝对路径。
 3. **V3.0 核心约束**：必须验证"双脚本模式"和"架构探针（ADR）"的集成有效性。
 4. **证据链**：所有发现的问题应附带代码片段或文档路径作为证据，并标注归属视角。
-5. **基线快照先行**：制定 Review_Plan 前，应先做一次基线快照（实际文件清单、当前 dev/V3.0/PROGRESS 状态、recent commits），避免计划与现实脱节。
+5. **基线快照先行**：制定 Review_Plan 前，应先做一次基线快照（实际文件清单、当前 dev/plan/ 状态、recent commits），避免计划与现实脱节。
 
 ---
 
-**文档版本**：1.2
-**更新日期**：2026-04-25
+**文档版本**：1.3
+**更新日期**：2026-06-13
 **v1.2 变更**：对齐 Framework_Review_Guidelines v1.2 的三视角分层；修正 sub-agent 名称（generalist/codebase_investigator → 实际 agents/runtime/ 角色）；新增"基线快照先行"原则
-**状态**：就绪（已适配 V3.0+ 与三视角审查模型）
+**v1.3 变更**：对齐三分支模型（master/dev/internal）；视角 A/B/C 范围描述改写；基线快照源由 dev/V3.0/PROGRESS 改为 dev/plan/
+**状态**：就绪（已适配三分支模型与三视角审查模型）
