@@ -144,11 +144,12 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 ### 7.2 方案模板
 - `templates/PLAN_TEMPLATE.md` frontmatter 增字段：`review_status: not_reviewed | reviewed | skipped`、`review_rounds`、`review_reason`。
 - 正文增标准「方案自审核记录」块（审核日期 / 方式 / 轮次 / 未隔离原因 / 发现摘要 / 写回修改 / 仍需确认 / 是否允许进入实现）。
+- **生命周期态表示的前置事实（实现须先对齐）**：现行 `PLAN_TEMPLATE.md` frontmatter **无 `status:` 字段**——方案 `active/done/archive` 态由**目录位置**（`dev_docs/plans/{active,done,archive}/`，见 `framework_spec.md` §plans/）+ 正文 bullet `**状态**` 表示。故本方案的 done 判定**以目录成员身份为准**（文件位于/被移入 `plans/done/`），不依赖某个并不存在的 `status: done` frontmatter（§7.3 / §7.6.2 据此校正）。`review_status` 作为新增 frontmatter 子状态独立引入，与目录态正交（§9）。
 
 ### 7.3 框架规范
 - `core/framework_spec.md` 的 `plans/` 章节增状态规则：「active 内方案进入实现前，`review_status` 必须为 `reviewed`，或带理由的 `skipped`」。
 - **复杂度分级 + 高风险面叠加触发（Q1 已定案）**：**复杂度决定深度**——trivial / simple → 允许 `skipped`（记录理由）；medium → 单轮；complex / critical → 双轮。**高风险面清单**（auth / payment / data-schema / migration / external-API / privacy-secrets / concurrency / breaking-change，复用 §7.5）**决定开关**——任何复杂度只要触面即强制至少单轮，不得 `skipped`。
-- **工具阻断分两层（Q4 已定案）**：`done` 方案 `review_status` 非 `reviewed|skipped(理由)` 由 `doc_health_checker`（Python/JS 双实现）**硬阻断**（新增 issue `plan_done_without_review`，severity=blocker）；「进入实现」无法被静态检查器拦截，改由入口/工作流路由**流程硬约束** + 检查器对事后可观测后果（已实现/已 done 却无复查记录）**软告警**。无 `review_status` 的历史方案给 info/warning（除非此刻被移入 done），复用 generation_plan 门已建的 severity 分层。
+- **工具阻断分两层（Q4 已定案）**：**位于 `plans/done/`** 的方案若 `review_status` 非 `reviewed|skipped(理由)`，由 `doc_health_checker`（Python/JS 双实现）**硬阻断**（新增 issue `plan_done_without_review`，severity=blocker；done 态以**目录成员身份**判定，见 §7.2，不依赖 frontmatter `status`）；「进入实现」无法被静态检查器拦截，改由入口/工作流路由**流程硬约束** + 检查器对事后可观测后果（已实现/已 done 却无复查记录）**软告警**。无 `review_status` 的历史方案给 info/warning（除非此刻被移入 done），复用 generation_plan 门已建的 severity 分层。
 - 明确「`reviewed` ≠ 用户已批准实现」两门禁分离。
 
 ### 7.4 路由与索引
@@ -172,21 +173,22 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 
 #### 7.6.2 done 硬阻断 → 复用 `pre_commit_gate` hook + 投影检查器（对应 §7.3 / Q4 第①层）
 - `plan_done_without_review` 检查项在 SSOT 落于 `tools/py/doc_health_checker.py`（+JS 双实现），经 build.py 投影进插件的 `plugin/scripts/py/doc_health.py`。
-- 阻断由插件**既有** `hooks/pre_commit_gate.py`（PreToolUse / git commit，现已校验 `dev_docs/**/*.md` frontmatter + main-doc 契约）承接：扩展其判定——本次提交若把 `plans/**/*.md` 翻成 `status: done` 而 `review_status` 非 `reviewed|skipped(理由)` → blocker。沿用其既有失败安全语义（默认 `ask`，可配 `deny`），**不新增 hook**。
+- 阻断由插件**既有** `hooks/pre_commit_gate.py`（PreToolUse / git commit，现已校验 `dev_docs/**/*.md` frontmatter + main-doc 契约）承接：扩展其判定——**本次提交若新增/移动某 `dev_docs/plans/done/*.md`**（done 信号 = 目录成员身份，见 §7.2）而其 `review_status` 非 `reviewed|skipped(理由)` → blocker。沿用其既有失败安全语义（默认 `ask`，可配 `deny`），**不新增 hook**。
+- **单一真源约束（实现要点）**：`pre_commit_gate.py` 当前只 import `summary_validator` + `contract_check`，**不含 `doc_health`**。扩展时 gate 须**调用 `doc_health`/`doc_health_checker` 暴露的 `plan_done_without_review` 函数**复用同一判定，**不得在 hook 内另写一段平行正则**——否则 SSOT 的 Py/JS 双实现纪律会被旁路成第三处真源。gate 已具备的 staged-diff 取文件能力（`--diff-filter=ACM`）天然能看到 `git mv … plans/done/` 产生的 done/ 路径新增。
 - `hooks/session_inject.py`（SessionStart）的健康快照顺带把「done 却无复查」「active 已实现却无复查记录」列为可见项 —— 即 Q4 第②层的事后软告警面。
 
 #### 7.6.3 进入实现的流程门（对应 §7.3 / Q4 第②层）
 - 与 SSOT 结论一致：静态 hook 拦不住「AI 开始写代码」的运行时动作。插件层的流程硬约束落在 **`init` / `incremental-update` 技能正文**——其进入实现前的步骤引用 `/aicc:plan-review` 协议，要求先把对象审到 `reviewed|skipped`；可观测后果（已实现 / 已 done 却无记录）由 7.6.2 的检查器软告警兜底。
 
 #### 7.6.4 模板与配置投影（对应 §7.2 / §7.4）
-- `templates/PLAN_TEMPLATE.md` 的 `review_status / review_rounds / review_reason` 字段与「方案自审核记录」块，随 `init` 技能脚手架的 plan 模板一并投影（插件生成 plan 即带新字段）。
+- `templates/PLAN_TEMPLATE.md` 的 `review_status / review_rounds / review_reason` 字段与「方案自审核记录」块，随 `init` 技能脚手架的 plan 模板一并投影（插件生成 plan 即带新字段）。**实现注意**：脚手架模板含中文正文，投影进 `plugin/` 后须确认 reverse-entropy lint（`plugin/build/lint.py` 的 no-CJK 扫描）对其豁免——`init` 现已脚手架中文 dev_docs，大概率已在豁免名单内，实现时复核一次即可。
 - `plugin/settings.json` 新增 `aicc.planReview` 配置块，**镜像既有 `git_safety.commit_gate` 风格**：`gate: ask|deny|off`（默认 `ask`）、复杂度阈值、高风险面默认清单（§7.5）。符合分层轻量：默认 `ask`、仅 done-without-review 才硬 `deny`、trivial/simple 默认放行。
 
 #### 7.6.5 Codex 落地（对应交付链末端，2026-06-13 更正前提）
 > **前置依赖**：本节涉及的 Codex `.codex/` 强制包属**已交付物对齐**，由独立的 [Codex hook 机制收敛方案](./codex-hook-convergence-delivery-form-alignment-plan.md)（Doc A）承载并已落地。本方案（Doc B）的 plan-review 门**建立在其上**——实施顺序：先 A 后 B。下文仅述本方案 plan-review 门如何挂接，不复述 Doc A 的通用基础设施细节。
 
 - **前提更正**：原文断言「codex 无 hook，硬门降级为顾问式」。查验 OpenAI 官方文档后确认：**Codex 自 v0.117.0 起已支持 lifecycle hooks**，其 stdin/stdout 契约与 Claude Code **同构**（`tool_name` / `tool_input.command` / `cwd` 入，`hookSpecificOutput.permissionDecision(+Reason)` 出，并提供 `CLAUDE_PLUGIN_ROOT` 兼容别名）。故 AICC 的 hook 脚本在 I/O 层**本已 Codex 兼容**，「无 hook → 全面降级」的前提已失效。
-- **通用基础设施已落地**：`codex_projection.py` 现额外产出自包含的 `dist/codex/.codex/` 强制包（`hooks.json` + 原样 hook 脚本 + `scripts/py` 依赖 + `settings.json`）；用户拷至仓库根、经 `/hooks` 信任后，`pre_commit_gate` / `dangerous_git_guard` / `session_inject` 自动强制——与插件**同脚本、非重写**。已本地验证（`CLAUDE_PLUGIN_ROOT` 未设、project-local 安装下，force-push / hard-reset / 提交非法 dev_docs 均被 deny）。2026-06-13 提交 `c8d3f46`（dev 分支）。
+- **通用基础设施已落地**：`codex_projection.py` 现额外产出自包含的 `dist/codex/.codex/` 强制包（`hooks.json` + 原样 hook 脚本 + `scripts/py` 依赖 + `settings.json`）；用户拷至仓库根、经 `/hooks` 信任后，`pre_commit_gate` / `dangerous_git_guard` / `session_inject` 自动强制——与插件**同脚本、非重写**。已通过回归测试验证：投影脚本在**喂入 Codex 事件形状**（`tool_name:"Bash"`、`CLAUDE_PLUGIN_ROOT` 未设、project-local 自解析）时,对 force-push / hard-reset 产出 `deny`、green 静默（`test_codex_projection.py`）。**残留核验缺口**：测试证明的是「脚本在该事件下 deny」,而非「真实 Codex 会 fire 它」——后者依赖官方文档已确认的 `tool_name=="Bash"` + `^Bash$` matcher（见 Doc A §1），落地时宜补一次安装级冒烟。2026-06-13 提交 `c8d3f46`（dev 分支）。
 - **本方案 Codex 落点据此升级**：`codex_projection.py` 把 `plan-review` 技能扁平投影为 `dist/codex/aicc-plan-review/`；7.6.2 的 `plan_done_without_review` 硬门由该 `.codex/` 包内的 `pre_commit_gate` 承接（实现时扩展其判定即可），**不再降级为顾问式**，获得与插件一致的 done-hard-block。
 - **兜底保留**：Codex hook 对部分 shell 路径拦截有 gap（官方自承「a guardrail rather than a complete enforcement boundary」），故 `AGENTS.md` 仍保留 `aicc-doc-health` 顾问条目作为 backstop，与既有「hook 门 + 顾问 CLI 双层」一致。
 
@@ -200,6 +202,8 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 | `doc_health_checker` 新增 `plan_done_without_review`（Py/JS 双实现） | 投影为 `scripts/py/doc_health.py`（仅 Python） | 投影进 `.codex/scripts/py/`，hook 强制 + `aicc-doc-health` 顾问兜底 |
 | 入口/工作流流程门 | init / incremental-update 技能正文引用协议 | 技能正文（顾问） |
 | 高风险面清单 / 复杂度分级 | `settings.json` `aicc.planReview` 配置 | settings 默认值（无 hook 强制） |
+
+> **强制范围界定（避免读成「review 门被强制」）**：上表的 hook 强制**仅覆盖 commit 时的 done-without-review 阻断**——即「方案已落入 `plans/done/` 却无 `review_status`」这一**滞后检查点**。LingoTrace 协议的核心「**实现前先审**」是运行时动作，静态 hook 拦不住（§7.3 Q4 已定案），故 pre-implementation review 门**在 SSOT / 插件 / Codex 三形态均为顾问/流程级**，不存在平台差。Doc A 的「收敛/enforcement parity」指的是这个 done-gate 在 Codex 与插件取得同等强度,**不是** review 门本身被强制。
 
 ---
 

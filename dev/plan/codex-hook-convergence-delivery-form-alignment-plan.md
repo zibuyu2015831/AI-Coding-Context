@@ -75,6 +75,8 @@ Codex 自 **v0.117.0** 起支持 lifecycle hooks，与 Claude Code **逐字段�
 
 即交付模型从"**2 强制 + 1 顾问降级**"收敛为"**2 强制（插件 + Codex/.codex）+ 1 源（SSOT）**"。顾问 CLI 从"Codex 的唯一手段"降为"任一形态在 hook 拦截 gap 处的兜底"。
 
+> **"强制"的精确范围**：本矩阵的"强制"指 `PreToolUse` 对**匹配到的 shell 路径**（`git commit` / 危险 git）的 deny——这是一道 commit/命令时的门,**两个平台等价**。它**不等于**"AI 实现前必先审"这类运行时意图被拦截:任何 `PreToolUse` 都只能拦它匹配到的工具调用,绕道未匹配路径仍可能发生（官方亦自承 "a guardrail rather than a complete enforcement boundary"）。故 Codex 与插件取得的是**同一道门的同等强度**,而非把顾问层全部硬化;"退路"列的 `bin/aicc-*` 正是为这些 gap 保留。涉及 plan-review 自审门时,这一点尤其重要——见 Doc B §7.6.6 的强制范围界定。
+
 ---
 
 ## 4. 实施项与状态
@@ -85,7 +87,7 @@ Codex 自 **v0.117.0** 起支持 lifecycle hooks，与 Claude Code **逐字段�
 - [x] **T4 规格对齐**：对 `01`/`02`/`03` 三份已归档规格在 stale 断言处加**日期更正横幅**（降级 → 收敛），指向本文；不改写历史正文。internal（本提交）。
 - [x] **T5 概念矩阵**：收敛矩阵记录于 §3，作为后续引用真源。
 
-**验证**：`python3 plugin/build/test_codex_projection.py` 全绿；`python3 plugin/build/build.py --codex` lint clean、产物含 `.codex/` 包；手测 project-local 安装（env 未设）下 force-push / hard-reset / 提交非法 dev_docs 均被 deny。
+**验证**：`python3 plugin/build/test_codex_projection.py` 全绿；`python3 plugin/build/build.py --codex` lint clean、产物含 `.codex/` 包；回归测试以 **Codex 事件形状**（`tool_name:"Bash"`、`CLAUDE_PLUGIN_ROOT` 未设、project-local 自解析）驱动投影脚本,force-push / hard-reset 产出 `deny`、green 静默。**残留缺口**：该测试证明「脚本在此事件下 deny」,不证明「真实 Codex 必 fire 它」——后者依赖 §1 已据官方文档确认的 `tool_name=="Bash"` + `^Bash$` matcher,落地时宜补一次安装级冒烟（非阻断项）。
 
 ---
 
