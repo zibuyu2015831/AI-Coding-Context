@@ -1,0 +1,126 @@
+# 复杂度阈值配置文件
+# 用于定义项目复杂度的风险阈值
+
+# 警告阈值（建议改进）
+warning_threshold:
+  daily_growth: 5          # 每日代码增长百分比（%）
+  file_count: 150          # 项目文件总数
+  dependency_depth: 3      # 依赖层级深度
+  quality_score: 70        # 代码质量评分（0-100）
+  coupling_score: 20       # 代码耦合度（0-100）
+
+# 严重警告阈值（必须改进）
+critical_threshold:
+  daily_growth: 10         # 每日代码增长百分比（%）
+  file_count: 200          # 项目文件总数
+  dependency_depth: 5      # 依赖层级深度
+  quality_score: 60        # 代码质量评分（0-100）
+  coupling_score: 30       # 代码耦合度（0-100）
+
+# 危机阈值（立即重构）
+crisis_threshold:
+  daily_growth: 15         # 每日代码增长百分比（%）
+  file_count: 300          # 项目文件总数
+  dependency_depth: 7      # 依赖层级深度
+  quality_score: 50        # 代码质量评分（0-100）
+  coupling_score: 40       # 代码耦合度（0-100）
+
+# 指标权重配置
+weights:
+  code_size: 0.3           # 代码规模权重
+  dependencies: 0.2        # 依赖关系权重
+  code_quality: 0.3        # 代码质量权重
+  architecture: 0.2        # 架构健康度权重
+
+# 分析配置
+analysis:
+  include_directories:
+    - src
+    - lib
+    - app
+    - components
+
+  exclude_directories:
+    - node_modules
+    - dist
+    - build
+    - .git
+    - venv
+
+  file_extensions:
+    - .js
+    - .ts
+    - .jsx
+    - .tsx
+    - .py
+    - .java
+    - .c
+    - .cpp
+    - .cs
+
+# 依赖分析配置
+dependency_analysis:
+  nodejs:
+    package_files:
+      - package.json
+
+  python:
+    package_files:
+      - requirements.txt
+      - setup.py
+
+  ignore:
+    - lodash
+    - dayjs
+    - axios
+
+# 质量分析配置
+quality_analysis:
+  todo_patterns:
+    - TODO
+    - todo
+    - Todo
+
+  fixme_patterns:
+    - FIXME
+    - fixme
+    - Fixme
+
+# 架构分析配置
+architecture_analysis:
+  core_files:
+    - package.json
+    - requirements.txt
+    - README.md
+    - tsconfig.json
+    - setup.py
+
+  domain_boundaries:
+    - src/api
+    - src/utils
+    - src/components
+
+# 代码审查配置
+review:
+  # 危险函数列表
+  dangerous_functions:
+    - eval
+    - exec
+    - Function
+
+  # 大文件阈值
+  large_file_threshold: 500
+
+  # TODO 警告阈值
+  todo_warning_threshold: 3
+  todo_critical_threshold: 5
+
+  # 通知配置
+  notification:
+    level: warning
+    channels:
+      - slack
+      - email
+
+version: 1.0.0
+updated: 2026-04-12
