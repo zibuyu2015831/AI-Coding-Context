@@ -33,7 +33,7 @@
         "README.md"
       ],
       "converged": true,
-      "lines": 102,
+      "lines": 106,
       "note": "quick-start distilled from the 811-line entry doc; rest deleted"
     },
     {
@@ -139,14 +139,14 @@
       "path": "build/build.py",
       "sources": [],
       "converged": null,
-      "lines": 317,
+      "lines": 319,
       "note": "authored"
     },
     {
       "path": "build/codex_projection.py",
       "sources": [],
       "converged": null,
-      "lines": 301,
+      "lines": 312,
       "note": "authored Codex flat projection (spec 7) + self-contained .codex/ hooks bundle for enforcement parity (Codex >= v0.117)"
     },
     {
@@ -155,6 +155,13 @@
       "converged": null,
       "lines": 190,
       "note": "authored"
+    },
+    {
+      "path": "build/test_codex_projection.py",
+      "sources": [],
+      "converged": null,
+      "lines": 108,
+      "note": "authored regression test for the Codex projection + .codex/ enforcement bundle"
     },
     {
       "path": "hooks/_aicc_common.py",

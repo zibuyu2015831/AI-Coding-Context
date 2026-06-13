@@ -111,9 +111,20 @@ plugin ships — enforcement parity, not a reimplementation.
 ## Install
 
 1. Copy this `.codex/` directory to the root of your project repository.
+   The hooks locate scripts via `git rev-parse --show-toplevel`, so the
+   repo must be a git work tree (a commit gate is moot without one).
 2. In Codex, run `/hooks` and trust the three AICC hooks (Codex records
    trust against each hook's hash; re-trust after updates).
 3. Python 3 must be on PATH (the hooks shell out to `python3`).
+
+## Configure
+
+Policy lives in this bundle's `settings.json` (`aicc` block): set
+`git_safety.commit_gate` (`ask` | `deny` | `off`) and `git_safety.mode`
+(`standard` | `strict` | `permissive`) THERE — on Codex the scripts
+self-resolve their root to this `.codex/` dir, so the `.claude/` project
+override layer they also read is inert here. Edit `.codex/settings.json`
+directly to change enforcement strength.
 
 ## What runs
 
