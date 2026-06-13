@@ -225,6 +225,14 @@ plans/
 - 完成并通过验证后移动到 `dev_docs/plans/done/`
 - 废弃、搁置或被替代后移动到 `dev_docs/plans/archive/`
 
+### 方案自审核（review_status）
+
+方案在进入实现前可经一次**自审核**（审核对象 / 寻址 / 写回 / 两门禁分离的完整语义见 [`core/plan_review_protocol.md`](plan_review_protocol.md)；"怎么审"委派 [`workflows/review-workflow.md`](../workflows/review-workflow.md)）。
+
+- frontmatter 可含 `review_status: not_reviewed | reviewed | skipped`（与 `active/done/archive` 目录态正交，是独立子状态）。
+- **硬规则**：位于 `dev_docs/plans/done/` 的方案，其 `review_status` 必须为 `reviewed`，或带 `review_reason` 的 `skipped`——否则 `doc_health_checker` 报 blocker（`plan_done_without_review`，done 态以目录成员身份判定）。
+- `review_status: reviewed` ≠ 用户已批准实现，是两个独立门禁。
+
 ### 方案文档模板
 
 ```markdown

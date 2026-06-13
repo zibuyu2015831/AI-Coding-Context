@@ -18,6 +18,14 @@ DEFAULT_SETTINGS = {
         "commit_gate": "ask",
         "protected_branches": ["main", "master", "production"],
     },
+    "planReview": {
+        "gate": "ask",
+        "complexityThreshold": "medium",
+        "highRiskSurfaces": [
+            "auth", "payment", "data-schema", "migration",
+            "external-API", "privacy-secrets", "concurrency", "breaking-change",
+        ],
+    },
 }
 
 

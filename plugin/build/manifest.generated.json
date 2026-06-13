@@ -139,7 +139,7 @@
       "path": "build/build.py",
       "sources": [],
       "converged": null,
-      "lines": 319,
+      "lines": 321,
       "note": "authored"
     },
     {
@@ -167,7 +167,7 @@
       "path": "hooks/_aicc_common.py",
       "sources": [],
       "converged": null,
-      "lines": 94,
+      "lines": 102,
       "note": "authored"
     },
     {
@@ -201,7 +201,7 @@
         "workflows/git_safety_workflow.md"
       ],
       "converged": true,
-      "lines": 119,
+      "lines": 132,
       "note": "advisory pre-commit doc checks turned into an enforcing PreToolUse gate"
     },
     {
@@ -285,7 +285,7 @@
         "tools/py/timestamp_analyzer.py"
       ],
       "converged": true,
-      "lines": 172,
+      "lines": 251,
       "note": "English rewrite of the health orchestrator (paths/staleness/frontmatter)"
     },
     {
@@ -333,7 +333,7 @@
         "config/CONFIG_TEMPLATE.md"
       ],
       "converged": true,
-      "lines": 12,
+      "lines": 20,
       "note": "config keys reduced to the consumed set (spec \u00a75)"
     },
     {
@@ -649,6 +649,17 @@
       "note": "converged English skill content (see BUILD_NOTES.md)"
     },
     {
+      "path": "skills/plan-review/SKILL.md",
+      "sources": [
+        "core/plan_review_protocol.md",
+        "workflows/review-workflow.md",
+        "templates/PLAN_TEMPLATE.md"
+      ],
+      "converged": true,
+      "lines": 70,
+      "note": "converged English skill content (see BUILD_NOTES.md)"
+    },
+    {
       "path": "skills/systematic-review/SKILL.md",
       "sources": [
         "dev/quality/AUDIT_WORKFLOW.md",
@@ -661,7 +672,7 @@
     }
   ],
   "doc_budget": {
-    "doc_lines": 1642,
+    "doc_lines": 1712,
     "baseline": 63176,
     "cap": 31588,
     "within_budget": true

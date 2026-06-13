@@ -50,11 +50,12 @@ def changed_doc_files(cwd, command):
     return result
 
 
-def validate(cwd, files):
+def validate(cwd, files, check_plan_review=True):
     """Run the validators; return a list of English failure strings."""
     scripts = os.path.join(common.plugin_root(), "scripts", "py")
     sys.path.insert(0, scripts)
     import contract_check
+    import doc_health
     import summary_validator
 
     failures = []
@@ -68,6 +69,12 @@ def validate(cwd, files):
         if os.path.basename(rel) == "AI_Coding_Context.md":
             for issue in contract_check.check_main_doc(path)["issues"]:
                 failures.append("%s: %s" % (rel, issue))
+        # Plan-review done-gate: a plan committed into plans/done/ must carry a
+        # recorded review. Same judgment as doc_health (single source of truth),
+        # not a parallel regex here.
+        if check_plan_review:
+            for msg in doc_health.plan_done_without_review(path):
+                failures.append("%s: %s" % (rel, msg))
     return failures
 
 
@@ -82,14 +89,18 @@ def main():
     cwd = event.get("cwd") or os.getcwd()
     settings = common.load_settings(cwd)
     gate = settings["git_safety"].get("commit_gate", "ask")
-    if gate == "off":
+    plan_gate = (settings.get("planReview") or {}).get("gate", "ask")
+    if gate == "off" and plan_gate == "off":
         return
 
     files = changed_doc_files(cwd, command)
     if not files:
         return
 
-    failures = validate(cwd, files)
+    failures = validate(cwd, files, check_plan_review=(plan_gate != "off"))
+    if gate == "off":
+        # Only the plan-review done-gate is active; drop doc-validation noise.
+        failures = [f for f in failures if "plan-review:" in f]
     if not failures:
         return  # pass: no opinion, normal permission flow applies
 
@@ -101,7 +112,9 @@ def main():
         "Fix the docs, or set aicc.git_safety.commit_gate to \"off\" to disable the gate."
         % (len(failures), "\n- ".join(shown))
     )
-    decision = "deny" if gate == "deny" else "ask"
+    has_plan_failure = any("plan-review:" in f for f in failures)
+    deny = gate == "deny" or (plan_gate == "deny" and has_plan_failure)
+    decision = "deny" if deny else "ask"
     common.emit(common.pretooluse_decision(decision, reason))
 
 

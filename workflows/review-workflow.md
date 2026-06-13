@@ -183,5 +183,20 @@ def should_auto_fix(plan, review):
 
 ---
 
-**版本**: 1.1  
-**最后更新**: 2025-12-11
+## 6. 审核对象：单个落盘方案（plan-review）
+
+本工作流默认审核**当前回合刚生成**的 in-flight 产物。还有第三种审核对象——**磁盘上某个具名、独立的落盘方案**（`dev_docs/plans/active/<plan>.md`），它可寻址、可重入、与生成解耦。该对象的语义层（寻址 / 两门禁分离 / 写回 / 想法路由）由 [`core/plan_review_protocol.md`](../core/plan_review_protocol.md) 统一定义，**"怎么审"仍复用本工作流第 3–5 节的引擎**，不另造。
+
+**流程门（进入实现前）**：当用户要对一个已落盘方案发起复查（"审核 plans/active 下某方案、判断是否可进入实现"），或在进入实现前：
+
+1. 以 `<PLAN_PATH>` 寻址该方案。
+2. 按复杂度分级（trivial/simple 可 `skipped` 带理由；medium 单轮；complex/critical 双轮）+ 高风险面叠加触发，跑本工作流引擎。
+3. 写回方案的"方案自审核记录"块，置 `review_status: reviewed | skipped`。
+4. **`reviewed` ≠ 用户已批准实现**——是否动手仍需用户确认（两门禁分离）。
+
+> 该流程门是顾问 / 流程级的（静态检查器拦不住"开始写代码"这一运行时动作）。唯一被 hook 在 commit 时硬强制的是滞后检查点：方案落入 `dev_docs/plans/done/` 却无 `review_status` → `doc_health_checker` 报 blocker（`plan_done_without_review`）。
+
+---
+
+**版本**: 1.2  
+**最后更新**: 2026-06-13

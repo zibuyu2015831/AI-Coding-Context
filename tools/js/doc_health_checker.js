@@ -74,6 +74,7 @@ function parseArgs() {
       case '--check-required-sections': out.checkRequiredSections = true; break;
       case '--check-template-residue': out.checkTemplateResidue = true; break;
       case '--check-run-record-integrity': out.checkRunRecordIntegrity = true; break;
+      case '--check-plan-review': out.checkPlanReview = true; break;
       case '--full-check': out.fullCheck = true; break;
       case '--doc-dir': out.docDir = next; i++; break;
       case '--output': out.output = next; i++; break;
@@ -916,6 +917,92 @@ function checkRunRecordIntegrity(targets) {
   return { checked, issues };
 }
 
+const PLAN_REVIEW_OK = ['reviewed', 'skipped'];
+
+function planFrontmatter(text) {
+  const m = text.match(/^---\s*\n([\s\S]*?)\n---/);
+  return m ? m[1] : '';
+}
+
+function planFmField(frontmatter, field) {
+  const re = new RegExp('^' + field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':\\s*(.*)$', 'm');
+  const m = frontmatter.match(re);
+  return m ? m[1].trim() : '';
+}
+
+function planDirState(file) {
+  const parts = file.split(/[\\/]/);
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (parts[i] === 'plans' && ['active', 'done', 'archive'].includes(parts[i + 1])) {
+      return parts[i + 1];
+    }
+  }
+  return null;
+}
+
+function isPlanFile(file) {
+  const base = path.basename(file);
+  return file.endsWith('.md') && base.toLowerCase() !== 'readme.md';
+}
+
+// done 态以目录成员身份判定。位于 plans/done/ 的方案 review_status 必须为
+// reviewed 或带 review_reason 的 skipped。返回 issue 列表（空 == 合规）。
+function planDoneWithoutReview(file, text) {
+  if (!isPlanFile(file) || planDirState(file) !== 'done') return [];
+  if (text == null) {
+    try { text = fs.readFileSync(file, 'utf8'); } catch (e) { return []; }
+  }
+  const fm = planFrontmatter(text);
+  const status = planFmField(fm, 'review_status').toLowerCase();
+  const reason = planFmField(fm, 'review_reason');
+  if (!PLAN_REVIEW_OK.includes(status)) {
+    return [{
+      file,
+      type: 'plan_done_without_review',
+      severity: 'blocker',
+      review_status: status || 'missing',
+      message: '位于 plans/done/ 的方案 review_status 必须为 reviewed 或带理由的 skipped'
+    }];
+  }
+  if (status === 'skipped' && !reason) {
+    return [{
+      file,
+      type: 'plan_skipped_without_reason',
+      severity: 'blocker',
+      message: 'review_status=skipped 的方案必须填写 review_reason'
+    }];
+  }
+  return [];
+}
+
+// 方案自审核门（Q4 两层）：done 方案硬阻断，active 方案软告警。
+function checkPlanReview(targets) {
+  const issues = [];
+  let checked = 0;
+  for (const file of targets) {
+    if (!isPlanFile(file) || !fs.existsSync(file)) continue;
+    const state = planDirState(file);
+    if (state === null) continue;
+    checked++;
+    let text;
+    try { text = fs.readFileSync(file, 'utf8'); } catch (e) { continue; }
+    if (state === 'done') {
+      issues.push(...planDoneWithoutReview(file, text));
+    } else if (state === 'active') {
+      const status = planFmField(planFrontmatter(text), 'review_status').toLowerCase();
+      if (!['reviewed', 'skipped', 'not_reviewed'].includes(status)) {
+        issues.push({
+          file,
+          type: 'plan_active_missing_review_status',
+          severity: 'warning',
+          message: 'active 方案缺少 review_status（进入实现前应审至 reviewed|skipped）'
+        });
+      }
+    }
+  }
+  return { checked, issues };
+}
+
 function walkMd(dir) {
   const out = [];
   if (!fs.existsSync(dir)) return out;
@@ -960,6 +1047,7 @@ function showHelp() {
   node tools/js/doc_health_checker.js --mode quick|standard|deep
   node tools/js/doc_health_checker.js --check-file-paths | --check-code-samples | --check-dependencies
   node tools/js/doc_health_checker.js --check-required-sections | --check-template-residue | --check-run-record-integrity
+  node tools/js/doc_health_checker.js --check-plan-review
   node tools/js/doc_health_checker.js --full-check
   [--doc-dir DIR] [--output FILE] [--timeout SECONDS]
 `);
@@ -976,8 +1064,9 @@ function main() {
   const doRequired = !!(args.checkRequiredSections || args.fullCheck || args.mode === 'deep');
   const doResidue = !!(args.checkTemplateResidue || args.fullCheck || args.mode === 'deep');
   const doRunRecords = !!(args.checkRunRecordIntegrity || args.fullCheck || args.mode === 'deep');
+  const doPlanReview = !!(args.checkPlanReview || args.fullCheck || args.mode === 'deep' || args.file);
 
-  if (!(doPaths || doSamples || doDeps || doFm || doRequired || doResidue || doRunRecords)) {
+  if (!(doPaths || doSamples || doDeps || doFm || doRequired || doResidue || doRunRecords || doPlanReview)) {
     console.error('错误：请提供 --file / --mode / --check-* / --full-check 之一');
     process.exit(2);
   }
@@ -996,6 +1085,7 @@ function main() {
   if (doRequired) checks.required_sections = checkRequiredSections(targets);
   if (doResidue) checks.template_residue = checkTemplateResidue(targets);
   if (doRunRecords) checks.run_record_integrity = checkRunRecordIntegrity(targets);
+  if (doPlanReview) checks.plan_review = checkPlanReview(targets);
 
   const totalIssues = Object.values(checks).reduce((s, v) => s + v.issues.length, 0);
   const result = {

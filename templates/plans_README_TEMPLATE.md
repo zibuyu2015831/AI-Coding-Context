@@ -119,16 +119,28 @@ verified_at: 2026-05-29
 
 ## 📊 方案状态索引
 
+> **两轴状态**: 生命周期态（active/done/archive，由目录表示）与自审核态（`review_status`，frontmatter 子状态）正交。索引同时标注两者，便于一眼看出"已落 done 却未审"的违规项。`review_status` 取值 `not_reviewed | reviewed | skipped`，详见 `core/plan_review_protocol.md`。
+
 ### 🔵 Active
 
-_暂无_
+| 方案 | 类型 | review_status |
+| ---- | ---- | ------------- |
+| _暂无_ |    |               |
+
+<!-- 示例:
+- [2025-11-27_新增导出功能](./active/2025-11-27_feature_export.md) — feature — review_status: not_reviewed
+-->
 
 ### ✅ Done
 
-_暂无_
+> **硬规则**: 进入 `done/` 的方案 `review_status` 必须为 `reviewed` 或带理由的 `skipped`，否则 `doc_health_checker` 报 blocker。
+
+| 方案 | 类型 | review_status |
+| ---- | ---- | ------------- |
+| _暂无_ |    |               |
 
 <!-- 示例:
-- [2025-11-25_优化列表性能](./done/2025-11-25_perf_list-performance.md)
+- [2025-11-25_优化列表性能](./done/2025-11-25_perf_list-performance.md) — perf — review_status: reviewed
   - 已归档到: `knowledge/performance/list-virtualization.md`
 -->
 

@@ -112,6 +112,84 @@ def check_code_samples(files, issues):
     return deduction
 
 
+PLAN_REVIEW_OK = ("reviewed", "skipped")
+
+
+def _plan_frontmatter(text):
+    match = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
+    return match.group(1) if match else ""
+
+
+def _plan_fm_field(frontmatter, field):
+    match = re.search(r"(?m)^%s:\s*(.*)$" % re.escape(field), frontmatter)
+    return match.group(1).strip() if match else ""
+
+
+def _plan_dir_state(path):
+    """active|done|archive from plans/<state>/ directory membership, else None."""
+    parts = path.replace("\\", "/").split("/")
+    for i in range(len(parts) - 1):
+        if parts[i] == "plans" and parts[i + 1] in ("active", "done", "archive"):
+            return parts[i + 1]
+    return None
+
+
+def _is_plan_file(path):
+    base = os.path.basename(path)
+    return path.endswith(".md") and base.lower() != "readme.md"
+
+
+def plan_done_without_review(path, text=None):
+    """Blocker strings for a plan in plans/done/ lacking a recorded review.
+
+    done is judged by directory membership (not a frontmatter status). A plan
+    in plans/done/ must carry review_status reviewed, or skipped with a
+    review_reason. Reused by the commit gate so the rule has a single source.
+    Returns a list of english failure strings (empty == ok).
+    """
+    if not _is_plan_file(path) or _plan_dir_state(path) != "done":
+        return []
+    if text is None:
+        try:
+            text = open(path, "r", encoding="utf-8", errors="replace").read()
+        except OSError:
+            return []
+    frontmatter = _plan_frontmatter(text)
+    status = _plan_fm_field(frontmatter, "review_status").lower()
+    reason = _plan_fm_field(frontmatter, "review_reason")
+    rel = os.path.basename(path)
+    if status not in PLAN_REVIEW_OK:
+        return ["plan-review: %s is in plans/done/ but review_status is %s "
+                "(must be reviewed|skipped)" % (rel, status or "missing")]
+    if status == "skipped" and not reason:
+        return ["plan-review: %s skipped review without a review_reason" % rel]
+    return []
+
+
+def check_plan_review(files, issues):
+    """done plans hard-fail; active plans missing review_status soft-warn."""
+    deduction = 0
+    for path in files:
+        if not _is_plan_file(path):
+            continue
+        state = _plan_dir_state(path)
+        if state == "done":
+            for msg in plan_done_without_review(path):
+                issues.append(msg)
+                deduction = min(deduction + 10, 30)
+        elif state == "active":
+            try:
+                text = open(path, "r", encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            status = _plan_fm_field(_plan_frontmatter(text), "review_status").lower()
+            if status not in ("reviewed", "skipped", "not_reviewed"):
+                issues.append("plan-review: %s (active) is missing review_status"
+                              % os.path.basename(path))
+                deduction = min(deduction + 2, 10)
+    return deduction
+
+
 def health_snapshot(doc_dir, mode="quick"):
     """Importable entry point (used by the SessionStart hook and bin CLI)."""
     repo_root = os.path.dirname(os.path.abspath(doc_dir)) or "."
@@ -137,6 +215,7 @@ def health_snapshot(doc_dir, mode="quick"):
     fm_deduction, stale = check_frontmatter(files, repo_root, issues)
     score -= fm_deduction
     snapshot["stale_count"] = stale
+    score -= check_plan_review(files, issues)
     if mode in ("standard", "deep"):
         score -= check_links(files, repo_root, issues)
     if mode == "deep":

@@ -153,6 +153,7 @@ function runTests() {
     assert.ok(result.stdout.includes('--check-required-sections'));
     assert.ok(result.stdout.includes('--check-template-residue'));
     assert.ok(result.stdout.includes('--check-run-record-integrity'));
+    assert.ok(result.stdout.includes('--check-plan-review'));
   });
 
   test('required sections pass for complete main doc', () => {
@@ -571,6 +572,55 @@ export default defineConfig({
       const { result, payload } = runJson(['--doc-dir', devDocs, '--check-code-samples']);
       assert.strictEqual(result.status, 0);
       assert.deepStrictEqual(payload.checks.code_samples.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('plan in done/ without review is a blocker', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const done = path.join(devDocs, 'plans', 'done');
+      fs.mkdirSync(done, { recursive: true });
+      fs.writeFileSync(path.join(done, '2026-06-13_feature_x.md'),
+        '---\ntitle: x\nreview_status: not_reviewed\n---\n# x\n', 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-plan-review']);
+      assert.strictEqual(result.status, 1);
+      const issue = payload.checks.plan_review.issues.find((i) => i.type === 'plan_done_without_review');
+      assert.ok(issue && issue.severity === 'blocker');
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('plan in done/ reviewed passes; skipped needs reason', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const done = path.join(devDocs, 'plans', 'done');
+      fs.mkdirSync(done, { recursive: true });
+      fs.writeFileSync(path.join(done, '2026-06-13_feature_ok.md'),
+        '---\ntitle: ok\nreview_status: reviewed\n---\n# ok\n', 'utf8');
+      fs.writeFileSync(path.join(done, '2026-06-13_feature_skip.md'),
+        '---\ntitle: s\nreview_status: skipped\nreview_reason: trivial typo fix\n---\n# s\n', 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-plan-review']);
+      assert.strictEqual(result.status, 0);
+      assert.deepStrictEqual(payload.checks.plan_review.issues, []);
+    } finally {
+      cleanup(base);
+    }
+  });
+
+  test('active plan missing review_status is a warning, not a blocker', () => {
+    const { base, devDocs } = makeTempDevDocs();
+    try {
+      const active = path.join(devDocs, 'plans', 'active');
+      fs.mkdirSync(active, { recursive: true });
+      fs.writeFileSync(path.join(active, '2026-06-13_feature_a.md'),
+        '---\ntitle: a\n---\n# a\n', 'utf8');
+      const { result, payload } = runJson(['--doc-dir', devDocs, '--check-plan-review']);
+      assert.strictEqual(result.status, 1);
+      const issue = payload.checks.plan_review.issues.find((i) => i.type === 'plan_active_missing_review_status');
+      assert.ok(issue && issue.severity === 'warning');
     } finally {
       cleanup(base);
     }

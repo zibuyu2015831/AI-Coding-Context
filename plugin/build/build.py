@@ -211,6 +211,8 @@ SKILL_SOURCES = {
                       "workflows/review_standards/bugfix_review_standard.md",
                       "workflows/review_standards/refactor_review_standard.md",
                       "workflows/review_standards/doc_review_standard.md"],
+    "plan-review": ["core/plan_review_protocol.md", "workflows/review-workflow.md",
+                    "templates/PLAN_TEMPLATE.md"],
     "adr": ["dev/architecture/adr-template.md", "workflows/decision_workflow.md"],
     "doc-fallacy-fix": ["workflows/doc_error_fix_workflow.md",
                         "agents/workflows/error_detector.md",

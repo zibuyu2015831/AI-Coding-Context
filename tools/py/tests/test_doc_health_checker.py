@@ -189,6 +189,7 @@ class TestDocHealthCheckerCLI(unittest.TestCase):
         self.assertIn("--check-required-sections", result.stdout)
         self.assertIn("--check-template-residue", result.stdout)
         self.assertIn("--check-run-record-integrity", result.stdout)
+        self.assertIn("--check-plan-review", result.stdout)
 
     def test_required_sections_passes_for_complete_main_doc(self):
         self._write_valid_bundle()
@@ -729,6 +730,51 @@ export default defineConfig({});
         self.assertEqual(payload["checks"]["code_samples"]["issues"], [])
 
 
+    def _write_done_plan(self, name, frontmatter):
+        done = self.dev_docs / "plans" / "done"
+        done.mkdir(parents=True, exist_ok=True)
+        (done / name).write_text("---\n%s\n---\n# %s\n" % (frontmatter, name), encoding="utf-8")
+
+    def test_plan_done_without_review_is_blocker(self):
+        self._write_done_plan("2026-06-13_feature_x.md", "title: x\nreview_status: not_reviewed")
+        result, payload = _run_json([
+            "python3", str(PY_CHECKER), "--doc-dir", str(self.dev_docs), "--check-plan-review",
+        ])
+        self.assertEqual(result.returncode, 1, payload)
+        issues = payload["checks"]["plan_review"]["issues"]
+        match = [i for i in issues if i["type"] == "plan_done_without_review"]
+        self.assertTrue(match and match[0]["severity"] == "blocker", payload)
+
+    def test_plan_done_reviewed_passes_and_skipped_needs_reason(self):
+        self._write_done_plan("2026-06-13_feature_ok.md", "title: ok\nreview_status: reviewed")
+        self._write_done_plan("2026-06-13_feature_s.md", "title: s\nreview_status: skipped\nreview_reason: trivial typo fix")
+        result, payload = _run_json([
+            "python3", str(PY_CHECKER), "--doc-dir", str(self.dev_docs), "--check-plan-review",
+        ])
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertEqual(payload["checks"]["plan_review"]["issues"], [])
+
+    def test_plan_skipped_without_reason_is_blocker(self):
+        self._write_done_plan("2026-06-13_feature_s.md", "title: s\nreview_status: skipped\nreview_reason:")
+        result, payload = _run_json([
+            "python3", str(PY_CHECKER), "--doc-dir", str(self.dev_docs), "--check-plan-review",
+        ])
+        self.assertEqual(result.returncode, 1, payload)
+        issues = payload["checks"]["plan_review"]["issues"]
+        self.assertTrue(any(i["type"] == "plan_skipped_without_reason" for i in issues), payload)
+
+    def test_active_plan_missing_review_status_is_warning(self):
+        active = self.dev_docs / "plans" / "active"
+        active.mkdir(parents=True, exist_ok=True)
+        (active / "2026-06-13_feature_a.md").write_text("---\ntitle: a\n---\n# a\n", encoding="utf-8")
+        result, payload = _run_json([
+            "python3", str(PY_CHECKER), "--doc-dir", str(self.dev_docs), "--check-plan-review",
+        ])
+        issues = payload["checks"]["plan_review"]["issues"]
+        match = [i for i in issues if i["type"] == "plan_active_missing_review_status"]
+        self.assertTrue(match and match[0]["severity"] == "warning", payload)
+
+
 class TestDocHealthCheckerJSSmoke(unittest.TestCase):
     def test_help_mentions_new_checks_js(self):
         result = subprocess.run(
@@ -742,6 +788,7 @@ class TestDocHealthCheckerJSSmoke(unittest.TestCase):
         self.assertIn("--check-required-sections", result.stdout)
         self.assertIn("--check-template-residue", result.stdout)
         self.assertIn("--check-run-record-integrity", result.stdout)
+        self.assertIn("--check-plan-review", result.stdout)
 
 
 if __name__ == "__main__":

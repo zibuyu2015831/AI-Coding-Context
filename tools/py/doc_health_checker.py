@@ -1052,6 +1052,98 @@ def check_run_record_integrity(targets):
     return {"checked": checked, "issues": issues}
 
 
+PLAN_REVIEW_OK = ("reviewed", "skipped")
+
+
+def _plan_frontmatter(text):
+    match = re.match(r"^---\s*\n(.*?)\n---", text, flags=re.DOTALL)
+    return match.group(1) if match else ""
+
+
+def _plan_fm_field(frontmatter, field):
+    match = re.search(r"(?m)^%s:\s*(.*)$" % re.escape(field), frontmatter)
+    return match.group(1).strip() if match else ""
+
+
+def _plan_dir_state(path):
+    """active|done|archive based on plans/<state>/ directory membership, else None."""
+    parts = Path(path).parts
+    for idx, part in enumerate(parts[:-1]):
+        if part == "plans" and idx + 1 < len(parts):
+            nxt = parts[idx + 1]
+            if nxt in ("active", "done", "archive"):
+                return nxt
+    return None
+
+
+def _is_plan_file(path):
+    p = Path(path)
+    return p.suffix == ".md" and p.name.lower() != "readme.md"
+
+
+def plan_done_without_review(path, text=None):
+    """Blocker check for a single plan that sits in plans/done/.
+
+    done 态以目录成员身份判定（不依赖 frontmatter status）。位于 plans/done/
+    的方案，其 review_status 必须为 reviewed，或带 review_reason 的 skipped。
+    返回 issue dict 列表（空 == 合规）。供 pre_commit_gate 等 hook 复用同一判定，
+    避免在别处另写平行正则。
+    """
+    if not _is_plan_file(path) or _plan_dir_state(path) != "done":
+        return []
+    if text is None:
+        try:
+            text = Path(path).read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            return []
+    frontmatter = _plan_frontmatter(text)
+    status = _plan_fm_field(frontmatter, "review_status").lower()
+    reason = _plan_fm_field(frontmatter, "review_reason")
+    if status not in PLAN_REVIEW_OK:
+        return [{
+            "file": str(path),
+            "type": "plan_done_without_review",
+            "severity": "blocker",
+            "review_status": status or "missing",
+            "message": "位于 plans/done/ 的方案 review_status 必须为 reviewed 或带理由的 skipped",
+        }]
+    if status == "skipped" and not reason:
+        return [{
+            "file": str(path),
+            "type": "plan_skipped_without_reason",
+            "severity": "blocker",
+            "message": "review_status=skipped 的方案必须填写 review_reason",
+        }]
+    return []
+
+
+def check_plan_review(targets):
+    """方案自审核门（Q4 两层）：done 方案硬阻断，active 方案软告警。"""
+    issues = []
+    checked = 0
+    for f in targets:
+        path = Path(f)
+        if not _is_plan_file(path) or not path.exists():
+            continue
+        state = _plan_dir_state(path)
+        if state is None:
+            continue
+        checked += 1
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        if state == "done":
+            issues.extend(plan_done_without_review(path, text))
+        elif state == "active":
+            status = _plan_fm_field(_plan_frontmatter(text), "review_status").lower()
+            if status not in ("reviewed", "skipped", "not_reviewed"):
+                issues.append({
+                    "file": str(path),
+                    "type": "plan_active_missing_review_status",
+                    "severity": "warning",
+                    "message": "active 方案缺少 review_status（进入实现前应审至 reviewed|skipped）",
+                })
+    return {"checked": checked, "issues": issues}
+
+
 def _collect_targets(args):
     """根据 --file / --doc-dir 决定检查目标。
 
@@ -1083,6 +1175,7 @@ def main():
     p.add_argument("--check-required-sections", action="store_true")
     p.add_argument("--check-template-residue", action="store_true")
     p.add_argument("--check-run-record-integrity", action="store_true")
+    p.add_argument("--check-plan-review", action="store_true", help="方案自审核门（done 硬阻断 / active 软告警）")
     p.add_argument("--full-check", action="store_true", help="综合检查（mode deep × 全文档目录）")
     p.add_argument("--doc-dir", help="文档目录（默认 dev_docs/）")
     p.add_argument("--output", help="JSON 输出文件")
@@ -1097,8 +1190,9 @@ def main():
     do_required = bool(args.check_required_sections or args.full_check or args.mode == "deep")
     do_residue = bool(args.check_template_residue or args.full_check or args.mode == "deep")
     do_run_records = bool(args.check_run_record_integrity or args.full_check or args.mode == "deep")
+    do_plan_review = bool(args.check_plan_review or args.full_check or args.mode == "deep" or args.file)
 
-    if not any([do_paths, do_samples, do_deps, do_fm, do_required, do_residue, do_run_records]):
+    if not any([do_paths, do_samples, do_deps, do_fm, do_required, do_residue, do_run_records, do_plan_review]):
         p.error("请提供 --file / --mode / --check-* / --full-check 之一")
 
     targets = _collect_targets(args)
@@ -1121,6 +1215,8 @@ def main():
         checks["template_residue"] = check_template_residue(targets)
     if do_run_records:
         checks["run_record_integrity"] = check_run_record_integrity(targets)
+    if do_plan_review:
+        checks["plan_review"] = check_plan_review(targets)
 
     total_issues = sum(len(v["issues"]) for v in checks.values())
     summary = {

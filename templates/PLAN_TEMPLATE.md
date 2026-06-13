@@ -3,9 +3,12 @@ title: 实施方案模板
 summary: 提供功能开发、Bug 修复或性能优化等场景的统一方案模板，用于记录类型、生命周期状态、背景、技术选型、实施步骤和验证计划。
 keywords: template | implementation-plan | bugfix | feature | aicc
 scope: 单个功能或 Bug 的方案模板
-related_files: 无
+related_files: core/plan_review_protocol.md
 dependencies: 无
-verified_at: 2026-05-29
+verified_at: 2026-06-13
+review_status: not_reviewed
+review_rounds: 0
+review_reason:
 ---
 
 # [功能/Bug] 简短标题
@@ -131,6 +134,38 @@ npm run test
 1. ...
 2. ...
 ```
+
+---
+
+## 🔍 方案自审核记录
+
+> **用途**: 进入实现前的方案自审核留痕（协议见 `ai_coding_context/core/plan_review_protocol.md`）。
+> **门禁分离**: `review_status: reviewed` 表示"已审核"，**不等于**用户已批准实现——后者仍需用户确认。
+> **触发分级**: trivial/simple 可 `skipped`（须填理由）；medium 单轮；complex/critical 双轮；触及高风险面（auth/payment/data-schema/migration/external-API/privacy-secrets/concurrency/breaking-change）任一面即强制至少单轮。
+> **怎么审**: 委派互审引擎 `workflows/review-workflow.md` 与 `workflows/review_standards/`。
+
+- **审核日期**: YYYY-MM-DD
+- **审核方式 / 轮次**: [skip / 单轮 / 双轮]，`review_rounds` = [0/1/2]
+- **是否隔离审查**: [是 / 否]；未隔离原因: [如有]
+- **复杂度 / 触及高风险面**: [trivial…critical]；[列出触及的高风险面，或"无"]
+
+### 发现摘要（按严重度）
+
+| 编号 | 问题 | 证据 | 影响 | 建议修改 | 是否阻塞 |
+| ---- | ---- | ---- | ---- | -------- | -------- |
+| P0-1 |      |      |      |          | 是       |
+| P1-1 |      |      |      |          | 否       |
+
+### 写回与路由
+
+- **已写回方案的修改**: [本次审核直接改动了方案的哪些部分]
+- **路由到 memos/ 的未来想法**: [属"未来能力"的发现，链接到 memo，不塞进当前实施步骤]
+- **仍需用户确认项**: [需用户拍板的开放问题]
+
+### 结论
+
+- **review_status**: [not_reviewed / reviewed / skipped]
+- **是否允许进入实现**: [是 / 否 / 待用户确认]
 
 ---
 
