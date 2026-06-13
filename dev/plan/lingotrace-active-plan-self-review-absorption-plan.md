@@ -6,7 +6,7 @@ scope: AI-Coding-Context 框架 plans/ 子系统的方案审核能力演进
 related_files: core/framework_spec.md | workflows/review-workflow.md | workflows/review_standards | templates/PLAN_TEMPLATE.md | templates/plans_README_TEMPLATE.md | templates/review/review_plan_TEMPLATE.md | agents/runtime/plan_reviewer.md
 dependencies: dev/plan/done/aicc-generation-plan-review-process-gap-plan.md | dev/plan/done/aicc-phase1-review-gate-implementation-plan.md | dev/plan/done/aicc-phase1-review-gate-followup-plan.md
 verified_at: 2026-06-13
-status: proposed（提案，待决策）
+status: proposed（开放问题已定案，待转可执行实施计划，2026-06-13）
 ---
 
 # LingoTrace 方案自审核协议吸收分析与决策记录
@@ -137,8 +137,9 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 不新增竞争性评审系统，而是把可泛化内核分散嵌入现有资产：
 
 ### 7.1 新增审核对象语义层（核心）
-- 可选新增 `core/plan_review_protocol.md`，**只定义**：审核对象（单个落盘 active plan）、寻址（`<PLAN_PATH>`）、可重入语义、两门禁分离、写回要求、未来想法路由。
+- **新增 `core/plan_review_protocol.md`（Q2 已定案）**，定位为横跨 `plans/` 与 `_analysis/` 的**统一薄层**，**只定义**：审核对象（单个落盘方案产物——含日常 active plan 与 Phase 1 `_analysis` 三件套两个实例）、寻址（`<PLAN_PATH>`）、可重入语义、两门禁分离、写回要求、未来想法路由。
 - 「怎么审」一律指向 `workflows/review-workflow.md`（打分 / 维度 / auto-fix）与 `workflows/review_standards/`，避免重复造引擎。
+- `framework_spec.md` 的 plans/ 章节仅补**一行指针 + 一条硬规则**（`done` 方案 `review_status` 必须为 `reviewed|skipped(理由)`，见 §7.3 / Q4），不在该节展开协议正文，避免「目录规范」膨胀成「评审协议」。
 
 ### 7.2 方案模板
 - `templates/PLAN_TEMPLATE.md` frontmatter 增字段：`review_status: not_reviewed | reviewed | skipped`、`review_rounds`、`review_reason`。
@@ -146,7 +147,8 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 
 ### 7.3 框架规范
 - `core/framework_spec.md` 的 `plans/` 章节增状态规则：「active 内方案进入实现前，`review_status` 必须为 `reviewed`，或带理由的 `skipped`」。
-- **绑定复杂度层级**（复用既有复杂度评估）：trivial / simple → 允许 `skipped`（记录理由）；medium → 单轮；complex / critical → 双轮。
+- **复杂度分级 + 高风险面叠加触发（Q1 已定案）**：**复杂度决定深度**——trivial / simple → 允许 `skipped`（记录理由）；medium → 单轮；complex / critical → 双轮。**高风险面清单**（auth / payment / data-schema / migration / external-API / privacy-secrets / concurrency / breaking-change，复用 §7.5）**决定开关**——任何复杂度只要触面即强制至少单轮，不得 `skipped`。
+- **工具阻断分两层（Q4 已定案）**：`done` 方案 `review_status` 非 `reviewed|skipped(理由)` 由 `doc_health_checker`（Python/JS 双实现）**硬阻断**（新增 issue `plan_done_without_review`，severity=blocker）；「进入实现」无法被静态检查器拦截，改由入口/工作流路由**流程硬约束** + 检查器对事后可观测后果（已实现/已 done 却无复查记录）**软告警**。无 `review_status` 的历史方案给 info/warning（除非此刻被移入 done），复用 generation_plan 门已建的 severity 分层。
 - 明确「`reviewed` ≠ 用户已批准实现」两门禁分离。
 
 ### 7.4 路由与索引
@@ -180,36 +182,38 @@ LingoTrace 协议 §8 已自洽地给出三段顺序（实现前方案自审 →
 
 ## 10. 与既有计划的关系
 
-- `aicc-generation-plan-review-process-gap-plan.md`：同源同构——都是「用户短指令发起对既有落盘方案的复查」缺口；前者对象是 Phase 1 `_analysis` 产物，本方案对象是日常 `plans/active/` 方案。实现时应统一路由与回写格式，避免两套并行。
+- `aicc-generation-plan-review-process-gap-plan.md`：同源同构——都是「用户短指令发起对既有落盘方案的复查」缺口；前者对象是 Phase 1 `_analysis` 产物，本方案对象是日常 `plans/active/` 方案。**Q3 已定案：共用抽象脊柱 + 对象 profile 参数化**——复用该门已落地的脊柱（寻址 → 机器检查 → 人工语义复查 → 持久化 `review_status` → 写回 → severity 阻断），以两个 profile（Phase 1 三件套 / daily-plan 单文件）参数化对象差异，共享路由词汇/写回格式/证据字段/severity/双实现纪律；daily-plan 门新增**平行 `plan_review_*` issue 家族**，靠对象探测（`_analysis/` vs `plans/active/`）分派，不重载 `phase1_*` 名字。即本方案作为该已落地门的**扩展**实现，而非平行再造，避免两套并行。
 - `aicc-phase1-review-gate-implementation-plan.md` / `aicc-phase1-review-gate-followup-plan.md`：审核门落地与回写经验可直接复用到本方案的 `review_status` 门禁与写回块设计。
 
 ---
 
-## 11. 开放问题（待决策）
+## 11. 关键决策（原开放问题，2026-06-13 已定案）
 
-1. **默认开启策略**：是「按复杂度分级开启」（推荐）还是「全局强制」？直接决定 PLAN_TEMPLATE 与 framework_spec 的默认值。
-2. **是否新增 `core/plan_review_protocol.md`**，还是把语义层折叠进 `framework_spec.md` plans/ 章节 + review-workflow.md？
-3. **与 generation_plan 复查缺口的合并程度**：共用一套「落盘方案复查」流程，还是各自独立、仅共享回写格式？
-4. **工具阻断**：`review_status != reviewed` 时是否由 `tools/py/*` 检查器阻断「进入实现 / 移入 done」？
+> 原四个开放问题已由用户**采纳架构师推荐方案**并定案。以下为决策结论，完整依据见 §11.1，落地点见 §7、§10。
 
-## 11.1 架构师推荐方案（待用户确认，2026-06-13）
+1. **默认开启策略 → 复杂度分级 + 高风险面叠加触发**（不采用全局强制）。落入 PLAN_TEMPLATE 与 framework_spec 默认值（§7.3）。
+2. **语义层落点 → 新增 `core/plan_review_protocol.md`**，定位为横跨 `plans/` 与 `_analysis/` 的统一薄层；framework_spec plans/ 章节仅补指针 + 硬规则（§7.1）。
+3. **与 generation_plan 复查缺口 → 共用抽象脊柱 + 对象 profile 参数化**，作为已落地 Phase 1 门的扩展，新增平行 `plan_review_*` issue 家族（§10）。
+4. **工具阻断 → 分两层**：`done` 方案 `review_status` 非 `reviewed|skipped(理由)` 由 `doc_health_checker` 硬阻断；「进入实现」走流程门 + 事后软告警（§7.3）。
 
-> 以下为站在 AICC 定位（「让 AI 在陌生代码库中稳定获得可验证上下文」的分层轻量框架）与既有事实（**generation_plan 复查门已落地并验证**，见 §10）之上对 §11 的推荐。四问非并列：**Q1、Q3 为承重决策，Q2、Q4 由其收敛**；全部应作为已发 Phase 1 门的**扩展**实现，而非另起一套。
+## 11.1 决策依据（2026-06-13 采纳）
 
-**Q1 — 推荐「复杂度分级 + 高风险面叠加触发」。** LingoTrace 默认全局强审，是因为它是单一高风险 App（隐私/支付/本地优先），整项目都在北极星射程内；AICC 服务多项目类型，全局强制违背分层轻量，且会让 `Reviewed` 退化为橡皮图章。细化方案 §7.3：**复杂度决定深度**（medium 单轮 / complex·critical 双轮），**高风险面清单**（auth / payment / data-schema / migration / external-API / privacy-secrets / concurrency / breaking-change）**决定开关**——任何复杂度只要触面即强制至少单轮；trivial/simple 不触面则默认 `skipped(理由)`。此举复现了 LingoTrace 全局强制背后的真实动机，又复用互审引擎既有的复杂度评分（0–30 skip / 31–65 standard / 66–100 deep）。
+> 以下为站在 AICC 定位（「让 AI 在陌生代码库中稳定获得可验证上下文」的分层轻量框架）与既有事实（**generation_plan 复查门已落地并验证**，见 §10）之上对 §11 的决策依据。四问非并列：**Q1、Q3 为承重决策，Q2、Q4 由其收敛**；全部作为已发 Phase 1 门的**扩展**实现，而非另起一套。
 
-**Q2 — 推荐新建 `core/plan_review_protocol.md`，但定位为横跨 `plans/` 与 `_analysis/` 的统一薄层。** 折叠进 framework_spec plans/ 章节会让「目录规范」膨胀成「评审协议」（混轴）；折叠进 review-workflow 则与引擎正交。关键：新对象天然横跨两个子系统——日常 active plan 与 Phase 1 `_analysis` 三件套是**同一模式的两个实例**，故协议不应只住在 plans/ 章节。该文档**只定义**对象/寻址（`<PLAN_PATH>`）/重入/两门禁分离/写回/想法路由→`memos/`；「怎么审」一律指向 review-workflow.md。framework_spec plans/ 章节仅补一行指针 + 一条硬规则（done 必须 reviewed）。此选择顺手统一了 Q3 的落点。
+**Q1 — 决策「复杂度分级 + 高风险面叠加触发」。** LingoTrace 默认全局强审，是因为它是单一高风险 App（隐私/支付/本地优先），整项目都在北极星射程内；AICC 服务多项目类型，全局强制违背分层轻量，且会让 `Reviewed` 退化为橡皮图章。细化方案 §7.3：**复杂度决定深度**（medium 单轮 / complex·critical 双轮），**高风险面清单**（auth / payment / data-schema / migration / external-API / privacy-secrets / concurrency / breaking-change）**决定开关**——任何复杂度只要触面即强制至少单轮；trivial/simple 不触面则默认 `skipped(理由)`。此举复现了 LingoTrace 全局强制背后的真实动机，又复用互审引擎既有的复杂度评分（0–30 skip / 31–65 standard / 66–100 deep）。
 
-**Q3 — 推荐「共用抽象脊柱 + 对象 profile 参数化」，不各自独立、也不强压成一套字面流程。** generation_plan 门**已建成**（routing / 复查证据包 / run_record_contract 字段 / `phase1_*` issue 家族 / severity 分层），故新对象应复用其脊柱：寻址→机器检查（复用 doc_health/semantic checker）→人工语义复查→持久化 review_status→写回→severity 阻断。两个 profile：Phase 1（三件套一致性、三文件权责、已发 `phase1_*` 规则）与 daily-plan（单文件、`review_status` frontmatter、两门禁）。共享路由词汇/写回格式/证据字段命名/severity/双实现纪律。**实现要点**：daily-plan 门新增**平行 issue 家族**（如 `plan_review_*`），靠对象探测（`_analysis/` vs `plans/active/`）分派，**不重载 `phase1_*` 名字**。即把已发的 Phase 1 门当样板扩展，消除 §10「两套并行」之虑。
+**Q2 — 决策新建 `core/plan_review_protocol.md`，定位为横跨 `plans/` 与 `_analysis/` 的统一薄层。** 折叠进 framework_spec plans/ 章节会让「目录规范」膨胀成「评审协议」（混轴）；折叠进 review-workflow 则与引擎正交。关键：新对象天然横跨两个子系统——日常 active plan 与 Phase 1 `_analysis` 三件套是**同一模式的两个实例**，故协议不应只住在 plans/ 章节。该文档**只定义**对象/寻址（`<PLAN_PATH>`）/重入/两门禁分离/写回/想法路由→`memos/`；「怎么审」一律指向 review-workflow.md。framework_spec plans/ 章节仅补一行指针 + 一条硬规则（done 必须 reviewed）。此选择顺手统一了 Q3 的落点。
 
-**Q4 — 推荐「是，但分两层落点」。** 校正开放问题的隐含前提：检查器是对文档树的静态 linter，**拦不住「AI 开始写代码」这一运行时动作**，能可靠阻断的只有磁盘不变量。① **移入 done → 工具硬阻断**：新增 `plan_done_without_review`，`status: done` 而 `review_status` 非 `reviewed|skipped(理由)` → blocker，放进 `doc_health_checker`（已管 frontmatter/status 一致性），Python/JS 双实现。② **进入实现 → 流程硬约束 + 工具软告警**：硬门在入口/工作流路由，检查器只对事后可观测后果（已实现/已 done 却无复查记录）告警，预实现阶段最多 warning。③ **兼容层**复用 §G 已建的 severity 分层：无 `review_status` 的历史方案给 info/warning（除非此刻被移入 done），trivial `skipped(理由)` 放行，Py/Node 单运行时两实现结论须一致。
+**Q3 — 决策「共用抽象脊柱 + 对象 profile 参数化」，不各自独立、也不强压成一套字面流程。** generation_plan 门**已建成**（routing / 复查证据包 / run_record_contract 字段 / `phase1_*` issue 家族 / severity 分层），故新对象应复用其脊柱：寻址→机器检查（复用 doc_health/semantic checker）→人工语义复查→持久化 review_status→写回→severity 阻断。两个 profile：Phase 1（三件套一致性、三文件权责、已发 `phase1_*` 规则）与 daily-plan（单文件、`review_status` frontmatter、两门禁）。共享路由词汇/写回格式/证据字段命名/severity/双实现纪律。**实现要点**：daily-plan 门新增**平行 issue 家族**（如 `plan_review_*`），靠对象探测（`_analysis/` vs `plans/active/`）分派，**不重载 `phase1_*` 名字**。即把已发的 Phase 1 门当样板扩展，消除 §10「两套并行」之虑。
 
-**一句话汇总**：Q1 分级+风险面触发；Q2 统一薄层协议文档；Q3 统一脊柱+双 profile；Q4 done 硬阻断、进入实现走流程门+软告警。承重次序：先定 Q1、Q3 → Q2、Q4 收敛 → 全部作为已发 generation_plan 门的扩展落地。
+**Q4 — 决策「是，但分两层落点」。** 校正开放问题的隐含前提：检查器是对文档树的静态 linter，**拦不住「AI 开始写代码」这一运行时动作**，能可靠阻断的只有磁盘不变量。① **移入 done → 工具硬阻断**：新增 `plan_done_without_review`，`status: done` 而 `review_status` 非 `reviewed|skipped(理由)` → blocker，放进 `doc_health_checker`（已管 frontmatter/status 一致性），Python/JS 双实现。② **进入实现 → 流程硬约束 + 工具软告警**：硬门在入口/工作流路由，检查器只对事后可观测后果（已实现/已 done 却无复查记录）告警，预实现阶段最多 warning。③ **兼容层**复用 §G 已建的 severity 分层：无 `review_status` 的历史方案给 info/warning（除非此刻被移入 done），trivial `skipped(理由)` 放行，Py/Node 单运行时两实现结论须一致。
+
+**一句话汇总**：Q1 分级+风险面触发；Q2 统一薄层协议文档；Q3 统一脊柱+双 profile；Q4 done 硬阻断、进入实现走流程门+软告警。承重次序：Q1、Q3 已承重定案 → Q2、Q4 随之收敛 → 全部作为已发 generation_plan 门的扩展落地（详见 §7 各落点）。
 
 ---
 
 ## 12. 下一步
 
-- [ ] 就 §11 开放问题（尤其问题 1、3）与用户确认。
-- [ ] 确认后，将本分析转化为可执行实施计划（精确到 §7 各落点的 diff 设计与验证命令）。
-- [ ] 在 `dev/plan/README.md` 索引登记本文档（随本次提交完成）。
+- [x] 就 §11 开放问题与用户确认 —— 2026-06-13 用户采纳架构师推荐方案，四问全部定案（见 §11 / §11.1）。
+- [ ] 将本分析转化为可执行实施计划（精确到 §7 各落点的 diff 设计与验证命令），作为已落地 generation_plan 门的**扩展**实现：`core/plan_review_protocol.md`（统一薄层）+ framework_spec plans/ 指针与硬规则 + PLAN_TEMPLATE/plans_README_TEMPLATE 增 `review_status` 字段 + `doc_health_checker` 新增 `plan_done_without_review`（Python/JS 双实现 + fixture）+ 入口/工作流路由的流程门。
+- [x] 在 `dev/plan/README.md` 索引登记本文档。
