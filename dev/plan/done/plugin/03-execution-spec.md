@@ -11,6 +11,8 @@ status: done（已实施）
 
 # AICC Plugin Build — Execution Spec
 
+> **⚠️ 2026-06-13 premise correction**: §7's "advisory — Codex has no hooks" and the P4 acceptance "advisory degradation noted" are obsolete. Codex (>= v0.117) added lifecycle hooks isomorphic to Claude Code's, so `codex_projection.py` now ALSO emits an installable `.codex/` enforcement bundle (hooks.json + hook scripts + deps); P4 acceptance is now "the `.codex/` bundle enforces" (see `plugin/build/test_codex_projection.py`). Full alignment: [Codex hook convergence plan](../../codex-hook-convergence-delivery-form-alignment-plan.md). Body preserved as historical record.
+
 > **Audience**: the Claude Code `/goal` session that builds the plugin in one run.
 > **This file is the blueprint.** Rationale lives in `README.md` / `01` / `02`; do not re-derive it — execute this.
 > **Everything you generate is English.** The planning docs may be Chinese; your output (every file under `plugin/`, every description, comment, message, README) MUST be English (decision D5).

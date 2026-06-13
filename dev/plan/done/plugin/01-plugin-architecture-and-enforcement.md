@@ -11,6 +11,8 @@ status: done（已实施）
 
 # AICC Plugin 架构与强制执行层设计
 
+> **⚠️ 2026-06-13 前提更正**：§3.4 的"Codex **无 hooks 机制**、强制层退化为建议级"已被推翻——Codex v0.117 已支持与 Claude Code 同构的 lifecycle hooks，`codex_projection.py` 现产出可安装的 `.codex/` 强制包，commit 门禁 / 危险 Git 拦截在 Codex 获 enforcement parity。§3.4 的"降级矩阵"应读作"收敛矩阵"。完整对齐见 [Codex hook 机制收敛方案](../../codex-hook-convergence-delivery-form-alignment-plan.md)。正文保留历史原貌。
+
 > 本文是本方案的技术核心（设计/理由层）。**逐文件的执行蓝图见 `./03-execution-spec.md`（英文）。** 约定：11-skill 的语义映射沿用 `../skill-migration/02-component-mapping.md`，本文只写其增量与官方机制核验后的修正，不重复。
 >
 > **语言强制（D5）**：本文为中文规划稿；但**一切 plugin 产物（plugin.json description、SKILL.md、references、hooks 注释与消息、bin 帮助、plugin README）必须为英文**。下文出现的中文仅为设计说明，落地时全部以英文实现。

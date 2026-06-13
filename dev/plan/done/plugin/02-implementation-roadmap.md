@@ -11,6 +11,8 @@ status: done（已实施）
 
 # AICC Plugin 化实施路线图（迁移即收敛）
 
+> **⚠️ 2026-06-13 前提更正**：P4 行（L54）"hooks 退化为 body 内建议"与风险表（L71）"Codex 无 hooks，强制层不可用"已被推翻——Codex v0.117 支持同构 hooks，P4 投影现产出可安装的 `.codex/` 强制包而非顾问降级。完整对齐见 [Codex hook 机制收敛方案](../../codex-hook-convergence-delivery-form-alignment-plan.md)。正文保留历史原貌。
+
 > 本路线图**不复制** skill-migration `03-implementation-roadmap.md` 的 8 阶段细节，而是叠加两个新约束：**①每阶段强制耦合“收敛动作”；②Phase 0 因 Q1–Q5 已答而收敛为冒烟测试。**
 
 > **用于一次性 `/goal` 执行**：下列阶段**不是 7.5 人月的人工排期，而是单次 goal 会话应遵循的「构建顺序 + 检查点」**。执行者按 P0→P5 顺序推进，**每完成一个阶段做一次 checkpoint commit**（含该阶段验收自检），失败则在本阶段内自我修复后再进入下一阶段。逐文件的“构建什么”见 `./03-execution-spec.md`（英文蓝图）。
